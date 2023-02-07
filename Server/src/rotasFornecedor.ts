@@ -81,7 +81,7 @@ export async function rotasFornecedor(app: FastifyInstance) {
             JOIN enderecos_fornecedor EF
                 ON F.id = EF.id_fornecedor
         `
-        return listaDeFornecedores
+        return listaDeFornecedores;
     });
     app.get('/buscarFornecedorNome/:razaoSocial', async (request, response) => {
         const nomeFornecedor = z.object({
@@ -96,7 +96,7 @@ export async function rotasFornecedor(app: FastifyInstance) {
                 FROM fornecedores
                 WHERE razaoSocial = ${razaoSocial}
             `
-            if(!fornecedor || Object.values(fornecedor).length === 0){
+            if (!fornecedor || Object.values(fornecedor).length === 0) {
                 response.status(404).send(JSON.stringify({
                     mensagem: 'Não foi possível encontrar o fornecedor'
                 }));
@@ -113,14 +113,14 @@ export async function rotasFornecedor(app: FastifyInstance) {
             id: z.string()
         });
         const { id } = idFornecedor.parse(request.params);
-        
+
         try {
             const fornecedor = await prisma.$queryRaw`
                 SELECT * 
                 FROM fornecedores 
                 WHERE id = ${Number(id)}
             `
-            if(!fornecedor || Object.values(fornecedor).length === 0){
+            if (!fornecedor || Object.values(fornecedor).length === 0) {
                 response.status(404).send(JSON.stringify({
                     mensagem: 'Não foi possível encontrar o fornecedor'
                 }));
@@ -132,7 +132,7 @@ export async function rotasFornecedor(app: FastifyInstance) {
             }));
         }
     });
-    app.get('/buscarEnderecoFornecedor/:id', async (request, response) =>{
+    app.get('/buscarEnderecoFornecedor/:id', async (request, response) => {
         const idEndereco = z.object({
             id: z.string()
         });
@@ -144,7 +144,7 @@ export async function rotasFornecedor(app: FastifyInstance) {
                 FROM enderecos_fornecedor
                 WHERE id = ${Number(id)}
             `
-            if(!endereco || Object.values(endereco).length === 0){
+            if (!endereco || Object.values(endereco).length === 0) {
                 response.status(404).send(JSON.stringify({
                     mensagem: 'Não foi possível encontrar o endereço do fornecedor'
                 }));
@@ -188,7 +188,7 @@ export async function rotasFornecedor(app: FastifyInstance) {
                     cnpj: cnpj
                 }
             });
-            if(!validarId || Object.values(validarId).length === 0){
+            if (!validarId || Object.values(validarId).length === 0) {
                 response.status(404).send(JSON.stringify({
                     mensagem: 'Não foi possível encontrar o fornecedor'
                 }));
@@ -213,20 +213,40 @@ export async function rotasFornecedor(app: FastifyInstance) {
             }));
         }
     });
-    app.delete('/excluirFornecedor/:id', async (request) => {
+    app.delete('/excluirFornecedor', async (request, response) => {
         const idFornecedor = z.object({
             id: z.number()
         });
         const { id } = idFornecedor.parse(request.body);
         const validarId = await prisma.fornecedor.findUnique({
-            where:{
+            where: {
                 id: id
             }
-        })
+        });
         try {
-            
+            if (!validarId || Object.values(validarId).length === 0) {
+                response.status(404).send(JSON.stringify({
+                    mensagem: 'Não foi possível encontrar o fornecedor'
+                }));
+            }
+            await prisma.endereco_Fornecedor.delete({
+                where: {
+                    id_fornecedor: id
+                }
+            });
+            await prisma.fornecedor.delete({
+                where: {
+                    id: id
+                }
+            });
+            response.status(200).send(JSON.stringify({
+                mensagem: 'Fornecedor excluido com sucesso'
+            }));
         } catch (error) {
-            
+            response.status(500).send(JSON.stringify({
+                erro: error,
+                mensagem: 'Ocorreu um erro'
+            }));
         }
     });
 }
