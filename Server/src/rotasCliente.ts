@@ -16,7 +16,7 @@ export async function rotasCliente(app: FastifyInstance) {
             logradouro: z.string(),
             numero: z.number(),
             complemento: z.string()
-        })
+        });
         const { nomeRazaoSocial,
             cpfCnpj,
             telefone,
@@ -27,7 +27,8 @@ export async function rotasCliente(app: FastifyInstance) {
             estado,
             logradouro,
             numero,
-            complemento } = cliente.parse(request.body)
+            complemento } = cliente.parse(request.body);
+
         try {
             await prisma.cliente.create({
                 data: {
@@ -37,10 +38,10 @@ export async function rotasCliente(app: FastifyInstance) {
                     email,
                     inscricaoEstadual
                 }
-            })
+            });
             const cliente_cadastrado = await prisma.cliente.findFirst({
                 take: -1
-            })
+            });
 
             await prisma.endereco.create({
                 data: {
@@ -52,13 +53,13 @@ export async function rotasCliente(app: FastifyInstance) {
                     numero,
                     complemento
                 }
-            })
+            });
             response.status(200).send('Cliente adicionado com sucesso!');
         } catch (error) {
             response.status(400).send(JSON.stringify({
                 campo: error.meta.target + ' Duplicado',
                 mensagem: 'Não foi possível cadastrar o cliente'
-            }))
+            }));
         }
     });
     app.get('/listarClientes', async () => {
@@ -98,13 +99,13 @@ export async function rotasCliente(app: FastifyInstance) {
             if (!cliente || Object.values(cliente).length === 0) {
                 response.status(404).send(JSON.stringify({
                     message: 'Não foi possível encontrar o cliente'
-                }))
+                }));
             }
             response.send(cliente);
         } catch (error) {
             response.status(500).send(JSON.stringify({
                 message: 'Ocorreu um erro!'
-            }))
+            }));
         }
     });
     app.get('/buscarClienteId/:id', async (request, response) => {
@@ -146,13 +147,13 @@ export async function rotasCliente(app: FastifyInstance) {
             if (!endereco || Object.values(endereco).length === 0) {
                 response.status(404).send(JSON.stringify({
                     message: 'Não foi possível encontrar o endereço'
-                }))
+                }));
             }
             response.status(200).send(endereco);
         } catch (error) {
             response.status(500).send(JSON.stringify({
                 message: 'Ocorreu um erro'
-            }))
+            }));
         }
     });
     app.put('/atualizarCliente', async (request, response) => {
@@ -167,13 +168,14 @@ export async function rotasCliente(app: FastifyInstance) {
             cpfCnpj,
             telefone,
             email,
-            inscricaoEstadual } = cliente.parse(request.body)
+            inscricaoEstadual } = cliente.parse(request.body);
+
         try {
             const validarId = await prisma.cliente.findUnique({
                 where: {
                     cpfCnpj: cpfCnpj
                 }
-            })
+            });
             if (!validarId || Object.values(validarId).length === 0) {
                 response.status(404).send(JSON.stringify({
                     mensagem: 'Não foi possível encontrar o cliente'
@@ -196,44 +198,44 @@ export async function rotasCliente(app: FastifyInstance) {
             response.status(500).send(JSON.stringify({
                 erro: error.meta.message,
                 mensagem: 'Ocorreu um erro'
-            }))
+            }));
         }
     });
     app.delete('/excluirCliente', async (request, response) => {
         const idCliente = z.object({
             id: z.number()
-        })
-        const { id } = idCliente.parse(request.body)
+        });
+        const { id } = idCliente.parse(request.body);
         const validarId = await prisma.cliente.findUnique({
             where: {
                 id: id
             }
-        })
-        
+        });
+
         try {
             if (!validarId || Object.values(validarId).length === 0) {
                 response.status(404).send(JSON.stringify({
                     mensagem: 'Não foi possível encontrar o cliente!'
-                }))
+                }));
             }
             await prisma.endereco.delete({
                 where: {
                     id_cliente: id
                 }
-            })
+            });
             await prisma.cliente.delete({
                 where: {
                     id: id
                 }
-            })
+            });
             response.status(200).send(JSON.stringify({
                 mensagem: 'Cliente excluido com sucesso!'
-            }))
+            }));
         } catch (error) {
             response.status(500).send(JSON.stringify({
                 erro: error,
                 mensagem: 'Ocorreu um erro'
-            }))
+            }));
         }
     });
 }
