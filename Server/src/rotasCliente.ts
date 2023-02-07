@@ -122,15 +122,14 @@ export async function rotasCliente(app: FastifyInstance) {
             if (!cliente || Object.values(cliente).length === 0) {
                 response.status(404).send(JSON.stringify({
                     message: 'Não foi possível encontrar o cliente'
-                }))
+                }));
             }
-            response.status(200).send(cliente)
+            response.status(200).send(cliente);
         } catch (error) {
             response.status(500).send(JSON.stringify({
                 mensagem: 'Ocorreu um erro'
-            }))
+            }));
         }
-
     });
     app.get('/buscarClienteEndereco/:id', async (request, response) => {
         const idEndereco = z.object({
@@ -204,14 +203,13 @@ export async function rotasCliente(app: FastifyInstance) {
         const idCliente = z.object({
             id: z.number()
         })
-
         const { id } = idCliente.parse(request.body)
-
         const validarId = await prisma.cliente.findUnique({
             where: {
                 id: id
             }
         })
+        
         try {
             if (!validarId || Object.values(validarId).length === 0) {
                 response.status(404).send(JSON.stringify({
