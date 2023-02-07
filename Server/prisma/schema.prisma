@@ -1,0 +1,125 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator erd {
+  provider = "prisma-erd-generator"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Cliente {
+  id                Int        @id @default(autoincrement())
+  nomeRazaoSocial   String
+  cpfCnpj           String     @unique
+  telefone          String
+  email             String     @unique
+  inscricaoEstadual String
+  Endereco          Endereco[]
+
+  @@map("clientes")
+}
+
+model Endereco {
+  id          Int    @id @default(autoincrement())
+  id_cliente  Int    @unique
+  cep         String
+  cidade      String
+  estado      String
+  logradouro  String
+  numero      Int
+  complemento String
+
+  id_cliente_fk Cliente @relation(fields: [id_cliente], references: [id])
+
+  @@map("enderecos")
+}
+
+model Fornecedor {
+  id                  Int                   @id @default(autoincrement())
+  razaoSocial         String
+  cnpj                String                @unique
+  inscricaoEstadual   String
+  telefone            String
+  id_produto          Int
+  Endereco_Fornecedor Endereco_Fornecedor[]
+
+  id_produto_fk Produto @relation(fields: [id_produto], references: [id])
+
+  @@map("fornecedores")
+}
+
+model Endereco_Fornecedor {
+  id            Int    @id @default(autoincrement())
+  id_fornecedor Int
+  cep           String
+  cidade        String
+  estado        String
+  logradouro    String
+  numero        Int
+  complemento   String
+
+  id_fornecedor_fk Fornecedor @relation(fields: [id_fornecedor], references: [id])
+
+  @@map("enderecos_fornecedor")
+}
+
+model Categoria {
+  id      Int       @id @default(autoincrement())
+  nome    String
+  Produto Produto[]
+
+  @@map("categorias")
+}
+
+model Produto {
+  id           Int    @id @default(autoincrement())
+  nome         String
+  descricao    String
+  ncmSh        String
+  preco        Int
+  id_categoria Int
+
+  id_categoria_fk Categoria    @relation(fields: [id_categoria], references: [id])
+  Estoque         Estoque[]
+  Fornecedor      Fornecedor[]
+
+  @@map("produtos")
+}
+
+model Estoque {
+  id         Int @id @default(autoincrement())
+  id_produto Int
+  quantidade Int
+
+  id_produto_fk Produto @relation(fields: [id_produto], references: [id])
+
+  @@map("estoques")
+}
+
+model Tipo_de_Usuario {
+  id      Int       @id @default(autoincrement())
+  nome    String
+  Usuario Usuario[]
+
+  @@map("tipo_de_usuarios")
+}
+
+model Usuario {
+  id                 Int    @id @default(autoincrement())
+  nome               String
+  login_usuario      String @unique
+  senha_usuario      String
+  email              String @unique
+  id_tipo_de_usuario Int
+
+  id_tipo_de_usuario_fk Tipo_de_Usuario @relation(fields: [id_tipo_de_usuario], references: [id])
+
+  @@map("usuarios")
+}
