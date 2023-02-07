@@ -44,13 +44,12 @@ model Endereco {
 model Fornecedor {
   id                  Int                   @id @default(autoincrement())
   razaoSocial         String
+  email               String                @unique
   cnpj                String                @unique
   inscricaoEstadual   String
   telefone            String
-  id_produto          Int
   Endereco_Fornecedor Endereco_Fornecedor[]
-
-  id_produto_fk Produto @relation(fields: [id_produto], references: [id])
+  Produto             Produto[]
 
   @@map("fornecedores")
 }
@@ -79,16 +78,17 @@ model Categoria {
 }
 
 model Produto {
-  id           Int    @id @default(autoincrement())
-  nome         String
-  descricao    String
-  ncmSh        String
-  preco        Int
-  id_categoria Int
+  id            Int    @id @default(autoincrement())
+  nome          String
+  descricao     String
+  ncmSh         String
+  preco         Int
+  id_categoria  Int
+  id_fornecedor Int
 
-  id_categoria_fk Categoria    @relation(fields: [id_categoria], references: [id])
-  Estoque         Estoque[]
-  Fornecedor      Fornecedor[]
+  id_categoria_fk  Categoria  @relation(fields: [id_categoria], references: [id])
+  id_fornecedor_fk Fornecedor @relation(fields: [id_fornecedor], references: [id])
+  Estoque          Estoque[]
 
   @@map("produtos")
 }
