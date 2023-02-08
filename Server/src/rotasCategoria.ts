@@ -2,7 +2,6 @@ import { prisma } from "./libs/prisma"
 import { FastifyInstance } from "fastify";
 import { number, z } from 'zod'
 export async function rotasCategoria(app: FastifyInstance) {
-    //Rotas Categoria
     app.post('/adicionarCategoria', async (request, response) => {
         const categoria = z.object({
             nome: z.string()

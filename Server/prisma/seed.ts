@@ -7,8 +7,9 @@ async function run(){
         prisma.endereco.deleteMany(),
         prisma.cliente.deleteMany(),
         prisma.endereco_Fornecedor.deleteMany(),
-        prisma.fornecedor.deleteMany()
-    ])
+        prisma.fornecedor.deleteMany(),
+        prisma.categoria.deleteMany
+    ]);
     /*Create cliente*/ await Promise.all([
         prisma.cliente.create({
             data:{
@@ -73,7 +74,7 @@ async function run(){
                 }
             }
         }),
-    ])
+    ]);
     /*Create fornecedor */ await Promise.all([
         prisma.fornecedor.create({
             data:{
@@ -138,7 +139,69 @@ async function run(){
                 }
             }
         }),
-    ])
+    ]);
+    /*Create categoria*/ await Promise.all([
+        prisma.categoria.create({
+            data:{
+                id: 1,
+                nome: 'Alimentar'
+            }
+        }),
+        prisma.categoria.create({
+            data:{
+                id: 2,
+                nome: 'Eletronico'
+            }
+        }),
+        prisma.categoria.create({
+            data:{
+                id: 3,
+                nome: 'Serviço'
+            }
+        }),
+        prisma.categoria.create({
+            data:{
+                id: 4,
+                nome: 'Eletrodoméstico'
+            }
+        }),
+        prisma.categoria.create({
+           data:{
+                id: 5,
+                nome: 'Cama/Mesa/Banho'
+           }
+        }),
+        prisma.categoria.create({
+            data:{
+                id: 6,
+                nome: 'Padaria'
+            }
+        }),
+        prisma.categoria.create({
+            data:{
+                id: 7,
+                nome: 'Açougue'
+            }
+        }),
+        prisma.categoria.create({
+            data:{
+                id: 8,
+                nome: 'Brinquedos'
+            }
+        }),
+        prisma.categoria.create({
+            data:{
+                id: 9,
+                nome: 'Elétrica'
+            }
+        }),
+        prisma.categoria.create({
+            data:{
+                id: 10,
+                nome: 'Automotiva'
+            }
+        })
+    ]);
 }
 
 run().then(async () => {
