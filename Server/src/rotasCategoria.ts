@@ -1,6 +1,6 @@
 import { prisma } from "./libs/prisma"
 import { FastifyInstance } from "fastify";
-import { number, z } from 'zod'
+import { z } from 'zod'
 export async function rotasCategoria(app: FastifyInstance) {
     app.post('/adicionarCategoria', async (request, response) => {
         const categoria = z.object({
@@ -29,6 +29,17 @@ export async function rotasCategoria(app: FastifyInstance) {
 
         return listaDeCategorias;
     });
+    app.get('/buscarCategorias/:nome', async (request, response) =>{
+        const categorias = z.object({
+            nome: z.string()
+        });
+        const { nome } = categorias.parse(request.params);
+        const listaBuscaCategorias = await prisma.$queryRawUnsafe(
+            'SELECT * FROM categorias WHERE nome like $1',
+            `${nome}%`
+        );
+        response.send(listaBuscaCategorias);
+    })
     app.get('/buscarCategoria/:id', async (request, response) => {
         const idCategoria = z.object({
             id: z.string()
