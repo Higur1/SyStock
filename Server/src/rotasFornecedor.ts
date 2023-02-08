@@ -91,11 +91,10 @@ export async function rotasFornecedor(app: FastifyInstance) {
         const { razaoSocial } = nomeFornecedor.parse(request.params);
 
         try {
-            const fornecedor = await prisma.$queryRaw`
-                SELECT *
-                FROM fornecedores
-                WHERE razaoSocial = ${razaoSocial}
-            `
+            const fornecedor = await prisma.$queryRawUnsafe(
+                'SELECT * FROM fornecedores WHERE razaoSocial like $1',
+                `${razaoSocial}%`
+            );
             if (!fornecedor || Object.values(fornecedor).length === 0) {
                 response.status(404).send(JSON.stringify({
                     mensagem: 'Não foi possível encontrar o fornecedor'
