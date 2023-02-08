@@ -1,6 +1,6 @@
-import { prisma } from "./libs/prisma"
+import { prisma } from "./libs/prisma";
 import { FastifyInstance } from "fastify";
-import { z } from 'zod'
+import { z } from 'zod';
 export async function rotasCategoria(app: FastifyInstance) {
     app.post('/adicionarCategoria', async (request, response) => {
         const categoria = z.object({
@@ -29,16 +29,28 @@ export async function rotasCategoria(app: FastifyInstance) {
 
         return listaDeCategorias;
     });
-    app.get('/buscarCategorias/:nome', async (request, response) =>{
+    app.get('/buscarCategorias/:nome', async (request, response) => {
         const categorias = z.object({
             nome: z.string()
         });
         const { nome } = categorias.parse(request.params);
-        const listaBuscaCategorias = await prisma.$queryRawUnsafe(
-            'SELECT * FROM categorias WHERE nome like $1',
-            `${nome}%`
-        );
-        response.send(listaBuscaCategorias);
+
+        try {
+            const listaBuscaCategorias = await prisma.$queryRawUnsafe(
+                'SELECT * FROM categorias WHERE nome like $1',
+                `${nome}%`
+            );
+            if (!listaBuscaCategorias || Object.values(listaBuscaCategorias).length === 0) {
+                response.status(404).send(JSON.stringify({
+                    mensagem: 'Não foi possível encontrar a categoria'
+                }));
+            }
+            response.status(200).send(listaBuscaCategorias);
+        } catch (error) {
+            response.status(500).send(JSON.stringify({
+                mensagem: 'Ocorreu um erro'
+            }));
+        }
     })
     app.get('/buscarCategoria/:id', async (request, response) => {
         const idCategoria = z.object({
@@ -71,7 +83,7 @@ export async function rotasCategoria(app: FastifyInstance) {
             nome: z.string()
         });
         const { id,
-                nome } = categoria.parse(request.body);
+            nome } = categoria.parse(request.body);
 
         try {
             const validarId = await prisma.categoria.findUnique({

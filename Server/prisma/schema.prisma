@@ -78,11 +78,11 @@ model Categoria {
 }
 
 model Produto {
-  id            Int    @id @default(autoincrement())
+  id            Int     @id @default(autoincrement())
   nome          String
   descricao     String
   ncmSh         String
-  preco         Int
+  preco         Decimal
   id_categoria  Int
   id_fornecedor Int
 
