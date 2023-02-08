@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import ip from 'ip';
 import { rotasCliente } from './rotasCliente';
 import { rotasFornecedor } from './rotasFornecedor';
+import { rotasCategoria } from './rotasCategoria';
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.register(cors, {
 app.register(appRoutes);
 app.register(rotasCliente);
 app.register(rotasFornecedor);
+app.register(rotasCategoria);
 
 app.listen({
     port: port,
