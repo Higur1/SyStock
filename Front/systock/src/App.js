@@ -1,11 +1,11 @@
 import Master from './Master.js';
 import './App.css';
+import Sidebar from './pages/Sidebar/Sidebar.js';
 
 function App() {
   return (
     <div className='main'>
-      {/* <Sidebar /> */}
-      <div style={{ background: '#000000'}}>Sidebar will be here</div>
+      <Sidebar />
       <Master />
     </div>
   );
