@@ -16,6 +16,18 @@ export const Option = styled.div`
     background: #6084C9;
   }
   cursor: pointer;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 30px;
+  color: #1E1E1E;
+  & a {
+    width: 100%;
+    padding-left: 16px;
+    text-decoration: none;
+  }
+  & a:visited {
+    color: inherit;
+  }
 `;
 
 export const OptionText = styled.div`
@@ -30,5 +42,4 @@ export const OptionText = styled.div`
   & a:visited {
     color: inherit;
   }
-  
 `;

@@ -6,7 +6,7 @@ import Product from './pages/Product/Product'
 export default function Master() {
   return (
     
-    <>
+    <div style={{margin: "16px"}}>
       <Routes>
         <Route path="category" element={<Category />}/>
         <Route path="product" element={<Product />}/>
@@ -15,6 +15,6 @@ export default function Master() {
         {/* <Route path="*" element={<NoMatch />} /> */}
       </Routes>
       
-    </>
+    </div>
   )
 }
