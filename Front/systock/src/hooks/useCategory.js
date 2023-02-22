@@ -1,19 +1,44 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function useCategory() {
-  const [categories, setCategories] = useState(['teste','teste 2','teste 3', 'TESTE INITIAL CATEGORY']);
-  const [categorySelected, setCategory] = useState('TESTE INITIAL CATEGORY');
+  const [categories, setCategories] = useState([
+    {id: 0, label: 'Garrafa', quantity: '4235', father: null},
+    {id: 1, label: 'Potes', quantity: '67523', father: null},
+    {id: 2, label: 'Copos', quantity: '5432', father: null},
+    {id: 3, label: 'Garfos', quantity: '35245', father: null},
+  ]);
+  
+  const [selectedCategories, setselectedCategories] = useState([]);
 
-  function handleChange(e) {
-    setCategory(e.target.value);
+  const [categoriesFiltered, setCategoriesFiltered] = useState([]);
+
+  //* HANDLE WHEN AUTOCOMPLETE
+  //* CATEGORY SCREEN
+  function handleSelectedOptions(newValue) {
+    setselectedCategories(newValue);
   }
+
+  useEffect(() => {
+    let filteredOptions = [];
+  
+    for (let i = 0; i < selectedCategories.length; i++) {
+      filteredOptions = [...filteredOptions, ...categories.filter(cat => cat.label === selectedCategories[i])];
+    }
+    if(!filteredOptions.length) {
+      setCategoriesFiltered(categories);
+    } else {
+      setCategoriesFiltered(filteredOptions);
+    }
+  }, [selectedCategories]);
+
 
 
 
   return {
     categories,
     setCategories,
-    categorySelected,
-    handleChange
+    selectedCategories,
+    handleSelectedOptions,
+    categoriesFiltered
   }
 }
