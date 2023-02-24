@@ -7,7 +7,6 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { TableVirtuoso } from 'react-virtuoso';
-import useCategory from '../hooks/useCategory';
 import PropTypes from 'prop-types';
 
 const columns = [
@@ -19,7 +18,7 @@ const columns = [
   {
     width: 150,
     label: 'Categoria Pai',
-    dataKey: 'father'
+    dataKey: 'parent'
   },
   {
     width: 100,
@@ -80,7 +79,7 @@ function rowContent(option) {
 export default function VirtualizedTable({ options }) {
 
   return (
-    <Paper style={{ height: 400, width: '100%' }}>
+    <Paper style={{ height: '100%', width: '100%' }}>
       <TableVirtuoso
         components={VirtuosoTableComponents}
         fixedHeaderContent={fixedHeaderContent}
