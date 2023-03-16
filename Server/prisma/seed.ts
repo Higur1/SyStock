@@ -11,354 +11,385 @@ async function run() {
         `
     }
     /*Deletes*/ await Promise.all([
-        prisma.$queryRaw`DELETE FROM produtos`,
-        prisma.$queryRaw`DELETE FROM categorias`,
-        prisma.$queryRaw`DELETE FROM enderecos_fornecedor`,
-        prisma.$queryRaw`DELETE FROM fornecedores`,
-        prisma.$queryRaw`DELETE FROM enderecos`,
-        prisma.$queryRaw`DELETE FROM clientes`,
-        prisma.$queryRaw`DELETE FROM tipo_de_usuarios`
+        prisma.product.deleteMany(),
+        prisma.category.deleteMany(),
+        prisma.supplier_Address.deleteMany(),
+        prisma.supplier.deleteMany(),
+        prisma.user.deleteMany(),
+        prisma.user_Types.deleteMany(),
+        //prisma.$queryRaw`DELETE FROM customer_address`,
+        //prisma.$queryRaw`DELETE FROM customers`
     ]);
-    /*Create TipoDeUsuario*/ await Promise.all([
-        resetId('tipo_de_usuarios'),
-        prisma.tipo_de_Usuario.create({
+    /*Create supplier*/ await Promise.all([
+        resetId('suppliers'),
+        prisma.supplier.create({
             data: {
-                nome: 'Administrador',
-            }
-        }),
-        prisma.tipo_de_Usuario.create({
-            data: {
-                nome: 'Funcionário',
-            }
-        }),
-    ]);
-    /*Create fornecedor*/ await Promise.all([
-        resetId('fornecedores'),
-        prisma.fornecedor.create({
-            data: {
-                razaoSocial: 'HigorEmpresa',
-                cnpj: '111111111-11',
-                telefone: '(11)91111-1111',
+                company_name: 'HigorEmpresa',
                 email: 'higor@gmail.com',
-                inscricaoEstadual: 'SP',
-                Endereco_Fornecedor: {
-                    create: {
+                cnpj: '111111111-11',
+                state_registration: 'SP',
+                phone: '(11)91111-1111',
+                Supplier_Address:{
+                    create:{
                         cep: '11111-111',
-                        cidade: 'São Paulo',
-                        estado: 'SP',
-                        logradouro: 'Rua 1',
-                        numero: 1001,
-                        complemento: 'esquina'
+                        city: 'São Paulo',
+                        state: 'SP',
+                        street:'Rua 1',
+                        number: 1001,
+                        complement: 'esquina'
                     }
                 }
             }
         }),
-        prisma.fornecedor.create({
+        prisma.supplier.create({
             data: {
-                razaoSocial: 'GabrielEmpresa',
-                cnpj: '222222222-22',
-                telefone: '(22)92222-2222',
+                company_name: 'GabrielEmpresa',
                 email: 'gabriel@gmail.com',
-                inscricaoEstadual: 'RJ',
-                Endereco_Fornecedor: {
-                    create: {
+                cnpj: '222222222-22',
+                state_registration: 'RJ',
+                phone: '(22)92222-2222',
+                Supplier_Address:{
+                    create:{
                         cep: '22222-222',
-                        cidade: 'Rio de Janeiro',
-                        estado: 'RJ',
-                        logradouro: 'Rua 2',
-                        numero: 1002,
-                        complemento: 'esquina'
+                        city: 'Rio de Janeiro',
+                        state: 'RJ',
+                        street:'Rua 2',
+                        number: 1002,
+                        complement: 'esquina'
                     }
                 }
             }
         }),
-        prisma.fornecedor.create({
+        prisma.supplier.create({
             data: {
-                razaoSocial: 'BrenoEmpresa',
-                cnpj: '333333333-33',
-                telefone: '(33)93333-3333',
+                company_name: 'BrenoEmpresa',
                 email: 'breno@gmail.com',
-                inscricaoEstadual: 'MG',
-                Endereco_Fornecedor: {
-                    create: {
+                cnpj: '333333333-33',
+                state_registration: 'MG',
+                phone: '(33)93333-3333',
+                Supplier_Address:{
+                    create:{
                         cep: '33333-333',
-                        cidade: 'Belo Horizonte',
-                        estado: 'MG',
-                        logradouro: 'Rua 3',
-                        numero: 1003,
-                        complemento: 'esquina'
+                        city: 'Belo Horizonte',
+                        state: 'MG',
+                        street:'Rua 3',
+                        number: 1003,
+                        complement: 'esquina'
                     }
                 }
             }
         }),
+
     ]);
-    /*Create Categoria*/ await Promise.all([
-        resetId('categorias'),
-        prisma.categoria.create({
+    /*Create category*/ await Promise.all([
+        resetId('categories'),
+        prisma.category.create({
             data: {
                 id: 1,
-                nome: 'Alimentar'
+                name: 'Alimentar'
             }
         }),
-        prisma.categoria.create({
+        prisma.category.create({
             data: {
                 id: 2,
-                nome: 'Eletronico'
+                name: 'Eletronico'
             }
         }),
-        prisma.categoria.create({
+        prisma.category.create({
             data: {
                 id: 3,
-                nome: 'Serviço'
+                name: 'Serviço'
             }
         }),
-        prisma.categoria.create({
+        prisma.category.create({
             data: {
                 id: 4,
-                nome: 'Eletrodoméstico'
+                name: 'Eletrodoméstico'
             }
         }),
-        prisma.categoria.create({
+        prisma.category.create({
             data: {
                 id: 5,
-                nome: 'Cama/Mesa/Banho'
+                name: 'Cama/Mesa/Banho'
             }
         }),
-        prisma.categoria.create({
+        prisma.category.create({
             data: {
                 id: 6,
-                nome: 'Padaria'
+                name: 'Padaria'
             }
         }),
-        prisma.categoria.create({
+        prisma.category.create({
             data: {
                 id: 7,
-                nome: 'Açougue'
+                name: 'Açougue'
             }
         }),
-        prisma.categoria.create({
+        prisma.category.create({
             data: {
                 id: 8,
-                nome: 'Brinquedos'
+                name: 'Brinquedos'
             }
         }),
-        prisma.categoria.create({
+        prisma.category.create({
             data: {
                 id: 9,
-                nome: 'Elétrica'
+                name: 'Elétrica'
             }
         }),
-        prisma.categoria.create({
+        prisma.category.create({
             data: {
                 id: 10,
-                nome: 'Automotiva'
+                name: 'Automotiva'
             }
         })
     ]);
-    /*Create Produto*/ await Promise.all([
-        resetId('produtos'),
-        prisma.produto.create({
+    /*Create product*/ await Promise.all([
+        resetId('products'),
+        prisma.product.create({
             data: {
-                nome: 'Frango Assado',
-                descricao: 'Frango assado com batatas e farofa',
-                ncmSh: '111',
-                preco: 45.0,
-                id_categoria: 1,
-                id_fornecedor: 1
+                name: 'Frango Assado',
+                description: 'Frango assado com batatas e farofa',
+                ncmSh: '110',
+                price: 45.0,
+                category_id: 1,
+                supplier_id: 1
             }
         }),
-        prisma.produto.create({
+        prisma.product.create({
             data: {
-                nome: 'Cachorro-Quente',
-                descricao: 'Cachorro-Quente completo prensado',
+                name: 'Cachorro-Quente',
+                description: 'Cachorro-Quente completo prensado',
                 ncmSh: '111',
-                preco: 15.0,
-                id_categoria: 1,
-                id_fornecedor: 1
+                price: 15.0,
+                category_id: 1,
+                supplier_id: 1
             }
         }),
-        prisma.produto.create({
+        prisma.product.create({
             data: {
-                nome: 'Televisão',
-                descricao: 'Smart TV LED 42" Full HD Philco PTV42G52RCF com WiFi, HDMI, USB e Processador Quad-core',
-                ncmSh: '111',
-                preco: 1482.0,
-                id_categoria: 2,
-                id_fornecedor: 2
+                name: 'Televisão',
+                description: 'Smart TV LED 42" Full HD Philco PTV42G52RCF com WiFi, HDMI, USB e Processador Quad-core',
+                ncmSh: '112',
+                price: 1482.0,
+                category_id: 2,
+                supplier_id: 2
             }
         }),
-        prisma.produto.create({
+        prisma.product.create({
             data: {
-                nome: 'Computador',
-                descricao: 'Computador Completo Intel Core i3 6GB HD 500GB',
-                ncmSh: '111',
-                preco: 1146.0,
-                id_categoria: 2,
-                id_fornecedor: 2
+                name: 'Computador',
+                description: 'Computador Completo Intel Core i3 6GB HD 500GB',
+                ncmSh: '113',
+                price: 1146.0,
+                category_id: 2,
+                supplier_id: 2
             }
         }),
-        prisma.produto.create({
+        prisma.product.create({
             data: {
-                nome: 'Pintura',
-                descricao: 'Pintura de predios 40m²',
-                ncmSh: '111',
-                preco: 1200.0,
-                id_categoria: 3,
-                id_fornecedor: 3
+                name: 'Pintura',
+                description: 'Pintura de predios 40m²',
+                ncmSh: '114',
+                price: 1200.0,
+                category_id: 3,
+                supplier_id: 3
             }
         }),
-        prisma.produto.create({
+        prisma.product.create({
             data: {
-                nome: 'Lava-Rápido',
-                descricao: 'Lavagem de carros e motos',
-                ncmSh: '111',
-                preco: 50.0,
-                id_categoria: 3,
-                id_fornecedor: 3
+                name: 'Lava-Rápido',
+                description: 'Lavagem de carros e motos',
+                ncmSh: '115',
+                price: 50.0,
+                category_id: 3,
+                supplier_id: 3
             }
         }),
-        prisma.produto.create({
+        prisma.product.create({
             data: {
-                nome: 'Micro-ondas',
-                descricao: 'Forno de Micro-ondas Midea MRAS2 com Função Eco 20L – Branco',
-                ncmSh: '111',
-                preco: 499.0,
-                id_categoria: 4,
-                id_fornecedor: 1
+                name: 'Micro-ondas',
+                description: 'Forno de Micro-ondas Midea MRAS2 com Função Eco 20L – Branco',
+                ncmSh: '116',
+                price: 499.0,
+                category_id: 4,
+                supplier_id: 1
             }
         }),
-        prisma.produto.create({
+        prisma.product.create({
             data: {
-                nome: 'Fogão',
-                descricao: 'Fogão 5 Bocas Atlas Mônaco Top Glass',
-                ncmSh: '111',
-                preco: 1099.0,
-                id_categoria: 4,
-                id_fornecedor: 1
+                name: 'Fogão',
+                description: 'Fogão 5 Bocas Atlas Mônaco Top Glass',
+                ncmSh: '117',
+                price: 1099.0,
+                category_id: 4,
+                supplier_id: 1
             }
         }),
-        prisma.produto.create({
+        prisma.product.create({
             data: {
-                nome: 'Cama',
-                descricao: 'Cama Box Emma',
-                ncmSh: '111',
-                preco: 699.00,
-                id_categoria: 5,
-                id_fornecedor: 2
+                name: 'Cama',
+                description: 'Cama Box Emma',
+                ncmSh: '118',
+                price: 699.00,
+                category_id: 5,
+                supplier_id: 2
             }
         }),
-        prisma.produto.create({
+        prisma.product.create({
             data: {
-                nome: 'Toalha',
-                descricao: 'Kit Toalhas de Banho/Rosto 200 Fios Super Premium',
-                ncmSh: '111',
-                preco: 33.00,
-                id_categoria: 5,
-                id_fornecedor: 2
+                name: 'Toalha',
+                description: 'Kit Toalhas de Banho/Rosto 200 Fios Super Premium',
+                ncmSh: '119',
+                price: 33.00,
+                category_id: 5,
+                supplier_id: 2
             }
         }),
-        prisma.produto.create({
+        prisma.product.create({
             data: {
-                nome: 'Pão',
-                descricao: 'Pão Francês',
-                ncmSh: '111',
-                preco: 1.0,
-                id_categoria: 6,
-                id_fornecedor: 3
+                name: 'Pão',
+                description: 'Pão Francês',
+                ncmSh: '120',
+                price: 1.0,
+                category_id: 6,
+                supplier_id: 3
             }
         }),
-        prisma.produto.create({
+        prisma.product.create({
             data: {
-                nome: 'Sonho',
-                descricao: 'Sonho de creme',
-                ncmSh: '111',
-                preco: 4.0,
-                id_categoria: 6,
-                id_fornecedor: 3
+                name: 'Sonho',
+                description: 'Sonho de creme',
+                ncmSh: '121',
+                price: 4.0,
+                category_id: 6,
+                supplier_id: 3
             }
         }),
-        prisma.produto.create({
+        prisma.product.create({
             data: {
-                nome: 'Carne',
-                descricao: 'Picanha 1k600g',
-                ncmSh: '111',
-                preco: 103.00,
-                id_categoria: 7,
-                id_fornecedor: 1
+                name: 'Carne',
+                description: 'Picanha 1k600g',
+                ncmSh: '122',
+                price: 103.00,
+                category_id: 7,
+                supplier_id: 1
             }
         }),
-        prisma.produto.create({
+        prisma.product.create({
             data: {
-                nome: 'Carne de porco',
-                descricao: 'Lombo 1k100g',
-                ncmSh: '111',
-                preco: 29.00,
-                id_categoria: 7,
-                id_fornecedor: 1
+                name: 'Carne de porco',
+                description: 'Lombo 1k100g',
+                ncmSh: '123',
+                price: 29.00,
+                category_id: 7,
+                supplier_id: 1
             }
         }),
-        prisma.produto.create({
+        prisma.product.create({
             data: {
-                nome: 'Lego',
-                descricao: 'Brinquedo lego star-wars',
-                ncmSh: '111',
-                preco: 219.00,
-                id_categoria: 8,
-                id_fornecedor: 2
+                name: 'Lego',
+                description: 'Brinquedo lego star-wars',
+                ncmSh: '124',
+                price: 219.00,
+                category_id: 8,
+                supplier_id: 2
             }
         }),
-        prisma.produto.create({
+        prisma.product.create({
             data: {
-                nome: 'Quebra-Cabeça',
-                descricao: 'Quebra-Cabeça 1000 peças do Harry Poter',
-                ncmSh: '111',
-                preco: 153.00,
-                id_categoria: 8,
-                id_fornecedor: 2
+                name: 'Quebra-Cabeça',
+                description: 'Quebra-Cabeça 1000 peças do Harry Poter',
+                ncmSh: '125',
+                price: 153.00,
+                category_id: 8,
+                supplier_id: 2
             }
         }),
-        prisma.produto.create({
+        prisma.product.create({
             data: {
-                nome: 'Fio Preto',
-                descricao: 'Cabo Flexível 2,5mm 100m Preto 750V SIL',
-                ncmSh: '111',
-                preco: 169.00,
-                id_categoria: 9,
-                id_fornecedor: 3
+                name: 'Fio Preto',
+                description: 'Cabo Flexível 2,5mm 100m Preto 750V SIL',
+                ncmSh: '126',
+                price: 169.00,
+                category_id: 9,
+                supplier_id: 3
             }
         }),
-        prisma.produto.create({
+        prisma.product.create({
             data: {
-                nome: 'Fita Isolante',
-                descricao: 'Fita Isolante 3M Scotch 33+ Uso Profissional Classe A Preta 19mm x 10m x 0,19mm unidade',
-                ncmSh: '111',
-                preco: 16.00,
-                id_categoria: 9,
-                id_fornecedor: 3
+                name: 'Fita Isolante',
+                description: 'Fita Isolante 3M Scotch 33+ Uso Profissional Classe A Preta 19mm x 10m x 0,19mm unidade',
+                ncmSh: '127',
+                price: 16.00,
+                category_id: 9,
+                supplier_id: 3
             }
         }),
-        prisma.produto.create({
+        prisma.product.create({
             data: {
-                nome: 'Carro',
-                descricao: 'Volkswagen Polo',
-                ncmSh: '111',
-                preco: 103990.00,
-                id_categoria: 10,
-                id_fornecedor: 1
+                name: 'Carro',
+                description: 'Volkswagen Polo',
+                ncmSh: '128',
+                price: 103990.00,
+                category_id: 10,
+                supplier_id: 1
             }
         }),
-        prisma.produto.create({
+        prisma.product.create({
             data: {
-                nome: 'Moto',
-                descricao: 'Yamaha Fazer 150cc',
-                ncmSh: '111',
-                preco: 12500.00,
-                id_categoria: 10,
-                id_fornecedor: 1
+                name: 'Moto',
+                description: 'Yamaha Fazer 150cc',
+                ncmSh: '129',
+                price: 12500.00,
+                category_id: 10,
+                supplier_id: 1
             }
         }),
     ]);
-    /*Create cliente*/ await Promise.all([
+    /*Create user_type*/await Promise.all([
+        prisma.user_Types.create({
+            data:{
+                name: "Administrador"
+            }
+        }),
+        prisma.user_Types.create({
+            data:{
+                name: "Gerente"
+            }
+        })
+    ]);
+    /*Create users*/ await Promise.all([
+        prisma.user.create({
+            data:{
+                name: "Higor",
+                email: "Higor@gmail.com",
+                user_login: "Higu",
+                user_password: "Higu",
+                user_type_id: 2
+            }
+        }),
+        prisma.user.create({
+            data:{
+                name: "Breno",
+                email: "Breno@gmail.com",
+                user_login: "Bre",
+                user_password: "Bre",
+                user_type_id: 2
+            }
+        }),
+        prisma.user.create({
+            data:{
+                name: "Gabriel",
+                email: "Gabriel@gmail.com",
+                user_login: "Gabriel",
+                user_password: "Gabriel",
+                user_type_id: 1
+            }
+        }),
+    ]);
+}
+    /*Create cliente await Promise.all([
         resetId('clientes'),
         prisma.cliente.create({
             data: {
@@ -423,9 +454,8 @@ async function run() {
                 }
             }
         }),
-    ]);
-}
-
+    ]);*/
+    
 run().then(async () => {
     await prisma.$disconnect();
 }).catch(async (e) => {
