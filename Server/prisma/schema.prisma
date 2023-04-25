@@ -14,112 +14,112 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Cliente {
-  id                Int        @id @default(autoincrement())
-  nomeRazaoSocial   String
-  cpfCnpj           String     @unique
-  telefone          String
-  email             String     @unique
-  inscricaoEstadual String
-  Endereco          Endereco[]
+model Customer {
+  id                 Int       @id @default(autoincrement())
+  name_company_name  String
+  cpfCnpj            String    @unique
+  phone              String
+  email              String    @unique
+  state_registration String
+  Address            Address[]
 
-  @@map("clientes")
+  @@map("customers")
 }
 
-model Endereco {
+model Address {
   id          Int    @id @default(autoincrement())
-  id_cliente  Int    @unique
+  customer_id Int    @unique
   cep         String
-  cidade      String
-  estado      String
-  logradouro  String
-  numero      Int
-  complemento String
+  city        String
+  state       String
+  street      String
+  number      Int
+  complement  String
 
-  id_cliente_fk Cliente @relation(fields: [id_cliente], references: [id])
+  id_customer_fk Customer @relation(fields: [customer_id], references: [id])
 
-  @@map("enderecos")
+  @@map("address")
 }
 
-model Fornecedor {
-  id                  Int                   @id @default(autoincrement())
-  razaoSocial         String
-  email               String                @unique
-  cnpj                String                @unique
-  inscricaoEstadual   String
-  telefone            String
-  Endereco_Fornecedor Endereco_Fornecedor[]
-  Produto             Produto[]
+model Supplier {
+  id                 Int                @id @default(autoincrement())
+  company_name       String
+  email              String             @unique
+  cnpj               String             @unique
+  state_registration String
+  phone              String
+  Supplier_Address   Supplier_Address[]
+  Product            Product[]
 
-  @@map("fornecedores")
+  @@map("suppliers")
 }
 
-model Endereco_Fornecedor {
-  id            Int    @id @default(autoincrement())
-  id_fornecedor Int    @unique
-  cep           String
-  cidade        String
-  estado        String
-  logradouro    String
-  numero        Int
-  complemento   String
+model Supplier_Address {
+  id          Int    @id @default(autoincrement())
+  supplier_id Int    @unique
+  cep         String
+  city        String
+  state       String
+  street      String
+  number      Int
+  complement  String
 
-  id_fornecedor_fk Fornecedor @relation(fields: [id_fornecedor], references: [id])
+  id_supplier_fk Supplier @relation(fields: [supplier_id], references: [id])
 
-  @@map("enderecos_fornecedor")
+  @@map("supplier_address")
 }
 
-model Categoria {
+model Category {
   id      Int       @id @default(autoincrement())
-  nome    String
-  Produto Produto[]
+  name    String
+  Product Product[]
 
-  @@map("categorias")
+  @@map("categories")
 }
 
-model Produto {
-  id            Int     @id @default(autoincrement())
-  nome          String
-  descricao     String
-  ncmSh         String
-  preco         Decimal
-  id_categoria  Int
-  id_fornecedor Int
+model Product {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String
+  ncmSh       String
+  price       Decimal
+  category_id Int
+  supplier_id Int
 
-  id_categoria_fk  Categoria  @relation(fields: [id_categoria], references: [id])
-  id_fornecedor_fk Fornecedor @relation(fields: [id_fornecedor], references: [id])
-  Estoque          Estoque[]
+  id_category_fk Category @relation(fields: [category_id], references: [id])
+  id_supplier_fk Supplier @relation(fields: [supplier_id], references: [id])
+  Stock          Stock[]
 
-  @@map("produtos")
+  @@map("products")
 }
 
-model Estoque {
+model Stock {
   id         Int @id @default(autoincrement())
-  id_produto Int
-  quantidade Int
+  product_id Int
+  quantity   Int
 
-  id_produto_fk Produto @relation(fields: [id_produto], references: [id])
+  id_product_fk Product @relation(fields: [product_id], references: [id])
 
-  @@map("estoques")
+  @@map("stock")
 }
 
-model Tipo_de_Usuario {
-  id      Int       @id @default(autoincrement())
-  nome    String
-  Usuario Usuario[]
+model User_Types {
+  id   Int    @id @default(autoincrement())
+  name String
+  User User[]
 
-  @@map("tipo_de_usuarios")
+  @@map("user_types")
 }
 
-model Usuario {
-  id                 Int    @id @default(autoincrement())
-  nome               String
-  login_usuario      String @unique
-  senha_usuario      String
-  email              String @unique
-  id_tipo_de_usuario Int
+model User {
+  id            Int    @id @default(autoincrement())
+  name          String
+  user_login    String @unique
+  user_password String
+  email         String @unique
+  user_type_id  Int
 
-  id_tipo_de_usuario_fk Tipo_de_Usuario @relation(fields: [id_tipo_de_usuario], references: [id])
+  user_type_id_fk User_Types @relation(fields: [user_type_id], references: [id])
 
-  @@map("usuarios")
+  @@map("users")
 }

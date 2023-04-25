@@ -1,4 +1,4 @@
-import { prisma } from "./libs/prisma"
+/*import { prisma } from "./libs/prisma"
 import { FastifyInstance } from "fastify";
 import { number, z } from 'zod'
 export async function rotasCliente(app: FastifyInstance) {
@@ -238,4 +238,4 @@ export async function rotasCliente(app: FastifyInstance) {
             }));
         }
     });
-}
+}*/
