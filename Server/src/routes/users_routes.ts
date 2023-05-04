@@ -2,9 +2,17 @@ import { prisma } from "../config/prisma";
 import { FastifyInstance } from "fastify";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
+import { $ref} from "./user.schema";
 
 export async function user_routes(app: FastifyInstance) {
-  app.post("/users/new", async (request, response) => {
+  app.post("/users/new", {
+    schema:{
+      body: $ref("createUserSchema"),
+      response:{
+        201: $ref("userResponseSchema")
+      }
+    }
+  },async (request, response) => {
     const user = z.object({
       name: z.string(),
       user_login: z.string(),

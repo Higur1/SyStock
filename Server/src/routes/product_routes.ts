@@ -1,8 +1,10 @@
 import { prisma } from "../config/prisma";
 import { FastifyInstance } from "fastify";
 import { z } from "zod";
+import { $ref } from "./user.schema";
 export async function product_routes(app: FastifyInstance) {
-  app.post("/products/new", async (request, response) => {
+  app.post("/products/new",
+    async (request, response) => {
     const product = z.object({
       name: z.string(),
       description: z.string(),
