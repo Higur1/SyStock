@@ -1,23 +1,27 @@
 import { Autocomplete, Button, Chip, TextField } from '@mui/material'
 import React, { useState } from 'react'
-import { useContext } from 'react';
 import CreateCategoryDialog from '../../components/dialogs/CreateCategoryDialog';
 import VirtualizedTable from '../../components/VirtualizedTable';
-import { CategoryContext } from '../../contexts/CategoryContext';
 import { Container, HeaderContainer } from './styles'
+import useCategory from '../../hooks/useCategory';
 
 
 
 export default function Category() {
 
-  const [openCreateCategory, setOpenCreateCategory] = useState(false);
-  const { 
+  const {
     categories,
-    handleSelectedOptions,
+    categoryRedux,
+    setCategories,
     selectedCategories,
+    handleSelectedOptions,
     categoriesFiltered,
     handleCreateCategory
-  } = useContext(CategoryContext);
+  } = useCategory();
+
+  console.log(categoryRedux);
+
+  const [openCreateCategory, setOpenCreateCategory] = useState(false);
   
   return (
     <>

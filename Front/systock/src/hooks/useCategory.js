@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 export default function useCategory() {
+
+  const categoryRedux = useSelector(state => state.categories);
+
   const [categories, setCategories] = useState([
     {id: 0, label: 'Garrafa', quantity: '4235', parent: null},
     {id: 1, label: 'Potes', quantity: '67523', parent: null},
@@ -42,6 +46,7 @@ export default function useCategory() {
   }
 
   return {
+    categoryRedux,
     categories,
     setCategories,
     selectedCategories,
