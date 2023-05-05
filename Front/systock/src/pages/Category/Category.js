@@ -11,26 +11,18 @@ import { getCategories } from '../../redux/actions/categoriesActions';
 
 export default function Category() {
 
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(getCategories());
-  }, []);
-
   const {
     categories,
-    categoryRedux,
-    setCategories,
     selectedCategories,
-    handleSelectedOptions,
+    setSelectedCategories,
     categoriesFiltered,
     handleCreateCategory
   } = useCategory();
 
-  console.log(categoryRedux);
-
   const [openCreateCategory, setOpenCreateCategory] = useState(false);
   
+  if(categories.length === 0) return;
+
   return (
     <>
       <Container>
@@ -38,7 +30,7 @@ export default function Category() {
           <Autocomplete
             multiple
             id="combo-box-category"
-            options={categories.map(cat => cat.label)}
+            options={categories.map(cat => cat.name)}
             freeSolo
             renderTags={(value, getTagProps) =>
               value.map((option, index) => (
@@ -50,7 +42,7 @@ export default function Category() {
               ))
             }
             value={selectedCategories}
-            onChange={(event, newValue) => handleSelectedOptions(newValue)}
+            onChange={(event, newValue) => setSelectedCategories(newValue)}
             sx={{ width: '100%', margin: 0 }}
             renderInput={(params) => <TextField {...params} label="Categoria" />}
           />

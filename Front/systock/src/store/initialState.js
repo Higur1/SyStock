@@ -2,6 +2,8 @@ export default {
   category: {
     items: [],
     isGettingCategories: false,
-    error: null
+    error: null,
+    insertingCategory: false,
+    itemAdded: {}
   }
 };;

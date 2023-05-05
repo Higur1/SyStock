@@ -1,5 +1,5 @@
-import { apiBase, performFetch } from "../../apiBase"
-import { CATEGORIES_GETTING_ALL, CATEGORIES_GETTING_ERROR, CATEGORIES_GETTING_SUCCESS } from "./actionTypes";
+import { performFetch } from "../../apiBase"
+import { CATEGORIES_GETTING_ALL, CATEGORIES_GETTING_ERROR, CATEGORIES_GETTING_SUCCESS, CATEGORIES_INSERTING_ALL, CATEGORIES_INSERTING_ERROR, CATEGORIES_INSERTING_SUCCESS, CATEGORIES_UPDATING_ALL, CATEGORIES_UPDATING_ERROR, CATEGORIES_UPDATING_SUCCESS } from "./actionTypes";
 
 
 
@@ -46,5 +46,87 @@ export function getCategories() {
     // performFetch(`${apiBase}${url}`, {method: 'GET'})
     //   .then(response => dispatch(gettingCategoriesSuccess(response)))
     //   .catch((error) => dispatch(gettingCategoriesError(error)));
+  }
+}
+
+export function insertCategory(category) {
+  const url = "/categories/new";
+
+  function insertingCategory(insertingCategory) {
+    return {
+      type: CATEGORIES_INSERTING_ALL,
+      payload: {
+        insertingCategory
+      }
+    };
+  }
+  
+  function insertingCategorySuccess(itemAdded) {
+    return {
+      type: CATEGORIES_INSERTING_SUCCESS,
+      payload: {
+        itemAdded,
+        insertingCategory: false
+      }
+    };
+  }
+  
+  function insertingCategoryError(error) {
+    return {
+      type: CATEGORIES_INSERTING_ERROR,
+      payload: {
+        insertingCategory: false,
+        error
+      }
+    };
+  }
+
+  return (dispatch) => {
+    dispatch(insertingCategory(true));
+
+    performFetch(url, {method: 'POST', body: JSON.stringify(category)})
+      .then(response => dispatch(insertingCategorySuccess(response)))
+      .catch((error) => dispatch(insertingCategoryError(error)));
+  }
+}
+
+export function updateCategory(category) {
+  const url = "/categories/update";
+
+  function updatingCategory(updatingCategory) {
+    return {
+      type: CATEGORIES_UPDATING_ALL,
+      payload: {
+        updatingCategory
+      }
+    };
+  }
+  
+  function updatingCategorySuccess(itemAdded) {
+    return {
+      type: CATEGORIES_UPDATING_SUCCESS,
+      payload: {
+        itemAdded,
+        updatingCategory: false
+      }
+    };
+  }
+  
+  function updatingCategoryError(error) {
+    return {
+      type: CATEGORIES_UPDATING_ERROR,
+      payload: {
+        updatingCategory: false,
+        error
+      }
+    };
+  }
+
+  return (dispatch) => {
+    dispatch(updatingCategory(true));
+
+    performFetch(url, {method: 'PUT', body: JSON.stringify(category)})
+      .then(response => dispatch(updatingCategorySuccess(response)))
+      .catch((error) => dispatch(updatingCategoryError(error)));
   }
 }

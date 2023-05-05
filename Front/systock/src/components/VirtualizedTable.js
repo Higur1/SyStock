@@ -8,24 +8,38 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { TableVirtuoso } from 'react-virtuoso';
 import PropTypes from 'prop-types';
+import { CellContainer, ColumnTable, RowDiv, RowTable } from '../pages/Category/styles';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { IconButton } from '@mui/material';
 
 const columns = [
   {
-    width: 150,
+    width: 450,
     label: 'Categoria',
-    dataKey: 'label',
+    dataKey: 'name',
+    icon: null,
+    isText: true,
+    isIcon: false
   },
+  // {
+  //   width: 150,
+  //   label: 'Categoria Pai',
+  //   dataKey: 'parent'
+  // },
+  // {
+  //   width: 100,
+  //   label: 'Quantidade de Produtos',
+  //   dataKey: 'quantity',
+  //   numeric: true,
+  // },
   {
-    width: 150,
-    label: 'Categoria Pai',
-    dataKey: 'parent'
+    width: 50,
+    label: '',
+    dataKey: null,
+    icon: <MoreVertIcon fontSize='small' />,
+    isText: false,
+    isIcon: true
   },
-  {
-    width: 100,
-    label: 'Quantidade de Produtos',
-    dataKey: 'quantity',
-    numeric: true,
-  }
 ];
 
 const VirtuosoTableComponents = {
@@ -64,13 +78,21 @@ function rowContent(option) {
   return (
     <React.Fragment>
       {columns.map((column) => (
-        <TableCell
+        <ColumnTable
           key={column.dataKey}
-          align={column.numeric || false ? 'right' : 'left'}
-          style={{ textAlign: 'left' }}
         >
-          {option[column.dataKey]}
-        </TableCell>
+          <CellContainer style={{justifyContent: column.isIcon ? 'flex-end' : 'flex-start'}}>
+            {column.isText && option[column.dataKey]}
+            {column.isIcon && (
+              <IconButton>
+                {column.icon}
+              </IconButton>
+            )}
+          </CellContainer>
+        </ColumnTable>
+        // <RowDiv>
+        //   {option[column.dataKey]}
+        // </RowDiv>
       ))}
     </React.Fragment>
   );
