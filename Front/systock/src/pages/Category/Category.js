@@ -1,13 +1,21 @@
 import { Autocomplete, Button, Chip, TextField } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import CreateCategoryDialog from '../../components/dialogs/CreateCategoryDialog';
 import VirtualizedTable from '../../components/VirtualizedTable';
 import { Container, HeaderContainer } from './styles'
 import useCategory from '../../hooks/useCategory';
+import { useDispatch } from 'react-redux';
+import { getCategories } from '../../redux/actions/categoriesActions';
 
 
 
 export default function Category() {
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getCategories());
+  }, []);
 
   const {
     categories,

@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { getCategories } from "../redux/actions/categoriesActions";
 
 export default function useCategory() {
+  // const dispatch = useDispatch();
+
+  // useEffect(() => {
+  //   dispatch(getCategories());
+  // });
 
   const categoryRedux = useSelector(state => state.categories);
 
@@ -13,6 +19,7 @@ export default function useCategory() {
   ]);
   const [selectedCategories, setselectedCategories] = useState([]);
   const [categoriesFiltered, setCategoriesFiltered] = useState([]);
+
 
   //* HANDLE WHEN AUTOCOMPLETE
   //* CATEGORY SCREEN

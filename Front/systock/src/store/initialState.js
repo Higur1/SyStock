@@ -1,3 +1,7 @@
 export default {
-  category: {}
+  category: {
+    items: [],
+    isGettingCategories: false,
+    error: null
+  }
 };;
