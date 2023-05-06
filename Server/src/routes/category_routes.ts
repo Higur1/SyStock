@@ -32,8 +32,14 @@ export async function category_routes(app: FastifyInstance) {
             data: {
               name: name,
             },
-          });
-          response.status(201);
+          }).then(async (bodyReturn) =>{
+            await prisma.category.findFirst({
+              where:{
+                name: name
+              }
+            })
+            response.status(201).send(bodyReturn)
+          })
         });
     } catch (error) {
       response.status(400).send(
@@ -147,8 +153,14 @@ export async function category_routes(app: FastifyInstance) {
           await prisma.category.update({
             where: { id: id },
             data: { name: name },
-          });
-          response.status(200);
+          }).then(async (bodyReturn) => {
+            await prisma.category.findFirst({
+              where:{
+                id: id
+              }
+            })
+            response.status(200).send(bodyReturn);
+          })
         });
     } catch (error) {
       response.status(400).send(
