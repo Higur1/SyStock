@@ -17,7 +17,7 @@ export const HeaderContainer = styled("div")({
 
 export const ColumnTable = styled(TableCell)({
   height: 47,
-  padding: '0px 8px',
+  padding: '0px 16px',
 });
 
 export const CellContainer = styled("div")({
