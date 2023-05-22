@@ -1,8 +1,9 @@
 import React from "react";
+import useProduct from "../../hooks/useProduct"
 
 export default function Product() {
 
-  const {} = useProduct();
+  const { products } = useProduct();
   
   return (
     <>
@@ -34,16 +35,7 @@ export default function Product() {
           >
             Adicionar Categoria</Button>
         </HeaderContainer>
-        <VirtualizedTable options={categoriesFiltered} />
       </Container>
-      {openCreateCategory && (
-        <CreateCategoryDialog 
-          open={openCreateCategory}
-          handleClose={() => setOpenCreateCategory(false)}
-          categories={categories}
-          createCategory={handleCreateCategory}
-        />
-      )}
     </>
   )
 }

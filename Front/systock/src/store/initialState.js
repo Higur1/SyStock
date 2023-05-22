@@ -4,6 +4,7 @@ export default {
     isGettingCategories: false,
     error: null,
     insertingCategory: false,
-    itemAdded: {}
+    itemAdded: {},
+    deletingCategory: false
   }
-};;
+};

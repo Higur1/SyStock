@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getCategories, insertCategory } from "../redux/actions/categoriesActions";
+import { getCategories, insertCategory, updateCategory } from "../redux/actions/categoriesActions";
 import { deepCopy } from "../utils/utils";
 
 export default function useCategory() {
@@ -8,6 +8,7 @@ export default function useCategory() {
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [categoriesFiltered, setCategoriesFiltered] = useState([]);
+  const [message, setMessage] = useState("");
 
   const dispatch = useDispatch();
   const categoriesRedux = useSelector(state => state.categories);
@@ -38,6 +39,30 @@ export default function useCategory() {
     dispatch(insertCategory(obj));
   }
 
+  function handleUpdateCategory(category) {
+    dispatch(updateCategory(category));
+  }
+
+  /**
+   * * delete category by id
+   * @param {*} id 
+   */
+  async function handleDeleteCategory(id) {
+    const url = "/categories/delete";
+
+    try {
+      performFetch(url, {method: 'DELETE', body: JSON.stringify(id)});
+
+      const updatedCategories = categories.filter(cat => cat.id !== id);
+      setCategories(updatedCategories);
+    } catch (e) {
+      setMessage(e.message);
+    }
+  }
+
+  /**
+   * * when add a category
+   */
   useEffect(() => {
     if(Object.values(categoriesRedux.itemAdded).length === 0) return;
 
@@ -58,6 +83,6 @@ export default function useCategory() {
     selectedCategories, setSelectedCategories,
     categoriesFiltered, setCategoriesFiltered,
     categoriesRedux,
-    handleCreateCategory
+    handleCreateCategory, handleUpdateCategory, handleDeleteCategory
   }
 }

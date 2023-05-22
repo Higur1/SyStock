@@ -1,5 +1,5 @@
 import { performFetch } from "../../apiBase"
-import { CATEGORIES_GETTING_ALL, CATEGORIES_GETTING_ERROR, CATEGORIES_GETTING_SUCCESS, CATEGORIES_INSERTING_ALL, CATEGORIES_INSERTING_ERROR, CATEGORIES_INSERTING_SUCCESS, CATEGORIES_UPDATING_ALL, CATEGORIES_UPDATING_ERROR, CATEGORIES_UPDATING_SUCCESS } from "./actionTypes";
+import { CATEGORIES_DELETING, CATEGORIES_DELETING_ERROR, CATEGORIES_DELETING_SUCCESS, CATEGORIES_GETTING_ALL, CATEGORIES_GETTING_ERROR, CATEGORIES_GETTING_SUCCESS, CATEGORIES_INSERTING_ALL, CATEGORIES_INSERTING_ERROR, CATEGORIES_INSERTING_SUCCESS, CATEGORIES_UPDATING_ALL, CATEGORIES_UPDATING_ERROR, CATEGORIES_UPDATING_SUCCESS } from "./actionTypes";
 
 
 
@@ -128,5 +128,47 @@ export function updateCategory(category) {
     performFetch(url, {method: 'PUT', body: JSON.stringify(category)})
       .then(response => dispatch(updatingCategorySuccess(response)))
       .catch((error) => dispatch(updatingCategoryError(error)));
+  }
+}
+
+export function deleteCategory(category) {
+  const url = "/categories/delete"
+  function deletingCategory(deletingCategory) {
+    return {
+      type: CATEGORIES_DELETING,
+      payload: {
+        deletingCategory
+      }
+    };
+  }
+
+  function deletingCategorySuccess() {
+    return {
+      type: CATEGORIES_DELETING_SUCCESS,
+      payload: {
+        deletingCategory: false,
+        error: null
+      }
+    }
+  }
+
+  function deletingCategoryError(error) {
+    return {
+      type: CATEGORIES_DELETING_ERROR,
+      payload: {
+        deletingCategory: false,
+        error
+      }
+    }
+  }
+
+  return (dispatch) => {
+
+    dispatch(deletingCategory(true));
+
+    performFetch(url, {method: 'DELETE', body: JSON.stringify(category)})
+      .then(() => dispatch(deletingCategorySuccess()))
+      .catch((e) => dispatch(deletingCategoryError(e.message)));
+
   }
 }

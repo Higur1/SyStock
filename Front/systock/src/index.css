@@ -6,15 +6,16 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+div {
+  box-sizing: border-box;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
 
 #root {
-  background: url(./images/background-main-img.png);
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
   width: 100vw;
   height: 100vh;
 }
