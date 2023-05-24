@@ -1,18 +1,10 @@
 import { performFetch } from "../../apiBase"
+import { PRODUCTS_CREATING, PRODUCTS_CREATING_ERROR, PRODUCTS_CREATING_SUCCESS, PRODUCTS_DELETING, PRODUCTS_DELETING_ERROR, PRODUCTS_DELETING_SUCCESS, PRODUCTS_GETTING_ALL, PRODUCTS_GETTING_ERROR, PRODUCTS_GETTING_SUCCESS, PRODUCTS_UPDATING, PRODUCTS_UPDATING_ERROR, PRODUCTS_UPDATING_SUCCESS } from "./actionTypes";
 
 export function createProduct(product) {
   const url = "/products/new";
 
   function creatingProduct(isCreatingProduct) {
-    return {
-      type: PRODUCTS_CREATING,
-      payload: {
-        isCreatingProduct
-      }
-    };
-  }
-
-  function creatingProductSuccess(isCreatingProduct) {
     return {
       type: PRODUCTS_CREATING,
       payload: {
@@ -105,114 +97,73 @@ export function getProducts() {
   }
 }
 
-export function insertCategory(category) {
-  const url = "/categories/new";
+export function updateProduct(product) {
+  const url = "/products/update";
 
-  function insertingCategory(insertingCategory) {
+  function updatingProduct(isUpdatingProduct) {
     return {
-      type: CATEGORIES_INSERTING_ALL,
+      type: PRODUCTS_UPDATING,
       payload: {
-        insertingCategory
+        isUpdatingProduct
       }
     };
   }
   
-  function insertingCategorySuccess(itemAdded) {
+  function updatingProductSuccess(itemAdded) {
     return {
-      type: CATEGORIES_INSERTING_SUCCESS,
+      type: PRODUCTS_UPDATING_SUCCESS,
       payload: {
         itemAdded,
-        insertingCategory: false
+        isUpdatingProduct: false
       }
     };
   }
   
-  function insertingCategoryError(error) {
+  function updatingProductError(error) {
     return {
-      type: CATEGORIES_INSERTING_ERROR,
+      type: PRODUCTS_UPDATING_ERROR,
       payload: {
-        insertingCategory: false,
+        isUpdatingProduct: false,
         error
       }
     };
   }
 
   return (dispatch) => {
-    dispatch(insertingCategory(true));
+    dispatch(updatingProduct(true));
 
-    performFetch(url, {method: 'POST', body: JSON.stringify(category)})
-      .then(response => dispatch(insertingCategorySuccess(response)))
-      .catch((error) => dispatch(insertingCategoryError(error)));
+    performFetch(url, {method: 'PUT', body: JSON.stringify(product)})
+      .then(response => dispatch(updatingProductSuccess(response)))
+      .catch((error) => dispatch(updatingProductError(error.message)));
   }
 }
 
-export function updateCategory(category) {
-  const url = "/categories/update";
-
-  function updatingCategory(updatingCategory) {
+export function deleteProduct(Product) {
+  const url = "/products/delete"
+  function deletingProduct(isDeletingProduct) {
     return {
-      type: CATEGORIES_UPDATING_ALL,
+      type: PRODUCTS_DELETING,
       payload: {
-        updatingCategory
-      }
-    };
-  }
-  
-  function updatingCategorySuccess(itemAdded) {
-    return {
-      type: CATEGORIES_UPDATING_SUCCESS,
-      payload: {
-        itemAdded,
-        updatingCategory: false
-      }
-    };
-  }
-  
-  function updatingCategoryError(error) {
-    return {
-      type: CATEGORIES_UPDATING_ERROR,
-      payload: {
-        updatingCategory: false,
-        error
+        isDeletingProduct
       }
     };
   }
 
-  return (dispatch) => {
-    dispatch(updatingCategory(true));
-
-    performFetch(url, {method: 'PUT', body: JSON.stringify(category)})
-      .then(response => dispatch(updatingCategorySuccess(response)))
-      .catch((error) => dispatch(updatingCategoryError(error)));
-  }
-}
-
-export function deleteCategory(category) {
-  const url = "/categories/delete"
-  function deletingCategory(deletingCategory) {
+  function deletingProductSuccess() {
     return {
-      type: CATEGORIES_DELETING,
+      type: PRODUCTS_DELETING_SUCCESS,
       payload: {
-        deletingCategory
-      }
-    };
-  }
-
-  function deletingCategorySuccess() {
-    return {
-      type: CATEGORIES_DELETING_SUCCESS,
-      payload: {
-        deletingCategory: false,
+        isDeletingProduct: false,
         error: null
       }
     }
   }
 
-  function deletingCategoryError(error) {
+  function deletingProductError(error) {
     return {
-      type: CATEGORIES_DELETING_ERROR,
+      type: PRODUCTS_DELETING_ERROR,
       payload: {
-        deletingCategory: false,
+        isDeletingProduct: false,
         error
       }
     }
@@ -220,11 +171,11 @@ export function deleteCategory(category) {
 
   return (dispatch) => {
 
-    dispatch(deletingCategory(true));
+    dispatch(deletingProduct(true));
 
-    performFetch(url, {method: 'DELETE', body: JSON.stringify(category)})
-      .then(() => dispatch(deletingCategorySuccess()))
-      .catch((e) => dispatch(deletingCategoryError(e.message)));
+    performFetch(url, {method: 'DELETE', body: JSON.stringify(Product)})
+      .then(() => dispatch(deletingProductSuccess()))
+      .catch((e) => dispatch(deletingProductError(e.message)));
 
   }
 }
