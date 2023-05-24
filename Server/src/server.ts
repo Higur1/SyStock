@@ -46,6 +46,7 @@ const start = async () => {
     await app.listen({ port: port, host: ip.address() });
     console.log(`Served at ${ip.address()}:${port}`);
   } catch (error) {
+    console.log(error);
     app.log.error(error);
     process.exit(1);
   }
