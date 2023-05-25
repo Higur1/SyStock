@@ -43,3 +43,29 @@ export const TableData = styled("div")(({minWidth, width}) => ({
   height: '48px',
   fontWeight: 600
 }));
+
+export const Menu = styled("div")({
+  display: 'flex',
+  position: 'absolute',
+  width: 200,
+  flexDirection: 'column',
+  borderRadius: '16px',
+  background: "#fff",
+  right: '40px',
+  border: '1px solid #C3C3C3',
+  top: 0
+});
+
+export const MenuOption = styled("div")({
+  fontSize: 14,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-start',
+  height: 40,
+  paddingLeft: '8px',
+  borderBottom: '1px solid #C3C3C3',
+  color: 'black',
+  "&:hover": {
+    background: '#DCDCDC'
+  }
+});

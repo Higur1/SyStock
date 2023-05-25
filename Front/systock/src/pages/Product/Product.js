@@ -1,14 +1,25 @@
 import React, { useState } from "react";
 import useProduct from "../../hooks/useProduct"
-import { Container, HeaderContainer, TableContainer, TableData, TableRow } from "./styles";
-import { Button, Fade } from "@mui/material";
+import { Container, HeaderContainer, MenuOption, TableContainer, TableData, TableRow, Menu } from "./styles";
+import { Button, ClickAwayListener, IconButton } from "@mui/material";
 import ToolTipAndEllipsis from "../../components/dialogs/ComponentUtils/ToolTipAndEllipsis";
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 export default function Product() {
 
   const { products } = useProduct();
+  const [menuOption, setMenuOption] = useState(false);
+  const [idMenu, setIdMenu] = useState(null);
 
-  const [ openCreateProduct, setOpenCreateProduct] = useState(false);
+  function handleMenuOptions(id) {
+    setMenuOption(true);
+    setIdMenu(id);
+  }
+
+  function handleCloseMenu() {
+    setMenuOption(false);
+    setIdMenu(null);
+  }
 
   return (
     <>
@@ -36,7 +47,7 @@ export default function Product() {
           <Button
             variant="contained"
             style={{ minWidth: '236px' }}
-            onClick={() => setOpenCreateProduct(true)}
+            // onClick={() => setOpenCreateProduct(true)}
           >
             Adicionar Produto
           </Button>
@@ -49,6 +60,7 @@ export default function Product() {
             <TableData width={"7%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{"Preço"}</TableData>
             <TableData width={"7%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{"Categoria"}</TableData>
             <TableData width={"7%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{"Supplier"}</TableData>
+            <TableData width={"40px"} style={{justifyContent: 'center'}}minWidth={'40px'} />
           </TableRow>
           {products.map((prod, index) => (
             <TableRow key={index} style={{
@@ -64,10 +76,27 @@ export default function Product() {
               <TableData width={"7%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{prod.price}</TableData>
               <TableData width={"7%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{prod.category_id}</TableData>
               <TableData width={"7%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{prod.supplier_id}</TableData>
+              <TableData width={"40px"} style={{justifyContent: 'center'}}minWidth={'40px'}>
+                <IconButton onClick={() => handleMenuOptions(index)}>
+                  <MoreVertIcon fontSize='small'/>
+                  {menuOption && idMenu === index && (
+                    <ClickAwayListener onClickAway={handleCloseMenu}>
+                      <Menu>
+                        <MenuOption style={{borderRadius: '16px 16px 0px 0px'}}>{"Visualizar Produto"}</MenuOption>
+                        <MenuOption>{"Editar Produto"}</MenuOption>
+                        <MenuOption style={{borderBottom: '0px', borderRadius: '0px 0px 16px 16px'}} >{"Apagar Produto"}</MenuOption>
+                      </Menu>
+                    </ClickAwayListener>
+                  
+                )}
+                </IconButton>
+                </TableData>
             </TableRow> 
           ))}
         </TableContainer>
       </Container>
+
+      
     </>
   )
 }

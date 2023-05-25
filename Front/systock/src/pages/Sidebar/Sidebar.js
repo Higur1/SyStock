@@ -5,7 +5,6 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 import Estoque from '../../images/stock.png';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 
 export default function Sidebar() {
 
@@ -24,7 +23,7 @@ export default function Sidebar() {
       </Option>
       <Option>
         <InventoryIcon style={{ width: 30, height: 30 }} />
-        <Link to="product">Product</Link>
+        <Link to="products">Product</Link>
       </Option>
       <Option>
         <img src={Estoque} style={{ width: 32, height: 32 }}/>

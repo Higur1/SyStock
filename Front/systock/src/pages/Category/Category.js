@@ -1,4 +1,4 @@
-import { Autocomplete, Button, Chip, Icon, IconButton, TextField } from '@mui/material'
+import { Autocomplete, Button, Chip, Dialog, DialogActions, DialogTitle, IconButton, TextField } from '@mui/material'
 import React, { useState } from 'react'
 import CreateCategoryDialog from '../../components/dialogs/CreateCategoryDialog';
 import { Container, HeaderContainer, Menu, MenuOption, TableContainer, TableData, TableRow } from './styles'
@@ -43,6 +43,7 @@ export default function Category() {
             renderTags={(value, getTagProps) =>
               value.map((option, index) => (
                 <Chip
+                  key={index}
                   variant="outlined"
                   label={option}
                   {...getTagProps({ index })}
@@ -108,11 +109,10 @@ export default function Category() {
       {deleteCategory && (
         <Dialog
         open={deleteCategory}
-        TransitionComponent={Transition}
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle><Title>{"Deseja  mesmo apagar essa categoria?"}</Title></DialogTitle>
+        <DialogTitle>{"Deseja  mesmo apagar essa categoria?"}</DialogTitle>
         <DialogActions>
           <Button onClick={() => setDeleteCategory(false)}>Cancelar</Button>
           <Button onClick={() => {

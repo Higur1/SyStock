@@ -1,24 +1,24 @@
+/* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { deepCopy } from "../utils/utils";
-import { getProducts } from "../redux/actions/productsActions";
+import { performFetch } from "../apiBase";
 
 export default function useCategory() {
   const [products, setProducts] = useState([]);
 
-  const dispatch = useDispatch();
-  const productsRedux = useSelector(state => state.products);
 
   useEffect(() => {
-    dispatch(getProducts());
+    getProducts();
   }, []);
 
-  useEffect(() => {
-    if(productsRedux.items.length === 0) return;
+  async function getProducts() {
+    try {
+      const products = await performFetch("/products", {method: 'GET'});
 
-    const newProducts = deepCopy(productsRedux.items);
-    setProducts(newProducts);
-  }, [productsRedux.items]);
+      setProducts(products);
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
 
   return {
     products, setProducts

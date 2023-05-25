@@ -1,11 +1,10 @@
 import { Tooltip } from "@mui/material";
-import React, { useRef, useState } from "react";
+import PropTypes from 'prop-types';
+import React, { useRef } from "react";
 
 export default function TooltipAndEllipsis(props) {
 
   let refInfo = useRef(null);
-  const [rerender, setRerender] = useState(false);
-
   
   const setRef = e => {
     if(e !== null) {
@@ -30,4 +29,8 @@ export default function TooltipAndEllipsis(props) {
       </div>
     </Tooltip>
   )
+}
+
+TooltipAndEllipsis.propTypes = {
+  item: PropTypes.string
 }
