@@ -1,5 +1,6 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, Slide, TextField } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Slide, TextField } from "@mui/material";
 import React, { useState } from "react";
+import PropTypes from 'prop-types';
 import styled from "styled-components";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -19,11 +20,10 @@ const Container = styled.div`
   padding-top: 16px;
 `
 
-export default function CreateCategoryDialog(props) {
-  const { open, handleClose, categories, createCategory } = props;
+export default function EditCategoryDialog(props) {
+  const { open, handleClose, category, handleSave } = props;
 
-  const [categoryLabel, setCategoryLabel] = useState('');
-  const [categoryParent, setCategoryParent] = useState('');
+  const [categoryLabel, setCategoryLabel] = useState(category.name);
   const [hasError, setHasError] = useState(false);
 
   return (
@@ -33,7 +33,7 @@ export default function CreateCategoryDialog(props) {
       maxWidth="md"
       fullWidth
     >
-      <DialogTitle><Title>{"Adicionar Categoria"}</Title></DialogTitle>
+      <DialogTitle><Title>{"Editar Categoria"}</Title></DialogTitle>
       <DialogContent>
         <Container>
           <TextField
@@ -43,23 +43,6 @@ export default function CreateCategoryDialog(props) {
             onChange={(e) => setCategoryLabel(e.target.value)}
             error={hasError}
           />
-          <FormControl>
-            <InputLabel id="test-select-label">Categoria Pai</InputLabel>
-            <Select
-              value={categoryParent}
-              onChange={(e) => setCategoryParent(e.target.value)}
-              labelId="test-select-label"
-              label="Categoria Pai"
-            >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              {categories.map((cat, index) => (
-                <MenuItem value={cat.label} key={index}>{cat.label}</MenuItem>
-              )
-              )}
-            </Select>
-          </FormControl>
           <div style={{color: 'red', display: hasError ? 'block' : 'none'}}>Preencha os campos obrigatórios!</div>
         </Container>
 
@@ -71,11 +54,18 @@ export default function CreateCategoryDialog(props) {
             setHasError(true);
             return;
           }
-          createCategory(categoryLabel, categoryParent);
+          handleSave({id: category.id, name: categoryLabel});
           handleClose();
-          }}>Adicionar</Button>
+          }}>Salvar</Button>
       </DialogActions>
 
     </Dialog>
   );
 }
+
+EditCategoryDialog.propTypes = {
+  open: PropTypes.bool,
+  handleClose: PropTypes.func,
+  category: PropTypes.object,
+  handleSave: PropTypes.func
+};

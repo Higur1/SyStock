@@ -5,6 +5,8 @@ import { performFetch } from "../apiBase";
 export default function useCategory() {
   const [products, setProducts] = useState([]);
 
+  const [errorInsert, setErrorInsert] = useState(null);
+
 
   useEffect(() => {
     getProducts();
@@ -20,7 +22,31 @@ export default function useCategory() {
     }
   }
 
+  async function createProduct(product) {
+    try {
+      const prod = await performFetch("/products/new", {method: 'POST', body: JSON.stringify(product)});
+
+      setProducts(prod);
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
+  async function updateProduct(product) {
+    try {
+      const prod = await performFetch("/products/update", {method: 'POST', body: JSON.stringify(product)});
+
+      const newProducts = products.map(p => (p.id === prod.id ? {...prod} : {...p}));
+
+      setProducts(newProducts);
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
   return {
-    products, setProducts
+    products, setProducts,
+    createProduct, updateProduct,
+    errorInsert
   }
 }

@@ -1,10 +1,10 @@
 import { Autocomplete, Button, Chip, Dialog, DialogActions, DialogTitle, IconButton, TextField } from '@mui/material'
 import React, { useState } from 'react'
-import CreateCategoryDialog from '../../components/dialogs/CreateCategoryDialog';
 import { Container, HeaderContainer, Menu, MenuOption, TableContainer, TableData, TableRow } from './styles'
 import useCategory from '../../hooks/useCategory';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import EditCategoryDialog from '../../components/dialogs/EditCategoryDialog';
+import CreateCategoryDialog from './dialogs/CreateCategoryDialog';
+import EditCategoryDialog from './dialogs/EditCategoryDialog';
 
 export default function Category() {
 

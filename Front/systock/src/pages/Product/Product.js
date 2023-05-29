@@ -1,15 +1,18 @@
 import React, { useState } from "react";
 import useProduct from "../../hooks/useProduct"
 import { Container, HeaderContainer, MenuOption, TableContainer, TableData, TableRow, Menu } from "./styles";
-import { Button, ClickAwayListener, IconButton } from "@mui/material";
+import { Backdrop, Button, CircularProgress, ClickAwayListener, IconButton } from "@mui/material";
 import ToolTipAndEllipsis from "../../components/dialogs/ComponentUtils/ToolTipAndEllipsis";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import CreateProductDialog from "./dialogs/CreateProductDialog";
 
 export default function Product() {
 
-  const { products } = useProduct();
+  const { products, createProduct, errorInsert } = useProduct();
   const [menuOption, setMenuOption] = useState(false);
   const [idMenu, setIdMenu] = useState(null);
+  const [openCreateProduct, setOpenCreateProduct] = useState(false);
+  const [openEditProduct, setOpenEditProduct] = useState(false);
 
   function handleMenuOptions(id) {
     setMenuOption(true);
@@ -47,7 +50,7 @@ export default function Product() {
           <Button
             variant="contained"
             style={{ minWidth: '236px' }}
-            // onClick={() => setOpenCreateProduct(true)}
+            onClick={() => setOpenCreateProduct(true)}
           >
             Adicionar Produto
           </Button>
@@ -83,7 +86,7 @@ export default function Product() {
                     <ClickAwayListener onClickAway={handleCloseMenu}>
                       <Menu>
                         <MenuOption style={{borderRadius: '16px 16px 0px 0px'}}>{"Visualizar Produto"}</MenuOption>
-                        <MenuOption>{"Editar Produto"}</MenuOption>
+                        <MenuOption onClick={() => setOpenEditProduct(true)}>{"Editar Produto"}</MenuOption>
                         <MenuOption style={{borderBottom: '0px', borderRadius: '0px 0px 16px 16px'}} >{"Apagar Produto"}</MenuOption>
                       </Menu>
                     </ClickAwayListener>
@@ -96,6 +99,12 @@ export default function Product() {
         </TableContainer>
       </Container>
 
+      {openCreateProduct && <CreateProductDialog 
+        handleCreate={createProduct}
+        handleClose={() => setOpenCreateProduct(false)}
+        error={errorInsert}
+        open={openCreateProduct}
+      />}
       
     </>
   )

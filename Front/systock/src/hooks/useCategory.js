@@ -1,6 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getCategories, insertCategory, updateCategory } from "../redux/actions/categoriesActions";
 import { deepCopy } from "../utils/utils";
 import { performFetch } from "../apiBase";
 
