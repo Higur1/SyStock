@@ -4,36 +4,25 @@ import { z } from "zod";
 export async function supplier_routes(app: FastifyInstance) {
   app.post("/suppliers/new", async (request, response) => {
     const supplier = z.object({
-      company_name: z.string(),
-      email: z.string(),
-      cnpj: z.string(),
-      state_registration: z.string(),
+      name: z.string(),
+      company_id: z.number(),
       phone: z.string(),
-      cep: z.string(),
-      city: z.string(),
-      state: z.string(),
-      street: z.string(),
-      number: z.number(),
-      complement: z.string(),
+      email: z.string(),
+
     });
     const {
-      company_name,
-      email,
-      cnpj,
-      state_registration,
+      name,
+      company_id,
       phone,
-      cep,
-      city,
-      state,
-      street,
-      number,
-      complement,
+      email,
     } = supplier.parse(request.body);
 
     try {
       await prisma.supplier
         .findFirst({
-          where: { OR: [{ cnpj }, { email }] },
+          where: {
+            email: email
+          },
         })
         .then(async (supplier_exist) => {
           if (supplier_exist) {
@@ -42,32 +31,27 @@ export async function supplier_routes(app: FastifyInstance) {
           await prisma.supplier
             .create({
               data: {
-                company_name: company_name,
-                email: email,
-                cnpj: cnpj,
-                state_registration: state_registration,
-                phone: phone,
+                company_id: company_id,
+                name: name,
+                email: email
               },
             })
             .then(async () => {
               await prisma.supplier
                 .findFirst({
                   where: {
-                    cnpj: cnpj,
+                    email: email
                   },
                 })
-                .then(async (supplier_id) => {
-                  await prisma.supplier_Address.create({
-                    data: {
-                      supplier_id: supplier_id!.id,
-                      cep: cep,
-                      city: city,
-                      state: state,
-                      street: street,
-                      number: number,
-                      complement: complement,
-                    },
-                  });
+                .then(async (supplier_email) => {
+                  if(supplier_email){
+                    await prisma.supplier_Phone.create({
+                      data: {
+                        phone: phone,
+                        supplier_id: supplier_email!.id
+                      },
+                    });
+                  }
                 });
             });
           response.status(201);
@@ -86,20 +70,13 @@ export async function supplier_routes(app: FastifyInstance) {
       await prisma.$queryRaw`
             SELECT  
                 S.id,
-                S.company_name,
+                S.name,
                 S.email,
-                S.cnpj,
-                S.state_registration,
-                S.phone,  
-                SA.cep,
-                SA.city,
-                SA.state,
-                SA.street,
-                SA.number,
-                SA.complement
+                S.company_id,
+                P.phone,  
             FROM suppliers S
-            JOIN supplier_address SA
-                ON S.id = SA.supplier_id
+            JOIN supplier_phone P
+                ON S.id = P.supplier_id
             `.then((supplier) => {
         if (!supplier) {
           response.status(200).send("an operation could not be performed");
@@ -115,19 +92,19 @@ export async function supplier_routes(app: FastifyInstance) {
       );
     }
   });
-  app.get("/suppliers/findByName/:company_name", async (request, response) => {
+  app.get("/suppliers/findByName/:name", async (request, response) => {
     const supplier = z.object({
-      company_name: z.string(),
+      name: z.string(),
     });
 
-    const { company_name } = supplier.parse(request.params);
+    const { name } = supplier.parse(request.params);
 
     try {
       await prisma.supplier
         .findMany({
           where: {
-            company_name: {
-              startsWith: company_name,
+            name: {
+              startsWith: name,
             },
           },
         })
@@ -172,61 +149,21 @@ export async function supplier_routes(app: FastifyInstance) {
       );
     }
   });
-  app.get("/suppliers/findAddress/:supplier_id", async (request, response) => {
-    const supplier_address_id = z.object({
-      supplier_id: z.string(),
-    });
-    const { supplier_id } = supplier_address_id.parse(request.params);
-
-    try {
-      await prisma.supplier_Address
-        .findUnique({
-          where: {
-            supplier_id: Number(supplier_id),
-          },
-        })
-        .then((supplier_address) => {
-          if (!supplier_address) {
-            response.status(200).send("Not found");
-          }
-          response.status(200).send(supplier_address);
-        });
-    } catch (error) {
-      response.status(400).send(
-        JSON.stringify({
-          mensagem: "An error has occurred",
-        })
-      );
-    }
-  });
   app.put("/suppliers/update", async (request, response) => {
     const supplier = z.object({
       id: z.number(),
-      company_name: z.string(),
+      name: z.string(),
       email: z.string(),
-      cnpj: z.string(),
-      state_registration: z.string(),
       phone: z.string(),
-      cep: z.string(),
-      city: z.string(),
-      state: z.string(),
-      street: z.string(),
-      number: z.number(),
-      complement: z.string(),
+      company_id: z.number()
     });
     const {
       id,
-      company_name,
       email,
-      cnpj,
-      state_registration,
+      name,
       phone,
-      cep,
-      city,
-      state,
-      street,
-      number,
-      complement,
+      company_id,
+      
     } = supplier.parse(request.body);
 
     try {
@@ -238,30 +175,38 @@ export async function supplier_routes(app: FastifyInstance) {
         })
         .then(async (supplier) => {
           if (!supplier) {
-            response.status(200).send("Não encontrado");
+            response.status(200).send("Not found");
           }
           await prisma.supplier
             .update({
               where: { id: id },
               data: {
-                company_name: company_name,
+                name: name,
                 email: email,
-                state_registration: state_registration,
-                phone: phone,
+                company_id: company_id
               },
             })
             .then(async () => {
-              await prisma.supplier_Address.update({
-                where: { supplier_id: id },
-                data: {
-                  cep: cep,
-                  city: city,
-                  state: state,
-                  street: street,
-                  number: number,
-                  complement: complement,
-                },
-              });
+              await prisma.supplier_Phone.findFirst({
+                where:{
+                  supplier_id: id
+                }
+              }).then(async(phoneExists) =>{
+                if(phoneExists){
+                  await prisma.supplier_Phone.delete({
+                    where:{
+                      phone: phoneExists?.phone
+                    }
+                  })
+                  await prisma.supplier_Phone.create({
+                    data:{
+                      phone: phone,
+                      supplier_id: id
+                    }
+                  })
+                }
+                response.status(200).send("an operation could not be performed") 
+              })
             });
           response.status(200);
         });
@@ -289,8 +234,8 @@ export async function supplier_routes(app: FastifyInstance) {
           if (!user) {
             response.status(200).send("Not found");
           }
-          await prisma.supplier_Address.delete({
-            where: { supplier_id: id },
+          await prisma.supplier_Phone.delete({
+            where: { id: id },
           });
           await prisma.supplier.delete({
             where: { id: id },

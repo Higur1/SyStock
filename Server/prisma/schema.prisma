@@ -36,7 +36,7 @@ model Company_Address {
   city       String
   state      String
   street     String
-  number     Int   @unique
+  number     Int    @unique
   complement String
 
   Company Company[]
@@ -55,19 +55,20 @@ model Company_Phone {
 }
 
 model Supplier {
-  id         Int             @id @default(autoincrement())
-  email      String          @unique
+  id         Int    @id @default(autoincrement())
+  name       String
+  email      String @unique
   company_id Int
 
-  Phones      SupplierPhone[]
-  Batchs  Batch[]
- 
-  company_cnpj_fk Company   @relation(fields: [company_id], references: [id])
+  Phones Supplier_Phone[]
+  Batchs Batch[]
+
+  company_cnpj_fk Company @relation(fields: [company_id], references: [id])
 
   @@map("suppliers")
 }
 
-model SupplierPhone {
+model Supplier_Phone {
   id          Int    @id @default(autoincrement())
   phone       String @unique
   supplier_id Int
@@ -77,11 +78,11 @@ model SupplierPhone {
   @@map("supplier_phone")
 }
 
-model Batch{
-  id Int @id
-  number  String @unique
-  date DateTime
-  supplier_id Int
+model Batch {
+  id            Int             @id
+  number        String          @unique
+  date          DateTime
+  supplier_id   Int
   Batch_Product Batch_Product[]
 
   supplier_id_fk Supplier @relation(fields: [supplier_id], references: [id])
@@ -89,18 +90,18 @@ model Batch{
   @@map("batch")
 }
 
-model Batch_Product{
-  number_batch Int 
-  product_id Int 
-  quantity Int
+model Batch_Product {
+  number_batch Int
+  product_id   Int
+  quantity     Int
 
-  product_id_fk Product @relation(fields: [product_id], references: [id])
-  number_batch_fk Batch @relation(fields: [number_batch], references: [id])
+  product_id_fk   Product @relation(fields: [product_id], references: [id])
+  number_batch_fk Batch   @relation(fields: [number_batch], references: [id])
 
   @@id([number_batch, product_id])
-
   @@map("batch_product")
 }
+
 model Product {
   id          Int     @id @default(autoincrement())
   description String
@@ -122,6 +123,7 @@ model Category {
 
   @@map("categories")
 }
+
 model User_Types {
   id   Int    @id @default(autoincrement())
   name String

@@ -17,10 +17,10 @@ export async function product_routes(app: FastifyInstance) {
     try {
       await prisma.product
         .findFirst({
-          where: { ncmSh: ncmSh },
+          where: { description: description },
         })
-        .then(async (ncmShExist) => {
-          if (ncmShExist) {
+        .then(async (descriptionExists) => {
+          if (descriptionExists) {
             response.status(200).send("an operation could not be performed");
           }
           await prisma.product.create({
@@ -29,7 +29,6 @@ export async function product_routes(app: FastifyInstance) {
               description: description,
               price: price,
               category_id: category_id,
-              
             },
           });
           response.status(201);
@@ -60,18 +59,18 @@ export async function product_routes(app: FastifyInstance) {
       );
     }
   });
-  app.get("/products/findByName/:name", async (request, response) => {
-    const product_name = z.object({
-      name: z.string(),
+  app.get("/products/findByName/:description", async (request, response) => {
+    const product_description = z.object({
+      description: z.string(),
     });
-    const { name } = product_name.parse(request.params);
+    const { description } = product_description.parse(request.params);
 
     try {
       await prisma.product
         .findMany({
           where: {
-            name: {
-              startsWith: name,
+            description: {
+              startsWith: description,
             },
           },
         })
@@ -144,14 +143,12 @@ export async function product_routes(app: FastifyInstance) {
   app.put("/products/update", async (request, response) => {
     const product = z.object({
       id: z.number(),
-      name: z.string(),
       description: z.string(),
       ncmSh: z.string(),
       price: z.number(),
       category_id: z.number(),
-      supplier_id: z.number(),
     });
-    const { id, name, description, ncmSh, price, category_id, supplier_id } =
+    const { id, description, ncmSh, price, category_id} =
       product.parse(request.body);
 
     try {
@@ -166,12 +163,10 @@ export async function product_routes(app: FastifyInstance) {
           await prisma.product.update({
             where: { id: id },
             data: {
-              name: name,
               description: description,
               ncmSh: ncmSh,
               price: price,
               category_id: category_id,
-              supplier_id: supplier_id,
             },
           });
           response.status(200);
