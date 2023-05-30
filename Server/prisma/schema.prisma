@@ -14,32 +14,105 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Supplier {
-  id                 Int                @id @default(autoincrement())
-  company_name       String
-  email              String             @unique
-  cnpj               String             @unique
+model Company {
+  id                 Int    @id @default(autoincrement())
+  cnpj               String @unique
+  email              String @unique
   state_registration String
-  phone              String
-  Supplier_Address   Supplier_Address[]
-  Product            Product[]
+  company_address    Int
+
+  Company_Phones    Company_Phone[]
+  Company_Suppliers Supplier[]
+
+  company_address_id_fk Company_Address @relation(fields: [company_address], references: [id])
+
+  @@map("company")
+}
+
+model Company_Address {
+  id         Int    @id @default(autoincrement())
+  company_id Int
+  cep        String
+  city       String
+  state      String
+  street     String
+  number     Int   @unique
+  complement String
+
+  Company Company[]
+
+  @@map("company_address")
+}
+
+model Company_Phone {
+  id         Int    @id @default(autoincrement())
+  phone      String @unique
+  company_id Int
+
+  company_cnpj_phone_fk Company @relation(fields: [company_id], references: [id])
+
+  @@map("company_phone")
+}
+
+model Supplier {
+  id         Int             @id @default(autoincrement())
+  email      String          @unique
+  company_id Int
+
+  Phones      SupplierPhone[]
+  Batchs  Batch[]
+ 
+  company_cnpj_fk Company   @relation(fields: [company_id], references: [id])
 
   @@map("suppliers")
 }
 
-model Supplier_Address {
+model SupplierPhone {
   id          Int    @id @default(autoincrement())
-  supplier_id Int    @unique
-  cep         String
-  city        String
-  state       String
-  street      String
-  number      Int
-  complement  String
+  phone       String @unique
+  supplier_id Int
 
-  id_supplier_fk Supplier @relation(fields: [supplier_id], references: [id])
+  supplier_phone_id_fk Supplier @relation(fields: [supplier_id], references: [id])
 
-  @@map("supplier_address")
+  @@map("supplier_phone")
+}
+
+model Batch{
+  id Int @id
+  number  String @unique
+  date DateTime
+  supplier_id Int
+  Batch_Product Batch_Product[]
+
+  supplier_id_fk Supplier @relation(fields: [supplier_id], references: [id])
+
+  @@map("batch")
+}
+
+model Batch_Product{
+  number_batch Int 
+  product_id Int 
+  quantity Int
+
+  product_id_fk Product @relation(fields: [product_id], references: [id])
+  number_batch_fk Batch @relation(fields: [number_batch], references: [id])
+
+  @@id([number_batch, product_id])
+
+  @@map("batch_product")
+}
+model Product {
+  id          Int     @id @default(autoincrement())
+  description String
+  ncmSh       String
+  price       Decimal
+  category_id Int
+
+  Batch_Product Batch_Product[]
+
+  id_category_fk Category @relation(fields: [category_id], references: [id])
+
+  @@map("products")
 }
 
 model Category {
@@ -49,33 +122,6 @@ model Category {
 
   @@map("categories")
 }
-
-model Product {
-  id          Int     @id @default(autoincrement())
-  name        String
-  description String
-  ncmSh       String
-  price       Decimal
-  category_id Int
-  supplier_id Int
-
-  id_category_fk Category @relation(fields: [category_id], references: [id])
-  id_supplier_fk Supplier @relation(fields: [supplier_id], references: [id])
-  Stock          Stock[]
-
-  @@map("products")
-}
-
-model Stock {
-  id         Int @id @default(autoincrement())
-  product_id Int
-  quantity   Int
-
-  id_product_fk Product @relation(fields: [product_id], references: [id])
-
-  @@map("stock")
-}
-
 model User_Types {
   id   Int    @id @default(autoincrement())
   name String

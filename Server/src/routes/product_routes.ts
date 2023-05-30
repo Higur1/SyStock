@@ -6,14 +6,12 @@ export async function product_routes(app: FastifyInstance) {
   app.post("/products/new",
     async (request, response) => {
     const product = z.object({
-      name: z.string(),
       description: z.string(),
       ncmSh: z.string(),
       price: z.number(),
       category_id: z.number(),
-      supplier_id: z.number(),
     });
-    const { name, description, ncmSh, price, category_id, supplier_id } =
+    const {description, ncmSh, price, category_id} =
       product.parse(request.body);
 
     try {
@@ -27,12 +25,11 @@ export async function product_routes(app: FastifyInstance) {
           }
           await prisma.product.create({
             data: {
-              name: name,
               ncmSh: ncmSh,
               description: description,
               price: price,
               category_id: category_id,
-              supplier_id: supplier_id,
+              
             },
           });
           response.status(201);
