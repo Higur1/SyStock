@@ -14,33 +14,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Customer {
-  id                 Int       @id @default(autoincrement())
-  name_company_name  String
-  cpfCnpj            String    @unique
-  phone              String
-  email              String    @unique
-  state_registration String
-  Address            Address[]
-
-  @@map("customers")
-}
-
-model Address {
-  id          Int    @id @default(autoincrement())
-  customer_id Int    @unique
-  cep         String
-  city        String
-  state       String
-  street      String
-  number      Int
-  complement  String
-
-  id_customer_fk Customer @relation(fields: [customer_id], references: [id])
-
-  @@map("address")
-}
-
 model Supplier {
   id                 Int                @id @default(autoincrement())
   company_name       String
