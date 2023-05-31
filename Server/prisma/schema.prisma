@@ -90,14 +90,14 @@ model Batch {
 }
 
 model Batch_Product {
-  number_batch Int
+  batch_id Int
   product_id   Int
   quantity     Int
 
   product_id_fk   Product @relation(fields: [product_id], references: [id])
-  number_batch_fk Batch   @relation(fields: [number_batch], references: [id])
+  number_batch_fk Batch   @relation(fields: [batch_id], references: [id])
 
-  @@id([number_batch, product_id])
+  @@id([batch_id, product_id])
   @@map("batch_product")
 }
 

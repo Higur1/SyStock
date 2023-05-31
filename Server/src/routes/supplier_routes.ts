@@ -52,7 +52,7 @@ export async function supplier_routes(app: FastifyInstance) {
   app.get("/suppliers", async (request, response) => {
     try {
       await prisma.$queryRaw`
-        SELECT * FROM suppliers
+        SELECT S.*, P.phone  FROM suppliers S INNER JOIN supplier_phone P ON S.id == P.supplier_id 
       `.then(async (supplier) => {
         if (!supplier) {
           response.status(200).send("an operation could not be performed");
@@ -146,23 +146,35 @@ export async function supplier_routes(app: FastifyInstance) {
           if (!supplier) {
             response.status(200).send("Not found");
           }
-          await prisma.supplier.update({
-            where: { id: id },
-            data: {
-              name: name,
-              email: email,
-              company_id: company_id,
-            },
-          }).then(async(supplier) =>{
-            await prisma.$queryRaw`
+          await prisma.supplier
+            .findFirst({
+              where: {
+                email: email,
+              },
+            })
+            .then(async (emailExists) => {
+              if (emailExists) {
+                response.status(200).send("Email alredy exists");
+              }
+              await prisma.supplier
+                .update({
+                  where: { id: id },
+                  data: {
+                    name: name,
+                    email: email,
+                    company_id: company_id,
+                  },
+                })
+                .then(async (supplier) => {
+                  await prisma.$queryRaw`
               UPDATE supplier_phone
               SET phone = ${phone}
               WHERE supplier_id = ${supplier.id}
-            `
-          })
-          response.status(200);
+            `;
+                  response.status(200).send(supplier);
+                });
+            });
         });
-      response.status(200).send("an operation could not be performed");
     } catch (error) {
       response.status(400).send(
         JSON.stringify({

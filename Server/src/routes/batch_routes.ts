@@ -6,19 +6,16 @@ export async function batch_routes(app: FastifyInstance) {
   app.post("/batchs/new", async (request, response) => {
     const batch = z.object({
       number: z.string(),
-      supplier_id: z.number()
+      supplier_id: z.number(),
     });
-    const { number, supplier_id } =
-      batch.parse(request.body);
+    const { number, supplier_id } = batch.parse(request.body);
     try {
-      await prisma.batch.create({
-        data: {
-          number: number,
-          supplier_id: supplier_id,
-        },
-      }).then((batch) => {
-        response.status(201).send(batch)
-      })
+      await prisma.$queryRaw`
+        INSERT INTO batch (number, supplier_id)
+        VALUES(${number}, ${supplier_id}) 
+      `.then((batch) => {
+        response.status(201).send(batch);
+      });
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
