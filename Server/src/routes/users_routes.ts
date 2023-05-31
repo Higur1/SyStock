@@ -49,7 +49,7 @@ export async function user_routes(app: FastifyInstance) {
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
-          error: error.meta.target,
+          error: error.meta,
           message: "An error has occurred",
         })
       );
