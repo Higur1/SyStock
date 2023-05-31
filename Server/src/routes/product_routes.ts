@@ -3,36 +3,26 @@ import { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { $ref } from "./user.schema";
 export async function product_routes(app: FastifyInstance) {
-  app.post("/products/new",
-    async (request, response) => {
+  app.post("/products/new", async (request, response) => {
     const product = z.object({
       description: z.string(),
       ncmSh: z.string(),
       price: z.number(),
       category_id: z.number(),
+      number_batch: z.string(),
     });
-    const {description, ncmSh, price, category_id} =
+    const { description, ncmSh, price, category_id} =
       product.parse(request.body);
-
     try {
-      await prisma.product
-        .findFirst({
-          where: { description: description },
-        })
-        .then(async (descriptionExists) => {
-          if (descriptionExists) {
-            response.status(200).send("an operation could not be performed");
-          }
-          await prisma.product.create({
-            data: {
-              ncmSh: ncmSh,
-              description: description,
-              price: price,
-              category_id: category_id,
-            },
-          });
-          response.status(201);
-        });
+      await prisma.product.create({
+        data: {
+          description: description,
+          ncmSh: ncmSh,
+          price: price,
+          category_id: category_id,
+        },
+      });
+      response.status(201);
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
@@ -148,8 +138,9 @@ export async function product_routes(app: FastifyInstance) {
       price: z.number(),
       category_id: z.number(),
     });
-    const { id, description, ncmSh, price, category_id} =
-      product.parse(request.body);
+    const { id, description, ncmSh, price, category_id } = product.parse(
+      request.body
+    );
 
     try {
       await prisma.product

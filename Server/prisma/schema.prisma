@@ -16,15 +16,14 @@ datasource db {
 
 model Company {
   id                 Int    @id @default(autoincrement())
+  name               String @unique
   cnpj               String @unique
   email              String @unique
   state_registration String
-  company_address    Int
 
   Company_Phones    Company_Phone[]
   Company_Suppliers Supplier[]
-
-  company_address_id_fk Company_Address @relation(fields: [company_address], references: [id])
+  Company_Address Company_Address[]
 
   @@map("company")
 }
@@ -39,7 +38,7 @@ model Company_Address {
   number     Int    @unique
   complement String
 
-  Company Company[]
+  company_id_fk Company @relation(fields: [company_id], references: [id])
 
   @@map("company_address")
 }
@@ -56,19 +55,19 @@ model Company_Phone {
 
 model Supplier {
   id         Int    @id @default(autoincrement())
-  name       String
+  name       String @unique
   email      String @unique
   company_id Int
 
-  Phones Supplier_Phone[]
+  Phones SupplierPhone[]
   Batchs Batch[]
 
-  company_cnpj_fk Company @relation(fields: [company_id], references: [id])
+  company_id_fk Company @relation(fields: [company_id], references: [id])
 
   @@map("suppliers")
 }
 
-model Supplier_Phone {
+model SupplierPhone {
   id          Int    @id @default(autoincrement())
   phone       String @unique
   supplier_id Int
@@ -79,7 +78,7 @@ model Supplier_Phone {
 }
 
 model Batch {
-  id            Int             @id
+  id            Int             @id @default(autoincrement())
   number        String          @unique
   date          DateTime
   supplier_id   Int
@@ -105,7 +104,7 @@ model Batch_Product {
 model Product {
   id          Int     @id @default(autoincrement())
   description String
-  ncmSh       String
+  ncmSh       String 
   price       Decimal
   category_id Int
 

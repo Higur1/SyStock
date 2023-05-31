@@ -11,12 +11,59 @@ async function run() {
         `;
   }
   /*Deletes*/ await Promise.all([
+    prisma.company_Address.deleteMany(),
+    prisma.supplier.deleteMany(),
+    prisma.batch.deleteMany(),
+    prisma.company.deleteMany(),
     prisma.product.deleteMany(),
     prisma.category.deleteMany(),
     prisma.user.deleteMany(),
     prisma.user_Types.deleteMany(),
   ]);
-
+  /* Create generic company */ await Promise.all([
+    prisma.company.create({
+      data: {
+        id: 1,
+        name: "DEFAULT",
+        cnpj: "DEFAULT",
+        email: "DEFAULT",
+        state_registration: "DEFAULT",
+      },
+    }),
+  ]);
+  /* Create address for generic company*/ await Promise.all([
+    prisma.company_Address.create({
+      data: {
+        cep: "DEFAULT",
+        city: "DEFAULT",
+        company_id: 1,
+        complement: "",
+        number: 0,
+        state: "X",
+        street: "DEFAULT",
+      },
+    }),
+  ]);
+  /* Create generic supplier*/ await Promise.all([
+    prisma.supplier.create({
+      data: {
+        id: 1,
+        name: "DEFAULT",
+        email: "DEFAULT",
+        company_id: 1,
+      },
+    }),
+  ]);
+  /* Create generic batch*/ await Promise.all([
+    prisma.batch.create({
+      data: {
+        id: 1,
+        date: "1970-01-01T00:00:00.000Z",
+        number: "DEFAULT",
+        supplier_id: 1,
+      },
+    }),
+  ]);
   /*Create category*/ await Promise.all([
     resetId("categories"),
     prisma.category.create({
