@@ -3,12 +3,12 @@ import { FastifyInstance } from "fastify";
 import { z } from "zod";
 
 const CategorySchema = {
-  type: 'object',
-  properties:{
-    id: {type: 'number'},
-    name: {type: 'string'}
-  }
-}
+  type: "object",
+  properties: {
+    id: { type: "number" },
+    name: { type: "string" },
+  },
+};
 
 export async function category_routes(app: FastifyInstance) {
   app.post("/categories/new", async (request, response) => {
@@ -28,18 +28,15 @@ export async function category_routes(app: FastifyInstance) {
           if (nameExists) {
             response.status(200).send("an operation could not be performed");
           }
-          await prisma.category.create({
-            data: {
-              name: name,
-            },
-          }).then(async (bodyReturn) =>{
-            await prisma.category.findFirst({
-              where:{
-                name: name
-              }
+          await prisma.category
+            .create({
+              data: {
+                name: name,
+              },
             })
-            response.status(201).send(bodyReturn)
-          })
+            .then(async (category) => {
+              response.status(201).send(category);
+            });
         });
     } catch (error) {
       response.status(400).send(
@@ -50,16 +47,7 @@ export async function category_routes(app: FastifyInstance) {
       );
     }
   });
-  app.get("/categories", {
-    schema:{
-      response: {
-        default:{
-          type: 'array',
-          items: CategorySchema
-        }
-      }
-    }
-  },async (request, response) => {
+  app.get("/categories", async (request, response) => {
     try {
       await prisma.category.findMany().then((categories) => {
         if (Object.keys(categories).length === 0) {
@@ -150,17 +138,19 @@ export async function category_routes(app: FastifyInstance) {
           if (!category) {
             response.status(200).send("Not found");
           }
-          await prisma.category.update({
-            where: { id: id },
-            data: { name: name },
-          }).then(async (bodyReturn) => {
-            await prisma.category.findFirst({
-              where:{
-                id: id
-              }
+          await prisma.category
+            .update({
+              where: { id: id },
+              data: { name: name },
             })
-            response.status(200).send(bodyReturn);
-          })
+            .then(async (bodyReturn) => {
+              await prisma.category.findFirst({
+                where: {
+                  id: id,
+                },
+              });
+              response.status(200).send(bodyReturn);
+            });
         });
     } catch (error) {
       response.status(400).send(

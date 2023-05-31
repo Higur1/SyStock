@@ -8,8 +8,7 @@ export async function product_routes(app: FastifyInstance) {
       description: z.string(),
       ncmSh: z.string(),
       price: z.number(),
-      category_id: z.number(),
-      number_batch: z.string(),
+      category_id: z.number()
     });
     const { description, ncmSh, price, category_id} =
       product.parse(request.body);
@@ -21,8 +20,9 @@ export async function product_routes(app: FastifyInstance) {
           price: price,
           category_id: category_id,
         },
-      });
-      response.status(201);
+      }).then((product) => {
+        response.status(201).send(product)
+      })
     } catch (error) {
       response.status(400).send(
         JSON.stringify({

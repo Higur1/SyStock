@@ -8,20 +8,14 @@ export async function supplier_routes(app: FastifyInstance) {
       company_id: z.number(),
       phone: z.string(),
       email: z.string(),
-
     });
-    const {
-      name,
-      company_id,
-      phone,
-      email,
-    } = supplier.parse(request.body);
+    const { name, company_id, phone, email } = supplier.parse(request.body);
 
     try {
       await prisma.supplier
         .findFirst({
           where: {
-            email: email
+            email: email,
           },
         })
         .then(async (supplier_exist) => {
@@ -33,26 +27,16 @@ export async function supplier_routes(app: FastifyInstance) {
               data: {
                 company_id: company_id,
                 name: name,
-                email: email
+                email: email,
               },
             })
-            .then(async () => {
-              await prisma.supplier
-                .findFirst({
-                  where: {
-                    email: email
-                  },
-                })
-                .then(async (supplier_email) => {
-                  if(supplier_email){
-                    await prisma.supplier_Phone.create({
-                      data: {
-                        phone: phone,
-                        supplier_id: supplier_email!.id
-                      },
-                    });
-                  }
-                });
+            .then(async (supplier) => {
+              await prisma.supplierPhone.create({
+                data: {
+                  phone: phone,
+                  supplier_id: supplier.id,
+                },
+              });
             });
           response.status(201);
         });
@@ -68,16 +52,8 @@ export async function supplier_routes(app: FastifyInstance) {
   app.get("/suppliers", async (request, response) => {
     try {
       await prisma.$queryRaw`
-            SELECT  
-                S.id,
-                S.name,
-                S.email,
-                S.company_id,
-                P.phone,  
-            FROM suppliers S
-            JOIN supplier_phone P
-                ON S.id = P.supplier_id
-            `.then((supplier) => {
+        SELECT * FROM suppliers
+      `.then(async (supplier) => {
         if (!supplier) {
           response.status(200).send("an operation could not be performed");
         }
@@ -86,7 +62,7 @@ export async function supplier_routes(app: FastifyInstance) {
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
-          error: error.meta.target,
+          error: error.meta,
           message: "An error has occurred",
         })
       );
@@ -155,16 +131,9 @@ export async function supplier_routes(app: FastifyInstance) {
       name: z.string(),
       email: z.string(),
       phone: z.string(),
-      company_id: z.number()
+      company_id: z.number(),
     });
-    const {
-      id,
-      email,
-      name,
-      phone,
-      company_id,
-      
-    } = supplier.parse(request.body);
+    const { id, email, name, phone, company_id } = supplier.parse(request.body);
 
     try {
       await prisma.supplier
@@ -177,39 +146,23 @@ export async function supplier_routes(app: FastifyInstance) {
           if (!supplier) {
             response.status(200).send("Not found");
           }
-          await prisma.supplier
-            .update({
-              where: { id: id },
-              data: {
-                name: name,
-                email: email,
-                company_id: company_id
-              },
-            })
-            .then(async () => {
-              await prisma.supplier_Phone.findFirst({
-                where:{
-                  supplier_id: id
-                }
-              }).then(async(phoneExists) =>{
-                if(phoneExists){
-                  await prisma.supplier_Phone.delete({
-                    where:{
-                      phone: phoneExists?.phone
-                    }
-                  })
-                  await prisma.supplier_Phone.create({
-                    data:{
-                      phone: phone,
-                      supplier_id: id
-                    }
-                  })
-                }
-                response.status(200).send("an operation could not be performed") 
-              })
-            });
+          await prisma.supplier.update({
+            where: { id: id },
+            data: {
+              name: name,
+              email: email,
+              company_id: company_id,
+            },
+          }).then(async(supplier) =>{
+            await prisma.$queryRaw`
+              UPDATE supplier_phone
+              SET phone = ${phone}
+              WHERE supplier_id = ${supplier.id}
+            `
+          })
           response.status(200);
         });
+      response.status(200).send("an operation could not be performed");
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
@@ -234,7 +187,7 @@ export async function supplier_routes(app: FastifyInstance) {
           if (!user) {
             response.status(200).send("Not found");
           }
-          await prisma.supplier_Phone.delete({
+          await prisma.supplierPhone.delete({
             where: { id: id },
           });
           await prisma.supplier.delete({
