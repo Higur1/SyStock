@@ -1,6 +1,7 @@
+/* eslint-disable no-debugger */
 /* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
-import { performFetch } from "../apiBase";
+import { performFetch, performFetchNoResult } from "../apiBase";
 
 export default function useCategory() {
   const [products, setProducts] = useState([]);
@@ -42,7 +43,9 @@ export default function useCategory() {
     try {
       const prod = await performFetch("/products/new", {method: 'POST', body: JSON.stringify(product)});
 
-      setProducts(prod);
+
+      const productss = [...products, prod]
+      setProducts(productss);
     } catch (error) {
       handleOpenSnackBar("error", error.message, 3500);
     }
@@ -51,7 +54,7 @@ export default function useCategory() {
   async function updateProduct(product) {
     try {
       const prod = await performFetch("/products/update", {method: 'POST', body: JSON.stringify(product)});
-
+      debugger;
       const newProducts = products.map(p => (p.id === prod.id ? {...prod} : {...p}));
 
       setProducts(newProducts);
@@ -60,10 +63,25 @@ export default function useCategory() {
     }
   }
 
+  /**
+   * * delete product by id
+   * @param {*} id 
+   */
+  async function handleDeleteProduct(id) {
+    const url = "/products/delete";
+
+    performFetchNoResult(url, {method: 'DELETE', body: JSON.stringify(id)})
+      .then(() => {
+        const updatedProducts = products.filter(cat => cat.id !== id.product_id);
+        setProducts(updatedProducts);
+      })
+      .catch(e => handleOpenSnackBar("error", e.message, 3500));
+  }
+
   return {
     products, setProducts,
     createProduct, updateProduct,
-    errorInsert,
+    errorInsert, handleDeleteProduct,
     handleCloseSnackBar, openSnackBar, autoHideSnackBar, snackMessageSnackBar, severitySnackBar
   }
 }

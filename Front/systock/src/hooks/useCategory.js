@@ -109,7 +109,6 @@ export default function useCategory() {
 
     performFetchNoResult(url, {method: 'DELETE', body: JSON.stringify(id)})
     .then(() => {
-      debugger;
       const updatedCategories = categories.filter(cat => cat.id !== id.id);
       setCategories(updatedCategories);
     })
