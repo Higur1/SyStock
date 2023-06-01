@@ -78,7 +78,13 @@ export async function company_routes(app: FastifyInstance) {
   });
   app.get("/companies", async (request, response) => {
     try {
-      await prisma.$queryRaw`SELECT C.*,A.*, P* FROM company C INNER JOIN company_Address A ON C.id == A.company_id INNER JOIN company_Phone P ON P.company_id == C.id`.then(
+      await prisma.company.findMany({
+        include:{
+          Company_Address:{},
+          Company_Phones:{}
+        }
+      })
+      .then(
         async (company) => {
           if (!company) {
             response.status(404).send("Not found");
