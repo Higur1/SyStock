@@ -84,6 +84,6 @@ export default function CreateCategoryDialog(props) {
 CreateCategoryDialog.propTypes = {
   open: PropTypes.bool,
   handleClose: PropTypes.func,
-  categories: PropTypes.object,
+  categories: PropTypes.array,
   createCategory: PropTypes.func
 }

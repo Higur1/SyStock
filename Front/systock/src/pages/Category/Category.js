@@ -122,7 +122,7 @@ export default function Category() {
         <DialogActions>
           <Button onClick={() => setDeleteCategory(false)}>Cancelar</Button>
           <Button onClick={() => {
-            handleDeleteCategory(idMenu);
+            handleDeleteCategory({id: idMenu});
             setDeleteCategory(false);
           }}>Confirmar</Button>
         </DialogActions>
