@@ -81,7 +81,7 @@ export async function category_routes(app: FastifyInstance) {
         })
         .then((categories) => {
           if (Object.keys(categories).length === 0) {
-            response.status(200).send("Not found");
+            response.status(404).send("Not found");
           }
           response.status(200).send(categories);
         });
@@ -108,7 +108,7 @@ export async function category_routes(app: FastifyInstance) {
         })
         .then((categories) => {
           if (!categories) {
-            response.status(200).send("Not Found");
+            response.status(404).send("Not Found");
           }
           response.status(200).send(categories);
         });
@@ -136,7 +136,7 @@ export async function category_routes(app: FastifyInstance) {
         })
         .then(async (category) => {
           if (!category) {
-            response.status(200).send("Not found");
+            response.status(404).send("Not found");
           }
           await prisma.category
             .update({
@@ -176,7 +176,7 @@ export async function category_routes(app: FastifyInstance) {
         })
         .then(async (category) => {
           if (!category) {
-            response.status(200).send("Not found");
+            response.status(404).send("Not found");
           }
           await prisma.category.delete({
             where: {

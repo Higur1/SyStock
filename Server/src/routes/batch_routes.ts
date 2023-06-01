@@ -9,7 +9,10 @@ export async function batch_routes(app: FastifyInstance) {
       supplier_id: z.number(),
     });
     const { number, supplier_id } = batch.parse(request.body);
+    
 
+
+    
     try {
       await prisma.batch
         .findFirst({
