@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import useProduct from "../../hooks/useProduct"
 import { Container, HeaderContainer, MenuOption, TableContainer, TableData, TableRow, Menu } from "./styles";
-import { Backdrop, Button, CircularProgress, ClickAwayListener, IconButton } from "@mui/material";
+import { Button, ClickAwayListener, IconButton } from "@mui/material";
 import ToolTipAndEllipsis from "../../components/dialogs/ComponentUtils/ToolTipAndEllipsis";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CreateProductDialog from "./dialogs/CreateProductDialog";
+import CustomizedSnackbars from "../../components/CustomizedSnackBar";
 
 export default function Product() {
 
-  const { products, createProduct, errorInsert } = useProduct();
+  const { products, createProduct, errorInsert,
+    handleCloseSnackBar, openSnackBar, autoHideSnackBar, snackMessageSnackBar, severitySnackBar
+  } = useProduct();
   const [menuOption, setMenuOption] = useState(false);
   const [idMenu, setIdMenu] = useState(null);
   const [openCreateProduct, setOpenCreateProduct] = useState(false);
@@ -106,6 +109,15 @@ export default function Product() {
         open={openCreateProduct}
       />}
       
+      {openSnackBar && (
+        <CustomizedSnackbars 
+          open={openSnackBar}
+          autoHide={autoHideSnackBar}
+          handleClose={handleCloseSnackBar}
+          severity={severitySnackBar}
+          snackMessage={snackMessageSnackBar}
+        />
+      )}
     </>
   )
 }
