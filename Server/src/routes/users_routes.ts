@@ -106,7 +106,7 @@ export async function user_routes(app: FastifyInstance) {
         })
         .then((userExist) => {
           if (Object.keys(userExist).length === 0) {
-            response.status(200).send("Not found");
+            response.status(404).send("Not found");
           }
           response.status(200).send(userExist);
         });
@@ -140,7 +140,7 @@ export async function user_routes(app: FastifyInstance) {
         })
         .then((userExist) => {
           if (!userExist) {
-            response.status(200).send("Not found");
+            response.status(404).send("Not found");
           }
           response.status(200).send(userExist);
         });
@@ -174,7 +174,7 @@ export async function user_routes(app: FastifyInstance) {
         })
         .then((userExist) => {
           if (!userExist) {
-            response.status(200).send("Not found");
+            response.status(404).send("Not found");
           }
           response.status(200).send(userExist);
         });
@@ -202,7 +202,7 @@ export async function user_routes(app: FastifyInstance) {
         })
         .then(async (user) => {
           if (!user) {
-            response.status(200).send("Not found");
+            response.status(404).send("Not found");
           }
           await prisma.user.update({
             where: { id: id },
@@ -236,7 +236,7 @@ export async function user_routes(app: FastifyInstance) {
         })
         .then(async (userExist) => {
           if (!userExist) {
-            response.status(200).send("Not found");
+            response.status(404).send("Not found");
           }
           await prisma.user.delete({
             where: { id: id },

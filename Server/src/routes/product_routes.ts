@@ -66,7 +66,7 @@ export async function product_routes(app: FastifyInstance) {
         })
         .then((productList) => {
           if (Object.keys(productList).length === 0) {
-            response.status(200).send("Not found");
+            response.status(404).send("Not found");
           }
           response.status(200).send(productList);
         });
@@ -91,7 +91,7 @@ export async function product_routes(app: FastifyInstance) {
         })
         .then((product) => {
           if (!product) {
-            response.status(200).send("Not found");
+            response.status(404).send("Not found");
           }
           response.status(200).send(product);
         });
@@ -118,7 +118,7 @@ export async function product_routes(app: FastifyInstance) {
         })
         .then((productList) => {
           if (!productList) {
-            response.status(200).send("Not found");
+            response.status(404).send("Not found");
           }
           response.status(200).send(productList);
         });
@@ -149,7 +149,7 @@ export async function product_routes(app: FastifyInstance) {
         })
         .then(async (product) => {
           if (!product) {
-            response.status(200).send("Not found");
+            response.status(404).send("Not found");
           }
           await prisma.product.update({
             where: { id: id },
@@ -183,7 +183,7 @@ export async function product_routes(app: FastifyInstance) {
         })
         .then(async (product) => {
           if (!product) {
-            response.status(200).send("Not found");
+            response.status(404).send("Not found");
           }
           await prisma.product.delete({
             where: { id: product_id },

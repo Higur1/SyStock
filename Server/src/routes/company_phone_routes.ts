@@ -86,7 +86,7 @@ export async function supplier_routes(app: FastifyInstance) {
         })
         .then((supplier) => {
           if (Object.keys(supplier).length === 0) {
-            response.status(200).send("Not found");
+            response.status(404).send("Not found");
           }
           response.status(200).send(supplier);
         });
@@ -113,7 +113,7 @@ export async function supplier_routes(app: FastifyInstance) {
         })
         .then((supplier) => {
           if (!supplier) {
-            response.status(200).send("Not found");
+            response.status(404).send("Not found");
           }
           response.status(200).send(supplier);
         });
@@ -144,7 +144,7 @@ export async function supplier_routes(app: FastifyInstance) {
         })
         .then(async (supplier) => {
           if (!supplier) {
-            response.status(200).send("Not found");
+            response.status(404).send("Not found");
           }
           await prisma.supplier
             .findFirst({
@@ -197,7 +197,7 @@ export async function supplier_routes(app: FastifyInstance) {
         })
         .then(async (user) => {
           if (!user) {
-            response.status(200).send("Not found");
+            response.status(404).send("Not found");
           }
           await prisma.supplierPhone.delete({
             where: { id: id },
