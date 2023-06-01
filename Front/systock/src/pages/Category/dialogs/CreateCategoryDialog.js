@@ -72,7 +72,7 @@ export default function CreateCategoryDialog(props) {
             setHasError(true);
             return;
           }
-          createCategory(categoryLabel, categoryParent);
+          createCategory({name: categoryLabel});
           handleClose();
           }}>Adicionar</Button>
       </DialogActions>
