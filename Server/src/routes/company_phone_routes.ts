@@ -55,7 +55,7 @@ export async function supplier_routes(app: FastifyInstance) {
         SELECT S.*, P.phone  FROM suppliers S INNER JOIN supplier_phone P ON S.id == P.supplier_id 
       `.then(async (supplier) => {
         if (!supplier) {
-          response.status(200).send("Not found");
+          response.status(200).send("an operation could not be performed");
         }
         response.status(200).send(supplier);
       });

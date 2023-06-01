@@ -30,12 +30,12 @@ model Company {
 
 model Company_Address {
   id         Int    @id @default(autoincrement())
-  company_id Int
+  company_id Int    @unique
   cep        String
   city       String
   state      String
   street     String
-  number     Int    @unique
+  number     Int   
   complement String
 
   company_id_fk Company @relation(fields: [company_id], references: [id])

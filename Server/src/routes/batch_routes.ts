@@ -3,18 +3,34 @@ import { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { $ref } from "./user.schema";
 export async function batch_routes(app: FastifyInstance) {
-  app.post("/batchs/new", async (request, response) => {
+  app.post("/batch/new", async (request, response) => {
     const batch = z.object({
       number: z.string(),
       supplier_id: z.number(),
     });
     const { number, supplier_id } = batch.parse(request.body);
+
     try {
-      await prisma.$queryRaw`
-        INSERT INTO batch (number, supplier_id)
-        VALUES(${number}, ${supplier_id}) 
-      `.then((batch) => {
-        response.status(201).send(batch);
+      await prisma.batch
+        .findFirst({
+          where: {
+            number: number,
+          },
+        })
+        .then(async (numberExists) => {
+          if (numberExists) {
+            response.status(200).send("an operation could not be performed");
+          }
+          await prisma.batch.
+            create({
+              data: {
+                number: number,
+                supplier_id: supplier_id,
+              },
+            })
+            .then(async(batch) => {
+              response.status(201).send(batch);
+            });
       });
     } catch (error) {
       response.status(400).send(
@@ -73,7 +89,7 @@ export async function batch_routes(app: FastifyInstance) {
   });
   app.get("/batchs/findById/:batch_id", async (request, response) => {
     const batch = z.object({
-      batch_id: z.string(),
+      batch_id: z.number(),
     });
     const { batch_id } = batch.parse(request.params);
 

@@ -11,6 +11,7 @@ import { product_routes } from "./routes/product_routes";
 import { user_routes } from "./routes/users_routes";
 import { userSchemas } from "./routes/user.schema";
 import { batch_routes } from "./routes/batch_routes";
+import { company_routes } from "./routes/company_routes";
 
 dotenv.config();
 
@@ -37,6 +38,8 @@ app.register(category_routes);
 app.register(product_routes);
 app.register(user_routes);
 app.register(batch_routes);
+app.register(company_routes);
+
 
 
 const start = async () => {
