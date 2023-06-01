@@ -23,7 +23,7 @@ model Company {
 
   Company_Phones    Company_Phone[]
   Company_Suppliers Supplier[]
-  Company_Address Company_Address[]
+  Company_Address   Company_Address[]
 
   @@map("company")
 }
@@ -35,7 +35,7 @@ model Company_Address {
   city       String
   state      String
   street     String
-  number     Int   
+  number     Int
   complement String
 
   company_id_fk Company @relation(fields: [company_id], references: [id])
@@ -90,9 +90,9 @@ model Batch {
 }
 
 model Batch_Product {
-  batch_id Int
-  product_id   Int
-  quantity     Int
+  batch_id   Int
+  product_id Int
+  quantity   Int
 
   product_id_fk   Product @relation(fields: [product_id], references: [id])
   number_batch_fk Batch   @relation(fields: [batch_id], references: [id])
@@ -104,7 +104,7 @@ model Batch_Product {
 model Product {
   id          Int     @id @default(autoincrement())
   description String
-  ncmSh       String 
+  ncmSh       String
   price       Decimal
   category_id Int
 

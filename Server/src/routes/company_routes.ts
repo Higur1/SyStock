@@ -3,7 +3,7 @@ import { FastifyInstance } from "fastify";
 import { number, z } from "zod";
 import { $ref } from "./user.schema";
 export async function company_routes(app: FastifyInstance) {
-  app.post("/company/new", async (request, response) => {
+  app.post("/companies/new", async (request, response) => {
     const company = z.object({
       cnpj: z.string(),
       name: z.string(),
@@ -50,24 +50,27 @@ export async function company_routes(app: FastifyInstance) {
               },
             })
             .then(async (company) => {
-              await prisma.company_Address.create({
-                data: {
-                  company_id: company.id,
-                  cep: cep,
-                  state: state,
-                  complement: complement,
-                  city: city,
-                  number: number,
-                  street: street,
-                },
-              });
+              await prisma.company_Address
+                .create({
+                  data: {
+                    cep: cep,
+                    city: city,
+                    complement: complement,
+                    number: number,
+                    state: state,
+                    street: street,
+                    company_id: company.id,
+                  },
+                })
+                .then((company_address) => {
+                  response.status(201).send([company, company_address]);
+                });
             });
-          response.status(201).send(company);
         });
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
-          error: error,
+          error: error.target.meta,
           message: "An error has occurred",
         })
       );
@@ -78,7 +81,7 @@ export async function company_routes(app: FastifyInstance) {
       await prisma.$queryRaw`SELECT C.*,A.* FROM company C INNER JOIN company_Address A ON C.id == A.company_id`.then(
         async (company) => {
           if (!company) {
-            response.status(200).send("Not found");
+            response.status(404).send("Not found");
           }
           response.status(200).send(company);
         }
@@ -103,7 +106,7 @@ export async function company_routes(app: FastifyInstance) {
         id
       )}`.then((company) => {
         if (!company) {
-          response.status(200).send("Not found");
+          response.status(404).send("Not found");
         }
         response.status(200).send(company);
       });
@@ -143,31 +146,52 @@ export async function company_routes(app: FastifyInstance) {
 
     try {
       await prisma.company
-        .findUnique({
+        .findFirst({
           where: {
             id: id,
           },
         })
         .then(async (company) => {
           if (!company) {
-            response.status(200).send("Not found");
+            response.status(404).send("Not found");
           }
-          await prisma.company_Address
+          await prisma.company
             .update({
-              where: { company_id: company!.id },
+              where: {
+                id: id,
+              },
               data: {
-                cep,
-                city,
-                state,
-                number,
-                complement,
-                street,
+                name: name,
+                email: email,
+                state_registration: state_registration,
               },
             })
             .then(async (company) => {
-              await prisma.$queryRaw`UPDATE company SET name = ${name} AND SET email = ${email}  AND SET state_registration = ${state_registration}
-                  WHERE id=${id}`;
-              response.status(200).send(company);
+              await prisma.company_Address
+                .findFirst({
+                  where: {
+                    company_id: id,
+                  },
+                })
+                .then(async (company_address_id) => {
+                  await prisma.company_Address
+                    .update({
+                      where: {
+                        id: company_address_id!.id,
+                      },
+                      data: {
+                        cep: cep,
+                        city: city,
+                        state: state,
+                        number: number,
+                        complement: complement,
+                        street: street,
+                      },
+                    })
+                    .then((companyaddress) => {
+                      response.status(200).send([company, companyaddress]);
+                    });
+                });
             });
         });
     } catch (error) {
@@ -186,22 +210,32 @@ export async function company_routes(app: FastifyInstance) {
     const { id } = company.parse(request.body);
     try {
       await prisma.company
-        .findUnique({
+        .findFirst({
           where: { id: id },
         })
         .then(async (company) => {
           if (!company) {
-            response.status(200).send("Not found");
+            response.status(404).send("Not found");
           }
-          await prisma.company_Address.delete({
-            where: { company_id: id },
-          });
-          await prisma.company.delete({
-            where: {
-              id: id,
-            },
-          });
-          response.status(200);
+          await prisma.company_Address
+            .findFirst({
+              where: {
+                company_id: id,
+              },
+            })
+            .then(async (companyaddress_id) => {
+              await prisma.company_Address.delete({
+                where: {
+                  id: companyaddress_id!.id,
+                },
+              });
+              await prisma.company.delete({
+                where: {
+                  id: id,
+                },
+              });
+              response.status(200);
+            });
         });
     } catch (error) {
       response.status(400).send(
