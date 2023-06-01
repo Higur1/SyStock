@@ -7,6 +7,22 @@ export default function useCategory() {
 
   const [errorInsert, setErrorInsert] = useState(null);
 
+  //* snackBar
+  const [openSnackBar, setOpenSnackBar] = useState(false);
+  const [autoHideSnackBar, setAutoHideSnackBar] = useState(3000);
+  const [severitySnackBar, setSeveritySnackBar] = useState("info");
+  const [snackMessageSnackBar, setSnackMessageSnackBar] = useState("");
+
+  function handleOpenSnackBar(severity, message="Unexpected Error Occurred", autoHide=3000) {
+    setSnackMessageSnackBar(message);
+    setSeveritySnackBar(severity);
+    setAutoHideSnackBar(autoHide);
+    setOpenSnackBar(true);
+  }
+
+  function handleCloseSnackBar() {
+    setOpenSnackBar(false);
+  }
 
   useEffect(() => {
     getProducts();
@@ -18,7 +34,7 @@ export default function useCategory() {
 
       setProducts(products);
     } catch (error) {
-      console.log(error.message);
+      handleOpenSnackBar("error", error.message, 3500);
     }
   }
 
@@ -28,7 +44,7 @@ export default function useCategory() {
 
       setProducts(prod);
     } catch (error) {
-      console.log(error.message);
+      handleOpenSnackBar("error", error.message, 3500);
     }
   }
 
@@ -40,13 +56,14 @@ export default function useCategory() {
 
       setProducts(newProducts);
     } catch (error) {
-      console.log(error.message);
+      handleOpenSnackBar("error", error.message, 3500);
     }
   }
 
   return {
     products, setProducts,
     createProduct, updateProduct,
-    errorInsert
+    errorInsert,
+    handleCloseSnackBar, openSnackBar, autoHideSnackBar, snackMessageSnackBar, severitySnackBar
   }
 }
