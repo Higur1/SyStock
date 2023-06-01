@@ -10,9 +10,6 @@ export async function batch_routes(app: FastifyInstance) {
     });
     const { number, supplier_id } = batch.parse(request.body);
     
-
-
-    
     try {
       await prisma.batch
         .findFirst({

@@ -51,9 +51,12 @@ export async function supplier_routes(app: FastifyInstance) {
   });
   app.get("/suppliers", async (request, response) => {
     try {
-      await prisma.$queryRaw`
-        SELECT S.*, P.phone  FROM suppliers S INNER JOIN supplier_phone P ON S.id == P.supplier_id 
-      `.then(async (supplier) => {
+     await prisma.supplier.findMany({
+      include:{
+        Phones:{}
+      }
+     })
+      .then(async (supplier) => {
         if (!supplier) {
           response.status(404).send("Not found");
         }
