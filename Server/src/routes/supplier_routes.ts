@@ -134,9 +134,9 @@ export async function supplier_routes(app: FastifyInstance) {
       name: z.string(),
       email: z.string(),
       phone: z.string(),
-      company_id: z.number(),
+      /*company_id: z.number(),*/
     });
-    const { id, email, name, phone, company_id } = supplier.parse(request.body);
+    const { id, email, name, phone, /*company_id*/ } = supplier.parse(request.body);
 
     try {
       await prisma.supplier
@@ -165,7 +165,7 @@ export async function supplier_routes(app: FastifyInstance) {
                   data: {
                     name: name,
                     email: email,
-                    company_id: company_id,
+                    company_id: 1
                   },
                 })
                 .then(async (supplier) => {
