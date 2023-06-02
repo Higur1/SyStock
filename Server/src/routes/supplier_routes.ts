@@ -5,11 +5,11 @@ export async function supplier_routes(app: FastifyInstance) {
   app.post("/suppliers/new", async (request, response) => {
     const supplier = z.object({
       name: z.string(),
-      company_id: z.number(),
+      //company_id: z.number(),
       phone: z.string(),
       email: z.string(),
     });
-    const { name, company_id, phone, email } = supplier.parse(request.body);
+    const { name, /*company_id,*/ phone, email } = supplier.parse(request.body);
 
     try {
       await prisma.supplier
@@ -25,7 +25,7 @@ export async function supplier_routes(app: FastifyInstance) {
           await prisma.supplier
             .create({
               data: {
-                company_id: company_id,
+                company_id: 1, //alterar para company_id
                 name: name,
                 email: email,
               },
@@ -37,8 +37,8 @@ export async function supplier_routes(app: FastifyInstance) {
                   supplier_id: supplier.id,
                 },
               });
+              response.status(201).send(supplier);
             });
-          response.status(201);
         });
     } catch (error) {
       response.status(400).send(
@@ -51,9 +51,12 @@ export async function supplier_routes(app: FastifyInstance) {
   });
   app.get("/suppliers", async (request, response) => {
     try {
-      await prisma.$queryRaw`
-        SELECT S.*, P.phone  FROM suppliers S INNER JOIN supplier_phone P ON S.id == P.supplier_id 
-      `.then(async (supplier) => {
+     await prisma.supplier.findMany({
+      include:{
+        Phones:{}
+      }
+     })
+      .then(async (supplier) => {
         if (!supplier) {
           response.status(404).send("Not found");
         }
@@ -131,9 +134,9 @@ export async function supplier_routes(app: FastifyInstance) {
       name: z.string(),
       email: z.string(),
       phone: z.string(),
-      company_id: z.number(),
+      /*company_id: z.number(),*/
     });
-    const { id, email, name, phone, company_id } = supplier.parse(request.body);
+    const { id, email, name, phone, /*company_id*/ } = supplier.parse(request.body);
 
     try {
       await prisma.supplier
@@ -162,7 +165,7 @@ export async function supplier_routes(app: FastifyInstance) {
                   data: {
                     name: name,
                     email: email,
-                    company_id: company_id,
+                    company_id: 1
                   },
                 })
                 .then(async (supplier) => {
