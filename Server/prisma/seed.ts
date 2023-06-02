@@ -12,6 +12,7 @@ async function run() {
   }
   /*Deletes*/ await Promise.all([
     prisma.company_Address.deleteMany(),
+    prisma.supplierPhone.deleteMany(),
     prisma.supplier.deleteMany(),
     prisma.batch.deleteMany(),
     prisma.company.deleteMany(),
