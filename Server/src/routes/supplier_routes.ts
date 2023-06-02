@@ -31,13 +31,16 @@ export async function supplier_routes(app: FastifyInstance) {
               },
             })
             .then(async (supplier) => {
-              await prisma.supplierPhone.create({
-                data: {
-                  phone: phone,
-                  supplier_id: supplier.id,
-                },
-              });
-              response.status(201).send(supplier);
+              await prisma.supplierPhone
+                .create({
+                  data: {
+                    phone: phone,
+                    supplier_id: supplier.id,
+                  },
+                })
+                .then((supplier_phone) => {
+                  response.status(201).send([supplier, supplier_phone]);
+                });
             });
         });
     } catch (error) {
@@ -51,17 +54,18 @@ export async function supplier_routes(app: FastifyInstance) {
   });
   app.get("/suppliers", async (request, response) => {
     try {
-     await prisma.supplier.findMany({
-      include:{
-        Phones:{}
-      }
-     })
-      .then(async (supplier) => {
-        if (!supplier) {
-          response.status(404).send("Not found");
-        }
-        response.status(200).send(supplier);
-      });
+      await prisma.supplier
+        .findMany({
+          include: {
+            Phones: {},
+          },
+        })
+        .then(async (supplier) => {
+          if (!supplier) {
+            response.status(404).send("Not found");
+          }
+          response.status(200).send(supplier);
+        });
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
@@ -136,7 +140,9 @@ export async function supplier_routes(app: FastifyInstance) {
       phone: z.string(),
       /*company_id: z.number(),*/
     });
-    const { id, email, name, phone, /*company_id*/ } = supplier.parse(request.body);
+    const { id, email, name, phone /*company_id*/ } = supplier.parse(
+      request.body
+    );
 
     try {
       await prisma.supplier
@@ -165,16 +171,32 @@ export async function supplier_routes(app: FastifyInstance) {
                   data: {
                     name: name,
                     email: email,
-                    company_id: 1
+                    company_id: 1,
                   },
                 })
                 .then(async (supplier) => {
-                  await prisma.$queryRaw`
-              UPDATE supplier_phone
-              SET phone = ${phone}
-              WHERE supplier_id = ${supplier.id}
-            `;
-                  response.status(200).send(supplier);
+                  await prisma.supplierPhone
+                    .findFirst({
+                      where: {
+                        supplier_id: id,
+                      },
+                    })
+                    .then(async (supplier_phone_id) => {
+                      await prisma.supplierPhone
+                        .update({
+                          where: {
+                            id: supplier_phone_id!.id,
+                          },
+                          data: {
+                            phone: phone,
+                          },
+                        })
+                        .then((supplier_phone) => {
+                          response
+                            .status(200)
+                            .send([supplier, supplier_phone]);
+                        });
+                    });
                 });
             });
         });
