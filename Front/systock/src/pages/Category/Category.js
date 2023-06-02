@@ -5,6 +5,7 @@ import useCategory from '../../hooks/useCategory';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CreateCategoryDialog from './dialogs/CreateCategoryDialog';
 import EditCategoryDialog from './dialogs/EditCategoryDialog';
+import CustomizedSnackbars from '../../components/CustomizedSnackBar';
 
 export default function Category() {
 
@@ -15,7 +16,12 @@ export default function Category() {
     categoriesFiltered,
     handleCreateCategory,
     handleUpdateCategory,
-    handleDeleteCategory
+    handleDeleteCategory,
+    openSnackBar,
+    autoHideSnackBar,
+    severitySnackBar,
+    snackMessageSnackBar,
+    handleCloseSnackBar
   } = useCategory();
 
   const [openCreateCategory, setOpenCreateCategory] = useState(false);
@@ -116,11 +122,20 @@ export default function Category() {
         <DialogActions>
           <Button onClick={() => setDeleteCategory(false)}>Cancelar</Button>
           <Button onClick={() => {
-            handleDeleteCategory(idMenu);
+            handleDeleteCategory({id: idMenu});
             setDeleteCategory(false);
           }}>Confirmar</Button>
         </DialogActions>
       </Dialog>
+      )}
+      {openSnackBar && (
+        <CustomizedSnackbars 
+          open={openSnackBar}
+          autoHide={autoHideSnackBar}
+          handleClose={handleCloseSnackBar}
+          severity={severitySnackBar}
+          snackMessage={snackMessageSnackBar}
+        />
       )}
     </>
   )

@@ -72,7 +72,7 @@ export default function CreateCategoryDialog(props) {
             setHasError(true);
             return;
           }
-          createCategory(categoryLabel, categoryParent);
+          createCategory({name: categoryLabel});
           handleClose();
           }}>Adicionar</Button>
       </DialogActions>
@@ -84,6 +84,6 @@ export default function CreateCategoryDialog(props) {
 CreateCategoryDialog.propTypes = {
   open: PropTypes.bool,
   handleClose: PropTypes.func,
-  categories: PropTypes.object,
+  categories: PropTypes.array,
   createCategory: PropTypes.func
 }

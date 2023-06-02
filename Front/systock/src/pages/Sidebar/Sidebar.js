@@ -3,6 +3,7 @@ import { Option, Container, CustomArrow } from './styles.js';
 import CategoryIcon from '@mui/icons-material/Category';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import Estoque from '../../images/stock.png';
+import Fornecedor from '../../images/parcela.png';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 
@@ -23,7 +24,11 @@ export default function Sidebar() {
       </Option>
       <Option>
         <InventoryIcon style={{ width: 30, height: 30 }} />
-        <Link to="products">Product</Link>
+        <Link to="products">Produto</Link>
+      </Option>
+      <Option>
+        <img src={Fornecedor} style={{ width: 32, height: 32 }}/>
+        <Link to="supplier">Fornecedor</Link>
       </Option>
       <Option>
         <img src={Estoque} style={{ width: 32, height: 32 }}/>

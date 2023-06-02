@@ -29,15 +29,15 @@ const CurrencyInputCustom = () => {
   );
 };
 
-export default function CreateProductDialog(props) {
-  const { handleCreate, handleClose, error, open } = props;
+export default function EditProductDialog(props) {
+  const { handleEdit, handleClose, error, open, product } = props;
 
-
+  const { id } = product;
   const [name, setName] = useState("");
-  const [ncmsh, setNcmsh] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState(0);
-  const [categoryID, setCategoryID] = useState("");
+  const [ncmsh, setNcmsh] = useState(product.ncmSh || "");
+  const [description, setDescription] = useState(product.description || "");
+  const [price, setPrice] = useState(product.price || 0);
+  const [categoryID, setCategoryID] = useState(product.category_id || "");
   const [supplierID, setSupplierID] = useState(1);
   const [categories, setCategories] = useState([])
   const [hasError, setHasError] = useState(false);
@@ -90,7 +90,7 @@ export default function CreateProductDialog(props) {
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle><Title>{"Adicionar Produto"}</Title></DialogTitle>
+        <DialogTitle><Title>{"Editar Produto"}</Title></DialogTitle>
         <DialogContent>
           <Container>
           {/* <TextField
@@ -188,6 +188,7 @@ export default function CreateProductDialog(props) {
             setIsLoading(true);
             const priceString = parseFloat(price);
             const product = {
+              id,
               ncmSh: ncmsh,
               description,
               price: priceString,
@@ -195,8 +196,8 @@ export default function CreateProductDialog(props) {
               // supplier_id: supplierID
             };
 
-            handleCreate(product);
-            }}>Adicionar</Button>
+            handleEdit(product);
+            }}>Editar</Button>
         </DialogActions>
 
       </Dialog>
@@ -212,10 +213,11 @@ export default function CreateProductDialog(props) {
   );
 }
 
-CreateProductDialog.propTypes = {
+EditProductDialog.propTypes = {
   open: PropTypes.bool,
   handleClose: PropTypes.func,
   category: PropTypes.object,
-  handleCreate: PropTypes.func,
-  error: PropTypes.object
+  handleEdit: PropTypes.func,
+  error: PropTypes.object,
+  product: PropTypes.object
 };

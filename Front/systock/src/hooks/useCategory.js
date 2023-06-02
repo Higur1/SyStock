@@ -1,13 +1,30 @@
+/* eslint-disable no-debugger */
 import { useEffect, useRef, useState } from "react";
 import { deepCopy } from "../utils/utils";
-import { performFetch } from "../apiBase";
+import { performFetch, performFetchNoResult } from "../apiBase";
 
 export default function useCategory() {
 
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [categoriesFiltered, setCategoriesFiltered] = useState([]);
-  const [message, setMessage] = useState("");
+  
+  //* snackBar
+  const [openSnackBar, setOpenSnackBar] = useState(false);
+  const [autoHideSnackBar, setAutoHideSnackBar] = useState(3000);
+  const [severitySnackBar, setSeveritySnackBar] = useState("info");
+  const [snackMessageSnackBar, setSnackMessageSnackBar] = useState("");
+
+  function handleOpenSnackBar(severity, message="Unexpected Error Occurred", autoHide=3000) {
+    setSnackMessageSnackBar(message);
+    setSeveritySnackBar(severity);
+    setAutoHideSnackBar(autoHide);
+    setOpenSnackBar(true);
+  }
+
+  function handleCloseSnackBar() {
+    setOpenSnackBar(false);
+  }
 
   const isMount = useRef();
 
@@ -54,15 +71,16 @@ export default function useCategory() {
   async function handleCreateCategory(obj) {
     try {
       const newItem = await performFetch("/categories/new", {method: 'POST', body: JSON.stringify(obj)});
+      // const newItem = await fetch("http://192.168.15.12:3333/categories/new", {method: 'POST', body: JSON.stringify(obj)})
       if(typeof newItem === 'string') {
-        setMessage(newItem);
+        handleOpenSnackBar("error", newItem, 3500);
         return;
       }
 
       insertCategory(newItem);
 
     } catch (error) {
-      setMessage(error.message);
+      handleOpenSnackBar("error", error.message, 3500);
     }
   }
 
@@ -71,14 +89,14 @@ export default function useCategory() {
       const newItem = await performFetch("/categories/update", {method: 'PUT', body: JSON.stringify(category)});
       
       if(typeof newItem === 'string') {
-        setMessage(newItem);
+        handleOpenSnackBar("error", newItem, 3500);
         return;
       }
 
       insertCategory(newItem);
 
     } catch (error) {
-      setMessage(error.message);
+      handleOpenSnackBar("error", error.message, 3500);
     }
   }
 
@@ -89,14 +107,13 @@ export default function useCategory() {
   async function handleDeleteCategory(id) {
     const url = "/categories/delete";
 
-    try {
-      await performFetch(url, {method: 'DELETE', body: JSON.stringify(id)});
-
-      const updatedCategories = categories.filter(cat => cat.id !== id);
+    performFetchNoResult(url, {method: 'DELETE', body: JSON.stringify(id)})
+    .then(() => {
+      const updatedCategories = categories.filter(cat => cat.id !== id.id);
       setCategories(updatedCategories);
-    } catch (e) {
-      setMessage(e.message);
-    }
+    })
+    .catch(e => handleOpenSnackBar("error", e.message, 3500))
+    ;
   }
 
   return {
@@ -104,6 +121,6 @@ export default function useCategory() {
     selectedCategories, setSelectedCategories,
     categoriesFiltered, setCategoriesFiltered,
     handleCreateCategory, handleUpdateCategory, handleDeleteCategory,
-    message
+    handleCloseSnackBar, openSnackBar, autoHideSnackBar, snackMessageSnackBar, severitySnackBar
   }
 }
