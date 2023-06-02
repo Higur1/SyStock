@@ -24,7 +24,7 @@ export default function Sidebar() {
       </Option>
       <Option>
         <InventoryIcon style={{ width: 30, height: 30 }} />
-        <Link to="products">Product</Link>
+        <Link to="products">Produto</Link>
       </Option>
       <Option>
         <img src={Fornecedor} style={{ width: 32, height: 32 }}/>

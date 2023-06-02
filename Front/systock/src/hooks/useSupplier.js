@@ -42,30 +42,6 @@ export default function useSupplier() {
     }
   }
 
-  // //* UPDATE CATEGORY LIST WHEN CHOOSE
-  // useEffect(() => {
-  //   if(categories.length === 0) return;
-
-  //   let filteredOptions = categories
-  //     .filter(cat => selectedCategories
-  //       .some(catSelected => catSelected === cat.name));
-
-  //   setCategoriesFiltered(selectedCategories.length === 0 ? categories : filteredOptions);
-
-  // }, [selectedCategories, categories]);
-
-  // const insertCategory = (newCategory) => {
-  //   const newItem = deepCopy(newCategory);
-  //   let updatedCategories = [];
-  //   if(categories.some(cat => cat.id === newItem.id)) {
-  //     updatedCategories = categories.map(cat => (cat.id === newItem.id ? {...newItem} : {...cat}));
-  //   } else {
-  //     updatedCategories = [...categories, {...newItem}];
-  //   }
-
-  //   setCategories(updatedCategories);
-  // }
-
   async function createSupplier(obj) {
     try {
       const newItem = await performFetch("/suppliers/new", {method: 'POST', body: JSON.stringify(obj)});
@@ -82,43 +58,44 @@ export default function useSupplier() {
     }
   }
 
-  // async function handleUpdateCategory(category) {
-  //   try {
-  //     const newItem = await performFetch("/categories/update", {method: 'PUT', body: JSON.stringify(category)});
+  async function updateSupplier(sup) {
+    try {
+      const newItem = await performFetch("/suppliers/update", {method: 'PUT', body: JSON.stringify(sup)});
       
-  //     if(typeof newItem === 'string') {
-  //       handleOpenSnackBar("error", newItem, 3500);
-  //       return;
-  //     }
+      if(typeof newItem === 'string') {
+        handleOpenSnackBar("error", newItem, 3500);
+        return;
+      }
 
-  //     insertCategory(newItem);
+      const suplist = suppliers.map(sup => (sup.id === newItem.id ? {...newItem} : {...sup}));
+      setSuppliers(suplist);
 
-  //   } catch (error) {
-  //     handleOpenSnackBar("error", error.message, 3500);
-  //   }
-  // }
+    } catch (error) {
+      handleOpenSnackBar("error", error.message, 3500);
+    }
+  }
 
-  // /**
-  //  * * delete category by id
-  //  * @param {*} id 
-  //  */
-  // async function handleDeleteCategory(id) {
-  //   const url = "/categories/delete";
+  /**
+   * * delete category by id
+   * @param {*} id 
+   */
+  async function handleDeleteSupplier(id) {
+    const url = "/supplier/delete";
 
-  //   performFetchNoResult(url, {method: 'DELETE', body: JSON.stringify(id)})
-  //   .then(() => {
-  //     const updatedCategories = categories.filter(cat => cat.id !== id.id);
-  //     setCategories(updatedCategories);
-  //   })
-  //   .catch(e => handleOpenSnackBar("error", e.message, 3500))
-  //   ;
-  // }
+    performFetchNoResult(url, {method: 'DELETE', body: JSON.stringify(id)})
+    .then(() => {
+      const suppliersList = suppliers.filter(cat => cat.id !== id.id);
+      setSuppliers(suppliersList);
+    })
+    .catch(e => handleOpenSnackBar("error", e.message, 3500))
+    ;
+  }
 
   return {
     suppliers, 
     openSnackBar, autoHideSnackBar, 
     severitySnackBar, snackMessageSnackBar, 
     handleCloseSnackBar,
-    createSupplier
+    createSupplier, updateSupplier, handleDeleteSupplier
   }
 }

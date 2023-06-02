@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Container, HeaderContainer, MenuOption, TableContainer, TableData, TableRow, Menu } from "./styles";
-import { Button, ClickAwayListener, IconButton } from "@mui/material";
+import { Button, ClickAwayListener, Dialog, DialogActions, DialogTitle, IconButton } from "@mui/material";
 import ToolTipAndEllipsis from "../../components/dialogs/ComponentUtils/ToolTipAndEllipsis";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CustomizedSnackbars from "../../components/CustomizedSnackBar";
 import useSupplier from "../../hooks/useSupplier";
 import CreateSupplierDialog from "./dialogs/CreateSupplierDialog";
+import EditSupplierDialog from "./dialogs/EditSupplierDialog";
 
 export default function Supplier() {
 
@@ -14,14 +15,13 @@ export default function Supplier() {
     openSnackBar, autoHideSnackBar, 
     severitySnackBar, snackMessageSnackBar, 
     handleCloseSnackBar,
-    createSupplier
+    createSupplier, updateSupplier, handleDeleteSupplier
   } = useSupplier();
   const [menuOption, setMenuOption] = useState(false);
   const [idMenu, setIdMenu] = useState(null);
-  const [idEditProduct, setIdEditProduct] = useState(null);
   const [openCreateSupplier, setOpenCreateSupplier] = useState(false);
-  // const [openEditProduct, setOpenEditProduct] = useState(false);
-  // const [deleteProduct, setDeleteProduct] = useState(false);
+  const [openEditSupplier, setOpenEditSupplier] = useState(false);
+  const [deleteSupplier, setDeleteSupplier] = useState(false);
 
   function handleMenuOptions(id) {
     setMenuOption(true);
@@ -30,7 +30,6 @@ export default function Supplier() {
 
   function handleCloseMenu() {
     setMenuOption(false);
-    setIdMenu(null);
   }
 
   return (
@@ -63,7 +62,7 @@ export default function Supplier() {
                 <ToolTipAndEllipsis item={sup.name} />
               </TableData>
               <TableData width={"35%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{sup.email}</TableData>
-              <TableData width={"12%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{sup.phone}</TableData>
+              <TableData width={"12%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{sup.Phones.length ? sup.Phones[0].phone : null}</TableData>
               {/* <TableData width={"7%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{sup.supplier_id}</TableData> */}
               <TableData width={"40px"} style={{justifyContent: 'center'}}minWidth={'40px'}>
                 <IconButton onClick={() => handleMenuOptions(index)}>
@@ -71,9 +70,9 @@ export default function Supplier() {
                   {menuOption && idMenu === index && (
                     <ClickAwayListener onClickAway={handleCloseMenu}>
                       <Menu>
-                        <MenuOption style={{borderRadius: '16px 16px 0px 0px'}}>{"Visualizar Produto"}</MenuOption>
-                        <MenuOption>{"Editar Produto"}</MenuOption>
-                        <MenuOption style={{borderBottom: '0px', borderRadius: '0px 0px 16px 16px'}} >{"Apagar Produto"}</MenuOption>
+                        <MenuOption style={{borderRadius: '16px 16px 0px 0px'}}>{"Visualizar Fornecedor"}</MenuOption>
+                        <MenuOption onClick={() => setOpenEditSupplier(true)}>{"Editar Fornecedor"}</MenuOption>
+                        <MenuOption onClick={() => setDeleteSupplier(true)} style={{borderBottom: '0px', borderRadius: '0px 0px 16px 16px'}} >{"Apagar Fornecedor"}</MenuOption>
                       </Menu>
                     </ClickAwayListener>
                   
@@ -93,43 +92,34 @@ export default function Supplier() {
         handleClose={() => setOpenCreateSupplier(false)}
         open={openCreateSupplier}
       />}
-{/* 
-      {openCreateProduct && <CreateProductDialog 
-        handleCreate={(prod) => {
-          createProduct(prod);
-          setOpenCreateProduct(false);
+
+      {openEditSupplier && <EditSupplierDialog 
+        handleEdit={(sup) => {
+          updateSupplier(sup);
+          setOpenEditSupplier(false);
         }}
-        handleClose={() => setOpenCreateProduct(false)}
-        error={errorInsert}
-        open={openCreateProduct}
+        handleClose={() => setOpenEditSupplier(false)}
+        supplier={suppliers[idMenu]}
+        open={openEditSupplier}
       />}
 
-      {openEditProduct && <EditProductDialog 
-        handleEdit={updateProduct}
-        handleClose={() => setOpenEditProduct(false)}
-        error={errorInsert}
-        open={openEditProduct}
-        product={products[idEditProduct]}
-    
-      />}
-
-      {deleteProduct && (
+      {deleteSupplier && (
         <Dialog
-          open={deleteProduct}
+          open={deleteSupplier}
           maxWidth="md"
           fullWidth
         >
-          <DialogTitle>{"Deseja  mesmo apagar essa categoria?"}</DialogTitle>
+          <DialogTitle>{"Deseja  mesmo apagar esse Fornecedor?"}</DialogTitle>
           <DialogActions>
-            <Button onClick={() => setDeleteProduct(false)}>Cancelar</Button>
+            <Button onClick={() => setDeleteSupplier(false)}>Cancelar</Button>
             <Button onClick={() => {
-              handleDeleteProduct({ product_id: products.find((p, i) => i === idMenu).id });
-              setDeleteProduct(false);
+              handleDeleteSupplier({ id: suppliers[idMenu].id });
+              setDeleteSupplier(false);
             }}>Confirmar</Button>
           </DialogActions>
-        </Dialog> */}
-      {/* )} */}
-      
+        </Dialog>
+      )}
+
       {openSnackBar && (
         <CustomizedSnackbars 
           open={openSnackBar}
