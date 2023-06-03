@@ -49,8 +49,7 @@ export default function useSupplier() {
         handleOpenSnackBar("error", newItem, 3500);
         return;
       }
-
-      const suplist = [...suppliers, newItem];
+      const suplist = [...suppliers, {...newItem[0], Phones: newItem[1]}];
       setSuppliers(suplist);
 
     } catch (error) {
@@ -67,7 +66,7 @@ export default function useSupplier() {
         return;
       }
 
-      const suplist = suppliers.map(sup => (sup.id === newItem.id ? {...newItem} : {...sup}));
+      const suplist = suppliers.map(sup => (sup.id === newItem[0].id ? {...newItem[0], Phones: newItem[1]} : {...sup}));
       setSuppliers(suplist);
 
     } catch (error) {
@@ -80,7 +79,7 @@ export default function useSupplier() {
    * @param {*} id 
    */
   async function handleDeleteSupplier(id) {
-    const url = "/supplier/delete";
+    const url = "/suppliers/delete";
 
     performFetchNoResult(url, {method: 'DELETE', body: JSON.stringify(id)})
     .then(() => {

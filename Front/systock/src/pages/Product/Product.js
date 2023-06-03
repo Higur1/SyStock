@@ -65,12 +65,12 @@ export default function Product() {
         <TableContainer>
           <TableRow style={{background: '#DCDCDC', borderRadius: '8px 8px 0px 0px'}}>
             {/* <TableData width={"32%"} minWidth={'200px'}>{"Nome"}</TableData> */}
-            <TableData width={"50%"} minWidth={'300px'}>{"Descrição"}</TableData>
-            <TableData width={"7%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{"ncmSh"}</TableData>
-            <TableData width={"7%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{"Preço"}</TableData>
-            <TableData width={"7%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{"Categoria"}</TableData>
+            <TableData style={{flex: 1}}>{"Descrição"}</TableData>
+            <TableData style={{justifyContent: 'center', width: 150, maxWidth: 150}}>{"ncmSh"}</TableData>
+            <TableData style={{justifyContent: 'center', width: 150, maxWidth: 150}}>{"Preço"}</TableData>
+            <TableData style={{justifyContent: 'center', width: 150, maxWidth: 150}}>{"Categoria"}</TableData>
             {/* <TableData width={"7%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{"Supplier"}</TableData> */}
-            <TableData width={"40px"} style={{justifyContent: 'center'}}minWidth={'40px'} />
+            <TableData style={{justifyContent: 'center', width: 40}}/>
           </TableRow>
           {products.map((prod, index) => (
             <TableRow key={index} style={{
@@ -79,14 +79,14 @@ export default function Product() {
               background: index & 2 === 0 ? "#ebebeb" : "#F5f5f5"
             }}>
               {/* <TableData width={"32%"} minWidth={'200px'}>{prod.name}</TableData> */}
-              <TableData width={"50%"} minWidth={'300px'}>
+              <TableData style={{flex: 1}}>
                 <ToolTipAndEllipsis item={prod.description} />
               </TableData>
-              <TableData width={"7%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{prod.ncmSh}</TableData>
-              <TableData width={"7%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{prod.price}</TableData>
-              <TableData width={"7%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{prod.category_id}</TableData>
+              <TableData style={{justifyContent: 'center', width: 150, maxWidth: 150}}>{prod.ncmSh}</TableData>
+              <TableData style={{justifyContent: 'center', width: 150, maxWidth: 150}}>{prod.price}</TableData>
+              <TableData style={{justifyContent: 'center', width: 150, maxWidth: 150}}>{prod.category_id}</TableData>
               {/* <TableData width={"7%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{prod.supplier_id}</TableData> */}
-              <TableData width={"40px"} style={{justifyContent: 'center'}}minWidth={'40px'}>
+              <TableData style={{justifyContent: 'center', width: 40}}>
                 <IconButton onClick={() => handleMenuOptions(index)}>
                   <MoreVertIcon fontSize='small'/>
                   {menuOption && idMenu === index && (
@@ -120,7 +120,10 @@ export default function Product() {
       />}
 
       {openEditProduct && <EditProductDialog 
-        handleEdit={updateProduct}
+        handleEdit={(prod) => {
+          updateProduct(prod);
+          setOpenEditProduct(false);
+        }}
         handleClose={() => setOpenEditProduct(false)}
         error={errorInsert}
         open={openEditProduct}
