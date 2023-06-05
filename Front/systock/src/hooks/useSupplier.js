@@ -51,6 +51,8 @@ export default function useSupplier() {
       }
       const suplist = [...suppliers, {...newItem[0], Phones: newItem[1]}];
       setSuppliers(suplist);
+      
+      handleOpenSnackBar("success", "Fornecedor adicionado com sucesso!!", 3500)
 
     } catch (error) {
       handleOpenSnackBar("error", error.message, 3500);
@@ -68,6 +70,8 @@ export default function useSupplier() {
 
       const suplist = suppliers.map(sup => (sup.id === newItem[0].id ? {...newItem[0], Phones: newItem[1]} : {...sup}));
       setSuppliers(suplist);
+      
+      handleOpenSnackBar("success", "Fornecedor atualizado com sucesso!!", 3500);
 
     } catch (error) {
       handleOpenSnackBar("error", error.message, 3500);
@@ -85,6 +89,7 @@ export default function useSupplier() {
     .then(() => {
       const suppliersList = suppliers.filter(cat => cat.id !== id.id);
       setSuppliers(suppliersList);
+      handleOpenSnackBar("success", "Fornecedor apagado com sucesso!!", 3500)
     })
     .catch(e => handleOpenSnackBar("error", e.message, 3500))
     ;
