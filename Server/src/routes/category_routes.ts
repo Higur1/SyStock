@@ -2,14 +2,6 @@ import { prisma } from "../config/prisma";
 import { FastifyInstance } from "fastify";
 import { z } from "zod";
 
-const CategorySchema = {
-  type: "object",
-  properties: {
-    id: { type: "number" },
-    name: { type: "string" },
-  },
-};
-
 export async function category_routes(app: FastifyInstance) {
   app.post("/categories/new", async (request, response) => {
     const category_name = z.object({

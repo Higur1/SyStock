@@ -20,19 +20,19 @@ const port: number = Number(process.env.PORT);
 
 await app.register(swagger, {
   openapi: {}
-})
+});
 app.register(swaggerUi, {
   theme:{
     css:[
       {filename: 'theme.css', content: new SwaggerTheme('v3').getBuffer('dark')}
     ],
   }
-})
+});
 app.register(cors, {
   origin: "*",
 });
 
-//app.register(rotasCliente);
+//routes
 app.register(supplier_routes);
 app.register(category_routes);
 app.register(product_routes);
