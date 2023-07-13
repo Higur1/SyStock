@@ -47,10 +47,10 @@ export default function Supplier() {
         <TableContainer>
           <TableRow style={{background: '#DCDCDC', borderRadius: '8px 8px 0px 0px'}}>
             {/* <TableData width={"32%"} minWidth={'200px'}>{"Nome"}</TableData> */}
-            <TableData width={"35%"} minWidth={'300px'}>{"Nome"}</TableData>
-            <TableData width={"35%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{"E-mail"}</TableData>
-            <TableData width={"12%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{"Telefone"}</TableData>
-            <TableData width={"40px"} style={{justifyContent: 'center'}} minWidth={'40px'} />
+            <TableData style={{flex: 1, maxWidth: 700}}>{"Nome"}</TableData>
+            <TableData style={{flex: 1}}>{"E-mail"}</TableData>
+            <TableData style={{width: 350, maxWidth: 350}}>{"Telefone"}</TableData>
+            <TableData style={{justifyContent: 'center', width: 40}} />
           </TableRow>
           {suppliers.map((sup, index) => (
             <TableRow key={index} style={{
@@ -58,13 +58,11 @@ export default function Supplier() {
               borderBottom: index === suppliers.length - 1 ? '0px' : '1px solid #d3D3D3',
               background: index & 2 === 0 ? "#ebebeb" : "#F5f5f5"
             }}>
-              <TableData width={"35%"} minWidth={'300px'}>
-                <ToolTipAndEllipsis item={sup.name} />
-              </TableData>
-              <TableData width={"35%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{sup.email}</TableData>
-              <TableData width={"12%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{sup.Phones.length ? sup.Phones[0].phone : null}</TableData>
+              <TableData style={{flex: 1, maxWidth: 700}}><ToolTipAndEllipsis item={sup.name} /></TableData>
+              <TableData style={{flex: 1}}>{sup.email}</TableData>
+              <TableData style={{width: 350, maxWidth: 350}}>{sup.Phones.length ? sup.Phones[0].phone : null}</TableData>
               {/* <TableData width={"7%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{sup.supplier_id}</TableData> */}
-              <TableData width={"40px"} style={{justifyContent: 'center'}}minWidth={'40px'}>
+              <TableData style={{justifyContent: 'center', width: 40}}>
                 <IconButton onClick={() => handleMenuOptions(index)}>
                   <MoreVertIcon fontSize='small'/>
                   {menuOption && idMenu === index && (

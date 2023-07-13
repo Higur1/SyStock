@@ -9,9 +9,9 @@ export default function Master() {
 
     <div style={{ margin: "16px" }}>
       <Routes>
-        <Route path="category" element={<Category />}/>
+        <Route path="categories" element={<Category />}/>
         <Route path="products" element={<Product />}/>
-        <Route path="supplier" element={<Supplier />}/>
+        <Route path="suppliers" element={<Supplier />}/>
       </Routes>
     </div>
   )

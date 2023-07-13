@@ -28,7 +28,7 @@ export default function EditSupplierDialog(props) {
   const { id } = supplier;
   
   const [name, setName] = useState(supplier.name || "");
-  const [phone, setPhone] = useState(supplier.phone || "");
+  const [phone, setPhone] = useState(supplier.Phones.length ? supplier.Phones[0].phone : null || "");
   const [email, setEmail] = useState(supplier.email || "");
   const [hasError, setHasError] = useState(false);
   const [hasErrorPrice, setHasErrorPrice] = useState(false);

@@ -35,9 +35,7 @@ export const TableRow = styled("div")({
   borderBottom: '1px solid #d3D3D3'
 });
 
-export const TableData = styled("div")(({minWidth, width}) => ({
-  minWidth,
-  width,
+export const TableData = styled("div")(() => ({
   display: 'flex',
   alignItems: 'center',
   height: '48px',

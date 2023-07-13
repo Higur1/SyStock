@@ -53,9 +53,8 @@ export default function useCategory() {
 
   async function updateProduct(product) {
     try {
-      const prod = await performFetch("/products/update", {method: 'POST', body: JSON.stringify(product)});
-      debugger;
-      const newProducts = products.map(p => (p.id === prod.id ? {...prod} : {...p}));
+      await performFetchNoResult("/products/update", {method: 'PUT', body: JSON.stringify(product)});
+      const newProducts = products.map(p => (p.id === product.id ? {...product} : {...p}));
 
       setProducts(newProducts);
     } catch (error) {

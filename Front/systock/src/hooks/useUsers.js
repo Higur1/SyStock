@@ -3,9 +3,9 @@ import { useEffect, useRef, useState } from "react";
 import { deepCopy } from "../utils/utils";
 import { performFetch, performFetchNoResult } from "../apiBase";
 
-export default function useSupplier() {
+export default function useUsers() {
 
-  const [suppliers, setSuppliers] = useState([]);
+  const [users, setUsers] = useState([]);
   
   //* snackBar
   const [openSnackBar, setOpenSnackBar] = useState(false);
@@ -30,48 +30,48 @@ export default function useSupplier() {
     if(isMount.current) return;
     
     isMount.current = true;
-    getSuppliers();
+    getUsers();
   }, []);
 
-  async function getSuppliers() {
+  async function getUsers() {
     try {
-      const suppliers = await performFetch("/suppliers", {method: 'GET'});
-      setSuppliers(suppliers);
+      const users = await performFetch("/users", {method: 'GET'});
+      setUsers(users);
     } catch (error) {
       console.log(error.message);
     }
   }
 
-  async function createSupplier(obj) {
+  async function createUser(obj) {
     try {
-      const newItem = await performFetch("/suppliers/new", {method: 'POST', body: JSON.stringify(obj)});
+      const newItem = await performFetch("/users/new", {method: 'POST', body: JSON.stringify(obj)});
       if(typeof newItem === 'string') {
         handleOpenSnackBar("error", newItem, 3500);
         return;
       }
-      const suplist = [...suppliers, {...newItem[0], Phones: newItem[1]}];
-      setSuppliers(suplist);
+      const suplist = [...users, {...newItem[0], Phones: newItem[1]}];
+      setUsers(suplist);
       
-      handleOpenSnackBar("success", "Fornecedor adicionado com sucesso!!", 3500)
+      handleOpenSnackBar("success", "Usuário adicionado com sucesso!!", 3500)
 
     } catch (error) {
       handleOpenSnackBar("error", error.message, 3500);
     }
   }
 
-  async function updateSupplier(sup) {
+  async function updateUser(sup) {
     try {
-      const newItem = await performFetch("/suppliers/update", {method: 'PUT', body: JSON.stringify(sup)});
+      const newItem = await performFetch("/users/update", {method: 'PUT', body: JSON.stringify(sup)});
       
       if(typeof newItem === 'string') {
         handleOpenSnackBar("error", newItem, 3500);
         return;
       }
 
-      const suplist = suppliers.map(sup => (sup.id === newItem[0].id ? {...newItem[0], Phones: newItem[1]} : {...sup}));
-      setSuppliers(suplist);
+      const suplist = users.map(sup => (sup.id === newItem[0].id ? {...newItem[0], Phones: newItem[1]} : {...sup}));
+      setUsers(suplist);
       
-      handleOpenSnackBar("success", "Fornecedor atualizado com sucesso!!", 3500);
+      handleOpenSnackBar("success", "Usuário atualizado com sucesso!!", 3500);
 
     } catch (error) {
       handleOpenSnackBar("error", error.message, 3500);
@@ -82,24 +82,24 @@ export default function useSupplier() {
    * * delete category by id
    * @param {*} id 
    */
-  async function handleDeleteSupplier(id) {
-    const url = "/suppliers/delete";
+  async function handleDeleteUser(id) {
+    const url = "/users/delete";
 
     performFetchNoResult(url, {method: 'DELETE', body: JSON.stringify(id)})
     .then(() => {
-      const suppliersList = suppliers.filter(cat => cat.id !== id.id);
-      setSuppliers(suppliersList);
-      handleOpenSnackBar("success", "Fornecedor apagado com sucesso!!", 3500)
+      const usersList = users.filter(cat => cat.id !== id.id);
+      setUsers(usersList);
+      handleOpenSnackBar("success", "Usuário apagado com sucesso!!", 3500)
     })
     .catch(e => handleOpenSnackBar("error", e.message, 3500))
     ;
   }
 
   return {
-    suppliers, 
+    users, 
     openSnackBar, autoHideSnackBar, 
     severitySnackBar, snackMessageSnackBar, 
     handleCloseSnackBar,
-    createSupplier, updateSupplier, handleDeleteSupplier
+    createUser, updateUser, handleDeleteUser
   }
 }

@@ -66,6 +66,8 @@ export default function useCategory() {
     }
 
     setCategories(updatedCategories);
+    
+    handleOpenSnackBar("success", "Categoria adicionada com sucesso!!", 3500);
   }
 
   async function handleCreateCategory(obj) {
@@ -95,6 +97,7 @@ export default function useCategory() {
 
       insertCategory(newItem);
 
+      handleOpenSnackBar("success", "Categoria atualizada com sucesso!!", 3500);
     } catch (error) {
       handleOpenSnackBar("error", error.message, 3500);
     }
@@ -111,6 +114,8 @@ export default function useCategory() {
     .then(() => {
       const updatedCategories = categories.filter(cat => cat.id !== id.id);
       setCategories(updatedCategories);
+      
+    handleOpenSnackBar("success", "Categoria apagada com sucesso!!", 3500);
     })
     .catch(e => handleOpenSnackBar("error", e.message, 3500))
     ;
