@@ -1,13 +1,20 @@
 import Master from './Master.js';
 import './App.css';
 import Sidebar from './pages/Sidebar/Sidebar.js';
+import Login from './pages/Login/Login.js';
 
 function App() {
+
+  const isLoggedIn = false;
   return (
-    <div className='main'>
-      <Sidebar />
-      <Master />
-    </div>
+    isLoggedIn ? (
+      <div className='main'>
+        <Sidebar />
+        <Master />
+      </div>
+    ) : (
+      <Login />
+    )
   );
 }
 
