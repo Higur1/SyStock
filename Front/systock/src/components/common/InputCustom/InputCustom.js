@@ -13,7 +13,7 @@ const CssTextField = styled(TextField)({
 
 const InputCustom = (props) => {
 
-  const { label, autoFocus, onChange, placeholder, value, required, fullWidth, InputProps, color, type } = props; 
+  const { label, autoFocus, onChange, placeholder, value, required, fullWidth, InputProps, color, type, error } = props; 
 
   return (
     // <FormControl variant="filled">
@@ -43,6 +43,7 @@ const InputCustom = (props) => {
       required={required}
       placeholder={placeholder}
       color={color}
+      error={error}
     />
   );
 };
@@ -62,7 +63,8 @@ InputCustom.propTypes = {
   fullWidth: PropTypes.bool,
   InputProps: PropTypes.object,
   color: PropTypes.string,
-  type: PropTypes.string
+  type: PropTypes.string,
+  error: PropTypes.bool
 };
 
 export default InputCustom;

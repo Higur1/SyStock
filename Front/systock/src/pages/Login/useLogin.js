@@ -5,6 +5,10 @@ export const useLogin = () => {
 
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState({
+    user: false,
+    password: false
+  });
 
   const onChangeUser = (event) => {
     setUser(event.target.value);
@@ -14,7 +18,21 @@ export const useLogin = () => {
     setPassword(event.target.value);
   }
 
+  const verifyUserRequirements = () => {
+    let hasError = false;
+    if(user === '') hasError = true;
+
+    return hasError;
+  }
+
   async function onLogin () {
+    const hasError = verifyUserRequirements();
+    if(hasError) {
+      setError({
+        ...error, user: hasError 
+      });
+      return;
+    }
     try {
       const result = await performFetch("/auth", {
         method: "POST", 
@@ -23,7 +41,9 @@ export const useLogin = () => {
       console.log(result);
       //* set on localstorage
     } catch {
-      //* set error
+      setError({
+        ...error, user: hasError 
+      });
     }
   }
 
@@ -38,6 +58,7 @@ export const useLogin = () => {
   return {
     user, onChangeUser,
     password, onChangePassword,
+    error,
     onLogin, onSeePrice, onForgotPassword
   };
 }
