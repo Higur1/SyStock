@@ -7,8 +7,11 @@ export const useLogin = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState({
     user: false,
-    password: false
+    password: false,
+    email: ''
   });
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const onChangeUser = (event) => {
     setUser(event.target.value);
@@ -16,6 +19,12 @@ export const useLogin = () => {
 
   const onChangePassword = (event) => {
     setPassword(event.target.value);
+  }
+
+  const onChangeEmail = (event) => {
+    const email = event.target.value;
+    setError({...error, email: ''});
+    setEmail(email);
   }
 
   const verifyUserRequirements = () => {
@@ -26,11 +35,13 @@ export const useLogin = () => {
   }
 
   async function onLogin () {
+    setLoading(true);
     const hasError = verifyUserRequirements();
     if(hasError) {
       setError({
         ...error, user: hasError 
       });
+      setLoading(false);
       return;
     }
     try {
@@ -45,20 +56,49 @@ export const useLogin = () => {
         ...error, user: hasError 
       });
     }
+    setLoading(false);
   }
 
   const onForgotPassword = () => {
     alert('send');
   }
 
-  const onSeePrice = () => {
-    console.log('ver preços');
+  const onResetPassword = () => {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if(regex.test(email)) {
+      setError({...error, email: ''});
+    } else {
+      setError({...error, email: 'Formato de e-mail inválido'});
+    }
+  }
+
+  const clearInfo = (screen) => {
+    switch(screen) {
+      case "login": {
+        setUser('');
+        setPassword('');
+        break;
+      }
+      case "resetPassword": {
+        setEmail('');
+        break;
+      }
+      default:
+        return;
+    }
+    setError({
+      user: false,
+      password: false,
+      email: ''
+    });
   }
 
   return {
     user, onChangeUser,
     password, onChangePassword,
     error,
-    onLogin, onSeePrice, onForgotPassword
+    email, onChangeEmail, 
+    onLogin, onForgotPassword, onResetPassword, clearInfo,
+    loading
   };
 }
