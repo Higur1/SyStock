@@ -14,44 +14,85 @@ import { useState } from 'react';
 
 export default function Sidebar() {
 
-  const [openCollapseConfig, setOpenCollapseConfig] = useState(false);
+  const [options, setOptions] = useState([
+    {
+      type: 'dashboard', 
+      label: 'Dashboard', 
+      child: [],
+      openCollapse: false
+    },
+    {
+      type: 'categories', 
+      label: 'Categoria', 
+      child: [],
+      openCollapse: false
+    },
+    {
+      type: 'products', 
+      label: 'Produto', 
+      child: [],
+      openCollapse: false
+    },
+    {
+      type: 'suppliers', 
+      label: 'Fornecedor', 
+      child: [],
+      openCollapse: false
+    },
+    {
+      type: 'stock', 
+      label: 'Estoque', 
+      child: [],
+      openCollapse: false
+    },
+    {
+      type: 'settings', 
+      label: 'Configurações', 
+      child: [
+        {
+          type: 'users', 
+          label: 'Usuários', 
+          child: [],
+          openCollapse: false
+        }
+      ],
+      openCollapse: false
+    },
+  ]);
+
+  const handleCollapse = (type) => {
+    let updatedOptions = options.map(opt => (opt.type === type ? {...opt, openCollapse: !opt.openCollapse} : {...opt}));
+
+    setOptions(updatedOptions);
+  }
 
   return (
     <Container>
-      <Option>
-        <DashboardIcon style={{ width: 30, height: 30 }} />
-        <Link to="dashboard">Dashboard</Link>
-      </Option>
-      <Option>
-        <CategoryIcon style={{ width: 30, height: 30 }} />
-        <Link to="categories">Categoria</Link>
-      </Option>
-      <Option>
-        <InventoryIcon style={{ width: 30, height: 30 }} />
-        <Link to="products">Produto</Link>
-      </Option>
-      <Option>
-        <img src={Fornecedor} style={{ width: 32, height: 32 }}/>
-        <Link to="suppliers">Fornecedor</Link>
-      </Option>
-      <Option>
-        <img src={Estoque} style={{ width: 32, height: 32 }}/>
-        <Link to="stock">Estoque</Link>
-      </Option>
-      <Option>
-        <SettingsIcon style={{ width: 30, height: 30 }} />
-        <Link to="settings">Configurações</Link>
-        <IconButton onClick={() => setOpenCollapseConfig(!openCollapseConfig)} style={{ width: 30, height: 30, paddingRight: 8 }}>
-          {openCollapseConfig ? <ExpandMoreIcon /> : <ExpandLessIcon />}
-        </IconButton>
-        
-      </Option>
-      <Collapse in={!openCollapseConfig}>
-        <Option style={{paddingLeft: 32}}>
-          <PersonIcon style={{ width: 30, height: 30 }} />
-          <Link to="users">Usuários</Link>
-        </Option>
-      </Collapse>
+      {options.map((option, index) => {
+
+        return (
+        <>
+          <Option key={option.type + index}>
+            {/* icon */}
+            <Link to={option.type}>{option.label}</Link>
+            {option.child.length !== 0 ? (
+              <IconButton onClick={() => handleCollapse(option.type)} style={{ width: 30, height: 30, paddingRight: 8 }}>
+                {option.openCollapse ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              </IconButton>
+            ) : null}
+          </Option>
+          <Collapse in={option.openCollapse}>
+            {option.child.map((optionChild, i) => (
+              <Option key={option.type + i}>
+                {/* icon */}
+                <Link to={optionChild.type} style={{paddingLeft: 32}}>{optionChild.label}</Link>
+              </Option>
+            ))}
+          </Collapse>
+        </>
+          
+        );
+      })}
     </Container>
   );
 }
