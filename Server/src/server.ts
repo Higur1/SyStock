@@ -44,9 +44,6 @@ app.register(company_routes);
 
 const start = async () => {
   try {
-    for(const schema of [...userSchemas]){
-      app.addSchema(schema);
-    }
     await app.listen({ port: port, host: ip.address() });
     console.log(`Served at ${ip.address()}:${port}`);
   } catch (error) {

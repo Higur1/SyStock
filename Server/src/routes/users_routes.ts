@@ -2,7 +2,6 @@ import { prisma } from "../config/prisma";
 import { FastifyInstance } from "fastify";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
-import { $ref } from "./user.schema";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import auth_middleware from "../middleware/auth_middleware";
@@ -10,6 +9,88 @@ import auth_middleware from "../middleware/auth_middleware";
 dotenv.config();
 
 export async function user_routes(app: FastifyInstance) {
+  app.post("/recovery", async (request, response) => {
+    const recovery = z.object({
+      email: z.string(),
+    });
+
+    const { email } = recovery.parse(request.body);
+
+    await prisma.user
+      .findUnique({
+        where: {
+          email: email,
+        },
+      })
+      .then(async (emailValided) => {
+        if (emailValided == undefined) {
+          response.status(404).send({ message: "Not found" });
+        }
+        await prisma.tokenRecovery
+          .create({
+            data: {
+              user_id: emailValided!.id,
+            },
+          })
+          .then((token) => {
+            //logica para enviar o email com o token.value
+          });
+      });
+  });
+  app.post("/reset/password", async (request, response) => {
+    const passwordReset = z.object({
+      token: z.string(),
+      user_password: z.string(),
+    });
+
+    const { user_password, token } = passwordReset.parse(request.body);
+    var salt = await bcrypt.genSaltSync(10);
+    var hash = await bcrypt.hashSync(user_password, salt);
+
+    try {
+      await prisma.tokenRecovery
+        .findFirst({
+          where: {
+            value: token,
+          },
+        })
+        .then(async (tokenValidad) => {
+          if(tokenValidad == undefined){
+            response.status(401).send({message: "token invalid"}); // saber qual codigo enviar
+          }
+          if (tokenValidad?.tokenStatus == false) {
+            response.status(401).send({ message: "token is not available" }); //saber qual codigo enviar
+          }
+          await prisma.user
+            .update({
+              where: {
+                id: tokenValidad!.user_id,
+              },
+              data: {
+                user_password: hash,
+              },
+            })
+            .then(() => {
+              response.status(200);
+            })
+            await prisma.tokenRecovery.update({
+              where:{
+                id: tokenValidad!.id
+              },
+              data:{
+                tokenStatus: false
+              }
+            })
+        });
+    } catch (error) {
+      response.status(500).send(
+        JSON.stringify({
+          message: "An error has occurred",
+        })
+      );
+    }
+  });
+  //logica para utilizar o token para resetar a senha e trocar o status para used (verificar status antes)
   app.post("/auth", async (request, response) => {
     const user = z.object({
       user_login: z.string(),
@@ -26,13 +107,13 @@ export async function user_routes(app: FastifyInstance) {
         })
         .then(async (user) => {
           if (!user) {
-            response.status(404).send("Not found");
+            response.status(404).send({ message: "Not found" });
           }
           await bcrypt
             .compare(user_password, user!.user_password)
             .then(async (checkpassword) => {
               if (!checkpassword) {
-                response.status(401).send("Unauthorized");
+                response.status(401).send({ message: "Unauthorized" });
               }
               const knowkey = process.env.JWTSecret;
               const token = jwt.sign(
@@ -41,23 +122,20 @@ export async function user_routes(app: FastifyInstance) {
                 { expiresIn: "48h" }
               );
 
-              response.status(200).send(token);
+              response.status(200).send({ token: token });
             });
         });
     } catch (error) {
       response.status(500).send(
         JSON.stringify({
-          error: error.meta,
           message: "An error has occurred",
         })
       );
     }
   });
   app.post(
-    "/users/new",
-    {
-      preHandler: auth_middleware,
-    },
+    "/user",
+
     async (request, response) => {
       const user = z.object({
         name: z.string(),
@@ -77,10 +155,11 @@ export async function user_routes(app: FastifyInstance) {
           .then(async (userExist) => {
             if (userExist) {
               response
-                .status(422)
-                .send(
-                  "an operation could not be performed email or login already exists"
-                );
+                .status(409)
+                .send({
+                  message:
+                    "an operation could not be performed email or login already exists",
+                });
             }
             var salt = await bcrypt.genSaltSync(10);
             var hash = await bcrypt.hashSync(user_password, salt);
@@ -95,22 +174,19 @@ export async function user_routes(app: FastifyInstance) {
                 },
               })
               .then((user) => {
-                response
-                  .status(201)
-                  .send({
-                    user: {
-                      id: user.id,
-                      user_login: user.user_login,
-                      email: user.email,
-                      type: user.user_type_id,
-                    },
-                  });
+                response.status(201).send({
+                  user: {
+                    id: user.id,
+                    user_login: user.user_login,
+                    email: user.email,
+                    type: user.user_type_id,
+                  },
+                });
               });
           });
       } catch (error) {
-        response.status(400).send(
+        response.status(500).send(
           JSON.stringify({
-            error: error.meta,
             message: "An error has occurred",
           })
         );
@@ -134,14 +210,13 @@ export async function user_routes(app: FastifyInstance) {
           })
           .then((userList) => {
             if (Object.keys(userList).length === 0) {
-              response.status(200).send("Empty");
+              response.status(204).send({ message: "Empty" });
             }
             response.status(200).send(userList);
           });
       } catch (error) {
-        response.status(400).send(
+        response.status(500).send(
           JSON.stringify({
-            error: error,
             message: "An error has occurred",
           })
         );
@@ -149,7 +224,7 @@ export async function user_routes(app: FastifyInstance) {
     }
   );
   app.get(
-    "/users/findByName/:name",
+    "/user/name/:name",
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
@@ -175,12 +250,12 @@ export async function user_routes(app: FastifyInstance) {
           })
           .then((userExist) => {
             if (Object.keys(userExist).length === 0) {
-              response.status(404).send("Not found");
+              response.status(404).send({ message: "Not found" });
             }
-            response.status(200).send(userExist);
+            response.status(200).send({ users: userExist });
           });
       } catch (error) {
-        response.status(400).send(
+        response.status(500).send(
           JSON.stringify({
             mensagem: "An error has occurred",
           })
@@ -189,7 +264,7 @@ export async function user_routes(app: FastifyInstance) {
     }
   );
   app.get(
-    "/users/findById/:id",
+    "/user/:id",
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
@@ -213,12 +288,12 @@ export async function user_routes(app: FastifyInstance) {
           })
           .then((userExist) => {
             if (!userExist) {
-              response.status(404).send("Not found");
+              response.status(404).send({ message: "Not found" });
             }
-            response.status(200).send(userExist);
+            response.status(200).send({ user: userExist });
           });
       } catch (error) {
-        response.status(400).send(
+        response.status(500).send(
           JSON.stringify({
             mensagem: "An error has occurred",
           })
@@ -227,7 +302,7 @@ export async function user_routes(app: FastifyInstance) {
     }
   );
   app.get(
-    "/users/findByType/:type_id",
+    "/users/:type_id",
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
@@ -251,12 +326,12 @@ export async function user_routes(app: FastifyInstance) {
           })
           .then((userExist) => {
             if (!userExist) {
-              response.status(404).send("Not found");
+              response.status(404).send({ messsage: "Not found" });
             }
-            response.status(200).send(userExist);
+            response.status(200).send({ user: userExist });
           });
       } catch (error) {
-        response.status(400).send(
+        response.status(500).send(
           JSON.stringify({
             mensagem: "An error has occurred",
           })
@@ -265,7 +340,7 @@ export async function user_routes(app: FastifyInstance) {
     }
   );
   app.put(
-    "/users/update",
+    "/user",
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
@@ -283,7 +358,7 @@ export async function user_routes(app: FastifyInstance) {
           })
           .then(async (user) => {
             if (!user) {
-              response.status(404).send("Not found");
+              response.status(404).send({ message: "Not found" });
             }
             await prisma.user.update({
               where: { id: id },
@@ -295,9 +370,8 @@ export async function user_routes(app: FastifyInstance) {
             response.status(200);
           });
       } catch (error) {
-        response.status(400).send(
+        response.status(500).send(
           JSON.stringify({
-            error: error.meta.target,
             message: "An error has occurred",
           })
         );
@@ -305,7 +379,7 @@ export async function user_routes(app: FastifyInstance) {
     }
   );
   app.delete(
-    "/users/delete",
+    "/user",
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
@@ -321,7 +395,7 @@ export async function user_routes(app: FastifyInstance) {
           })
           .then(async (userExist) => {
             if (!userExist) {
-              response.status(404).send("Not found");
+              response.status(404).send({ message: "Not found" });
             }
             await prisma.user.delete({
               where: { id: id },
@@ -329,9 +403,8 @@ export async function user_routes(app: FastifyInstance) {
             response.status(200);
           });
       } catch (error) {
-        response.status(400).send(
+        response.status(500).send(
           JSON.stringify({
-            error: error.meta.target,
             message: "An error has occurred",
           })
         );

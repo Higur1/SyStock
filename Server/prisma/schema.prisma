@@ -138,8 +138,19 @@ model User {
   user_password String
   email         String @unique
   user_type_id  Int
+  tokenRecovery TokenRecovery[]
 
   user_type_id_fk User_Types @relation(fields: [user_type_id], references: [id])
 
   @@map("users")
+}
+model TokenRecovery {
+  id Int @id @default(autoincrement())
+  value String @default(uuid())
+  tokenStatus Boolean @default(true) 
+  user_id Int
+
+  user_id_fk User @relation(fields: [user_id], references: [id])
+
+  @@map("token_recovery")
 }
