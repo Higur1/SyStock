@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types';
 import { Container, FormContainer, InfoContainer, Main, ResetPasswordContainer, TextContainer } from './Login.styles'
 import { Backdrop, CircularProgress, InputAdornment, Typography } from '@mui/material'
 import InputCustom from '../../components/common/InputCustom/InputCustom'
@@ -14,7 +15,7 @@ const DivGrid8 = styled("div")({ display: 'grid', gap: 8, gridTemplate: '1fr / 5
 const DivColumnFlex16 = styled("div")({ display: 'flex', flexDirection: 'column', gap: 16 });
 const DivColumnFlex32 = styled("div")({ display: 'flex', flexDirection: 'column', gap: 32 });
 
-const Login = () => {
+const Login = ({setIsLoggedIn}) => {
 
   const {
     user, onChangeUser,
@@ -23,7 +24,7 @@ const Login = () => {
     email, onChangeEmail,
     onLogin, onResetPassword, clearInfo,
     loading
-  } = useLogin();
+  } = useLogin(setIsLoggedIn);
 
   const [showPassword, setShowPassword] = useState(false);
   const [screen, setScreen] = useState("login");
@@ -147,6 +148,10 @@ const Login = () => {
   )
 
 
+}
+
+Login.propTypes = {
+  setIsLoggedIn: PropTypes.func.isRequired
 }
 
 export default Login

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { performFetch } from "../../apiBase";
 
-export const useLogin = () => {
+export const useLogin = ({setIsLoggedIn}) => {
 
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
@@ -50,7 +50,8 @@ export const useLogin = () => {
         body: JSON.stringify({user_login: user, user_password: password})
       });
       console.log(result);
-      //* set on localstorage
+      window.localStorage.setItem('tokenLogin', result.token);
+      setIsLoggedIn(true);
     } catch {
       setError({
         ...error, user: hasError 
