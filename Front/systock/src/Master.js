@@ -5,17 +5,22 @@ import Product from './pages/Product/Product'
 import Supplier from './pages/Supplier/Supplier'
 import { LoginContext } from './App'
 import Login from './pages/Login/Login'
+import ResetPassword from './pages/Login/ResetPassword/ResetPassword'
 
 export default function Master() {
   return (
     <LoginContext.Consumer>
-      {({ isLoggedIn, actions }) => {
+      {({ isLoggedIn, actions, setIsLoggedIn }) => {
 
         return (
           <div style={{ margin: isLoggedIn ? "16px" : "0px", flex: isLoggedIn ? 0 : 1 }}>
             <Routes>
               <Route path="login" element={
-                !isLoggedIn ? <Login setIsLoggedIn={actions.setIsLoggedIn}/> : null
+                !isLoggedIn ? <Login /> : null
+              }
+              />
+              <Route path="reset/password/:token" element={
+                !isLoggedIn ? <ResetPassword/> : null
               }
               />
               <Route path="categories" element={isLoggedIn ? <Category /> : null} />

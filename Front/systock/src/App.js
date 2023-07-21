@@ -33,10 +33,13 @@ function App() {
         return;
       } else {
         setIsLoggedIn(true);
+        navigate('products');
       }
     } else {
       window.localStorage.removeItem('tokenLogin');
       setIsLoggedIn(false);
+
+      if(window.location.pathname.indexOf('reset/password') !== -1) return;
       navigate('login');
       return;
       // return window.location.pathname = 'login';
@@ -47,7 +50,7 @@ function App() {
 
   return (
     <LoginContext.Provider value={{
-      isLoggedIn, navigate,
+      isLoggedIn, navigate, setIsLoggedIn,
       actions: {
         setIsLoggedIn
       }

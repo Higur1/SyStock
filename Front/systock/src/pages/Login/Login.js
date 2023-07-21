@@ -15,7 +15,7 @@ const DivGrid8 = styled("div")({ display: 'grid', gap: 8, gridTemplate: '1fr / 5
 const DivColumnFlex16 = styled("div")({ display: 'flex', flexDirection: 'column', gap: 16 });
 const DivColumnFlex32 = styled("div")({ display: 'flex', flexDirection: 'column', gap: 32 });
 
-const Login = ({setIsLoggedIn}) => {
+const Login = () => {
 
   const {
     user, onChangeUser,
@@ -24,7 +24,7 @@ const Login = ({setIsLoggedIn}) => {
     email, onChangeEmail,
     onLogin, onResetPassword, clearInfo,
     loading
-  } = useLogin(setIsLoggedIn);
+  } = useLogin();
 
   const [showPassword, setShowPassword] = useState(false);
   const [screen, setScreen] = useState("login");
@@ -83,7 +83,6 @@ const Login = ({setIsLoggedIn}) => {
                         <InputCustom
                           label={"Senha"}
                           onChange={onChangePassword}
-                          autoFocus
                           type={showPassword ? "text" : "password"}
                           fullWidth
                           required
@@ -94,6 +93,11 @@ const Login = ({setIsLoggedIn}) => {
                             endAdornment: <InputAdornment position="end" onClick={() => setShowPassword(!showPassword)} style={{ cursor: 'pointer' }}>{showPassword ? <VisibilityOff /> : <Visibility />}</InputAdornment>
                           }}
                           value={password}
+                          onKeyDown={(e) => {
+                            if (e.keyCode === 13) {
+                              onLogin();
+                            }
+                          }}
                         />
                       </DivColumnFlex16>
                       <DivColumnFlex8>
@@ -146,12 +150,6 @@ const Login = ({setIsLoggedIn}) => {
     
     
   )
-
-
-}
-
-Login.propTypes = {
-  setIsLoggedIn: PropTypes.func.isRequired
 }
 
 export default Login

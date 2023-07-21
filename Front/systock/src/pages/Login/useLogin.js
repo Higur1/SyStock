@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { performFetch } from "../../apiBase";
+import { performFetch, performFetchNoResult } from "../../apiBase";
 
-export const useLogin = ({setIsLoggedIn}) => {
+export const useLogin = () => {
 
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
@@ -51,7 +51,7 @@ export const useLogin = ({setIsLoggedIn}) => {
       });
       console.log(result);
       window.localStorage.setItem('tokenLogin', result.token);
-      setIsLoggedIn(true);
+      window.location.pathname = 'dashboard';
     } catch {
       setError({
         ...error, user: hasError 
@@ -66,10 +66,20 @@ export const useLogin = ({setIsLoggedIn}) => {
 
   const onResetPassword = () => {
     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const instance =  window.location.href.split('/')[2];
     if(regex.test(email)) {
       setError({...error, email: ''});
+
+      try {
+        performFetchNoResult("/recovery", {
+          method: "POST", 
+          body: JSON.stringify({email, instance})
+        });
+      } catch (e) {
+        return setError({...error, email: e.message});
+      }
     } else {
-      setError({...error, email: 'Formato de e-mail inválido'});
+      return setError({...error, email: 'Formato de e-mail inválido'});
     }
   }
 
