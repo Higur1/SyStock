@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import auth_middleware from "../middleware/auth_middleware";
+import { sendEmail } from "../config/nodemailer";
 
 dotenv.config();
 
@@ -33,7 +34,8 @@ export async function user_routes(app: FastifyInstance) {
             },
           })
           .then((token) => {
-            //logica para enviar o email com o token.value
+            sendEmail(email, token);
+            response.status(200).send({ message: "e-mail sent" });
           });
       });
   });
@@ -55,8 +57,8 @@ export async function user_routes(app: FastifyInstance) {
           },
         })
         .then(async (tokenValidad) => {
-          if(tokenValidad == undefined){
-            response.status(401).send({message: "token invalid"}); // saber qual codigo enviar
+          if (tokenValidad == undefined) {
+            response.status(401).send({ message: "token invalid" }); // saber qual codigo enviar
           }
           if (tokenValidad?.tokenStatus == false) {
             response.status(401).send({ message: "token is not available" }); //saber qual codigo enviar
@@ -72,15 +74,15 @@ export async function user_routes(app: FastifyInstance) {
             })
             .then(() => {
               response.status(200);
-            })
-            await prisma.tokenRecovery.update({
-              where:{
-                id: tokenValidad!.id
-              },
-              data:{
-                tokenStatus: false
-              }
-            })
+            });
+          await prisma.tokenRecovery.update({
+            where: {
+              id: tokenValidad!.id,
+            },
+            data: {
+              tokenStatus: false,
+            },
+          });
         });
     } catch (error) {
       response.status(500).send(
@@ -90,7 +92,6 @@ export async function user_routes(app: FastifyInstance) {
       );
     }
   });
-  //logica para utilizar o token para resetar a senha e trocar o status para used (verificar status antes)
   app.post("/auth", async (request, response) => {
     const user = z.object({
       user_login: z.string(),
@@ -138,10 +139,10 @@ export async function user_routes(app: FastifyInstance) {
 
     async (request, response) => {
       const user = z.object({
-        name: z.string(),
-        user_login: z.string(),
-        user_password: z.string(),
-        email: z.string(),
+        name: z.string().trim(),
+        user_login: z.string().trim(),
+        user_password: z.string().trim(),
+        email: z.string().trim(),
         user_type_id: z.number(),
       });
       const { name, user_login, user_password, email, user_type_id } =
@@ -154,12 +155,10 @@ export async function user_routes(app: FastifyInstance) {
           })
           .then(async (userExist) => {
             if (userExist) {
-              response
-                .status(409)
-                .send({
-                  message:
-                    "an operation could not be performed email or login already exists",
-                });
+              response.status(409).send({
+                message:
+                  "an operation could not be performed email or login already exists",
+              });
             }
             var salt = await bcrypt.genSaltSync(10);
             var hash = await bcrypt.hashSync(user_password, salt);

@@ -1,10 +1,10 @@
 import fastify from "fastify";
 import cors from "@fastify/cors";
-import dotenv from "dotenv";
+import dotenv, { config } from "dotenv";
 import ip from "ip";
-import swagger from '@fastify/swagger'
-import swaggerUi from '@fastify/swagger-ui'
-import { SwaggerTheme } from 'swagger-themes'
+import swagger from "@fastify/swagger";
+import swaggerUi from "@fastify/swagger-ui";
+import { SwaggerTheme } from "swagger-themes";
 import { supplier_routes } from "./routes/supplier_routes";
 import { category_routes } from "./routes/category_routes";
 import { product_routes } from "./routes/product_routes";
@@ -19,14 +19,17 @@ const app = fastify();
 const port: number = Number(process.env.PORT);
 
 await app.register(swagger, {
-  openapi: {}
+  openapi: {},
 });
 app.register(swaggerUi, {
-  theme:{
-    css:[
-      {filename: 'theme.css', content: new SwaggerTheme('v3').getBuffer('dark')}
+  theme: {
+    css: [
+      {
+        filename: "theme.css",
+        content: new SwaggerTheme("v3").getBuffer("dark"),
+      },
     ],
-  }
+  },
 });
 app.register(cors, {
   origin: "*",
@@ -39,8 +42,6 @@ app.register(product_routes);
 app.register(user_routes);
 app.register(batch_routes);
 app.register(company_routes);
-
-
 
 const start = async () => {
   try {
