@@ -13,9 +13,10 @@ export async function user_routes(app: FastifyInstance) {
   app.post("/recovery", async (request, response) => {
     const recovery = z.object({
       email: z.string(),
+      instance: z.string()
     });
 
-    const { email } = recovery.parse(request.body);
+    const { email, instance } = recovery.parse(request.body);
 
     await prisma.user
       .findUnique({
@@ -34,7 +35,7 @@ export async function user_routes(app: FastifyInstance) {
             },
           })
           .then((token) => {
-            sendEmail(email, token);
+            sendEmail(email, token, instance);
             response.status(200).send({ message: "e-mail sent" });
           });
       });
