@@ -23,7 +23,7 @@ export const templateHtml = (token, instance) => {
                     <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
                         <tr>
                             <td align="center" valign="top" style="padding: 36px 24px;">
-                                <a href="http://orangetesting.com/"><img src="https://s3.amazonaws.com/orangestorage/onlyLogoSite.png" style="opacity: 1; display: block; width: 68px; transition: opacity 500ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;">              </a>
+
                             </td>
                         </tr>
                     </table>

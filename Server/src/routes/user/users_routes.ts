@@ -1,154 +1,35 @@
-import { prisma } from "../config/prisma";
+import { prisma } from "../../config/prisma";
 import { FastifyInstance } from "fastify";
 import { z } from "zod";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import auth_middleware from "../middleware/auth_middleware";
-import { sendEmail } from "../config/nodemailer";
+import auth_middleware from "../../middleware/auth_middleware";
+import { generatorHATEOAS, generatorPasswordCrypt } from "./user_controller";
 
 dotenv.config();
 
 export async function user_routes(app: FastifyInstance) {
-  app.post("/recovery", async (request, response) => {
-    const recovery = z.object({
-      email: z.string(),
-      instance: z.string()
-    });
-
-    const { email, instance } = recovery.parse(request.body);
-
-    await prisma.user
-      .findUnique({
-        where: {
-          email: email,
-        },
-      })
-      .then(async (emailValided) => {
-        if (emailValided == undefined) {
-          response.status(404).send({ message: "Not found" });
-        }
-        await prisma.tokenRecovery
-          .create({
-            data: {
-              user_id: emailValided!.id,
-            },
-          })
-          .then((token) => {
-            sendEmail(email, token, instance);
-            response.status(200).send({ message: "e-mail sent" });
-          });
-      });
-  });
-  app.post("/reset/password", async (request, response) => {
-    const passwordReset = z.object({
-      token: z.string(),
-      user_password: z.string(),
-    });
-
-    const { user_password, token } = passwordReset.parse(request.body);
-    var salt = await bcrypt.genSaltSync(10);
-    var hash = await bcrypt.hashSync(user_password, salt);
-
-    try {
-      await prisma.tokenRecovery
-        .findFirst({
-          where: {
-            value: token,
-          },
-        })
-        .then(async (tokenValidad) => {
-          if (tokenValidad == undefined) {
-            response.status(401).send({ message: "token invalid" }); // saber qual codigo enviar
-          }
-          if (tokenValidad?.tokenStatus == false) {
-            response.status(401).send({ message: "token is not available" }); //saber qual codigo enviar
-          }
-          await prisma.user
-            .update({
-              where: {
-                id: tokenValidad!.user_id,
-              },
-              data: {
-                user_password: hash,
-              },
-            })
-            .then(() => {
-              response.status(200);
-            });
-          await prisma.tokenRecovery.update({
-            where: {
-              id: tokenValidad!.id,
-            },
-            data: {
-              tokenStatus: false,
-            },
-          });
-        });
-    } catch (error) {
-      response.status(500).send(
-        JSON.stringify({
-          message: "An error has occurred",
-        })
-      );
-    }
-  });
-  app.post("/auth", async (request, response) => {
-    const user = z.object({
-      user_login: z.string(),
-      user_password: z.string(),
-    });
-    const { user_login, user_password } = user.parse(request.body);
-
-    try {
-      await prisma.user
-        .findUnique({
-          where: {
-            user_login: user_login,
-          },
-        })
-        .then(async (user) => {
-          if (!user) {
-            response.status(404).send({ message: "Not found" });
-          }
-          await bcrypt
-            .compare(user_password, user!.user_password)
-            .then(async (checkpassword) => {
-              if (!checkpassword) {
-                response.status(401).send({ message: "Unauthorized" });
-              }
-              const knowkey = process.env.JWTSecret;
-              const token = jwt.sign(
-                { id: user?.id, email: user?.email },
-                knowkey!,
-                { expiresIn: "48h" }
-              );
-
-              response.status(200).send({ token: token });
-            });
-        });
-    } catch (error) {
-      response.status(500).send(
-        JSON.stringify({
-          message: "An error has occurred",
-        })
-      );
-    }
-  });
   app.post(
     "/user",
 
     async (request, response) => {
       const user = z.object({
-        name: z.string().trim(),
-        user_login: z.string().trim(),
-        user_password: z.string().trim(),
-        email: z.string().trim(),
-        user_type_id: z.number(),
+        name: z
+          .string()
+          .min(5, "Name required minimum 5")
+          .max(20, "Name required Maximum 20"),
+        user_login: z
+          .string()
+          .min(5, "user_login required minimum 5")
+          .max(10, "user_login required maximum 10"),
+        user_password: z
+          .string()
+          .min(5, "user_password required minimum 5")
+          .max(10, "user_password required maximum 10"),
+        email: z.string().email("Valid e-mail required"),
+        user_type_id: z.number().gt(1),
       });
       const { name, user_login, user_password, email, user_type_id } =
         user.parse(request.body);
-
       try {
         await prisma.user
           .findFirst({
@@ -161,19 +42,18 @@ export async function user_routes(app: FastifyInstance) {
                   "an operation could not be performed email or login already exists",
               });
             }
-            var salt = await bcrypt.genSaltSync(10);
-            var hash = await bcrypt.hashSync(user_password, salt);
             await prisma.user
               .create({
                 data: {
                   name: name,
                   user_login: user_login,
-                  user_password: hash,
+                  user_password: generatorPasswordCrypt(user_password),
                   email: email,
                   user_type_id: user_type_id,
                 },
               })
               .then((user) => {
+                const _links = generatorHATEOAS(user);
                 response.status(201).send({
                   user: {
                     id: user.id,
@@ -181,6 +61,7 @@ export async function user_routes(app: FastifyInstance) {
                     email: user.email,
                     type: user.user_type_id,
                   },
+                  _links
                 });
               });
           });
@@ -197,6 +78,7 @@ export async function user_routes(app: FastifyInstance) {
     "/users",
     { preHandler: auth_middleware },
     async (request, response) => {
+      
       try {
         await prisma.user
           .findMany({
@@ -212,7 +94,12 @@ export async function user_routes(app: FastifyInstance) {
             if (Object.keys(userList).length === 0) {
               response.status(204).send({ message: "Empty" });
             }
-            response.status(200).send(userList);
+            var user = {
+              user_name : " ",
+              user_id : 0
+            }
+            const _links = generatorHATEOAS(user);
+            response.status(200).send({users: userList, _links});
           });
       } catch (error) {
         response.status(500).send(
@@ -228,7 +115,10 @@ export async function user_routes(app: FastifyInstance) {
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
-        name: z.string(),
+        name: z
+          .string()
+          .min(1, "Name required minimum 1")
+          .max(20, "Name required maximum 20"), //arrumar o caracteres
       });
 
       const { name } = user.parse(request.params);
@@ -268,7 +158,7 @@ export async function user_routes(app: FastifyInstance) {
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
-        id: z.string(),
+        id: z.string().min(1, "id required minimum 1"),
       });
 
       const { id } = user.parse(request.params);
@@ -306,7 +196,10 @@ export async function user_routes(app: FastifyInstance) {
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
-        type_id: z.string(),
+        type_id: z
+          .string()
+          .min(1, "type_id required minimum 1")
+          .max(1, "type_id required maximum 1"),
       });
 
       const { type_id } = user.parse(request.params);
@@ -344,9 +237,15 @@ export async function user_routes(app: FastifyInstance) {
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
-        id: z.number(),
-        name: z.string(),
-        user_type_id: z.number(),
+        id: z.number().min(1, "id required minimum 1"),
+        name: z
+          .string()
+          .min(1, "Name required minimum 1")
+          .max(20, "Name required maximum 20"),
+        user_type_id: z
+          .number()
+          .min(1, "type_id required minimum 1")
+          .max(1, "type_id required maximum 1"),
       });
 
       const { id, name, user_type_id } = user.parse(request.body);
@@ -383,7 +282,7 @@ export async function user_routes(app: FastifyInstance) {
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
-        id: z.number(),
+        id: z.number().min(1, "id required minimum 1"),
       });
 
       const { id } = user.parse(request.body);

@@ -1,6 +1,5 @@
 import * as nodemailer from 'nodemailer'
-import ip from "ip";
-import { templateHtml } from '../template';
+import { templateHtml } from './template';
 
 export const transport = nodemailer.createTransport({
     service: "gmail",
@@ -20,10 +19,8 @@ export function sendEmail(email, token, instance){
         subject: "Solicitação de reinicio de senha",
         html: templateHtml(token.value, instance)
     }).then(result =>{
-        console.log(result);
         return result;
     }).catch(error =>{
-        console.log(error);
         return error;
     })
 }
