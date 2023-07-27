@@ -4,6 +4,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   background: #98B5ED;
   box-sizing: border-box;
 `

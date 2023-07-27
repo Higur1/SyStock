@@ -70,30 +70,32 @@ export default function Category() {
         </HeaderContainer>
         <TableContainer>
           <TableRow style={{background: '#DCDCDC', borderRadius: '8px 8px 0px 0px'}}>
-            <TableData>{"Nome"}
-          </TableData>
+            <TableData>{"Nome"}</TableData>
           </TableRow>
-          {categoriesFiltered.map((cat, index) => (
-            <TableRow key={cat.id} style={{
-              borderRadius: index === categoriesFiltered.length - 1 ? '0px 0px 8px 8px' : '0px',
-              borderBottom: index === categoriesFiltered.length - 1 ? '0px' : '1px solid #d3D3D3',
-              background: index & 2 === 0 ? "#ebebeb" : "#F5f5f5"
-              }}>
-              <TableData size={'400px'} >{cat.name}</TableData>
-              <TableData size={'56px'} style={{justifyContent: 'flex-end', flex: 1}}>
-              <IconButton onClick={() => handleMenuOptions(cat.id)} style={{position: 'relative'}}>
-                <MoreVertIcon fontSize='small' />
-                {menuOption && idMenu === cat.id && (
-                  <Menu>
-                    <MenuOption style={{borderRadius: '16px 16px 0px 0px'}}>{"Visualizar Categoria"}</MenuOption>
-                    <MenuOption onClick={() => setEditCategory(true)}>{"Editar Categoria"}</MenuOption>
-                    <MenuOption style={{borderBottom: '0px', borderRadius: '0px 0px 16px 16px'}} onClick={() => setDeleteCategory(true)}>{"Apagar Categoria"}</MenuOption>
-                  </Menu>
-                )}
-              </IconButton>                
-              </TableData>
-            </TableRow> 
-          ))}
+          <div className="customScroll">
+            {categoriesFiltered.map((cat, index) => (
+              <TableRow key={cat.id} style={{
+                borderRadius: index === categoriesFiltered.length - 1 ? '0px 0px 8px 8px' : '0px',
+                borderBottom: index === categoriesFiltered.length - 1 ? '0px' : '1px solid #d3D3D3',
+                background: index & 2 === 0 ? "#ebebeb" : "#F5f5f5"
+                }}>
+                <TableData size={'400px'} >{cat.name}</TableData>
+                <TableData size={'56px'} style={{justifyContent: 'flex-end', flex: 1}}>
+                <IconButton onClick={() => handleMenuOptions(cat.id)} style={{position: 'relative'}}>
+                  <MoreVertIcon fontSize='small' />
+                  {menuOption && idMenu === cat.id && (
+                    <Menu>
+                      <MenuOption style={{borderRadius: '16px 16px 0px 0px'}}>{"Visualizar Categoria"}</MenuOption>
+                      <MenuOption onClick={() => setEditCategory(true)}>{"Editar Categoria"}</MenuOption>
+                      <MenuOption style={{borderBottom: '0px', borderRadius: '0px 0px 16px 16px'}} onClick={() => setDeleteCategory(true)}>{"Apagar Categoria"}</MenuOption>
+                    </Menu>
+                  )}
+                </IconButton>                
+                </TableData>
+              </TableRow> 
+            ))}
+          </div>
+          
         </TableContainer>
       </Container>
       {openCreateCategory && (

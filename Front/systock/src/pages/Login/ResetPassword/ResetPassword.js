@@ -23,17 +23,22 @@ const ResetPassword = () => {
     setToken(tokenFromRoute);
   }, []);
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if(password !== confirmPassword) {
       return setError("As senhas não correspondem!");
     } 
 
     try {
-      performFetchNoResult("/reset/password", {
+      const response = await performFetchNoResult("/reset/password", {
         method: "POST", 
         body: JSON.stringify({token, user_password: password})
       });
 
+      console.log(response);
+
+      if(!response.ok) {
+        return setError(response.message);
+      }
       
       handleSuccess();
 

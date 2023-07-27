@@ -10,10 +10,10 @@ import ResetPassword from './pages/Login/ResetPassword/ResetPassword'
 export default function Master() {
   return (
     <LoginContext.Consumer>
-      {({ isLoggedIn, actions, setIsLoggedIn }) => {
+      {({ isLoggedIn, actions }) => {
 
         return (
-          <div style={{ margin: isLoggedIn ? "16px" : "0px", flex: isLoggedIn ? 0 : 1 }}>
+          <div style={{ margin: isLoggedIn ? "16px" : "0px", flex: isLoggedIn ? 0 : 1, overflow: "auto" }}>
             <Routes>
               <Route path="login" element={
                 !isLoggedIn ? <Login /> : null

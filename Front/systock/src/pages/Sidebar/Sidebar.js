@@ -9,10 +9,12 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { Collapse, IconButton } from '@mui/material';
-import PersonIcon from '@mui/icons-material/Person';
-import { useState } from 'react';
 
-export default function Sidebar() {
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import IconCustom from '../../components/common/IconCustom.js';
+
+export default function Sidebar({logOff}) {
 
   const [options, setOptions] = useState([
     {
@@ -68,31 +70,42 @@ export default function Sidebar() {
 
   return (
     <Container>
-      {options.map((option, index) => {
+      <div style={{display: 'flex', flexDirection: 'column'}}>
+        {options.map((option, index) => {
 
-        return (
-        <>
-          <Option key={option.type + index}>
-            {/* icon */}
-            <Link to={option.type}>{option.label}</Link>
-            {option.child.length !== 0 ? (
-              <IconButton onClick={() => handleCollapse(option.type)} style={{ width: 30, height: 30, paddingRight: 8 }}>
-                {option.openCollapse ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-              </IconButton>
-            ) : null}
-          </Option>
-          <Collapse in={option.openCollapse}>
-            {option.child.map((optionChild, i) => (
-              <Option key={option.type + i}>
-                {/* icon */}
-                <Link to={optionChild.type} style={{paddingLeft: 32}}>{optionChild.label}</Link>
-              </Option>
-            ))}
-          </Collapse>
-        </>
-          
-        );
-      })}
+          return (
+          <React.Fragment key={index}>
+            <Option>
+              <IconCustom type={option.type} />
+              <Link to={option.type}>{option.label}</Link>
+              {option.child.length !== 0 ? (
+                <IconButton onClick={() => handleCollapse(option.type)} style={{ width: 30, height: 30, paddingRight: 8 }}>
+                  {option.openCollapse ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                </IconButton>
+              ) : null}
+            </Option>
+            <Collapse in={option.openCollapse}>
+              {option.child.map((optionChild, i) => (
+                <Option key={option.type + i}>
+                  <IconCustom type={option.type} />
+                  <Link to={optionChild.type} style={{paddingLeft: 32}}>{optionChild.label}</Link>
+                </Option>
+              ))}
+            </Collapse>
+          </React.Fragment>
+            
+          );
+        })}
+      </div>
+      
+      <Option onClick={logOff}>
+        <IconCustom type={"logOut"} />
+        <p>{"Sair da Conta"}</p>
+      </Option>
     </Container>
   );
+}
+
+Sidebar.propTypes = {
+  logOff: PropTypes.func
 }

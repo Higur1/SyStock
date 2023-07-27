@@ -46,17 +46,24 @@ function App() {
     }
   }
 
+  const logOff = () => {
+    window.localStorage.removeItem('tokenLogin');
+    setIsLoggedIn(false);
+    window.location.pathname = 'login';
+  }
+
 
 
   return (
     <LoginContext.Provider value={{
       isLoggedIn, navigate, setIsLoggedIn,
       actions: {
-        setIsLoggedIn
+        setIsLoggedIn,
+        logOff
       }
     }}>
       <div className='main' style={{display: !isLoggedIn ? 'flex' : 'grid'}}>
-        {isLoggedIn && <Sidebar />}
+        {isLoggedIn && <Sidebar logOff={logOff}/>}
         <Master />
       </div>
     </LoginContext.Provider>

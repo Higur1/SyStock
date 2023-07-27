@@ -21,7 +21,8 @@ export const TableContainer = styled("div")({
   flexDirection: 'column',
   borderRadius: '8px',
   background: "#ebebeb",
-  border: '1px solid #d3D3D3'
+  border: '1px solid #d3D3D3',
+  maxHeight: "calc(100% - 68.5px)"
 });
 
 export const TableRow = styled("div")({

@@ -72,40 +72,42 @@ export default function Product() {
             {/* <TableData width={"7%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{"Supplier"}</TableData> */}
             <TableData style={{justifyContent: 'center', width: 40}}/>
           </TableRow>
-          {products.map((prod, index) => (
-            <TableRow key={index} style={{
-              borderRadius: index === products.length - 1 ? '0px 0px 8px 8px' : '0px',
-              borderBottom: index === products.length - 1 ? '0px' : '1px solid #d3D3D3',
-              background: index & 2 === 0 ? "#ebebeb" : "#F5f5f5"
-            }}>
-              {/* <TableData width={"32%"} minWidth={'200px'}>{prod.name}</TableData> */}
-              <TableData style={{flex: 1}}>
-                <ToolTipAndEllipsis item={prod.description} />
-              </TableData>
-              <TableData style={{justifyContent: 'center', width: 150, maxWidth: 150}}>{prod.ncmSh}</TableData>
-              <TableData style={{justifyContent: 'center', width: 150, maxWidth: 150}}>{prod.price}</TableData>
-              <TableData style={{justifyContent: 'center', width: 150, maxWidth: 150}}>{prod.category_id}</TableData>
-              {/* <TableData width={"7%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{prod.supplier_id}</TableData> */}
-              <TableData style={{justifyContent: 'center', width: 40}}>
-                <IconButton onClick={() => handleMenuOptions(index)}>
-                  <MoreVertIcon fontSize='small'/>
-                  {menuOption && idMenu === index && (
-                    <ClickAwayListener onClickAway={handleCloseMenu}>
-                      <Menu>
-                        <MenuOption style={{borderRadius: '16px 16px 0px 0px'}}>{"Visualizar Produto"}</MenuOption>
-                        <MenuOption onClick={() => {
-                          setOpenEditProduct(true);
-                          setIdEditProduct(index);
-                          }}>{"Editar Produto"}</MenuOption>
-                        <MenuOption onClick={() => setDeleteProduct(true)} style={{borderBottom: '0px', borderRadius: '0px 0px 16px 16px'}} >{"Apagar Produto"}</MenuOption>
-                      </Menu>
-                    </ClickAwayListener>
-                  
-                )}
-                </IconButton>
+          <div className="customScroll">
+            {products.map((prod, index) => (
+              <TableRow key={index} style={{
+                borderRadius: index === products.length - 1 ? '0px 0px 8px 8px' : '0px',
+                borderBottom: index === products.length - 1 ? '0px' : '1px solid #d3D3D3',
+                background: index & 2 === 0 ? "#ebebeb" : "#F5f5f5"
+              }}>
+                {/* <TableData width={"32%"} minWidth={'200px'}>{prod.name}</TableData> */}
+                <TableData style={{flex: 1}}>
+                  <ToolTipAndEllipsis item={prod.description} />
                 </TableData>
-            </TableRow> 
-          ))}
+                <TableData style={{justifyContent: 'center', width: 150, maxWidth: 150}}>{prod.ncmSh}</TableData>
+                <TableData style={{justifyContent: 'center', width: 150, maxWidth: 150}}>{prod.price}</TableData>
+                <TableData style={{justifyContent: 'center', width: 150, maxWidth: 150}}>{prod.category_id}</TableData>
+                {/* <TableData width={"7%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{prod.supplier_id}</TableData> */}
+                <TableData style={{justifyContent: 'center', width: 40}}>
+                  <IconButton onClick={() => handleMenuOptions(index)}>
+                    <MoreVertIcon fontSize='small'/>
+                    {menuOption && idMenu === index && (
+                      <ClickAwayListener onClickAway={handleCloseMenu}>
+                        <Menu>
+                          <MenuOption style={{borderRadius: '16px 16px 0px 0px'}}>{"Visualizar Produto"}</MenuOption>
+                          <MenuOption onClick={() => {
+                            setOpenEditProduct(true);
+                            setIdEditProduct(index);
+                            }}>{"Editar Produto"}</MenuOption>
+                          <MenuOption onClick={() => setDeleteProduct(true)} style={{borderBottom: '0px', borderRadius: '0px 0px 16px 16px'}} >{"Apagar Produto"}</MenuOption>
+                        </Menu>
+                      </ClickAwayListener>
+                    
+                  )}
+                  </IconButton>
+                  </TableData>
+              </TableRow> 
+            ))}
+          </div>
         </TableContainer>
       </Container>
 

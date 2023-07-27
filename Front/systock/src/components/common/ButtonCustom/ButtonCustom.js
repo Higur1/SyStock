@@ -9,7 +9,7 @@ const ButtonStyled = styled(Button)({
 
 const ButtonCustom = (props) => {
 
-  const { label, onClick, variant, style, fullWidth, color } = props;
+  const { label, onClick, variant, style, fullWidth, color, disabled } = props;
 
   return (
     <ButtonStyled 
@@ -18,6 +18,7 @@ const ButtonCustom = (props) => {
       fullWidth={fullWidth}
       style={{...style}}
       color={color}
+      disabled={disabled}
     >
       {label}
     </ButtonStyled>
@@ -34,6 +35,7 @@ ButtonCustom.propTypes = {
   onClick: PropTypes.func.isRequired,
   style: PropTypes.object,
   fullWidth: PropTypes.bool,
+  disabled: PropTypes.bool,
   color: PropTypes.string
 }
 

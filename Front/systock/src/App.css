@@ -8,3 +8,20 @@
 a, a:visited, a:hover, a:active {
   color: inherit;
 }
+
+.customScroll {
+  overflow-y: scroll
+}
+
+.customScroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.customScroll::-webkit-scrollbar-track {
+  margin-block: 4px;
+  background: transparent;
+}
+
+.customScroll::-webkit-scrollbar-thumb {
+  background-color: #cccccc;
+}
