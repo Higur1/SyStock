@@ -15,17 +15,22 @@ export async function user_routes(app: FastifyInstance) {
       const user = z.object({
         name: z
           .string()
-          .min(5, "Name required minimum 5")
-          .max(20, "Name required Maximum 20"),
+          .trim()
+          .min(5, "Name required minimum 5 chars")
+          .max(20, "Name required Maximum 20 chars"),
         user_login: z
           .string()
-          .min(5, "user_login required minimum 5")
-          .max(10, "user_login required maximum 10"),
+          .trim()
+          .min(5, "user_login required minimum 5 chars")
+          .trim()
+          .max(10, "user_login required maximum 10 chars")
+          .trim(),
         user_password: z
           .string()
-          .min(5, "user_password required minimum 5")
-          .max(10, "user_password required maximum 10"),
-        email: z.string().email("Valid e-mail required"),
+          .trim()
+          .min(5, "user_password required minimum 5 chars")
+          .max(10, "user_password required maximum 10 chars"),
+        email: z.string().email("Valid e-mail required").trim(),
         user_type_id: z.number().gt(1),
       });
       const { name, user_login, user_password, email, user_type_id } =
@@ -61,7 +66,7 @@ export async function user_routes(app: FastifyInstance) {
                     email: user.email,
                     type: user.user_type_id,
                   },
-                  _links
+                  _links,
                 });
               });
           });
@@ -78,7 +83,6 @@ export async function user_routes(app: FastifyInstance) {
     "/users",
     { preHandler: auth_middleware },
     async (request, response) => {
-      
       try {
         await prisma.user
           .findMany({
@@ -95,11 +99,11 @@ export async function user_routes(app: FastifyInstance) {
               response.status(204).send({ message: "Empty" });
             }
             var user = {
-              user_name : " ",
-              user_id : 0
-            }
+              user_name: " ",
+              user_id: 0,
+            };
             const _links = generatorHATEOAS(user);
-            response.status(200).send({users: userList, _links});
+            response.status(200).send({ users: userList, _links });
           });
       } catch (error) {
         response.status(500).send(
@@ -117,8 +121,9 @@ export async function user_routes(app: FastifyInstance) {
       const user = z.object({
         name: z
           .string()
-          .min(1, "Name required minimum 1")
-          .max(20, "Name required maximum 20"), //arrumar o caracteres
+          .trim()
+          .min(1, "Name required minimum 1 char")
+          .max(20, "Name required maximum 20 chars"), //arrumar o caracteres
       });
 
       const { name } = user.parse(request.params);
@@ -158,7 +163,7 @@ export async function user_routes(app: FastifyInstance) {
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
-        id: z.string().min(1, "id required minimum 1"),
+        id: z.string().trim().min(1, "id required minimum 1 char"),
       });
 
       const { id } = user.parse(request.params);
@@ -198,8 +203,9 @@ export async function user_routes(app: FastifyInstance) {
       const user = z.object({
         type_id: z
           .string()
-          .min(1, "type_id required minimum 1")
-          .max(1, "type_id required maximum 1"),
+          .trim()
+          .min(1, "type_id required minimum 1 char")
+          .max(1, "type_id required maximum 1 char"),
       });
 
       const { type_id } = user.parse(request.params);
@@ -237,15 +243,16 @@ export async function user_routes(app: FastifyInstance) {
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
-        id: z.number().min(1, "id required minimum 1"),
+        id: z.number().min(1, "id required minimum 1 char"),
         name: z
           .string()
-          .min(1, "Name required minimum 1")
-          .max(20, "Name required maximum 20"),
+          .trim()
+          .min(1, "Name required minimum 1 char")
+          .max(20, "Name required maximum 20 chars"),
         user_type_id: z
           .number()
-          .min(1, "type_id required minimum 1")
-          .max(1, "type_id required maximum 1"),
+          .min(1, "type_id required minimum 1 char")
+          .max(1, "type_id required maximum 1 char"),
       });
 
       const { id, name, user_type_id } = user.parse(request.body);
@@ -282,7 +289,7 @@ export async function user_routes(app: FastifyInstance) {
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
-        id: z.number().min(1, "id required minimum 1"),
+        id: z.number().min(1, "id required minimum 1 char"),
       });
 
       const { id } = user.parse(request.body);

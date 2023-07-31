@@ -14,12 +14,14 @@ export async function user_recovery(app: FastifyInstance) {
     const user = z.object({
       user_login: z
         .string()
-        .min(5, "user_login required minimum 5")
-        .max(10, "user_login required maximum 10"),
+        .trim()
+        .min(5, "user_login required minimum 5 chars")
+        .max(10, "user_login required maximum 10 chars"),
       user_password: z
         .string()
-        .min(5, "user_password required minimum 5")
-        .max(10, "user_password required maximum 10"),
+        .trim()
+        .min(5, "user_password required minimum 5 chars")
+        .max(10, "user_password required maximum 10 chars"),
     });
 
     const { user_login, user_password } = user.parse(request.body);
@@ -47,7 +49,7 @@ export async function user_recovery(app: FastifyInstance) {
                 knowkey!,
                 { expiresIn: "48h" }
               );
-              const _links = generatorHATEOAS(user)
+              const _links = generatorHATEOAS(user);
               response.status(200).send({ token: token, _links });
             });
         });
@@ -61,8 +63,8 @@ export async function user_recovery(app: FastifyInstance) {
   });
   app.post("/recovery", async (request, response) => {
     const recovery = z.object({
-      email: z.string().email("Email need validad"),
-      instance: z.string().min(10, "That name no has 10 caracters"),
+      email: z.string().trim().email("valid email required"),
+      instance: z.string().trim().min(10, "instance required 10 chars"),
     });
 
     const { email, instance } = recovery.parse(request.body);
@@ -93,12 +95,13 @@ export async function user_recovery(app: FastifyInstance) {
     const passwordReset = z.object({
       token: z
         .string()
-        .min(36, "token required minimum 36")
-        .max(36, "token required maximum 36"),
+        .trim()
+        .min(36, "token required minimum 36 chars")
+        .max(36, "token required maximum 36 chars"),
       user_password: z
         .string()
-        .min(5, "user_password required minimum 5")
-        .max(10, "user_password required maximum 10"),
+        .min(5, "user_password required minimum 5 chars")
+        .max(10, "user_password required maximum 10 chars"),
     });
     const { user_password, token } = passwordReset.parse(request.body);
 
