@@ -3,89 +3,101 @@ import { FastifyInstance } from "fastify";
 import { z } from "zod";
 import dotenv from "dotenv";
 import auth_middleware from "../../middleware/auth_middleware";
-import { generatorHATEOAS, generatorPasswordCrypt } from "./user_controller";
+import {
+  LimitOfUsers,
+  generatorHATEOAS,
+  generatorPasswordCrypt,
+  verifyTokenCompany,
+} from "./user_controller";
 
 dotenv.config();
 
 export async function user_routes(app: FastifyInstance) {
-  app.post(
-    "/user",
-
-    async (request, response) => {
-      const user = z.object({
-        name: z
-          .string()
-          .trim()
-          .min(5, "Name required minimum 5 chars")
-          .max(20, "Name required Maximum 20 chars"),
-        user_login: z
-          .string()
-          .trim()
-          .min(5, "user_login required minimum 5 chars")
-          .trim()
-          .max(10, "user_login required maximum 10 chars")
-          .trim(),
-        user_password: z
-          .string()
-          .trim()
-          .min(5, "user_password required minimum 5 chars")
-          .max(10, "user_password required maximum 10 chars"),
-        email: z.string().email("Valid e-mail required").trim(),
-        user_type_id: z.number().gt(1),
-      });
-      const { name, user_login, user_password, email, user_type_id } =
-        user.parse(request.body);
-      try {
-        await prisma.user
-          .findFirst({
-            where: { OR: [{ email: email }, { user_login: user_login }] },
-          })
-          .then(async (userExist) => {
-            if (userExist) {
-              response.status(409).send({
-                message:
-                  "an operation could not be performed email or login already exists",
-              });
-            }
-            await prisma.user
-              .create({
+  app.post("/user", async (request, response) => {
+    const user = z.object({
+      name: z
+        .string()
+        .trim()
+        .min(5, "Name required minimum 5 chars")
+        .max(20, "Name required Maximum 20 chars"),
+      user_login: z
+        .string()
+        .trim()
+        .min(5, "user_login required minimum 5 chars")
+        .trim()
+        .max(10, "user_login required maximum 10 chars")
+        .trim(),
+      user_password: z
+        .string()
+        .trim()
+        .min(5, "user_password required minimum 5 chars")
+        .max(10, "user_password required maximum 10 chars"),
+      email: z.string().email("Valid e-mail required").trim(),
+      user_type_id: z.number().gt(0),
+      company_id: z.string().trim(),
+    });
+    const { name, user_login, user_password, email, user_type_id, company_id } =
+      user.parse(request.body);
+    try {
+      await prisma.user
+        .findFirst({
+          where: {
+            OR: [{ email: email }, { user_login: user_login }],
+          },
+        })
+        .then(async (userExist) => {
+          if (!userExist) {
+            const isPossible = await LimitOfUsers(company_id, user_type_id);
+            if (isPossible) {
+              await prisma.user.create({
                 data: {
-                  name: name,
-                  user_login: user_login,
+                  name,
+                  user_login,
                   user_password: generatorPasswordCrypt(user_password),
-                  email: email,
-                  user_type_id: user_type_id,
+                  email,
+                  user_type_id,
+                  company_id: company_id,
                 },
-              })
-              .then((user) => {
+              }).then((user) => {
                 const _links = generatorHATEOAS(user);
-                response.status(201).send({
+                response.send({
                   user: {
-                    id: user.id,
+                    name: user.name,
                     user_login: user.user_login,
                     email: user.email,
-                    type: user.user_type_id,
+                    company_id: user.company_id,
                   },
                   _links,
                 });
-              });
+              })
+            }
+            response.status(409).send({
+              message: "it is not possible to create more users of type",
+            });
+          }
+          response.status(409).send({
+            message:
+              "an operation could not be performed email or login already exists",
           });
-      } catch (error) {
-        response.status(500).send(
-          JSON.stringify({
-            message: "An error has occurred",
-          })
-        );
-      }
+        });
+    } catch (error) {
+      response.status(500).send({
+        message: "An error has occurred",
+        error: error
+      });
     }
-  );
-  app.get(
-    "/users",
+  });
+  app.get("/users",
     { preHandler: auth_middleware },
     async (request, response) => {
       try {
+        const token = request.headers.authorization;
+
         await prisma.user
           .findMany({
+            where: {
+              company_id: String(verifyTokenCompany(token)),
+            },
             select: {
               id: true,
               name: true,
@@ -114,8 +126,7 @@ export async function user_routes(app: FastifyInstance) {
       }
     }
   );
-  app.get(
-    "/user/name/:name",
+  app.get("/user/:name",
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
@@ -127,7 +138,7 @@ export async function user_routes(app: FastifyInstance) {
       });
 
       const { name } = user.parse(request.params);
-
+      const token = request.headers.authorization;
       try {
         await prisma.user
           .findMany({
@@ -135,6 +146,7 @@ export async function user_routes(app: FastifyInstance) {
               name: {
                 startsWith: name,
               },
+              company_id: String(verifyTokenCompany(token)),
             },
             select: {
               id: true,
@@ -158,21 +170,21 @@ export async function user_routes(app: FastifyInstance) {
       }
     }
   );
-  app.get(
-    "/user/:id",
+  app.get("/user/",
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
         id: z.string().trim().min(1, "id required minimum 1 char"),
       });
-
-      const { id } = user.parse(request.params);
+      const token = request.headers.authorization;
+      const { id } = user.parse(request.body);
 
       try {
         await prisma.user
-          .findUnique({
+          .findFirst({
             where: {
               id: Number(id),
+              company_id: String(verifyTokenCompany(token)),
             },
             select: {
               id: true,
@@ -196,8 +208,7 @@ export async function user_routes(app: FastifyInstance) {
       }
     }
   );
-  app.get(
-    "/users/:type_id",
+  app.get("/users/:type_id",
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
@@ -209,12 +220,14 @@ export async function user_routes(app: FastifyInstance) {
       });
 
       const { type_id } = user.parse(request.params);
+      const token = request.headers.authorization;
 
       try {
         await prisma.user
           .findMany({
             where: {
               user_type_id: Number(type_id),
+              company_id: String(verifyTokenCompany(token)),
             },
             select: {
               id: true,
@@ -238,8 +251,7 @@ export async function user_routes(app: FastifyInstance) {
       }
     }
   );
-  app.put(
-    "/user",
+  app.put("/user",
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
@@ -252,15 +264,16 @@ export async function user_routes(app: FastifyInstance) {
         user_type_id: z
           .number()
           .min(1, "type_id required minimum 1 char")
-          .max(1, "type_id required maximum 1 char"),
+          .max(3),
       });
 
       const { id, name, user_type_id } = user.parse(request.body);
+      const token = request.headers.authorization;
 
       try {
         await prisma.user
-          .findUnique({
-            where: { id: id },
+          .findFirst({
+            where: { id: id, company_id: String(verifyTokenCompany(token)) },
           })
           .then(async (user) => {
             if (!user) {
@@ -284,8 +297,7 @@ export async function user_routes(app: FastifyInstance) {
       }
     }
   );
-  app.delete(
-    "/user",
+  app.delete("/user",
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
@@ -293,11 +305,11 @@ export async function user_routes(app: FastifyInstance) {
       });
 
       const { id } = user.parse(request.body);
-
+      const token = request.headers.authorization;
       try {
         await prisma.user
-          .findUnique({
-            where: { id: id },
+          .findFirst({
+            where: { id: id, company_id: String(verifyTokenCompany(token)) },
           })
           .then(async (userExist) => {
             if (!userExist) {

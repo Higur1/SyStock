@@ -1,6 +1,6 @@
 import { prisma } from "../../config/prisma";
 import { FastifyInstance } from "fastify";
-import { z } from "zod";
+import { date, z } from "zod";
 import bcrypt from "bcryptjs";
 import { sendEmail } from "./nodemailer";
 import jwt from "jsonwebtoken";
@@ -28,9 +28,9 @@ export async function user_recovery(app: FastifyInstance) {
 
     try {
       await prisma.user
-        .findUnique({
+        .findFirst({
           where: {
-            user_login: user_login,
+            user_login: user_login
           },
         })
         .then(async (user) => {
@@ -45,7 +45,7 @@ export async function user_recovery(app: FastifyInstance) {
               }
               const knowkey = process.env.JWTSecret;
               const token = jwt.sign(
-                { id: user?.id, email: user?.email },
+                { id: user?.id, email: user?.email, company_id: user?.company_id},
                 knowkey!,
                 { expiresIn: "48h" }
               );
@@ -70,7 +70,7 @@ export async function user_recovery(app: FastifyInstance) {
     const { email, instance } = recovery.parse(request.body);
 
     await prisma.user
-      .findUnique({
+      .findFirst({
         where: {
           email: email,
         },
@@ -79,10 +79,11 @@ export async function user_recovery(app: FastifyInstance) {
         if (emailValidad == undefined) {
           response.status(404).send({ message: "Not found" });
         }
-        await prisma.tokenRecovery
+        await prisma.token_Recovery
           .create({
             data: {
               user_id: emailValidad!.id,
+              company_id: emailValidad!.company_id
             },
           })
           .then((token) => {
@@ -106,17 +107,17 @@ export async function user_recovery(app: FastifyInstance) {
     const { user_password, token } = passwordReset.parse(request.body);
 
     try {
-      await prisma.tokenRecovery
+      await prisma.token_Recovery
         .findFirst({
           where: {
-            value: token,
+            id: token,
           },
         })
         .then(async (tokenValidad) => {
           if (tokenValidad == undefined) {
             response.status(401).send({ message: "Token invalid" });
           }
-          if (tokenValidad?.tokenStatus == false) {
+          if (tokenValidad?.token_status == false) {
             response.status(401).send({ message: "Token is not available" });
           }
           await prisma
@@ -126,15 +127,15 @@ export async function user_recovery(app: FastifyInstance) {
                   id: tokenValidad!.user_id,
                 },
                 data: {
-                  user_password: generatorPasswordCrypt(user_password),
+                  user_password: generatorPasswordCrypt(user_password)
                 },
               }),
-              prisma.tokenRecovery.update({
+              prisma.token_Recovery.update({
                 where: {
                   id: tokenValidad!.id,
                 },
                 data: {
-                  tokenStatus: false,
+                  token_status: false,
                 },
               }),
             ])

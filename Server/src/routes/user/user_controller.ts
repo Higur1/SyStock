@@ -1,16 +1,15 @@
 import bcrypt from "bcryptjs";
+import { prisma } from "../../config/prisma";
 
 export function generatorPasswordCrypt(user_password) {
   var salt = bcrypt.genSaltSync(10);
   var hash = bcrypt.hashSync(user_password, salt);
   return hash;
 }
-
 export function generatorHATEOAS(user) {
-    if(user == undefined){
-        user.name = '',
-        user.id = 0
-    }
+  if (user == undefined) {
+    (user.name = ""), (user.id = 0);
+  }
   return [
     {
       href: "http://localhost:3333/users",
@@ -58,4 +57,75 @@ export function generatorHATEOAS(user) {
       rel: "reset_password",
     },
   ];
+}
+async function verifyTypeOfPlan(company_id) {
+  return prisma.company.findFirst({
+    where: {
+      id: company_id,
+    },
+    select: {
+      subscription_plans: true,
+    },
+  });
+}
+function selectedQuantityOfUsers(plan_id) {
+  var quantityOfAdminUsers = 0;
+  var quantityOfSupervisorUsers = 0;
+  var quantityOfCommonUsers = 0;
+
+  switch (plan_id) {
+    case 1:
+      quantityOfAdminUsers = 1;
+      quantityOfSupervisorUsers = 0;
+      quantityOfCommonUsers = 0;
+      break;
+    case 2:
+      quantityOfAdminUsers = 1;
+      quantityOfSupervisorUsers = 1;
+      quantityOfCommonUsers = 1;
+      break;
+    case 3:
+      quantityOfAdminUsers = 1;
+      quantityOfSupervisorUsers = 2;
+      quantityOfCommonUsers = 2;
+      break;
+    default:
+      quantityOfAdminUsers = 1;
+      quantityOfSupervisorUsers = 3;
+      quantityOfCommonUsers = 3;
+  }
+
+  return {
+    Admin: quantityOfAdminUsers,
+    Supervisor: quantityOfSupervisorUsers,
+    Common: quantityOfCommonUsers,
+  };
+}
+export async function LimitOfUsers(company_id, user_type_id){
+  try {
+    const plan = await verifyTypeOfPlan(company_id)
+    const quantityOfUserForPlan = selectedQuantityOfUsers(plan?.subscription_plans)
+  
+    const userList = await prisma.user.findMany({
+      where:{
+        company_id: company_id,
+        user_type_id: user_type_id
+      },
+    })
+    //check in which position the user will be created ("Admin", "Supervisor", "Common")
+    var parameterOfQuantityUsers = (Object.values(quantityOfUserForPlan)[user_type_id-1])
+
+    if(parameterOfQuantityUsers == userList.length){
+      return false;
+    }else{
+      return true;
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+export function verifyTokenCompany(token){
+  const header = JSON.parse(atob(token.split('.')[1]));
+  const parseToken = Object.values(header)[2]
+  return parseToken;
 }

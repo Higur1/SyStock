@@ -17,7 +17,7 @@ export function sendEmail(email, token, instance){
         from: process.env.EMAIL,
         to:email,
         subject: "Solicitação de reinicio de senha",
-        html: templateHtml(token.value, instance)
+        html: templateHtml(Object.values(token)[0], instance)
     }).then(result =>{
         return result;
     }).catch(error =>{

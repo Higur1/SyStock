@@ -13,144 +13,164 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+model Company{
+  id String @id @default(uuid())
+  name String @unique
+  cnpj String @unique
+  status_company_id Int 
+  subscription_plans Int
+  
+  Category Category[]
+  Supplyer Supplyer[]
+  Product Product[]
+  Batch Batch[]
+  User User[]
+  Token_Recovery Token_Recovery[]
+  Address Address[]
+  Phone Phone[]
 
-model Company {
-  id                 Int    @id @default(autoincrement())
-  name               String @unique
-  cnpj               String @unique
-  email              String @unique
-  state_registration String
+  company_status_company_id_fk Status_Company @relation(fields: [status_company_id], references: [id])
+  company_subscription_plan_fk Subscription_Plan @relation(fields: [subscription_plans], references: [id])
 
-  Company_Phones    Company_Phone[]
-  Company_Suppliers Supplier[]
-  Company_Address   Company_Address[]
 
   @@map("company")
 }
+model Phone{
+  id Int @id @default(autoincrement())
+  phone String  
+  company_id String @default("")
+  supplyer_id String @default("")
 
-model Company_Address {
-  id         Int    @id @default(autoincrement())
-  company_id Int    @unique
-  cep        String
-  city       String
-  state      String
-  street     String
-  number     Int
+  phone_company_id_fk Company @relation(fields: [company_id], references: [id])
+  phone_supplyer_id_fk Supplyer @relation(fields: [supplyer_id], references: [id])
+
+  @@map("phone")
+}
+model Address{
+  id Int @id @default(autoincrement())
+  cep String
+  street String
+  number Int
+  district String
+  state String
+  city String
   complement String
+  company_id String @default("")
+  supplyer_id String @default("")
+ 
+  address_company_id Company @relation(fields: [company_id], references: [id])
+  address_supplyer_id Supplyer @relation(fields: [supplyer_id], references: [id])
 
-  company_id_fk Company @relation(fields: [company_id], references: [id])
-
-  @@map("company_address")
+  @@map("address")
 }
+model Status_Company{
+  id Int @id @default(autoincrement())
+  status String @default("Active")
 
-model Company_Phone {
-  id         Int    @id @default(autoincrement())
-  phone      String @unique
-  company_id Int
+  Company Company[]
 
-  company_cnpj_phone_fk Company @relation(fields: [company_id], references: [id])
-
-  @@map("company_phone")
+  @@map("status_company")
 }
+model Subscription_Plan{
+  id Int @id @default(autoincrement())
+  name String @default("FREE")
+  description String
 
-model Supplier {
-  id         Int    @id @default(autoincrement())
-  name       String @unique
-  email      String @unique
-  company_id Int
+  Company Company[]
 
-  Phones SupplierPhone[]
-  Batchs Batch[]
-
-  company_id_fk Company @relation(fields: [company_id], references: [id])
-
-  @@map("suppliers")
+  @@map("subscription_plan")
 }
+model Category{
+  id Int @id @default(autoincrement())
+  name String 
+  company_id String
 
-model SupplierPhone {
-  id          Int    @id @default(autoincrement())
-  phone       String @unique
-  supplier_id Int
+  Product Product[]
 
-  supplier_phone_id_fk Supplier @relation(fields: [supplier_id], references: [id])
-
-  @@map("supplier_phone")
+  category_company_id_fk Company @relation(fields: [company_id], references: [id])
+  
+  @@map("category")
 }
+model Product{
+  id Int @id @default(autoincrement())
+  name String 
+  company_id String
+  category_id Int
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+  price Decimal
 
-model Batch {
-  id            Int             @id @default(autoincrement())
-  number        String          @unique
-  date          DateTime        @default(now())
-  supplier_id   Int
-  Batch_Product Batch_Product[]
+  Batch Batch[]
 
-  supplier_id_fk Supplier @relation(fields: [supplier_id], references: [id])
+  product_company_id_fk Company @relation(fields: [company_id], references: [id])
+  product_category_id_fk Category @relation(fields: [category_id], references: [id])
+
+  @@map("product")
+}
+model Supplyer{
+  id String @id @default(uuid())
+  name String
+  company_id String 
+  address_id Int
+  email String
+
+  Batch Batch[]
+  Address Address[]
+  Phone Phone[]
+
+  company_id_supplyer_fk Company @relation(fields: [company_id], references: [id]) 
+
+  @@map("supplyer")
+}
+model Batch{
+  id Int @id @default(autoincrement())
+  product_id Int
+  supplyer_id String
+  company_id String
+  createAt DateTime
+  updateAt DateTime
+  quantity Int @default(0)
+
+  batch_product_id_fk Product @relation(fields: [product_id], references: [id])
+  batch_supplyer_id_fk Supplyer @relation(fields: [supplyer_id], references: [id])
+  batch_company_id_fk Company @relation(fields: [company_id], references: [id])
 
   @@map("batch")
 }
+model User_Type{
+  id Int @id @default(autoincrement())
+  name String @default("Common")
 
-model Batch_Product {
-  batch_id   Int
-  product_id Int
-  quantity   Int
-
-  product_id_fk   Product @relation(fields: [product_id], references: [id])
-  number_batch_fk Batch   @relation(fields: [batch_id], references: [id])
-
-  @@id([batch_id, product_id])
-  @@map("batch_product")
-}
-
-model Product {
-  id          Int     @id @default(autoincrement())
-  description String
-  ncmSh       String
-  price       Decimal
-  category_id Int
-
-  Batch_Product Batch_Product[]
-
-  id_category_fk Category @relation(fields: [category_id], references: [id])
-
-  @@map("products")
-}
-
-model Category {
-  id      Int       @id @default(autoincrement())
-  name    String
-  Product Product[]
-
-  @@map("categories")
-}
-
-model User_Types {
-  id   Int    @id @default(autoincrement())
-  name String
   User User[]
 
-  @@map("user_types")
+  @@map("user_type")
 }
-
-model User {
-  id            Int    @id @default(autoincrement())
-  name          String
-  user_login    String @unique
-  user_password String
-  email         String @unique
-  user_type_id  Int
-  tokenRecovery TokenRecovery[]
-
-  user_type_id_fk User_Types @relation(fields: [user_type_id], references: [id])
-
-  @@map("users")
-}
-model TokenRecovery {
+model User{
   id Int @id @default(autoincrement())
-  value String @default(uuid())
-  tokenStatus Boolean @default(true) 
+  company_id String
+  user_type_id Int
+  user_login String
+  user_password String
+  name String 
+  email String
+  createdAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+  
+  Token_Recovery Token_Recovery[]
+
+  user_company_id Company @relation(fields: [company_id], references: [id])
+  user_user_type_id_fk User_Type @relation(fields: [user_type_id], references: [id])
+
+  @@map("user")
+}
+model Token_Recovery{
+  id String @id @default(uuid())
+  token_status Boolean @default(true)
+  company_id String
   user_id Int
 
-  user_id_fk User @relation(fields: [user_id], references: [id])
+  token_recovery_company_id_fk Company @relation(fields: [company_id], references: [id])
+  token_recovery_user_id_fk User @relation(fields: [user_id], references: [id])
 
   @@map("token_recovery")
 }
