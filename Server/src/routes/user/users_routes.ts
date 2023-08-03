@@ -49,27 +49,29 @@ export async function user_routes(app: FastifyInstance) {
           if (!userExist) {
             const isPossible = await LimitOfUsers(company_id, user_type_id);
             if (isPossible) {
-              await prisma.user.create({
-                data: {
-                  name,
-                  user_login,
-                  user_password: generatorPasswordCrypt(user_password),
-                  email,
-                  user_type_id,
-                  company_id: company_id,
-                },
-              }).then((user) => {
-                const _links = generatorHATEOAS(user);
-                response.send({
-                  user: {
-                    name: user.name,
-                    user_login: user.user_login,
-                    email: user.email,
-                    company_id: user.company_id,
+              await prisma.user
+                .create({
+                  data: {
+                    name,
+                    user_login,
+                    user_password: generatorPasswordCrypt(user_password),
+                    email,
+                    user_type_id,
+                    company_id: company_id,
                   },
-                  _links,
+                })
+                .then((user) => {
+                  const _links = generatorHATEOAS(user);
+                  response.send({
+                    user: {
+                      name: user.name,
+                      user_login: user.user_login,
+                      email: user.email,
+                      company_id: user.company_id,
+                    },
+                    _links,
+                  });
                 });
-              })
             }
             response.status(409).send({
               message: "it is not possible to create more users of type",
@@ -83,16 +85,16 @@ export async function user_routes(app: FastifyInstance) {
     } catch (error) {
       response.status(500).send({
         message: "An error has occurred",
-        error: error
+        error: error,
       });
     }
   });
-  app.get("/users",
+  app.get(
+    "/users",
     { preHandler: auth_middleware },
     async (request, response) => {
       try {
         const token = request.headers.authorization;
-
         await prisma.user
           .findMany({
             where: {
@@ -126,7 +128,8 @@ export async function user_routes(app: FastifyInstance) {
       }
     }
   );
-  app.get("/user/:name",
+  app.get(
+    "/user/:name",
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
@@ -170,7 +173,8 @@ export async function user_routes(app: FastifyInstance) {
       }
     }
   );
-  app.get("/user/",
+  app.get(
+    "/user/",
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
@@ -208,7 +212,8 @@ export async function user_routes(app: FastifyInstance) {
       }
     }
   );
-  app.get("/users/:type_id",
+  app.get(
+    "/users/:type_id",
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
@@ -251,7 +256,8 @@ export async function user_routes(app: FastifyInstance) {
       }
     }
   );
-  app.put("/user",
+  app.put(
+    "/user",
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
@@ -279,14 +285,23 @@ export async function user_routes(app: FastifyInstance) {
             if (!user) {
               response.status(404).send({ message: "Not found" });
             }
-            await prisma.user.update({
-              where: { id: id },
-              data: {
-                name: name,
-                user_type_id: user_type_id,
-              },
-            });
-            response.status(200);
+            if(user!.user_type_id != 1){
+              await prisma.user.update({
+                where: { id: id },
+                data: {
+                  name: name,
+                  user_type_id: user_type_id,
+                },
+              });
+              response.status(200).send({message: "user updated"});
+            }else{
+              await prisma.user.update({
+                where: { id: id },
+                data: {
+                  name: name,
+                },
+              });
+            }
           });
       } catch (error) {
         response.status(500).send(
@@ -297,7 +312,8 @@ export async function user_routes(app: FastifyInstance) {
       }
     }
   );
-  app.delete("/user",
+  app.delete(
+    "/user",
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
@@ -315,10 +331,14 @@ export async function user_routes(app: FastifyInstance) {
             if (!userExist) {
               response.status(404).send({ message: "Not found" });
             }
-            await prisma.user.delete({
-              where: { id: id },
-            });
-            response.status(200);
+            if(userExist?.user_type_id == 1){
+              response.status(401).send({message: "Is not possible to delete the admin user"});
+            }else{
+              await prisma.user.delete({
+                where: { id: id },
+              });
+              response.status(200);
+            }
           });
       } catch (error) {
         response.status(500).send(

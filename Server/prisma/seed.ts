@@ -102,10 +102,10 @@ async function run() {
         id: 1,
         company_id:"uuidfake",
         user_type_id: 1,
-        user_login: "admin",
+        user_login: "admin HGB",
         email: "hgbsystemstock@gmail.com",
         name:"Admin HGB",
-        user_password: generatorPasswordCrypt("HGB"),
+        user_password: generatorPasswordCrypt("admin HGB"),
       }
     })
   ])

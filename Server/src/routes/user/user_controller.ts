@@ -8,7 +8,7 @@ export function generatorPasswordCrypt(user_password) {
 }
 export function generatorHATEOAS(user) {
   if (user == undefined) {
-    (user.name = ""), (user.id = 0);
+    (user.user_name = " "), (user.user_id = 0);
   }
   return [
     {
@@ -17,12 +17,12 @@ export function generatorHATEOAS(user) {
       rel: "list_users",
     },
     {
-      href: `http://localhost:3333/user/name/${user.name}`,
+      href: `http://localhost:3333/user/name/${user.user_name}`,
       method: "GET",
       rel: "info_user_by_name",
     },
     {
-      href: `http://localhost:3333/user/${user.id}`,
+      href: `http://localhost:3333/user/${user.user_id}`,
       method: "GET",
       rel: "info_user_by_id",
     },
@@ -91,8 +91,8 @@ function selectedQuantityOfUsers(plan_id) {
       break;
     default:
       quantityOfAdminUsers = 1;
-      quantityOfSupervisorUsers = 3;
-      quantityOfCommonUsers = 3;
+      quantityOfSupervisorUsers = 0;
+      quantityOfCommonUsers = 0;
   }
 
   return {

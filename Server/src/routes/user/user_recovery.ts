@@ -30,7 +30,7 @@ export async function user_recovery(app: FastifyInstance) {
       await prisma.user
         .findFirst({
           where: {
-            user_login: user_login
+            user_login: user_login,
           },
         })
         .then(async (user) => {
@@ -45,7 +45,11 @@ export async function user_recovery(app: FastifyInstance) {
               }
               const knowkey = process.env.JWTSecret;
               const token = jwt.sign(
-                { id: user?.id, email: user?.email, company_id: user?.company_id},
+                {
+                  id: user?.id,
+                  email: user?.email,
+                  company_id: user?.company_id,
+                },
                 knowkey!,
                 { expiresIn: "48h" }
               );
@@ -83,7 +87,7 @@ export async function user_recovery(app: FastifyInstance) {
           .create({
             data: {
               user_id: emailValidad!.id,
-              company_id: emailValidad!.company_id
+              company_id: emailValidad!.company_id,
             },
           })
           .then((token) => {
@@ -119,29 +123,30 @@ export async function user_recovery(app: FastifyInstance) {
           }
           if (tokenValidad?.token_status == false) {
             response.status(401).send({ message: "Token is not available" });
+          } else {
+            await prisma
+              .$transaction([
+                prisma.user.update({
+                  where: {
+                    id: tokenValidad!.user_id,
+                  },
+                  data: {
+                    user_password: generatorPasswordCrypt(user_password),
+                  },
+                }),
+                prisma.token_Recovery.update({
+                  where: {
+                    id: tokenValidad!.id,
+                  },
+                  data: {
+                    token_status: false,
+                  },
+                }),
+              ])
+              .then(() => {
+                response.status(200);
+              });
           }
-          await prisma
-            .$transaction([
-              prisma.user.update({
-                where: {
-                  id: tokenValidad!.user_id,
-                },
-                data: {
-                  user_password: generatorPasswordCrypt(user_password)
-                },
-              }),
-              prisma.token_Recovery.update({
-                where: {
-                  id: tokenValidad!.id,
-                },
-                data: {
-                  token_status: false,
-                },
-              }),
-            ])
-            .then(() => {
-              response.status(200);
-            });
         });
     } catch (error) {
       response.status(500).send(
