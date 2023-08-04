@@ -5,7 +5,10 @@ export const apiBase = 'http://192.168.15.17:3333';
 export function performFetch(url, obj) {
   return new Promise((resolve, reject) => {
     fetch(`${apiBase}${url}`, { method: 'GET', 
-    headers: { "Content-Type" : "application/json" }
+    headers: { 
+      "Content-Type" : "application/json", 
+      "Authorization" : `Bearer ${window.localStorage.getItem('tokenLogin')}` 
+    }
     ,...obj })
       .then(response => {
         if(!response.ok) {
@@ -38,7 +41,10 @@ export function performFetch(url, obj) {
 export function performFetchNoResult(url, obj) {
   return new Promise((resolve, reject) => {
     fetch(`${apiBase}${url}`, { method: 'GET', 
-    headers: { "Content-Type" : "application/json" }
+    headers: { 
+      "Content-Type" : "application/json",
+      "Authorization" : `Bearer ${window.localStorage.getItem('tokenLogin')}` 
+    }
     ,...obj })
       .then(response => {
         // if(!response.ok) {

@@ -125,7 +125,8 @@ export async function LimitOfUsers(company_id, user_type_id){
   }
 }
 export function verifyTokenCompany(token){
-  const header = JSON.parse(atob(token.split('.')[1]));
-  const parseToken = Object.values(header)[2]
+  const tokenUpdated = token.split('Bearer ')[1];
+  const header = JSON.parse(atob(tokenUpdated.split('.')[1]));
+  const parseToken = Object.values(header)[2];
   return parseToken;
 }
