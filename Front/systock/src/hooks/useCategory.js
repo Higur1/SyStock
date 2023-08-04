@@ -72,8 +72,7 @@ export default function useCategory() {
 
   async function handleCreateCategory(obj) {
     try {
-      const newItem = await performFetch("/categories/new", {method: 'POST', body: JSON.stringify(obj)});
-      // const newItem = await fetch("http://192.168.15.12:3333/categories/new", {method: 'POST', body: JSON.stringify(obj)})
+      const newItem = await performFetch("/category", {method: 'POST', body: JSON.stringify(obj)});
       if(typeof newItem === 'string') {
         handleOpenSnackBar("error", newItem, 3500);
         return;
@@ -88,7 +87,7 @@ export default function useCategory() {
 
   async function handleUpdateCategory(category) {
     try {
-      const newItem = await performFetch("/categories/update", {method: 'PUT', body: JSON.stringify(category)});
+      const newItem = await performFetch("/category", {method: 'PUT', body: JSON.stringify(category)});
       
       if(typeof newItem === 'string') {
         handleOpenSnackBar("error", newItem, 3500);
@@ -108,7 +107,7 @@ export default function useCategory() {
    * @param {*} id 
    */
   async function handleDeleteCategory(id) {
-    const url = "/categories/delete";
+    const url = "/category";
 
     performFetchNoResult(url, {method: 'DELETE', body: JSON.stringify(id)})
     .then(() => {

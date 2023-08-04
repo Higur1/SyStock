@@ -12,22 +12,20 @@ export function performFetch(url, obj) {
     ,...obj })
       .then(response => {
         if(!response.ok) {
-          if (response.status === 401) {
+          if (response.status === 401) { //! unauthorized voltar pro login
             throw new Error('Request failed with status ' + response.status);
           }
-          if (response.status === 404) {
-            //* not found
+          if (response.status === 400) {
+            return response.json().then(json => {
+              // console.log('aqui', json);
+              return Promise.reject({...json});
+            });
           }
-          if (response.status === 418) {
-            //* unauthorized
+          if (response.status === 404) {
+            //! not found
           }
           return response.json().then(json => {
-            return Promise.reject({
-              status: response.status,
-              ok: false,
-              statusText: response.message,
-              body: json
-            });
+            return Promise.reject({...json});
           });
         }
         
