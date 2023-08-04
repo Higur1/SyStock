@@ -7,6 +7,7 @@ import swaggerUi from "@fastify/swagger-ui";
 import { SwaggerTheme } from "swagger-themes";
 import { user_routes } from "./routes/user/users_routes";
 import { user_recovery } from "./routes/user/user_recovery";
+import { categories_routes } from "./routes/category/categories_routes";
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.register(cors, {
 //routes
 app.register(user_routes);
 app.register(user_recovery);
+app.register(categories_routes);
 
 const start = async () => {
   try {

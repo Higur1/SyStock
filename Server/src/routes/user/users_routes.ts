@@ -89,8 +89,7 @@ export async function user_routes(app: FastifyInstance) {
       });
     }
   });
-  app.get(
-    "/users",
+  app.get("/users",
     { preHandler: auth_middleware },
     async (request, response) => {
       try {
@@ -128,8 +127,7 @@ export async function user_routes(app: FastifyInstance) {
       }
     }
   );
-  app.get(
-    "/user/:name",
+  app.get("/user/:name",
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
@@ -173,8 +171,7 @@ export async function user_routes(app: FastifyInstance) {
       }
     }
   );
-  app.get(
-    "/user/",
+  app.get("/user/",
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
@@ -212,8 +209,7 @@ export async function user_routes(app: FastifyInstance) {
       }
     }
   );
-  app.get(
-    "/users/:type_id",
+  app.get("/users/:type_id",
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
@@ -256,8 +252,7 @@ export async function user_routes(app: FastifyInstance) {
       }
     }
   );
-  app.put(
-    "/user",
+  app.put("/user",
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
@@ -312,8 +307,7 @@ export async function user_routes(app: FastifyInstance) {
       }
     }
   );
-  app.delete(
-    "/user",
+  app.delete("/user",
     { preHandler: auth_middleware },
     async (request, response) => {
       const user = z.object({
