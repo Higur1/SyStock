@@ -129,3 +129,6 @@ export function verifyTokenCompany(token){
   const parseToken = Object.values(header)[2]
   return parseToken;
 }
+export function genericError(error){
+  return (error.issues.map(i => i.message));
+}

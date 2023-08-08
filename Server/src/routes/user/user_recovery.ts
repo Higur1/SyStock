@@ -5,28 +5,32 @@ import bcrypt from "bcryptjs";
 import { sendEmail } from "./nodemailer";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { generatorHATEOAS, generatorPasswordCrypt } from "./user_controller";
+import {
+  generatorHATEOAS,
+  generatorPasswordCrypt,
+  genericError,
+} from "./user_controller";
 
 dotenv.config();
 
 export async function user_recovery(app: FastifyInstance) {
   app.post("/auth", async (request, response) => {
-    const user = z.object({
-      user_login: z
-        .string()
-        .trim()
-        .min(5, "user_login required minimum 5 chars")
-        .max(10, "user_login required maximum 10 chars"),
-      user_password: z
-        .string()
-        .trim()
-        .min(5, "user_password required minimum 5 chars")
-        .max(10, "user_password required maximum 10 chars"),
-    });
-
-    const { user_login, user_password } = user.parse(request.body);
-
     try {
+      const user = z.object({
+        user_login: z
+          .string()
+          .trim()
+          .min(5, "user_login required minimum 5 character(s)")
+          .max(10, "user_login required maximum 10 character(s)"),
+        user_password: z
+          .string()
+          .trim()
+          .min(5, "user_password required minimum 5 character(s)")
+          .max(10, "user_password required maximum 10 character(s)"),
+      });
+
+      const { user_login, user_password } = user.parse(request.body);
+
       await prisma.user
         .findFirst({
           where: {
@@ -60,57 +64,68 @@ export async function user_recovery(app: FastifyInstance) {
     } catch (error) {
       response.status(500).send(
         JSON.stringify({
-          message: "An error has occurred",
+          error: genericError(error),
         })
       );
     }
   });
   app.post("/recovery", async (request, response) => {
-    const recovery = z.object({
-      email: z.string().trim().email("valid email required"),
-      instance: z.string().trim().min(10, "instance required 10 chars"),
-    });
-
-    const { email, instance } = recovery.parse(request.body);
-
-    await prisma.user
-      .findFirst({
-        where: {
-          email: email,
-        },
-      })
-      .then(async (emailValidad) => {
-        if (emailValidad == undefined) {
-          response.status(404).send({ message: "Not found" });
-        }
-        await prisma.token_Recovery
-          .create({
-            data: {
-              user_id: emailValidad!.id,
-              company_id: emailValidad!.company_id,
-            },
-          })
-          .then((token) => {
-            sendEmail(email, token, instance);
-            response.status(200).send({ message: "e-mail sent" });
-          });
+    try {
+      const recovery = z.object({
+        email: z.string().trim().email("valid email required"),
+        instance: z
+          .string()
+          .trim()
+          .min(10, "instance required 10 character(s)"),
       });
+
+      const { email, instance } = recovery.parse(request.body);
+
+      await prisma.user
+        .findFirst({
+          where: {
+            email: email,
+          },
+        })
+        .then(async (emailValidad) => {
+          if (emailValidad == undefined) {
+            response.status(404).send({ message: "Not found" });
+          }
+          await prisma.token_Recovery
+            .create({
+              data: {
+                user_id: emailValidad!.id,
+                company_id: emailValidad!.company_id,
+              },
+            })
+            .then((token) => {
+              sendEmail(email, token, instance);
+              response.status(200).send({ message: "e-mail sent" });
+            });
+        });
+    } catch (error) {
+      response.status(500).send(
+        JSON.stringify({
+          error: genericError(error),
+        })
+      );
+    }
   });
   app.put("/reset/password", async (request, response) => {
-    const passwordReset = z.object({
-      token: z
-        .string()
-        .trim()
-        .min(36, "token required minimum 36 chars")
-        .max(36, "token required maximum 36 chars"),
-      user_password: z
-        .string()
-        .min(5, "user_password required minimum 5 chars")
-        .max(10, "user_password required maximum 10 chars"),
-    });
-    const { user_password, token } = passwordReset.parse(request.body);
-
     try {
+      const passwordReset = z.object({
+        token: z
+          .string()
+          .trim()
+          .min(36, "token required minimum 36 character(s)")
+          .max(36, "token required maximum 36 character(s)"),
+        user_password: z
+          .string()
+          .min(5, "user_password required minimum 5 character(s)")
+          .max(10, "user_password required maximum 10 character(s)"),
+      });
+      const { user_password, token } = passwordReset.parse(request.body);
+
       await prisma.token_Recovery
         .findFirst({
           where: {
@@ -151,7 +166,7 @@ export async function user_recovery(app: FastifyInstance) {
     } catch (error) {
       response.status(500).send(
         JSON.stringify({
-          message: "An error has occurred",
+          error: genericError(error),
         })
       );
     }
