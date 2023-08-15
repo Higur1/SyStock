@@ -11,13 +11,14 @@ async function auth_middleware(request, response) {
     return response.status(401).send({ err: "Access Denied" });
   }
 
-  jwt.verify(authHeader, knowkey!, (error, data) =>{
-    if(error){
+  jwt.verify(authHeader, knowkey!, (error, data) => {
+    if (error) {
       response.status(401).send(error);
+    } else {
+      request.token = authHeader;
+      request.loggedUser = { id: data.user_login };
     }
-    request.token = authHeader;
-    request.loggedUser = {id: data.user_login}
-  })
+  });
 }
 
 export default auth_middleware;

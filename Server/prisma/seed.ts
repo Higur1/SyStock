@@ -1,8 +1,8 @@
 import { PrismaClient } from "@prisma/client";
-import { generatorPasswordCrypt } from "../src/routes/user/user_controller";
-
+import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
+const salt = bcrypt.genSaltSync(10);
 
 
 async function run() {
@@ -14,14 +14,14 @@ async function run() {
         `;
   }
 }
-/*Delete*/await Promise.all([
+/*Delete */await prisma.$transaction([
     prisma.token_Recovery.deleteMany(),
     prisma.user.deleteMany(),
     prisma.user_Type.deleteMany(),
     prisma.company.deleteMany(),
     prisma.status_Company.deleteMany(),
     prisma.subscription_Plan.deleteMany()
-])
+  ])
   /*Create status company*/ await Promise.all([
     prisma.status_Company.create({
       data:{
@@ -68,7 +68,7 @@ async function run() {
   /*Create generic company*/ await Promise.all([
     prisma.company.create({
       data:{
-        id: "uuidfake",
+        id: "b7f72e9b-dcdb-455f-83ae-a2dc5365c5c9",
         name: "Generic",
         cnpj: "00.000.000/0001-00",
         status_company_id: 1,
@@ -100,12 +100,12 @@ async function run() {
     prisma.user.create({
       data:{
         id: 1,
-        company_id:"uuidfake",
+        company_id: "b7f72e9b-dcdb-455f-83ae-a2dc5365c5c9",
         user_type_id: 1,
         user_login: "admin HGB",
         email: "hgbsystemstock@gmail.com",
         name:"Admin HGB",
-        user_password: generatorPasswordCrypt("admin HGB"),
+        user_password: bcrypt.hashSync( "Admin HGB", salt),
       }
     })
   ])

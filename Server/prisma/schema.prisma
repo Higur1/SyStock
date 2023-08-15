@@ -168,6 +168,8 @@ model Token_Recovery{
   token_status Boolean @default(true)
   company_id String
   user_id Int
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt
 
   token_recovery_company_id_fk Company @relation(fields: [company_id], references: [id])
   token_recovery_user_id_fk User @relation(fields: [user_id], references: [id])
