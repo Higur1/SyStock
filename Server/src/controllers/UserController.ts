@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
-import { sendEmail } from "./nodemailer";
+import { sendEmail } from "../nodemailer";
 
 dotenv.config();
 
@@ -299,8 +299,8 @@ export default class UserController {
         if (userId.user != undefined) {
           if (userId.user.user_type_id != 1) {
             await User.tokenDelete(userId.user.id);
-            const result = await User.delete(userId.user.id);
-            console.log(result);
+            await User.delete(userId.user.id);
+            response.status(200);
           } else {
             response.status(401).send(
               JSON.stringify({
