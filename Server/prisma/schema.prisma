@@ -21,7 +21,7 @@ model Company{
   subscription_plans Int
   
   Category Category[]
-  Supplyer Supplyer[]
+  Supplier Supplier[]
   Product Product[]
   Batch Batch[]
   User User[]
@@ -39,10 +39,10 @@ model Phone{
   id Int @id @default(autoincrement())
   phone String  
   company_id String @default("")
-  supplyer_id String @default("")
+  supplier_id String @default("")
 
   phone_company_id_fk Company @relation(fields: [company_id], references: [id])
-  phone_supplyer_id_fk Supplyer @relation(fields: [supplyer_id], references: [id])
+  phone_supplier_id_fk Supplier @relation(fields: [supplier_id], references: [id])
 
   @@map("phone")
 }
@@ -56,10 +56,10 @@ model Address{
   city String
   complement String
   company_id String @default("")
-  supplyer_id String @default("")
+  supplier_id String @default("")
  
   address_company_id Company @relation(fields: [company_id], references: [id])
-  address_supplyer_id Supplyer @relation(fields: [supplyer_id], references: [id])
+  address_supplier_id Supplier @relation(fields: [supplier_id], references: [id])
 
   @@map("address")
 }
@@ -107,32 +107,31 @@ model Product{
 
   @@map("product")
 }
-model Supplyer{
+model Supplier{
   id String @id @default(uuid())
   name String
   company_id String 
-  address_id Int
-  email String
+  email String 
 
   Batch Batch[]
   Address Address[]
   Phone Phone[]
 
-  company_id_supplyer_fk Company @relation(fields: [company_id], references: [id]) 
+  company_id_supplier_fk Company @relation(fields: [company_id], references: [id]) 
 
-  @@map("supplyer")
+  @@map("supplier")
 }
 model Batch{
   id Int @id @default(autoincrement())
   product_id Int
-  supplyer_id String
+  supplier_id String
   company_id String
   createAt DateTime
   updateAt DateTime
   quantity Int @default(0)
 
   batch_product_id_fk Product @relation(fields: [product_id], references: [id])
-  batch_supplyer_id_fk Supplyer @relation(fields: [supplyer_id], references: [id])
+  batch_supplier_id_fk Supplier @relation(fields: [supplier_id], references: [id])
   batch_company_id_fk Company @relation(fields: [company_id], references: [id])
 
   @@map("batch")

@@ -5,7 +5,7 @@ import ip from "ip";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 import { SwaggerTheme } from "swagger-themes";
-import {user_routes, category_routes} from './routes';
+import {user_routes, category_routes, supplier_routes} from './routes';
 
 dotenv.config();
 
@@ -28,7 +28,8 @@ app.register(swaggerUi, {
 app.register(cors, {
   origin: "*",
 });
-app.register(user_routes, category_routes);
+app.register(category_routes, supplier_routes);
+app.register(user_routes);
 
 const start = async () => {
   try {

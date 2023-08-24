@@ -1,7 +1,12 @@
 import fastify, { FastifyInstance } from "fastify";
+
 import UserController from "./controllers/UserController";
 import CategoryController from "./controllers/CategoryController";
+import Supplier from "./models/Supplier";
+
 import auth_middleware from "./middleware/auth_middleware";
+import SupplierController from "./controllers/SupplierController";
+
 const app = fastify();
 
 async function user_routes(app: FastifyInstance) {
@@ -23,5 +28,12 @@ async function category_routes(app: FastifyInstance){
   app.put("/category", { preHandler: auth_middleware }, CategoryController.edit);
   app.delete("/category", { preHandler: auth_middleware }, CategoryController.remove);
 }
+async function supplier_routes(app: FastifyInstance){
+  app.get("/suppliers", { preHandler: auth_middleware }, SupplierController.findAll);
+  app.post("/supplier", { preHandler: auth_middleware }, SupplierController.create);
+  app.get("/supplier/:id", { preHandler: auth_middleware }, SupplierController.findById);
+  app.put("/supplier", { preHandler: auth_middleware }, SupplierController.update);
+  app.delete("/supplier", { preHandler: auth_middleware }, SupplierController.delete);
+}
 
-export {user_routes, category_routes}
+export {user_routes, category_routes, supplier_routes}

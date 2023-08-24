@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
-import { sendEmail } from "../nodemailer";
+import { sendEmail } from "../functions/nodemailer";
 
 dotenv.config();
 
