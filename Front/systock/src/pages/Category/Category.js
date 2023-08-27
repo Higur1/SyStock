@@ -21,20 +21,16 @@ export default function Category() {
     autoHideSnackBar,
     severitySnackBar,
     snackMessageSnackBar,
-    handleCloseSnackBar
+    handleCloseSnackBar,
+
+    openCreateCategory, setOpenCreateCategory,
+    menuOption, setMenuOptions,
+    idMenu, setIdMenu,
+    editCategory, setEditCategory,
+    deleteCategory, setDeleteCategory,
+    handleMenuOptions
   } = useCategory();
 
-  const [openCreateCategory, setOpenCreateCategory] = useState(false);
-  const [menuOption, setMenuOptions] = useState(false);
-  const [idMenu, setIdMenu] = useState(null);
-  const [editCategory, setEditCategory] = useState(false);
-  const [deleteCategory, setDeleteCategory] = useState(false);
-
-  function handleMenuOptions(id) {
-    setMenuOptions(!menuOption);
-    setIdMenu(id);
-  }
-  
   if(categories.length === 0) return;
 
   return (
@@ -57,7 +53,7 @@ export default function Category() {
               ))
             }
             value={selectedCategories}
-            onChange={(event, newValue) => setSelectedCategories(newValue)}
+            onChange={(_, newValue) => setSelectedCategories(newValue)}
             sx={{ width: '100%', margin: 0 }}
             renderInput={(params) => <TextField {...params} label="Categoria" />}
           />
@@ -101,8 +97,8 @@ export default function Category() {
       {openCreateCategory && (
         <CreateCategoryDialog 
           open={openCreateCategory}
+          handleCloseSnackBar={handleCloseSnackBar}
           handleClose={() => setOpenCreateCategory(false)}
-          categories={categories}
           createCategory={handleCreateCategory}
         />
       )}

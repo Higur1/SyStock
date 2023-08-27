@@ -8,7 +8,12 @@ export default function useCategory() {
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [categoriesFiltered, setCategoriesFiltered] = useState([]);
-  
+  const [openCreateCategory, setOpenCreateCategory] = useState(false);
+  const [menuOption, setMenuOptions] = useState(false);
+  const [idMenu, setIdMenu] = useState(null);
+  const [editCategory, setEditCategory] = useState(false);
+  const [deleteCategory, setDeleteCategory] = useState(false);
+
   //* snackBar
   const [openSnackBar, setOpenSnackBar] = useState(false);
   const [autoHideSnackBar, setAutoHideSnackBar] = useState(3000);
@@ -35,6 +40,11 @@ export default function useCategory() {
     getCategories();
   }, []);
 
+  function handleMenuOptions(id) {
+    setMenuOptions(!menuOption);
+    setIdMenu(id);
+  }
+
   async function getCategories() {
     try {
       const categories = await performFetch("/categories", {method: 'GET'});
@@ -56,35 +66,47 @@ export default function useCategory() {
 
   }, [selectedCategories, categories]);
 
+  /**
+   * * insert category on state
+   * @param {*} category 
+   */
   const insertCategory = (newCategory) => {
     const newItem = deepCopy(newCategory);
-    let updatedCategories = [];
-    if(categories.some(cat => cat.id === newItem.id)) {
-      updatedCategories = categories.map(cat => (cat.id === newItem.id ? {...newItem} : {...cat}));
-    } else {
-      updatedCategories = [...categories, {...newItem}];
-    }
 
-    setCategories(updatedCategories);
+    setCategories(prevState => {
+      if(prevState.some(cat => cat.id === newItem.id)) {
+        return prevState.map(cat => (cat.id === newItem.id ? {...newItem} : {...cat}));
+      } else {
+        return [...prevState, newItem];
+      }
+    });
     
     handleOpenSnackBar("success", "Categoria adicionada com sucesso!!", 3500);
   }
 
+  /**
+   * * create category
+   * @param {*} 
+   */
   async function handleCreateCategory(obj) {
     try {
       const newItem = await performFetch("/category", {method: 'POST', body: JSON.stringify(obj)});
       if(typeof newItem === 'string') {
-        handleOpenSnackBar("error", newItem, 3500);
+        handleOpenSnackBar("error", newItem, null);
         return;
       }
 
       insertCategory(newItem);
-
+      setOpenCreateCategory(false);
     } catch (error) {
-      handleOpenSnackBar("error", error.message, 3500);
+      handleOpenSnackBar("error", error.message, null);
     }
   }
 
+  /**
+   * * update category
+   * @param {*} 
+   */
   async function handleUpdateCategory(category) {
     try {
       const newItem = await performFetch("/category", {method: 'PUT', body: JSON.stringify(category)});
@@ -125,6 +147,12 @@ export default function useCategory() {
     selectedCategories, setSelectedCategories,
     categoriesFiltered, setCategoriesFiltered,
     handleCreateCategory, handleUpdateCategory, handleDeleteCategory,
-    handleCloseSnackBar, openSnackBar, autoHideSnackBar, snackMessageSnackBar, severitySnackBar
+    handleCloseSnackBar, openSnackBar, autoHideSnackBar, snackMessageSnackBar, severitySnackBar,
+    openCreateCategory, setOpenCreateCategory,
+    menuOption, setMenuOptions,
+    idMenu, setIdMenu,
+    editCategory, setEditCategory,
+    deleteCategory, setDeleteCategory,
+    handleMenuOptions
   }
 }
