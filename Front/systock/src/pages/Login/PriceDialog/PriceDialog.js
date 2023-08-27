@@ -52,28 +52,25 @@ const PriceDialog = (props) => {
       fullWidth
       maxWidth="lg"
       style={{background: 'transparent', boxShadow: 'none'}}
-      PaperProps={{style: {background: 'transparent', boxShadow: 'none'}}}
+      PaperProps={{style: { boxShadow: 'none', background: 'transparent'}}}
     >
-      <DialogTitle>
-        
-      </DialogTitle>
-      <DialogContent style={{height: 524}}>
-      <Container>
-          {prices.map((plan, index) => (
-            <Card key={index}>
-              <Title>
-                  <TitleH2>{plan.title}</TitleH2>
-                  <p style={{fontWeight: 600, paddingLeft: 16}}><span>{plan.price}</span>/month</p>
-              </Title>
-              <div style={{display: 'flex', flexDirection: 'column', gap: 8, padding: '0px 16px'}}>
-                <p style={{margin: 0}}>{`${plan.admin} usuário${plan.admin > 1 ? 's' : ''} Administrador${plan.admin > 1 ? 'es' : ''}`}</p>
-                <p style={{margin: 0}}>{`${plan.supervisor} usuário${plan.supervisor > 1 ? 's' : ''} Supervisor${plan.supervisor > 1 ? 'es' : ''}`}</p>
-                <p style={{margin: 0}}>{`${plan.estoquista} usuário${plan.estoquista > 1 ? 's' : ''} Estoquista${plan.estoquista > 1 ? 's' : ''}`}</p>
-              </div>
-              <Button style={{color: '#FFF'}}>Selecionar</Button>
-          </Card>
-          ))}
-      </Container>
+      <DialogContent style={{height: 400}}>
+        <Container>
+            {prices.map((plan, index) => (
+              <Card key={index}>
+                <Title>
+                    <TitleH2>{plan.title}</TitleH2>
+                    <p style={{fontWeight: 600, paddingLeft: 16}}><span>{plan.price}</span>/month</p>
+                </Title>
+                <div style={{display: 'flex', flexDirection: 'column', gap: 8, padding: '0px 16px'}}>
+                  <p style={{margin: 0}}>{`${plan.admin} usuário${plan.admin > 1 ? 's' : ''} Administrador${plan.admin > 1 ? 'es' : ''}`}</p>
+                  <p style={{margin: 0}}>{`${plan.supervisor} usuário${plan.supervisor > 1 ? 's' : ''} Supervisor${plan.supervisor > 1 ? 'es' : ''}`}</p>
+                  <p style={{margin: 0}}>{`${plan.estoquista} usuário${plan.estoquista > 1 ? 's' : ''} Estoquista${plan.estoquista > 1 ? 's' : ''}`}</p>
+                </div>
+                <Button style={{color: '#FFF'}}>Selecionar</Button>
+            </Card>
+            ))}
+        </Container>
       </DialogContent>
     </Dialog>
   );
