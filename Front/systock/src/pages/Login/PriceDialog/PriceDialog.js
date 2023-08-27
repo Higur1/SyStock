@@ -66,9 +66,9 @@ const PriceDialog = (props) => {
                   <p style={{fontWeight: 600, paddingLeft: 16}}><span>{plan.price}</span>/month</p>
               </Title>
               <div style={{display: 'flex', flexDirection: 'column', gap: 8, padding: '0px 16px'}}>
-                <p style={{margin: 0}}>1 usuário administrador</p>
-                <p style={{margin: 0}}>3 usuários supervisor</p>
-                <p style={{margin: 0}}>10 usuários estoquista</p>
+                <p style={{margin: 0}}>{`${plan.admin} usuário${plan.admin > 1 ? 's' : ''} Administrador${plan.admin > 1 ? 'es' : ''}`}</p>
+                <p style={{margin: 0}}>{`${plan.supervisor} usuário${plan.supervisor > 1 ? 's' : ''} Supervisor${plan.supervisor > 1 ? 'es' : ''}`}</p>
+                <p style={{margin: 0}}>{`${plan.estoquista} usuário${plan.estoquista > 1 ? 's' : ''} Estoquista${plan.estoquista > 1 ? 's' : ''}`}</p>
               </div>
               <Button style={{color: '#FFF'}}>Selecionar</Button>
           </Card>
