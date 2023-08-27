@@ -13,7 +13,7 @@ export const templateHtml = (token, instance) => {
     <body style="background-color: #e9ecef;">
     
         <div class="preheader" style="display: none; max-width: 0; max-height: 0; overflow: hidden; font-size: 1px; line-height: 1px; color: #fff; opacity: 0;">
-            This is a reset password email for Systock.
+            This is a reset password email for HGB System Stock.
         </div>
         <table border="0" cellpadding="0" cellspacing="0" width="100%">
     
@@ -47,7 +47,7 @@ export const templateHtml = (token, instance) => {
                     <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
                         <tr>
                             <td align="left" bgcolor="#ffffff" style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
-                                <p style="margin: 0;">Tap the button below to reset your Systock account password. If you didn't request a new password, you can safely delete this email. The duration of this generated link is 1 hour, after said period the link will no longer be valid.</p>
+                                <p style="margin: 0;">Tap the button below to reset your HGB System Stock account password. If you didn't request a new password, you can safely delete this email. The duration of this generated link is 1 hour, after said period the link will no longer be valid.</p>
                             </td>
                         </tr>
                         <tr>
@@ -75,7 +75,7 @@ export const templateHtml = (token, instance) => {
                         </tr>
                         <tr>
                             <td align="left" bgcolor="#ffffff" style="padding: 24px; border-radius: 0px 0px 20px 20px ; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
-                                <p style="margin: 0;">Cheers,<br> Systock</p>
+                                <p style="margin: 0;">Cheers,<br> HGB System Stock</p>
                             </td>
                         </tr>
                     </table>
