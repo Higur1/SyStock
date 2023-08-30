@@ -13,22 +13,22 @@ export default class SupplierController {
             JSON.stringify({
                 suppliers: suppliers.suppliers
             })
-        )
+        );
       }else{
         response.status().send(
             JSON.stringify({
                 error: suppliers.error
             })
         );
-      }
+      };
     } catch (error) {
       response.status(500).send(
         JSON.stringify({
           error: error,
         })
       );
-    }
-  }
+    };
+  };
   static async create(request, response) {
     try {
       const supplierValidation = z.object({
@@ -80,14 +80,14 @@ export default class SupplierController {
               error: "An error has occurred",
             })
           );
-        }
+        };
       } else {
         response.status(500).send(
           JSON.stringify({
             error: supplierCreated.error,
           })
         );
-      }
+      };
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
@@ -95,8 +95,8 @@ export default class SupplierController {
           error: error.issues[0].message,
         })
       );
-    }
-  }
+    };
+  };
   static async findById(request, response) {
     try {
       const supplierValidation = z.object({
@@ -120,14 +120,14 @@ export default class SupplierController {
               error: "An error has occurred",
             })
           );
-        }
+        };
       } else {
         response.status(500).send(
           JSON.stringify({
             error: supplierFound.error,
           })
         );
-      }
+      };
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
@@ -135,8 +135,8 @@ export default class SupplierController {
           error: error.issues[0].message,
         })
       );
-    }
-  }
+    };
+  };
   static async findBatchs(request, response){
     try {
       const supplier = z.object({
@@ -162,14 +162,14 @@ export default class SupplierController {
               message: "Not found"
             })
           );  
-        }
+        };
       }else{
         response.status(500).send(
           JSON.stringify({
             error: listBatch.error,
           })
         );
-      }
+      };
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
@@ -177,8 +177,8 @@ export default class SupplierController {
           error: error.issues[0].message,
         })
       );
-    }
-  }
+    };
+  };
   static async update(request, response) {
     try {
       const supplierValidation = z.object({
@@ -247,14 +247,14 @@ export default class SupplierController {
               error: validData.message
             })
           );
-        }
+        };
       }else{
         response.status(500).send(
           JSON.stringify({
             error: validData.error
           })
         );
-      }
+      };
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
@@ -262,8 +262,8 @@ export default class SupplierController {
           error: error.issues[0].message,
         })
       );
-    }
-  }
+    };
+  };
   static async delete(request, response) {
     try {
       const supplierValidation = z.object({
@@ -281,7 +281,7 @@ export default class SupplierController {
             error: supplierDeleted.error,
           })
         );
-      }
+      };
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
@@ -289,6 +289,6 @@ export default class SupplierController {
           error: error.issues[0].message,
         })
       );
-    }
-  }
-}
+    };
+  };
+};

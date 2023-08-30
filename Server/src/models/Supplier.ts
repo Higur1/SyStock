@@ -36,7 +36,7 @@ export default class Supplier {
         : { status: true, suppliers: {} };
     } catch (error) {
       return { status: false, error: error };
-    }
+    };
   };
   static async create(supplierObject) {
     try {
@@ -113,9 +113,8 @@ export default class Supplier {
         ? { status: true, supplier: supplierIsCreated }
         : { status: true, supplier: undefined };
     } catch (error) {
-      console.log(error);
       return { status: false, error: error };
-    }
+    };
   };
   static async findById(supplier_id) {
     try {
@@ -151,7 +150,7 @@ export default class Supplier {
         : { status: true, supplier: undefined };
     } catch (error) {
       return { status: false, error: error };
-    }
+    };
   };
   static async getBatchs(supplier_id, company_id){
     try {
@@ -162,12 +161,12 @@ export default class Supplier {
             company_id: company_id
           }
         }
-      })
+      });
       return batchs != null ? {status: true, batchs: batchs} : {status:true, batchs: undefined};
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
+    };
+  };
   static async updateSupplier(supplierObject) {
     try {
       const supplier = await prisma.supplier.update({
@@ -178,11 +177,11 @@ export default class Supplier {
         where:{
           id: supplierObject.id
         }
-      })
+      });
       return supplier != null ? {status: true, supplier: supplier} : {status: true, supplier: {}};
     } catch (error) {
       return { status: false, error: error };
-    }
+    };
   };
   static async updateAddress(supplierObject){
     try {
@@ -210,11 +209,11 @@ export default class Supplier {
           complement: true,
           supplier_id: true
         }
-      })
+      });
       return address != null ? {status: true, address: address} : {status:true, address:{}};
     } catch (error) {
       return { status: false, error: error };
-    }
+    };
   };
   static async updatePhones(supplierObject){
     try {
@@ -228,10 +227,10 @@ export default class Supplier {
         where:{id: supplierObject.phones[1].id},
         select:{id:true, phone: true}
       })
-      return {status: true, phone:{first_phone, second_phone} }
+      return {status: true, phone:{first_phone, second_phone} };
     } catch (error) {
       return { status: false, error: error };
-    }
+    };
   };
   static async validatedSupplierData(supplierObject){
     try {
@@ -265,7 +264,7 @@ export default class Supplier {
       return message.length == 0 ? {status: true, isValid: true} : {status: true, isValid: false, message:message};
     } catch (error) {
       return { status: false, error: error };
-    }
+    };
   };
   static async delete(supplier_id) {
     try {
@@ -285,14 +284,14 @@ export default class Supplier {
             supplier_id: supplier_id,
           },
         });
-      }
+      };
       if (verifyPhones != null) {
         await prisma.phone.deleteMany({
           where: {
             supplier_id: supplier_id,
           },
         });
-      }
+      };
       await prisma.supplier.delete({
         where: {
           id: supplier_id,
@@ -302,6 +301,6 @@ export default class Supplier {
       return { status: true };
     } catch (error) {
       return { status: false, error: error };
-    }
+    };
   };
 };
