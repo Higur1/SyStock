@@ -37,7 +37,7 @@ export default class Supplier {
     } catch (error) {
       return { status: false, error: error };
     }
-  }
+  };
   static async create(supplierObject) {
     try {
       let supplierIsCreated = {};
@@ -116,7 +116,7 @@ export default class Supplier {
       console.log(error);
       return { status: false, error: error };
     }
-  }
+  };
   static async findById(supplier_id) {
     try {
       const supplierResult = await prisma.supplier.findUnique({
@@ -152,6 +152,21 @@ export default class Supplier {
     } catch (error) {
       return { status: false, error: error };
     }
+  };
+  static async getBatchs(supplier_id, company_id){
+    try {
+      const batchs = await prisma.batch.findMany({
+        where:{
+          AND:{
+            supplier_id: supplier_id,
+            company_id: company_id
+          }
+        }
+      })
+      return batchs != null ? {status: true, batchs: batchs} : {status:true, batchs: undefined};
+    } catch (error) {
+      return { status: false, error: error };
+    }
   }
   static async updateSupplier(supplierObject) {
     try {
@@ -168,7 +183,7 @@ export default class Supplier {
     } catch (error) {
       return { status: false, error: error };
     }
-  }
+  };
   static async updateAddress(supplierObject){
     try {
       const address = await prisma.address.update({
@@ -200,7 +215,7 @@ export default class Supplier {
     } catch (error) {
       return { status: false, error: error };
     }
-  }
+  };
   static async updatePhones(supplierObject){
     try {
       const first_phone = await prisma.phone.update({
@@ -217,7 +232,7 @@ export default class Supplier {
     } catch (error) {
       return { status: false, error: error };
     }
-  }
+  };
   static async validatedSupplierData(supplierObject){
     try {
       let message = "";
@@ -251,7 +266,7 @@ export default class Supplier {
     } catch (error) {
       return { status: false, error: error };
     }
-  }
+  };
   static async delete(supplier_id) {
     try {
       const verifyAddress = await prisma.address.findFirst({
@@ -288,5 +303,5 @@ export default class Supplier {
     } catch (error) {
       return { status: false, error: error };
     }
-  }
-}
+  };
+};

@@ -34,7 +34,7 @@ export default class SupplierController {
       const supplierValidation = z.object({
         name: z.string().trim().min(5).max(20),
         email: z.string().email(),
-        phones: z.array(z.string().trim().min(14).max(16)).min(1).max(2),
+        phones: z.array(z.string().trim().min(14).max(16).optional()).min(1).max(2),
         address: z.object({
           cep: z.string().trim().min(9).max(9),
           street: z.string().trim().min(5).max(250),
@@ -125,6 +125,48 @@ export default class SupplierController {
         response.status(500).send(
           JSON.stringify({
             error: supplierFound.error,
+          })
+        );
+      }
+    } catch (error) {
+      response.status(400).send(
+        JSON.stringify({
+          path: error.issues[0].path,
+          error: error.issues[0].message,
+        })
+      );
+    }
+  }
+  static async findBatchs(request, response){
+    try {
+      const supplier = z.object({
+        supplier_id: z.string().min(36).max(36)
+      });
+
+      const { supplier_id } = supplier.parse(request.params);
+      const company_id = verifyTokenCompany(request.headers.authorization);
+
+
+      const listBatch = await Supplier.getBatchs(supplier_id, company_id);
+
+      if(listBatch.status){
+        if(listBatch.batchs != undefined){
+          response.status(200).send(
+            JSON.stringify({
+              batchs: listBatch.batchs
+            })
+          );
+        }else{
+          response.status(400).send(
+            JSON.stringify({
+              message: "Not found"
+            })
+          );  
+        }
+      }else{
+        response.status(500).send(
+          JSON.stringify({
+            error: listBatch.error,
           })
         );
       }
