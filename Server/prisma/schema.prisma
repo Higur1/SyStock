@@ -126,8 +126,8 @@ model Batch{
   product_id Int
   supplier_id String
   company_id String
-  createAt DateTime
-  updateAt DateTime
+  createAt DateTime @default(now())
+  updateAt DateTime @default(now())
   quantity Int @default(0)
 
   batch_product_id_fk Product @relation(fields: [product_id], references: [id])

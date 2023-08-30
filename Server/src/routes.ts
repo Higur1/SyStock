@@ -6,6 +6,7 @@ import Supplier from "./models/Supplier";
 
 import auth_middleware from "./middleware/auth_middleware";
 import SupplierController from "./controllers/SupplierController";
+import ProductController from "./controllers/ProductController";
 
 const app = fastify();
 
@@ -19,7 +20,7 @@ async function user_routes(app: FastifyInstance) {
   app.post("/auth", UserController.auth);
   app.post("/recovery",UserController.recovery);
   app.put("/reset/password",UserController.resetPassword);
-}
+};
 async function category_routes(app: FastifyInstance){
   app.post("/category", { preHandler: auth_middleware }, CategoryController.create);
   app.get("/categories", { preHandler: auth_middleware }, CategoryController.listOfCategory);
@@ -27,13 +28,19 @@ async function category_routes(app: FastifyInstance){
   app.get("/category/name/:name", { preHandler: auth_middleware }, CategoryController.findByName);
   app.put("/category", { preHandler: auth_middleware }, CategoryController.edit);
   app.delete("/category", { preHandler: auth_middleware }, CategoryController.remove);
-}
+};
 async function supplier_routes(app: FastifyInstance){
   app.get("/suppliers", { preHandler: auth_middleware }, SupplierController.findAll);
   app.post("/supplier", { preHandler: auth_middleware }, SupplierController.create);
   app.get("/supplier/:id", { preHandler: auth_middleware }, SupplierController.findById);
   app.put("/supplier", { preHandler: auth_middleware }, SupplierController.update);
   app.delete("/supplier", { preHandler: auth_middleware }, SupplierController.delete);
-}
-
-export {user_routes, category_routes, supplier_routes}
+};
+async function product_routes(app: FastifyInstance){
+  app.get("/products", {preHandler: auth_middleware}, ProductController.findAll);
+  app.post("/product", {preHandler: auth_middleware}, ProductController.create);
+  app.get("/product/category/:category_id", {preHandler: auth_middleware}, ProductController.findByCategory);
+  app.put("/product", {preHandler: auth_middleware}, ProductController.update);
+  app.delete("/product", {preHandler: auth_middleware}, ProductController.delete);
+};
+export {user_routes, category_routes, supplier_routes, product_routes};
