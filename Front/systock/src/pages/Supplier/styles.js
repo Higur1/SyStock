@@ -13,6 +13,7 @@ export const HeaderContainer = styled.div`
   display: flex;
   justify-content: space-between;
   gap: 16px;
+  flex-direction: row-reverse;
 `
 
 export const TableContainer = styled("div")({
@@ -21,18 +22,19 @@ export const TableContainer = styled("div")({
   flexDirection: 'column',
   borderRadius: '8px',
   background: "#ebebeb",
-  border: '1px solid #d3D3D3'
+  border: '1px solid #d3D3D3',
+  minWidth: 743
 });
 
 export const TableRow = styled("div")({
   width: '100%',
   display: 'flex',
-  gap: 16,
+  gap: '16px',
   height: '48px',
   padding: '0px 8px',
   alignItems: 'center',
   justifyContent: 'flex-start',
-  borderBottom: '1px solid #d3D3D3'
+  borderBottom: '1px solid #d3D3D3',
 });
 
 export const TableData = styled("div")(({minWidth, width}) => ({
@@ -41,7 +43,8 @@ export const TableData = styled("div")(({minWidth, width}) => ({
   display: 'flex',
   alignItems: 'center',
   height: '48px',
-  fontWeight: 600
+  fontWeight: 600,
+  boxSizing: 'border-box'
 }));
 
 export const Menu = styled("div")({
