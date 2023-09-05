@@ -1,13 +1,15 @@
-import React, { useState } from "react";
-import { Container, HeaderContainer, MenuOption, TableContainer, TableData, TableRow, Menu } from "./styles";
-import { Button, ClickAwayListener, Dialog, DialogActions, DialogTitle, IconButton } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Container, HeaderContainer, TableContainer, TableData, TableRow } from "./styles";
+import { Button, Dialog, DialogActions, DialogTitle, IconButton, Menu, MenuItem } from "@mui/material";
 import ToolTipAndEllipsis from "../../components/dialogs/ComponentUtils/ToolTipAndEllipsis";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CustomizedSnackbars from "../../components/CustomizedSnackBar";
 import useSupplier from "../../hooks/useSupplier";
 import CreateSupplierDialog from "./dialogs/CreateSupplierDialog";
-import EditSupplierDialog from "./dialogs/EditSupplierDialog";
 import { LocationOn, Visibility } from "@mui/icons-material";
+import ButtonGroupCustom from "../../components/common/ButtonGroupCustom/ButtonGroupCustom";
+import LocationDialog from "./dialogs/LocationDialog";
+import BatchListDialog from "./dialogs/BatchListDialog";
 
 export default function Supplier() {
 
@@ -17,23 +19,67 @@ export default function Supplier() {
     severitySnackBar, snackMessageSnackBar, 
     handleCloseSnackBar,
     createSupplier, updateSupplier, handleDeleteSupplier,
-    errorMessage
+    handleChangeSelectedPhone
   } = useSupplier();
-  const [menuOption, setMenuOption] = useState(false);
-  const [idMenu, setIdMenu] = useState(null);
-  const [openCreateSupplier, setOpenCreateSupplier] = useState(false);
-  const [openEditSupplier, setOpenEditSupplier] = useState(false);
-  const [deleteSupplier, setDeleteSupplier] = useState(false);
 
-  function handleMenuOptions(id) {
-    setMenuOption(true);
-    setIdMenu(id);
+  const [menuOption, setMenuOption] = useState({
+    open: false,
+    index: null,
+    anchor: null
+  });
+  const [openCreateEditSupplier, setOpenCreateEditSupplier] = useState({
+    open: false,
+    sup: null
+  });
+  const [deleteSupplier, setDeleteSupplier] = useState(false);
+  const [openLocationDialog, setOpenLocationDialog] = useState({open: false, index: null});
+  const [openBatchDialog, setOpenBatchDialog] = useState({open: false, index: null});
+
+  useEffect(() => {
+    if(!openCreateEditSupplier.open || !deleteSupplier || !openLocationDialog.open) {
+      handleCloseMenu();
+    }
+
+  }, [openCreateEditSupplier.open, deleteSupplier, openLocationDialog.open]);
+
+  function handleBatchList(index) {
+    setOpenBatchDialog({open: true, index});
+  }
+
+  function handleCloseBatchList() {
+    setOpenBatchDialog({open: false, index: null});
+  }
+
+  function handleMenuOptions(e, index) {
+    setMenuOption({
+      anchor: e.currentTarget,
+      open: true,
+      index
+    });
   }
 
   function handleCloseMenu() {
-    setMenuOption(false);
+    setMenuOption({
+      open: false,
+      index: null,
+      anchor: null
+    });
   }
 
+  function handleOpenCreateEditDialog() {
+    setOpenCreateEditSupplier({
+      open: true,
+      sup: suppliers[menuOption.index]
+    });
+  }
+
+  function handleCloseCreateEditDialog() {
+    setOpenCreateEditSupplier({
+      open: false,
+      sup: null
+    });
+  }
+  
   return (
     <>
       <Container>
@@ -41,7 +87,7 @@ export default function Supplier() {
           <Button
             variant="contained"
             style={{ minWidth: '236px' }}
-            onClick={() => setOpenCreateSupplier(true)}
+            onClick={handleOpenCreateEditDialog}
           >
             Adicionar Fornecedor
           </Button>
@@ -64,31 +110,35 @@ export default function Supplier() {
             }}>
               <TableData style={{flex: 1, minWidth: '10%', maxWidth: 'calc(100% - (75% + 40px + 96px))'}}><ToolTipAndEllipsis item={sup.name} /></TableData>
               <TableData style={{flexBasis: '25%', maxWidth: '25%', minWidth: '25%'}}><ToolTipAndEllipsis item={sup.email} /></TableData>
-              <TableData style={{flexBasis: '20%', maxWidth: '20%', minWidth: '20%'}}>TELEFONE</TableData>
-              <TableData style={{flexBasis: '25%', maxWidth: '25%', minWidth: '25%', cursor: 'pointer'}} onClick={() => alert('info endereço')}>
+              <TableData style={{flexBasis: '20%', maxWidth: '20%', minWidth: '20%', gap: 8}}>
+                {
+                  <>
+                    <ButtonGroupCustom 
+                      options={[
+                        {id: 0, label: 1},
+                        {id: 1, label: 2}
+                      ]}
+                      value={sup.Phone.findIndex(phone => phone.isSelected)}
+                      onChange={(v) => handleChangeSelectedPhone(v, index)}
+                    />
+                    {sup.Phone.find(phone => phone.isSelected).phone}  
+                  </>
+                }
+              </TableData>
+              <TableData style={{flexBasis: '25%', maxWidth: '25%', minWidth: '25%', cursor: 'pointer'}} onClick={() => setOpenLocationDialog({open: true, index})}>
                 <LocationOn />
-                <ToolTipAndEllipsis item={sup.Address[0].state} />
+                <ToolTipAndEllipsis item={`${sup.Address[0].street}, ${sup.Address[0].number}`} />
               </TableData>
               <TableData style={{flexBasis: '5%', maxWidth: '5%', minWidth: '5%'}}>
                 {76}
-                <IconButton onClick={() => alert('dialog lotes')}>
+                <IconButton onClick={() => handleBatchList(index)}>
                   <Visibility />
                 </IconButton>
                 
               </TableData>
               <TableData style={{flex: 1, justifyContent: 'flex-end'}}>
-                <IconButton onClick={() => handleMenuOptions(index)}>
+                <IconButton onClick={(e) => handleMenuOptions(e, index)}>
                   <MoreVertIcon fontSize='small'/>
-                  {menuOption && idMenu === index && (
-                    <ClickAwayListener onClickAway={handleCloseMenu}>
-                      <Menu>
-                        <MenuOption style={{borderRadius: '16px 16px 0px 0px'}}>{"Visualizar Fornecedor"}</MenuOption>
-                        <MenuOption onClick={() => setOpenEditSupplier(true)}>{"Editar Fornecedor"}</MenuOption>
-                        <MenuOption onClick={() => setDeleteSupplier(true)} style={{borderBottom: '0px', borderRadius: '0px 0px 16px 16px'}} >{"Apagar Fornecedor"}</MenuOption>
-                      </Menu>
-                    </ClickAwayListener>
-                  
-                )}
                 </IconButton>
               </TableData>
             </TableRow> 
@@ -96,23 +146,34 @@ export default function Supplier() {
         </TableContainer>
       </Container>
 
-      {openCreateSupplier && <CreateSupplierDialog 
-        handleCreate={(sup) => {
-          setOpenCreateSupplier(false);
-          createSupplier(sup);
-        }}
-        handleClose={() => setOpenCreateSupplier(false)}
-        open={openCreateSupplier}
-      />}
+      
+      {menuOption.open && (
+        <Menu
+          anchorEl={menuOption.anchor}
+          open
+          onClose={handleCloseMenu}
+        >
+          <MenuItem style={{borderRadius: '16px 16px 0px 0px'}} onClick={handleOpenCreateEditDialog}>{"Editar Fornecedor"}</MenuItem>
+          <MenuItem onClick={() => setDeleteSupplier(true)} style={{borderBottom: '0px', borderRadius: '0px 0px 16px 16px'}} >{"Apagar Fornecedor"}</MenuItem>
+        </Menu>
+      )}
 
-      {openEditSupplier && <EditSupplierDialog 
-        handleEdit={(sup) => {
-          updateSupplier(sup);
-          setOpenEditSupplier(false);
+      {openCreateEditSupplier.open && <CreateSupplierDialog 
+        handleCreate={(sup) => {
+          if(openCreateEditSupplier.sup) {
+            updateSupplier(sup);
+            handleCloseCreateEditDialog();
+          } else {
+            createSupplier(sup);
+            handleCloseCreateEditDialog();
+          }
         }}
-        handleClose={() => setOpenEditSupplier(false)}
-        supplier={suppliers[idMenu]}
-        open={openEditSupplier}
+        handleClose={() => {
+          handleCloseCreateEditDialog();
+        }}
+        open
+        
+        supplierObj={openCreateEditSupplier.sup}
       />}
 
       {deleteSupplier && (
@@ -125,7 +186,7 @@ export default function Supplier() {
           <DialogActions>
             <Button onClick={() => setDeleteSupplier(false)}>Cancelar</Button>
             <Button onClick={() => {
-              handleDeleteSupplier({ id: suppliers[idMenu].id });
+              handleDeleteSupplier({ id: suppliers[menuOption.index].id });
               setDeleteSupplier(false);
             }}>Confirmar</Button>
           </DialogActions>
@@ -139,6 +200,20 @@ export default function Supplier() {
           handleClose={handleCloseSnackBar}
           severity={severitySnackBar}
           snackMessage={snackMessageSnackBar}
+        />
+      )}
+
+      {openLocationDialog.open && (
+        <LocationDialog
+          address={suppliers[openLocationDialog.index].Address[0]}
+          handleClose={() => setOpenLocationDialog({open: false, index: null})}
+        />
+      )}
+
+      {openBatchDialog.open && (
+        <BatchListDialog
+          handleClose={handleCloseBatchList}
+          id={suppliers[openBatchDialog.index].id}
         />
       )}
     </>

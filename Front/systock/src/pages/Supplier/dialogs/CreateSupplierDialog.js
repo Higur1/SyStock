@@ -9,6 +9,7 @@ import InputCustomMaskPhone from "../../../components/common/InputCustom/InputCu
 import InputCustomMaskCEP from "../../../components/common/InputCustom/InputCustomMaskCEP";
 import { useEffect } from "react";
 import useDebounce from "../../../utils/useDebounce";
+import { states } from "../../../utils/utils";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
@@ -27,7 +28,7 @@ const Container = styled.div`
   padding-top: 16px;
 `
 export default function CreateSupplierDialog(props) {
-  const { handleCreate, handleClose, errorMessage, open } = props;
+  const { handleCreate, handleClose, errorMessage, open, supplierObj } = props;
 
   const [supplier, setSupplier] = useState([
     {
@@ -36,6 +37,7 @@ export default function CreateSupplierDialog(props) {
       label: 'Nome',
       hasError: false,
       isRequired: true,
+      max: 20,
       rule: v => v.length > 5 && v.length < 20 
     },
     {
@@ -44,6 +46,7 @@ export default function CreateSupplierDialog(props) {
       label: 'E-mail',
       hasError: false,
       isRequired: true,
+      max: 250,
       rule: v => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(v)
     }, 
     {
@@ -52,6 +55,7 @@ export default function CreateSupplierDialog(props) {
       label: '',
       hasError: false,
       isRequired: false,
+      max: 16,
       rule: v => v.length > 14 && v.length < 16 
     },
     {
@@ -60,6 +64,7 @@ export default function CreateSupplierDialog(props) {
       label: '',
       hasError: false,
       isRequired: false,
+      max: 16,
       rule: v => v.length > 14 && v.length < 16 
     },
     {
@@ -68,6 +73,7 @@ export default function CreateSupplierDialog(props) {
       label: 'Cep',
       hasError: false,
       isRequired: true,
+      max: 9,
       rule: v => v.length === 9
     },
     {
@@ -77,6 +83,7 @@ export default function CreateSupplierDialog(props) {
       hasError: false,
       isRequired: true,
       size: '65%',
+      max: 30,
       rule: v => v.length > 5 && v.length < 30 
     },
     {
@@ -86,6 +93,7 @@ export default function CreateSupplierDialog(props) {
       hasError: false,
       isRequired: true,
       size: '15%',
+      max: 2,
       rule: v => v.length === 2
     }, {
       key: 'street',
@@ -94,6 +102,7 @@ export default function CreateSupplierDialog(props) {
       hasError: false,
       isRequired: true,
       size: '80%',
+      max: 250,
       rule: v => v.length > 5 && v.length < 250 
     }, {
       key: 'number',
@@ -102,7 +111,8 @@ export default function CreateSupplierDialog(props) {
       hasError: false,
       isRequired: true,
       size: '19%',
-      rule: () => false
+      max: 250,
+      rule: () => true
     }, {
       key: 'complement',
       value: '',
@@ -110,7 +120,8 @@ export default function CreateSupplierDialog(props) {
       hasError: false,
       isRequired: false,
       size: '80%',
-      rule: () => false
+      max: 250,
+      rule: () => true
     },{
       key: 'district',
       value: '',
@@ -118,13 +129,61 @@ export default function CreateSupplierDialog(props) {
       hasError: false,
       isRequired: true,
       size: '19%',
+      max: 250,
       rule: v => v.length > 5 && v.length < 250
     }, 
+    {
+      key: 'id',
+      value: null
+    }
   ]);
 
-  const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    if(!supplierObj) return;
 
-  const isMount = useRef();
+    const { Address, Phone, email, id, name } = supplierObj;
+    const { cep, city, complement, district, state, street, number } = Address[0];
+    const [phone1, phone2] = Phone;
+
+    setSupplier(prevState => prevState.map(atr => {
+      const hasError = false;
+      switch(atr.key) {
+        case 'id':
+          return {...atr, value: id};
+        case 'name':
+          return {...atr, value: name, hasError};
+        case 'email':
+          return {...atr, value: email, hasError};
+          case 'phone1': {
+            const value = phone1.phone;
+            return {...atr, value, hasError};
+          }
+          case 'phone2': {
+            const value = phone2.phone;
+            return {...atr, value, hasError};
+          }
+        case 'cep':
+          return {...atr, value: cep, hasError};
+        case 'city':
+          return {...atr, value: city, hasError};
+        case 'state':
+          return {...atr, value: state, hasError};
+        case 'street':
+          return {...atr, value: street, hasError};
+        case 'number':
+          return {...atr, value: number.toString(), hasError};
+        case 'complement':
+          return {...atr, value: complement, hasError};
+        case 'district':
+          return {...atr, value: district, hasError};
+        default:
+          break;
+      }
+    }));
+
+  }, []);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const getCepInfo = async (cep) => {
     setIsLoading(true);
@@ -142,8 +201,11 @@ export default function CreateSupplierDialog(props) {
 
         const hasError = false;
         switch(atr.key) {
-          case 'state':
+          case 'state': {
+            // const value = states.find(st => st.name === state)?.acronym;
+
             return {...atr, value: state, hasError};
+          }
           case 'city':
             return {...atr, value: city, hasError};
           case 'district':
@@ -171,7 +233,8 @@ export default function CreateSupplierDialog(props) {
     }
   }
 
-  const onChange = (value, key) => {
+  const onChange = (v, key, max) => {
+    const value = v.slice(0, max);
     setSupplier(prevState => prevState.map(atr => (atr.key === key ? {...atr, value, hasError: false} : {...atr})));
   }
 
@@ -214,7 +277,7 @@ export default function CreateSupplierDialog(props) {
                 value={atribute.value}
                 autoFocus={index === 0}
                 error={atribute.hasError || (atribute.value !== '' && !atribute.rule(atribute.value))}
-                onChange={(e) => onChange(e.target.value, atribute.key)}
+                onChange={(e) => onChange(e.target.value, atribute.key, atribute.max)}
                 disabled={isLoading}
               />
             ))}
@@ -226,7 +289,7 @@ export default function CreateSupplierDialog(props) {
                     <Title style={{fontSize: 16}}>{`${index + 1}°`}</Title>
                     <InputCustomMaskPhone
                       value={atribute.value}
-                      onChange={(value) => onChange(value, atribute.key)}
+                      onChange={(value) => onChange(value, atribute.key, atribute.max)}
                       error={atribute.hasError}
                     />
                   </div>
@@ -244,7 +307,7 @@ export default function CreateSupplierDialog(props) {
                         label={atribute.label}
                         style={{flexBasis: '19%'}}
                         value={atribute.value}
-                        onChange={(value) => onChange(value, atribute.key)}
+                        onChange={(value) => onChange(value, atribute.key, atribute.max)}
                         disabled={isLoading}
                         error={atribute.hasError || (atribute.value !== '' && !atribute.rule(atribute.value))}
                         onKeyDown={(e) => {
@@ -265,7 +328,7 @@ export default function CreateSupplierDialog(props) {
                       label={atribute.label}
                       style={{flexBasis: atribute.size}}
                       value={atribute.value}
-                      onChange={(e) => onChange(e.target.value, atribute.key)}
+                      onChange={(e) => onChange(e.target.value, atribute.key, atribute.max)}
                       disabled={isLoading}
                       error={atribute.hasError || (atribute.value !== '' && !atribute.rule(atribute.value))}
                     />
@@ -278,7 +341,7 @@ export default function CreateSupplierDialog(props) {
                     label={atribute.label}
                     style={{flexBasis: atribute.size}}
                     value={atribute.value}
-                    onChange={(e) => onChange(e.target.value, atribute.key)}
+                    onChange={(e) => onChange(e.target.value, atribute.key, atribute.max)}
                     disabled={isLoading}
                     error={atribute.hasError || (atribute.value !== '' && !atribute.rule(atribute.value))}
                   />
@@ -291,7 +354,7 @@ export default function CreateSupplierDialog(props) {
                       label={atribute.label}
                       style={{flexBasis: atribute.size}}
                       value={atribute.value}
-                      onChange={(e) => onChange(e.target.value, atribute.key)}
+                      onChange={(e) => onChange(e.target.value, atribute.key, atribute.max)}
                       disabled={isLoading}
                       error={atribute.hasError || (atribute.value !== '' && !atribute.rule(atribute.value))}
                     />
@@ -322,5 +385,6 @@ CreateSupplierDialog.propTypes = {
   open: PropTypes.bool,
   handleClose: PropTypes.func,
   handleCreate: PropTypes.func,
-  errorMessage: PropTypes.string
+  errorMessage: PropTypes.string,
+  supplierObj: PropTypes.object
 };

@@ -105,7 +105,7 @@ export default class Supplier {
         });
         supplierIsCreated = {
           supplier,
-          Phones: { first_phone, second_phone },
+          phones: { first_phone, second_phone },
           address,
         };
       });

@@ -73,9 +73,7 @@ export default class SupplierController {
       if (supplierCreated?.status) {
         if (supplierCreated.supplier != undefined) {
           response.status(201).send(
-            JSON.stringify({
-              supplier: supplierCreated.supplier,
-            })
+            JSON.stringify(supplierCreated.supplier)
           );
         } else {
           response.status(500).send(
@@ -154,9 +152,7 @@ export default class SupplierController {
       if (listBatch.status) {
         if (listBatch.batchs != undefined) {
           response.status(200).send(
-            JSON.stringify({
-              batchs: listBatch.batchs,
-            })
+            JSON.stringify(listBatch.batchs)
           );
         } else {
           response.status(400).send(
@@ -225,11 +221,7 @@ export default class SupplierController {
       const supplierUpdated = await Supplier.updateSupplier(supplier);
 
       response.status(200).send(
-        JSON.stringify({
-          supplier: supplierUpdated.supplier?.supplier,
-          addres: supplierUpdated.supplier?.address,
-          phones: supplierUpdated.supplier?.phones
-        })
+        JSON.stringify(supplierUpdated.supplier)
       );
     } catch (error) {
       response.status(400).send(
