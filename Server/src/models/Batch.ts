@@ -33,14 +33,16 @@ export default class Batch{
     };
     static async findBySupplier(company_id, supplier_id){
         try {
-            const batch = await prisma.batch.findMany({
-                where:{
-                    AND:{
-                        company_id: company_id,
-                        supplier_id: supplier_id
-                    }
-                }
-            });
+            const batch = await prisma.$queryRaw
+            `
+                SELECT b.id as batch_id, p.name as product_name, s.name as supplier_name, b.quantity as product_quantity
+                FROM product p 
+                INNER JOIN batch b 
+                ON p.id = b.product_id
+                INNER JOIN supplier s
+                ON b.supplier_id = s.id
+                WHERE b.supplier_id = ${supplier_id}
+            `;
             return {status: true, batch: batch};
         } catch (error) {
             return {status: false, error:error};

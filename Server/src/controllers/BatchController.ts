@@ -59,7 +59,7 @@ export default class BatchController {
       if (batch_supplier.status) {
         response.status(200).send(
           JSON.stringify({
-            batch: batch_supplier.batch,
+            batchs: batch_supplier.batch,
           })
         );
       } else {
