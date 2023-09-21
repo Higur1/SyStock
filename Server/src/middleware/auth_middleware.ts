@@ -4,7 +4,9 @@ import jwt from "jsonwebtoken";
 dotenv.config();
 
 async function auth_middleware(request, response) {
-  const authHeader = request.headers["authorization"].split('Bearer ')[1];
+  const authorization = request.headers["authorization"];
+  const hasBearer = authorization.indexOf('Bearer') !== -1;
+  const authHeader = hasBearer ? authorization.split('Bearer ')[1] : authorization;
   const knowkey = process.env.JWTSecret;
   if (!authHeader) {
     return response.status(401).send({ err: "Access Denied" });

@@ -86,10 +86,12 @@ export default function Sidebar({logOff}) {
             </Option>
             <Collapse in={option.openCollapse}>
               {option.child.map((optionChild, i) => (
-                <Option key={option.type + i}>
-                  <IconCustom type={option.type} />
-                  <Link to={optionChild.type} style={{paddingLeft: 32}}>{optionChild.label}</Link>
-                </Option>
+                <Link key={option.type + i} to={optionChild.type} style={{paddingLeft: 32}}>
+                  <Option >
+                    <IconCustom type={option.type} />
+                    {optionChild.label}
+                  </Option>
+                </Link>
               ))}
             </Collapse>
           </React.Fragment>

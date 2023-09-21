@@ -13,7 +13,6 @@ const CssTextField = styled(TextField)({
 
 const InputCustom = (props) => {
 
-  const { label, autoFocus, onChange, placeholder, value, required, fullWidth, InputProps, color, type, error, onKeyDown } = props; 
 
   return (
     // <FormControl variant="filled">
@@ -32,19 +31,7 @@ const InputCustom = (props) => {
     //   />
     // </FormControl>
     <CssTextField
-      label={label}
-      // sx={{ m: 1, width: '25ch' }}
-      InputProps={InputProps}
-      onChange={onChange}
-      autoFocus={autoFocus}
-      fullWidth={fullWidth}
-      value={value}
-      type={type}
-      required={required}
-      placeholder={placeholder}
-      color={color}
-      error={error}
-      onKeyDown={onKeyDown}
+      {...props}
     />
   );
 };
@@ -55,7 +42,7 @@ InputCustom.defaultProps = {
 }
 
 InputCustom.propTypes = {
-  label: PropTypes.string.isRequired,
+  label: PropTypes.string,
   autoFocus: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
   onKeyDown: PropTypes.func,
@@ -64,6 +51,8 @@ InputCustom.propTypes = {
   required: PropTypes.bool,
   fullWidth: PropTypes.bool,
   InputProps: PropTypes.object,
+  inputProps: PropTypes.object,
+  style: PropTypes.object,
   color: PropTypes.string,
   type: PropTypes.string,
   error: PropTypes.bool

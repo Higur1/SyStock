@@ -33,7 +33,7 @@ function App() {
         return;
       } else {
         setIsLoggedIn(true);
-        navigate('products');
+        navigate(window.location.pathname);
       }
     } else {
       window.localStorage.removeItem('tokenLogin');

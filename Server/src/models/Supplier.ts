@@ -105,7 +105,7 @@ export default class Supplier {
         });
         supplierIsCreated = {
           supplier,
-          Phones: { first_phone, second_phone },
+          phones: { first_phone, second_phone },
           address,
         };
       });
@@ -113,7 +113,6 @@ export default class Supplier {
         ? { status: true, supplier: supplierIsCreated }
         : { status: true, supplier: undefined };
     } catch (error) {
-      console.log(error);
       return { status: false, error: error };
     }
   }
@@ -153,101 +152,97 @@ export default class Supplier {
       return { status: false, error: error };
     }
   }
+  static async getBatchs(supplier_id, company_id) {
+    try {
+      const batchs = await prisma.batch.findMany({
+        where: {
+          AND: {
+            supplier_id: supplier_id,
+            company_id: company_id,
+          },
+        },
+      });
+      return batchs != null
+        ? { status: true, batchs: batchs }
+        : { status: true, batchs: undefined };
+    } catch (error) {
+      return { status: false, error: error };
+    }
+  }
   static async updateSupplier(supplierObject) {
     try {
-      const supplier = await prisma.supplier.update({
-        data:{
-          name: supplierObject.name,
-          email: supplierObject.email
+      const findAddres = await prisma.address.findFirst({
+        where: {
+          supplier_id: supplierObject.id,
         },
-        where:{
-          id: supplierObject.id
-        }
-      })
-      return supplier != null ? {status: true, supplier: supplier} : {status: true, supplier: {}};
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async updateAddress(supplierObject){
-    try {
-      const address = await prisma.address.update({
-        data:{
-          cep: supplierObject.address.cep,
-          street: supplierObject.address.street,
-          number: supplierObject.address.number,
-          district: supplierObject.address.district,
-          state: supplierObject.address.state,
-          city: supplierObject.address.city,
-          complement: supplierObject.address.complement
+      });
+      const findPhones = await prisma.phone.findMany({
+        where: {
+          AND: {
+            company_id: supplierObject.company_id,
+            supplier_id: supplierObject.id,
+          },
         },
-        where:{
-          id: supplierObject.address.id
-        },
-        select:{
-          id: true,
-          cep: true,
-          street: true,
-          number: true,
-          district: true,
-          state: true,
-          city: true,
-          complement: true,
-          supplier_id: true
-        }
-      })
-      return address != null ? {status: true, address: address} : {status:true, address:{}};
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async updatePhones(supplierObject){
-    try {
-      const first_phone = await prisma.phone.update({
-        data:{phone: supplierObject.phones[0].phone},
-        where:{id: supplierObject.phones[0].id},
-        select:{id: true, phone:true}
       });
-      const second_phone = await prisma.phone.update({
-        data:{phone: supplierObject.phones[1].phone},
-        where:{id: supplierObject.phones[1].id},
-        select:{id:true, phone: true}
-      })
-      return {status: true, phone:{first_phone, second_phone} }
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async validatedSupplierData(supplierObject){
-    try {
-      let message = "";
-      const validSupplier = await prisma.supplier.findFirst({
-        where:{
-          id: supplierObject.id
-        }
-      });
-      message += (validSupplier == null) ? "could not update supplier, " : "" 
-      const validAddress = await prisma.address.findFirst({
-        where:{
-          id: supplierObject.address.id,
-          supplier_id: supplierObject.id
-        }
-      });
-      message += (validAddress == null) ? "could not update address, " : "" 
-      const validFirstPhone = await prisma.phone.findFirst({
-        where:{
-          id: supplierObject.phones[0].id,
-          supplier_id: supplierObject.id
-        }
-      });
-      const validSecondPhone = await prisma.phone.findFirst({
-        where:{
-          id: supplierObject.phones[1].id,
-          supplier_id: supplierObject.id
-        }
-      });
-      message += (validFirstPhone == null || validSecondPhone == null) ? "could not update phones " : "" 
-      return message.length == 0 ? {status: true, isValid: true} : {status: true, isValid: false, message:message};
+      const [supplier, address, first_phone, second_phone] =
+        await prisma.$transaction([
+          prisma.supplier.update({
+            data: {
+              name: supplierObject.name,
+              email: supplierObject.email,
+            },
+            where: {
+              id: supplierObject.id,
+            },
+          }),
+
+          prisma.address.update({
+            data: {
+              cep: supplierObject.address.cep,
+              street: supplierObject.address.street,
+              number: supplierObject.address.number,
+              district: supplierObject.address.district,
+              state: supplierObject.address.state,
+              city: supplierObject.address.city,
+              complement: supplierObject.address.complement,
+            },
+            where: {
+              id: findAddres!.id,
+            },
+          }),
+
+          prisma.phone.update({
+            data: {
+              phone: supplierObject.phones[0],
+            },
+            where: {
+              id: findPhones[0].id,
+            },
+          }),
+
+          prisma.phone.update({
+            data: {
+              phone: supplierObject.phones[1],
+            },
+            where: {
+              id: findPhones[1].id,
+            },
+          }),
+        ]);
+        
+      return supplier != null &&
+        address != null &&
+        first_phone != null &&
+        second_phone != null
+        ? {
+            status: true,
+            supplier: {
+              supplier: supplier,
+              address: address,
+              phones: { first_phone: first_phone, second_phone: second_phone },
+            },
+          }
+        : { status: true, supplier: {} };
     } catch (error) {
       return { status: false, error: error };
     }
