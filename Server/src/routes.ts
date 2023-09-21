@@ -7,6 +7,7 @@ import Supplier from "./models/Supplier";
 import auth_middleware from "./middleware/auth_middleware";
 import SupplierController from "./controllers/SupplierController";
 import ProductController from "./controllers/ProductController";
+import BatchController from "./controllers/BatchController";
 
 const app = fastify();
 
@@ -44,4 +45,11 @@ async function product_routes(app: FastifyInstance){
   app.put("/product", {preHandler: auth_middleware}, ProductController.update);
   app.delete("/product", {preHandler: auth_middleware}, ProductController.delete);
 };
-export {user_routes, category_routes, supplier_routes, product_routes};
+async function batch_routes(app: FastifyInstance){
+  app.get("/batchs", {preHandler: auth_middleware}, BatchController.findAll);
+  app.get("/batch/product/:product_id", {preHandler: auth_middleware}, BatchController.findBatchByProduct);
+  app.get("/batch/supplier/:supplier_id", {preHandler: auth_middleware}, BatchController.findBatchBySupplier);
+  app.put("/batch", {preHandler: auth_middleware}, BatchController.update);
+  app.delete("/batch", {preHandler: auth_middleware}, BatchController.delete);
+}
+export {user_routes, category_routes, supplier_routes, product_routes, batch_routes};
