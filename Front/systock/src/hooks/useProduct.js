@@ -2,6 +2,8 @@
 /* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
 import { performFetch, performFetchNoResult } from "../apiBase";
+import { ENTITIES, getData, updateData } from "../utils/debug-local-helper";
+import { DEBUG_LOCAL } from "../App";
 
 export default function useCategory() {
   const [products, setProducts] = useState([]);
@@ -30,6 +32,10 @@ export default function useCategory() {
   }, []);
 
   async function getProducts() {
+    if(DEBUG_LOCAL) {
+      const products = getData(ENTITIES.PRODUCTS);
+      return setProducts(products);
+    }
     try {
       const products = await performFetch("/products", {method: 'GET'});
 
@@ -40,6 +46,12 @@ export default function useCategory() {
   }
 
   async function createProduct(product) {
+    if(DEBUG_LOCAL) {
+      const nextProducts = [...products, product];
+
+      setProducts(nextProducts);
+      return updateData(ENTITIES.PRODUCTS, nextProducts);
+    }
     try {
       const prod = await performFetch("/products/new", {method: 'POST', body: JSON.stringify(product)});
 
@@ -52,6 +64,13 @@ export default function useCategory() {
   }
 
   async function updateProduct(product) {
+    if(DEBUG_LOCAL) {
+      const nextProducts = products.map(p => (p.id === product.id ? {...product} : {...p}));
+
+      setProducts(nextProducts);
+      return updateData(ENTITIES.PRODUCTS, nextProducts);
+    }
+
     try {
       await performFetchNoResult("/products/update", {method: 'PUT', body: JSON.stringify(product)});
       const newProducts = products.map(p => (p.id === product.id ? {...product} : {...p}));
@@ -67,6 +86,13 @@ export default function useCategory() {
    * @param {*} id 
    */
   async function handleDeleteProduct(id) {
+    if(DEBUG_LOCAL) {
+      const nextProducts = products.filter(cat => cat.id !== id.product_id);
+
+      setProducts(nextProducts);
+      return updateData(ENTITIES.PRODUCTS, nextProducts);
+    }
+
     const url = "/products/delete";
 
     performFetchNoResult(url, {method: 'DELETE', body: JSON.stringify(id)})

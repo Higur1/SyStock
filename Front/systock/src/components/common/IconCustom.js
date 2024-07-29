@@ -7,6 +7,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
+import HomeIcon from '@mui/icons-material/Home';
 
 import Stock from '../../images/stock.png';
 import Supply from '../../images/parcela.png';
@@ -15,8 +16,8 @@ import { SvgIcon } from '@mui/material';
 const IconCustom = ({type, color="#424242"}) => {
 
   switch(type) {
-    case 'dashboard': {
-      return <DashboardIcon />;
+    case 'home': {
+      return <HomeIcon />;
     }
     case 'categories': {
       return <CategoryIcon />;

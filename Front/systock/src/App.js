@@ -3,19 +3,33 @@ import './App.css';
 import Sidebar from './pages/Sidebar/Sidebar.js';
 import { createContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { setInitialData, verifyHasContent } from './utils/debug-local-helper.js';
 
 export const LoginContext = createContext();
+export const DEBUG_LOCAL = true;
 
 function App() {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false); 
 
   useEffect(() => {
+    if(DEBUG_LOCAL) {
+      if(!verifyHasContent()) setInitialData();
+    }
     verifyToken();
   }, []);
   
   const verifyToken = () => {
     const payload = window.localStorage.getItem('tokenLogin');
+    if(DEBUG_LOCAL) {
+      if(payload === "connectLocal") {
+        setIsLoggedIn(true);
+        return navigate(window.location.pathname);
+      } else {
+        setIsLoggedIn(false);
+        return navigate('login');
+      }
+    }
 
     if(payload) {
       let base64Url = payload.split('.')[1];

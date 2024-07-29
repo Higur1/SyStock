@@ -1,6 +1,8 @@
 /* eslint-disable no-debugger */
 import { useEffect, useRef, useState } from "react";
 import { performFetch, performFetchNoResult } from "../apiBase";
+import { DEBUG_LOCAL } from "../App";
+import { ENTITIES, getData } from "../utils/debug-local-helper";
 
 export default function useSupplier() {
 
@@ -84,6 +86,10 @@ export default function useSupplier() {
   } 
 
   async function getSuppliers() {
+    if(DEBUG_LOCAL) {
+      const suppliers = getData(ENTITIES.SUPPLIERS);
+      return setSuppliers(suppliers);
+    }
     try {
       const obj = await performFetch("/suppliers", {method: 'GET'});
       const suppliers = obj.suppliers;
@@ -98,6 +104,12 @@ export default function useSupplier() {
   }
 
   async function createSupplier(obj) {
+
+    if(DEBUG_LOCAL) {
+      const nextSuppliers = [...suppliers, obj];
+      setSuppliers(nextSuppliers);
+      return updateData(ENTITIES.SUPPLIERS);
+    }
 
     handleOpenSnackBar("info", "Fornecedor está sendo adicionado");
 
@@ -125,6 +137,11 @@ export default function useSupplier() {
   }
 
   async function updateSupplier(obj) {
+    if(DEBUG_LOCAL) {
+      const nextSuppliers = suppliers.map(sup => sup.id === obj.id ? {...obj} : {...sup});
+      setSuppliers(nextSuppliers);
+      return updateData(ENTITIES.SUPPLIERS);
+    }
 
     handleOpenSnackBar("info", "Fornecedor está sendo atualizado");
 
@@ -155,6 +172,11 @@ export default function useSupplier() {
    * @param {*} id 
    */
   async function handleDeleteSupplier(id) {
+    if(DEBUG_LOCAL) {
+      const nextSuppliers = suppliers.filter(cat => cat.id !== id.id);
+      setSuppliers(nextSuppliers);
+      return updateData(ENTITIES.SUPPLIERS);
+    }
     const url = "/supplier";
 
     performFetchNoResult(url, {method: 'DELETE', body: JSON.stringify(id)})

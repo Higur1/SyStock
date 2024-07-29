@@ -8,7 +8,6 @@ import { AccountCircle, Key, Visibility, VisibilityOff } from '@mui/icons-materi
 import ButtonCustom from '../../components/common/ButtonCustom/ButtonCustom'
 import { useLogin } from './useLogin'
 import styled from 'styled-components'
-import PriceDialog from './PriceDialog'
 import CustomizedSnackbars from '../../components/CustomizedSnackBar';
 
 const DivColumnFlex8 = styled("div")({ display: 'flex', flexDirection: 'column', gap: 8 });
@@ -30,7 +29,6 @@ const Login = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [screen, setScreen] = useState("login");
-  const [openPrices, setOpenPrices] = useState(false);
 
   const mountSnackBar = useRef();
 
@@ -51,13 +49,8 @@ const Login = () => {
     setScreen(scr);
   }
 
-  const handleOpenPrices = () => {
-    setOpenPrices(!openPrices);
-  }
-
   return (
     <>
-      {openPrices && <PriceDialog handleClose={handleOpenPrices}/>}
       {(screen === "login" || screen === "forgotPassword") && (
         <Main>
           {screen === "login" && (
@@ -66,7 +59,7 @@ const Login = () => {
                 <>
                   <InfoContainer>
                     {"LOGO HERE"}
-                    <ButtonCustom
+                    {/* <ButtonCustom
                       style={{
                         padding: '4px 16px',
                         bottom: 25,
@@ -78,7 +71,7 @@ const Login = () => {
                       fullWidth={false}
                       color='primary'
                       label={"Ver Preços"}
-                    />
+                    /> */}
                   </InfoContainer>
                   <FormContainer>
                     <Typography color="textPrimary" variant="h4">{"Conecte-se"}</Typography>
@@ -172,9 +165,7 @@ const Login = () => {
       {snackBar.open && (
         <CustomizedSnackbars {...snackBar} />
       )}
-    </>
-    
-    
+    </> 
   )
 }
 

@@ -6,6 +6,7 @@ import Supplier from './pages/Supplier/Supplier'
 import { LoginContext } from './App'
 import Login from './pages/Login/Login'
 import ResetPassword from './pages/Login/ResetPassword/ResetPassword'
+import Home from './pages/Home/Home'
 
 export default function Master() {
   return (
@@ -23,6 +24,7 @@ export default function Master() {
                 !isLoggedIn ? <ResetPassword/> : null
               }
               />
+              <Route path="home" element={isLoggedIn ? <Home /> : null} />
               <Route path="categories" element={isLoggedIn ? <Category /> : null} />
               <Route path="products" element={isLoggedIn ? <Product /> : null} />
               <Route path="suppliers" element={isLoggedIn ? <Supplier /> : null} />

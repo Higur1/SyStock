@@ -18,8 +18,8 @@ export default function Sidebar({logOff}) {
 
   const [options, setOptions] = useState([
     {
-      type: 'dashboard', 
-      label: 'Dashboard', 
+      type: 'home', 
+      label: 'Página Inicial', 
       child: [],
       openCollapse: false
     },

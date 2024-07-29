@@ -32,7 +32,7 @@ export default function Category() {
   } = useCategory();
 
   if(categories.length === 0) return;
-
+  console.log(categories)
   return (
     <>
       <Container>

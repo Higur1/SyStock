@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { performFetch, performFetchNoResult } from "../../apiBase";
+import { ENTITIES, getData } from "../../utils/debug-local-helper";
 
 export const useLogin = () => {
 
@@ -50,6 +51,22 @@ export const useLogin = () => {
 
   async function onLogin () {
     setLoading(true);
+
+    if(DEBUG_LOCAL) {
+      const accounts = getData(ENTITIES.ACCOUNTS);
+
+      const i = accounts.findIndex(obj => obj.name === user && obj.password === password);
+      if(i !== -1) {
+        window.localStorage.setItem('tokenLogin', "connectLocal");
+        window.location.pathname = 'dashboard';
+      } else {
+        setError({
+          ...error, user: 'Usuário ou senha incorretos!' 
+        });
+      }
+
+      return setLoading(false);
+    };     
 
     try {
       const result = await performFetch("/auth", {

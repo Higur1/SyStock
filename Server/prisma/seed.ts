@@ -102,7 +102,14 @@ resetId();
       name: "Common",
     },
   }),
-
+  /*Create generic category*/
+  prisma.category.create({
+    data: {
+      id: 1,
+      name: "Generic",
+      company_id: "b7f72e9b-dcdb-455f-83ae-a2dc5365c5c9",
+    },
+  }),
   /*Create users */
   prisma.user.create({
     data: {
@@ -115,16 +122,6 @@ resetId();
       user_password: bcrypt.hashSync("Admin HGB", salt),
     },
   }),
-
-  /*Create generic category*/
-  prisma.category.create({
-    data: {
-      id: 1,
-      name: "Generic",
-      company_id: "b7f72e9b-dcdb-455f-83ae-a2dc5365c5c9",
-    },
-  }),
-
   /*Create generic supplier*/
   prisma.supplier.create({
     data: {

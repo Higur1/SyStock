@@ -2,6 +2,9 @@
 import { useEffect, useRef, useState } from "react";
 import { deepCopy } from "../utils/utils";
 import { performFetch, performFetchNoResult } from "../apiBase";
+import { DEBUG_LOCAL } from "../App";
+import { products } from "../utils/data";
+import { ENTITIES, getData, updateData } from "../utils/debug-local-helper";
 
 export default function useCategory() {
 
@@ -46,8 +49,13 @@ export default function useCategory() {
   }
 
   async function getCategories() {
+    if(DEBUG_LOCAL) {
+      const categArr = getData(ENTITIES.CATEGORIES);
+
+      return setTimeout(() => setCategories(categArr), 350);
+    }
     try {
-      const categories = await performFetch("/categories", {method: 'GET'});
+      const { categories } = await performFetch("/categories", {method: 'GET'});
       setCategories(categories);
     } catch (error) {
       console.log(error.message);
@@ -71,13 +79,18 @@ export default function useCategory() {
    * @param {*} category 
    */
   const insertCategory = (newCategory) => {
+
     const newItem = deepCopy(newCategory);
 
     setCategories(prevState => {
       if(prevState.some(cat => cat.id === newItem.id)) {
-        return prevState.map(cat => (cat.id === newItem.id ? {...newItem} : {...cat}));
+        const nextArr = prevState.map(cat => (cat.id === newItem.id ? {...newItem} : {...cat}));
+        if(DEBUG_LOCAL) updateData(ENTITIES.CATEGORIES, nextArr);
+        return nextArr;
       } else {
-        return [...prevState, newItem];
+        const nextArr = [...prevState, newItem];
+        if(DEBUG_LOCAL) updateData(ENTITIES.CATEGORIES, nextArr);
+        return nextArr;
       }
     });
     
@@ -89,6 +102,8 @@ export default function useCategory() {
    * @param {*} 
    */
   async function handleCreateCategory(obj) {
+    if(DEBUG_LOCAL) return insertCategory(obj);     
+
     try {
       const newItem = await performFetch("/category", {method: 'POST', body: JSON.stringify(obj)});
       if(typeof newItem === 'string') {
@@ -108,6 +123,7 @@ export default function useCategory() {
    * @param {*} 
    */
   async function handleUpdateCategory(category) {
+    if(DEBUG_LOCAL) return insertCategory(category);     
     try {
       const newItem = await performFetch("/category", {method: 'PUT', body: JSON.stringify(category)});
       
@@ -129,6 +145,11 @@ export default function useCategory() {
    * @param {*} id 
    */
   async function handleDeleteCategory(id) {
+    if(DEBUG_LOCAL) {
+      const updatedCategories = categories.filter(cat => cat.id !== id.id);
+      setCategories(updatedCategories);
+      return updateData(ENTITIES.CATEGORIES, updatedCategories);
+    }
     const url = "/category";
 
     performFetchNoResult(url, {method: 'DELETE', body: JSON.stringify(id)})

@@ -2,6 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import { deepCopy } from "../utils/utils";
 import { performFetch, performFetchNoResult } from "../apiBase";
+import { DEBUG_LOCAL } from "../App";
+import { ENTITIES, getData, updateData } from "../utils/debug-local-helper";
 
 export default function useUsers() {
 
@@ -34,6 +36,10 @@ export default function useUsers() {
   }, []);
 
   async function getUsers() {
+    if(DEBUG_LOCAL) {
+      const users = getData(ENTITIES.ACCOUNTS);
+      return setUsers(users);
+    }
     try {
       const users = await performFetch("/users", {method: 'GET'});
       setUsers(users);
@@ -43,6 +49,12 @@ export default function useUsers() {
   }
 
   async function createUser(obj) {
+    if(DEBUG_LOCAL) {
+      const nextUsers = [...users, obj];
+      setUsers(nextUsers);
+      return updateData(ENTITIES.ACCOUNTS, nextUsers);
+    }
+
     try {
       const newItem = await performFetch("/users/new", {method: 'POST', body: JSON.stringify(obj)});
       if(typeof newItem === 'string') {
@@ -60,6 +72,11 @@ export default function useUsers() {
   }
 
   async function updateUser(sup) {
+    if(DEBUG_LOCAL) {
+      const nextUsers = users.map(user => (user.id === sup.id ? sup : user));
+      setUsers(nextUsers);
+      return updateData(ENTITIES.ACCOUNTS, nextUsers);
+    }
     try {
       const newItem = await performFetch("/users/update", {method: 'PUT', body: JSON.stringify(sup)});
       

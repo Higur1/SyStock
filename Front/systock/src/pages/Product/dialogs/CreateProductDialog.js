@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import { CurrencyInput } from "react-currency-mask";
 import styled from "styled-components";
 import { performFetch } from "../../../apiBase";
+import { DEBUG_LOCAL } from "../../../App";
+import { ENTITIES } from "../../../utils/debug-local-helper";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
@@ -56,6 +58,11 @@ export default function CreateProductDialog(props) {
   }, []);
 
   async function getCategories() {
+    if(DEBUG_LOCAL) {
+      const categArr = getData(ENTITIES.CATEGORIES);
+
+      return setTimeout(() => setCategories(categArr), 350);
+    }
     try {
       const categories = await performFetch("/categories", {method: 'GET'});
       setCategories(categories);
@@ -65,6 +72,10 @@ export default function CreateProductDialog(props) {
   }
 
   async function getSupplier() {
+    if(DEBUG_LOCAL) {
+      const suppliers = getData(ENTITIES.SUPPLIERS);
+      return setSuppliers(suppliers);
+    }
     try {
       const suppliers = await performFetch("/suppliers", {method: 'GET'});
       setSuppliers(suppliers);
