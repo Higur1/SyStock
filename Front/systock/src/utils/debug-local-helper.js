@@ -1,4 +1,4 @@
-import { products, suppliers } from "./data";
+import { accounts, products, suppliers } from "./data";
 
 const DB_DEBUG_NAME = "db-local-debug";
 
@@ -27,14 +27,16 @@ export const ENTITIES = {
   PRODUCTS: "products",
   CATEGORIES: "categories",
   SUPPLIERS: "suppliers",
-  ACCOUNTS: "accounts" 
+  ACCOUNTS: "accounts",
+  HOME_PAGE: "homepage"
 };
 
 export function setInitialData() {
   const catArr = products.filter(obj => obj.category);
   const categories = catArr.filter((obj,i) => catArr.findIndex(o => o === obj) === i);
+  const homepage = { adviceQuantity: 0 };
 
-  const data = { products, categories, suppliers, accounts };
+  const data = { products, categories, suppliers, accounts, homepage };
 
   window.localStorage.setItem(DB_DEBUG_NAME, JSON.stringify(data));
 }

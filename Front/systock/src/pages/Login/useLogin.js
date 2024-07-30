@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { performFetch, performFetchNoResult } from "../../apiBase";
 import { ENTITIES, getData } from "../../utils/debug-local-helper";
+import { DEBUG_LOCAL } from "../../App";
 
 export const useLogin = () => {
 
@@ -55,10 +56,10 @@ export const useLogin = () => {
     if(DEBUG_LOCAL) {
       const accounts = getData(ENTITIES.ACCOUNTS);
 
-      const i = accounts.findIndex(obj => obj.name === user && obj.password === password);
+      const i = accounts.findIndex(obj => obj.user === user && obj.password === password);
       if(i !== -1) {
         window.localStorage.setItem('tokenLogin', "connectLocal");
-        window.location.pathname = 'dashboard';
+        window.location.pathname = 'home';
       } else {
         setError({
           ...error, user: 'Usuário ou senha incorretos!' 
@@ -75,7 +76,7 @@ export const useLogin = () => {
       });
       console.log(result);
       window.localStorage.setItem('tokenLogin', result.token);
-      window.location.pathname = 'dashboard';
+      window.location.pathname = 'home';
     } catch {
       setError({
         ...error, user: 'Usuário ou senha incorretos!' 

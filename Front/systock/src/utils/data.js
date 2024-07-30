@@ -508,7 +508,45 @@ export const suppliers = [
     name: "Fios & Cia",
     phone: "31 1234-5678",
     email: "vendas@fiosecia.com"
-  }
+  },
+  { name: "Sanitários Brasil", phone: "11 1234-5678", email: "contato@sanitariosbrasil.com" },
+  { name: "Vasos & Cia", phone: "11 2234-5678", email: "contato@vasosecia.com" },
+  { name: "Banheiro Top", phone: "11 3234-5678", email: "contato@banheirotop.com" },
+  { name: "Granitos & Cia", phone: "11 4234-5678", email: "contato@granitoscia.com" },
+  { name: "Pias Brasil", phone: "11 5234-5678", email: "contato@piasbrasil.com" },
+  { name: "Banheiro Perfeito", phone: "11 6234-5678", email: "contato@banheiroperfeito.com" },
+  { name: "Vidrobox", phone: "11 7234-5678", email: "contato@vidrobox.com" },
+  { name: "Boxes & Cia", phone: "11 8234-5678", email: "contato@boxeseacia.com" },
+  { name: "Banho Mais", phone: "11 9234-5678", email: "contato@banhomais.com" },
+  { name: "Cozinha Mais", phone: "11 1244-5678", email: "contato@cozinhamais.com" },
+  { name: "Torneiras & Cia", phone: "11 2244-5678", email: "contato@torneirasecia.com" },
+  { name: "Cozinha Top", phone: "11 3244-5678", email: "contato@cozinhatop.com" },
+  { name: "Pias Inox", phone: "11 4244-5678", email: "contato@piasinox.com" },
+  { name: "Cozinha & Cia", phone: "11 5244-5678", email: "contato@cozinhaecia.com" },
+  { name: "Inox Mais", phone: "11 6244-5678", email: "contato@inoxmais.com" },
+  { name: "Misturadores Brasil", phone: "11 7244-5678", email: "contato@misturadoresbrasil.com" },
+  { name: "Cozinha Pro", phone: "11 8244-5678", email: "contato@cozinhapro.com" },
+  { name: "Torneiras Top", phone: "11 9244-5678", email: "contato@torneirastop.com" },
+  { name: "Farpados & Cia", phone: "11 1254-5678", email: "contato@farpadosecia.com" },
+  { name: "Arames Brasil", phone: "11 2254-5678", email: "contato@aramesbrasil.com" },
+  { name: "Ferro Forte", phone: "11 3254-5678", email: "contato@ferroforte.com" },
+  { name: "Alambrados Brasil", phone: "11 4254-5678", email: "contato@alambradosbrasil.com" },
+  { name: "Telarte", phone: "11 5254-5678", email: "contato@telarte.com" },
+  { name: "Ferragens & Cia", phone: "11 6254-5678", email: "contato@ferragensecia.com" },
+  { name: "Ferramentas Pro", phone: "11 7254-5678", email: "contato@ferramentaspro.com" },
+  { name: "Ferramentas & Cia", phone: "11 8254-5678", email: "contato@ferramentasecia.com" },
+  { name: "Ferramentas Pro", phone: "11 7254-5678", email: "contato@ferramentaspro.com" },
+  { name: "Ferramentas & Cia", phone: "11 8254-5678", email: "contato@ferramentasecia.com" },
+  { name: "Pintura & Cia", phone: "11 9254-5678", email: "contato@pinturaecia.com" },
+  { name: "Ferragens Brasil", phone: "11 1264-5678", email: "contato@ferragensbrasil.com" },
+  { name: "Construparafuso", phone: "11 2264-5678", email: "contato@construparafuso.com" },
+  { name: "Porcas & Cia", phone: "11 3264-5678", email: "contato@porcasecia.com" },
+  { name: "Ferragens Top", phone: "11 4264-5678", email: "contato@ferragenstop.com" },
+  { name: "Construporca", phone: "11 5264-5678", email: "contato@construporca.com" },
+  { name: "Brocas & Cia", phone: "11 6264-5678", email: "contato@brocasecia.com" },
+  { name: "Ferramentas Brasil", phone: "11 7264-5678", email: "contato@ferramentasbrasil.com" },
+  { name: "Construbroca", phone: "11 8264-5678", email: "contato@construbroca.com" },
+  { name: "Ilumina Pro", phone: "11 9264-5678", email: "contato@iluminapro.com" }
 ];
 
 export const products = [
@@ -915,8 +953,8 @@ export const products = [
 ];
 
 export const accounts = [
-  {user: "gabriel.akio", password: "123"},
-  {user: "admin", password: "321"},
+  { user: "gabriel.akio", password: "123" },
+  { user: "admin", password: "321" },
 ];
 
 

@@ -31,4 +31,20 @@ export const states = [
   {name: "Sergipe", acronym: "SE"},
   {name: "Tocantins", acronym: "TO"}
 
-]
+];
+
+export function addSuppliersEntityToProducts(products, suppliers) {
+  
+  const arr = products
+  .map(obj => {
+    const nextSuppliers = obj.suppliers.map(sup => {
+      const supplierObj = suppliers.find(supp => supp.name === sup);
+      if(supplierObj !== undefined) console.log(supplierObj);
+      if(supplierObj === undefined) console.log("UNDEFINED: ", sup);
+      return supplierObj;
+    });
+    return {...obj, suppliers: nextSuppliers};
+  });
+
+  return arr;
+}
