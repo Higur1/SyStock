@@ -1,13 +1,11 @@
-import { verifyTokenCompany } from "../functions/verifyTokenCompany";
 import { z } from "zod";
 import Batch from "../models/Batch";
 
 export default class BatchController {
   static async findAll(request, response) {
     try {
-      const company_id = verifyTokenCompany(request.headers.authorization);
 
-      const batchs = await Batch.findAll(company_id);
+      const batchs = await Batch.findAll();
 
       if (batchs.status) {
         response.status(200).send(
@@ -32,7 +30,6 @@ export default class BatchController {
   }
   /*Resolver*/ static async findBatch(request, response) {
     try {
-      const company_id = verifyTokenCompany(request.headers.authorization);
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
@@ -49,10 +46,8 @@ export default class BatchController {
       });
 
       const { supplier_id } = supplierValidation.parse(request.params);
-      const company_id = verifyTokenCompany(request.headers.authorization);
 
       const batch_supplier = await Batch.findBySupplier(
-        company_id,
         supplier_id
       );
 
@@ -85,9 +80,8 @@ export default class BatchController {
       });
 
       const { product_id } = productValidation.parse(request.params);
-      const company_id = verifyTokenCompany(request.headers.authorization);
 
-      const batch_product = await Batch.findByProduct(company_id, Number(product_id));
+      const batch_product = await Batch.findByProduct(Number(product_id));
 
       if(batch_product.status){
         response.status(200).send(

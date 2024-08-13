@@ -1,12 +1,9 @@
 import { prisma } from "../config/prisma";
 
 export default class Product {
-  static async findAll(company_id) {
+  static async findAll() {
     try {
       const products = await prisma.product.findMany({
-        where: {
-          company_id: company_id,
-        },
         select: {
           id: true,
           name: true,
@@ -31,20 +28,8 @@ export default class Product {
 
       let product_template = {name: "", id: 0};
 
-      if (productObject.supplier == undefined) {
-        supplier_id = await Product.findGenericSupplier(
-          productObject.company_id
-        );
-      };
-      if (productObject.category == undefined){
-        category_id = await Product.findGenericCategory(
-          productObject.company_id
-        )
-      };
-
       const verifyProductExists = await Product.verifyDuplicateName(
         productObject.name,
-        productObject.company_id
       );
       
       if(!verifyProductExists.exists){
@@ -53,7 +38,6 @@ export default class Product {
             name: productObject.name,
             price: productObject.price,
             category_id: category_id,
-            company_id: productObject.company_id
           }
         });
         product_template.id = product.id;
@@ -63,7 +47,6 @@ export default class Product {
           where:{
             name: productObject.name,
             category_id: category_id,
-            company_id: productObject.company_id
           }
         });
         product_template.id = product!.id;
@@ -73,7 +56,6 @@ export default class Product {
         data:{
           product_id: product_template.id,
           supplier_id: supplier_id,
-          company_id: productObject.company_id,
           quantity: productObject.quantity
         },select:{
           id: true,
@@ -104,13 +86,12 @@ export default class Product {
       return { status: false, error: error };
     }
   };
-  static async findByCategory(category_id, company_id){
+  static async findByCategory(category_id){
     try {
       const productsByCategory = await prisma.product.findMany({
         where:{
           AND:{
             category_id: category_id,
-            company_id: company_id  
           }
         },select:{
           id:true,
@@ -171,46 +152,12 @@ export default class Product {
       return { status: false, error: error };
     }
   };
-  static async findGenericSupplier(company_id) {
-    try {
-      const supplier = await prisma.supplier.findFirst({
-        where: {
-          AND: {
-            name: "Generic",
-            company_id: company_id,
-          },
-        },
-        select: {
-          id: true,
-        },
-      });
-      return supplier!.id;
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  };
-  static async findGenericCategory(company_id){
-    try {
-      const category = await prisma.category.findFirst({
-        where:{
-          AND:{
-            name: "Generic",
-            company_id: company_id
-          }
-        }
-      })
-      return category!.id;
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  };
-  static async verifyDuplicateName(name, company_id) {
+  static async verifyDuplicateName(name) {
     try {
       const product = await prisma.product.findFirst({
         where: {
           AND: {
             name: name,
-            company_id: company_id,
           },
         },
       });
@@ -221,19 +168,4 @@ export default class Product {
       return { status: false, error: error };
     }
   };
-  static async sumQuantitiyProducts(company_id) {
-    try {
-      const product = await prisma.batch.groupBy({
-        by: ["product_id"],
-        _sum:{
-            quantity: true
-        },
-        
-        where:{company_id: company_id}
-      });
-      return { status: true, list: product };
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  };
-}
+};

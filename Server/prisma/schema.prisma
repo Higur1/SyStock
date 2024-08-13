@@ -13,165 +13,205 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
-model Company{
-  id String @id @default(uuid())
-  name String @unique
-  cnpj String @unique
-  status_company_id Int 
-  subscription_plans Int
-  
-  Category Category[]
-  Supplier Supplier[]
-  Product Product[]
-  Batch Batch[]
-  User User[]
-  Token_Recovery Token_Recovery[]
-  Address Address[]
-  Phone Phone[]
 
-  company_status_company_id_fk Status_Company @relation(fields: [status_company_id], references: [id])
-  company_subscription_plan_fk Subscription_Plan @relation(fields: [subscription_plans], references: [id])
-
-
-  @@map("company")
-}
-model Phone{
-  id Int @id @default(autoincrement())
-  phone String  
-  company_id String @default("")
-  supplier_id String @default("")
-
-  phone_company_id_fk Company @relation(fields: [company_id], references: [id])
-  phone_supplier_id_fk Supplier @relation(fields: [supplier_id], references: [id])
-
-  @@map("phone")
-}
-model Address{
-  id Int @id @default(autoincrement())
-  cep String
-  street String
-  number Int
-  district String
-  state String
-  city String
-  complement String
-  company_id String @default("")
-  supplier_id String @default("")
- 
-  address_company_id Company @relation(fields: [company_id], references: [id])
-  address_supplier_id Supplier @relation(fields: [supplier_id], references: [id])
-
-  @@map("address")
-}
-model Status_Company{
-  id Int @id @default(autoincrement())
-  status String @default("Active")
-
-  Company Company[]
-
-  @@map("status_company")
-}
-model Subscription_Plan{
-  id Int @id @default(autoincrement())
-  name String @default("FREE")
-  description String
-
-  Company Company[]
-
-  @@map("subscription_plan")
-}
-model Category{
-  id Int @id @default(autoincrement())
-  name String 
-  company_id String
-
-  Product Product[]
-
-  category_company_id_fk Company @relation(fields: [company_id], references: [id])
-  
-  @@map("category")
-}
-model Product{
-  id Int @id @default(autoincrement())
-  name String 
-  company_id String
-  category_id Int
-  createAt DateTime @default(now())
-  updateAt DateTime @updatedAt
-  price Decimal
-
-  Batch Batch[]
-
-  product_company_id_fk Company @relation(fields: [company_id], references: [id])
-  product_category_id_fk Category @relation(fields: [category_id], references: [id])
-
-  @@map("product")
-}
-model Supplier{
-  id String @id @default(uuid())
-  name String
-  company_id String 
-  email String 
-
-  Batch Batch[]
-  Address Address[]
-  Phone Phone[]
-
-  company_id_supplier_fk Company @relation(fields: [company_id], references: [id]) 
-
-  @@map("supplier")
-}
-model Batch{
-  id Int @id @default(autoincrement())
-  product_id Int
-  supplier_id String
-  company_id String
-  createAt DateTime @default(now())
-  updateAt DateTime @default(now())
-  quantity Int @default(0)
-
-  batch_product_id_fk Product @relation(fields: [product_id], references: [id])
-  batch_supplier_id_fk Supplier @relation(fields: [supplier_id], references: [id])
-  batch_company_id_fk Company @relation(fields: [company_id], references: [id])
-
-  @@map("batch")
-}
-model User_Type{
-  id Int @id @default(autoincrement())
-  name String @default("Common")
+model eTypeUser{
+  id Int @id
+  type String
 
   User User[]
-
-  @@map("user_type")
 }
+model eValitadionStatus{
+  id Int @id
+  type String
+
+  Batch Batch[]
+}
+model eSalesStatus{
+  id Int @id
+  type String
+
+  Sales Sales[]
+}
+model ePaymentMethod{
+  id Int @id
+  type String
+
+  Sales Sales[]
+}
+model eTypeAction{
+  id Int @id
+  type String
+
+
+}
+
 model User{
   id Int @id @default(autoincrement())
-  company_id String
-  user_type_id Int
-  user_login String
-  user_password String
-  name String 
-  email String
+  name String
+  login String 
+  password String
+  email String @unique
   createdAt DateTime @default(now())
   updateAt DateTime @updatedAt
-  
-  Token_Recovery Token_Recovery[]
+  user_type Int
 
-  user_company_id Company @relation(fields: [company_id], references: [id])
-  user_user_type_id_fk User_Type @relation(fields: [user_type_id], references: [id])
+  user_type_fk eTypeUser @relation(fields: [user_type], references: [id])
+
+  Sales Sales[]
 
   @@map("user")
 }
-model Token_Recovery{
-  id String @id @default(uuid())
-  token_status Boolean @default(true)
-  company_id String
+
+model Pre_User{
+  id Int @id @default(autoincrement())
+  email String @unique
+  name String
+
+  @@map("pre_user")
+}
+
+model Supplier{
+  id Int @id @default(autoincrement())
+  name String @unique
+  phone String
+  email String
+
+  Supplier_Fill Supplier_Fill[]
+
+  @@map("supplier")
+}
+model Fill{
+  id Int @id @default(autoincrement())
+  totalPrice Decimal
+  dateTime DateTime
+  observation String
+
+  Supplier_Fill Supplier_Fill[]
+
+  @@map("fill")
+}
+
+model Supplier_Fill{
+  id Int @id @default(autoincrement())
+  supplier_id Int
+  fill_id Int
+  quantity Int
+  subPrice Decimal
+  costPrice Decimal
+ 
+  supplier_id_fk Supplier @relation(fields: [supplier_id], references: [id])
+  fill_id_fk Fill @relation(fields: [fill_id], references: [id])
+
+  @@map("supplier_fill")
+}
+
+model Category{
+  id Int @id @default(autoincrement())
+  name String
+
+  Product Product[]
+  
+  @@map("category")
+}
+
+model Product{
+  id Int @id @default(autoincrement())
+  name String
+  price Decimal
+  costPrice Decimal
+  minimunQuantity Int
+  observation String
+  totalQuantityInStock Int
+  category_id Int
+  Product_Sales Product_Sales[]
+  Batch Batch[]
+
+  category_id_fk Category @relation(fields: [category_id], references: [id])
+
+  @@map("product")
+}
+model Batch{
+  id Int @id @default(autoincrement())
+  expirationDate DateTime
+  quantity Int
+  deletionStatus Boolean
+  dateTimeEmptyStock DateTime
+  product_id Int
+  eValidationSattus Int
+
+  eValidationStatus_fk eValitadionStatus @relation(fields: [eValidationSattus], references: [id])
+  product_id_fk Product @relation(fields: [product_id], references: [id])
+
+  @@map("batch")
+}
+
+
+model Sales{
+  id Int @id @default(autoincrement())
+  dateTime DateTime
   user_id Int
-  createAt DateTime @default(now())
-  updateAt DateTime @updatedAt
+  observation String
+  totalPrice Decimal
+  paymentMade Boolean
+  eSalesStatus Int
+  ePaymentMethod Int
 
-  token_recovery_company_id_fk Company @relation(fields: [company_id], references: [id])
-  token_recovery_user_id_fk User @relation(fields: [user_id], references: [id])
+  Product_Sales Product_Sales[]
 
-  @@map("token_recovery")
+  eSalesStatus_fk eSalesStatus @relation(fields: [eSalesStatus], references: [id])
+  ePaymentMethod_fk ePaymentMethod @relation(fields: [ePaymentMethod], references: [id])
+  user_id_fk User @relation(fields: [user_id], references: [id])
+
+  @@map("sales")
+}
+
+model Product_Sales{
+  id Int @id @default(autoincrement())
+  product_id Int
+  sales_id Int
+  quantity Int
+  totalPrice Decimal
+
+  product_id_fk Product @relation(fields: [product_id], references: [id])
+  sales_id_fk Sales @relation(fields: [sales_id], references: [id])
+
+  @@map("product_sales")
+}
+
+model logSales{
+  id Int @id @default(autoincrement())
+  sales_id Int
+  totalPrice Decimal
+  user_name String
+  dateTime DateTime @default(now())
+  ePaymentMethod String
+
+  @@map("log_sales")
+}
+
+model logProduct{
+  id Int @id @default(autoincrement())
+  product_id Int
+  product_name String
+  quantity Int
+  user_name String
+  dateTime DateTime @default(now())
+  eTypeAction Int
+
+  
+
+  @@map("log_product")
+}
+
+model logFill{
+  id Int @id @default(autoincrement())
+  observation String
+  dateTime DateTime @default(now())
+  user_name String
+  supplier_name String
+  price Decimal
+  totalPrice Decimal
+  subTotal Decimal
+
+  @@map("log_fill")
 }

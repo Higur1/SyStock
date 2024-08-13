@@ -10,10 +10,7 @@ dotenv.config();
 export default class UserController {
   static async listOfUsers(request, response) {
     try {
-      const company_id = String(
-        verifyTokenCompany(request.headers.authorization)
-      );
-      const listOfUsers = await User.findAll(company_id);
+      const listOfUsers = await User.findAll();
 
       if (listOfUsers.status) {
         const _links = generatorHATEOAS("");
@@ -59,11 +56,6 @@ export default class UserController {
           .max(10, "user_password required maximum 10 character(s)"),
         email: z.string().email("Valid e-mail required").trim(),
         user_type_id: z.number().gt(0),
-        company_id: z
-          .string()
-          .trim()
-          .min(36, "company_id required minimum 36 character(s)")
-          .max(36, "company_id required maximum 36 character(s)"),
       });
       const {
         name,
@@ -71,33 +63,23 @@ export default class UserController {
         user_password,
         email,
         user_type_id,
-        company_id,
       } = user.parse(request.body);
 
       const userExists = await User.findUser(email, user_login);
-      const isPossible = await LimitOfUser(company_id, user_type_id);
       const hash_password = cryptPassword(user_password);
 
-      if (userExists.status && userExists.user == undefined) {
-        if (isPossible) {
+      if (userExists.status && userExists.user == undefined){
           await User.create(
             name,
             user_login,
             hash_password,
             email,
             user_type_id,
-            company_id
           ).then((user) => {
             response.status(201).send(user.user);
           });
-        } else {
-          response.status(409).send(
-            JSON.stringify({
-              message: "it is not possible to create more users of type",
-            })
-          );
-        }
-      } else {
+        } 
+      else {
         response.status(409).send(
           JSON.stringify({
             message:
@@ -125,9 +107,8 @@ export default class UserController {
       });
       const { name } = user.parse(request.params);
       const token = request.headers.authorization;
-      const company_id = await String(verifyTokenCompany(token));
-
-      const userList = await User.findNameStartWith(name, company_id);
+    
+      const userList = await User.findNameStartWith(name);
       if (userList.status) {
         if (userList.user != undefined) {
           response.status(200).send(
@@ -168,12 +149,8 @@ export default class UserController {
           .max(1, "type_id required maximum 1 character(s)"),
       });
       const { type_id } = user.parse(request.params);
-      const company_id = String(
-        verifyTokenCompany(request.headers.authorization)
-      );
       const listOfUsers = await User.findUserByTypeId(
-        Number(type_id),
-        company_id
+        Number(type_id)
       );
 
       if (listOfUsers.status) {
@@ -220,12 +197,8 @@ export default class UserController {
           .max(3),
       });
       const { id, name, user_type_id } = user.parse(request.body);
-      const company = await String(
-        verifyTokenCompany(request.headers.authorization)
-      );
-      const userFind = await User.findUserById(id, company);
-      const userNameExists = await User.findName(name, company);
-      const isPossible = await LimitOfUser(company, user_type_id);
+      const userFind = await User.findUserById(id);
+      const userNameExists = await User.findName(name);
 
       if (userFind.status) {
         if (userNameExists.exists) {
@@ -242,13 +215,12 @@ export default class UserController {
                   id: userResult.userUpdated?.id,
                   name: userResult.userUpdated?.name,
                   login: userResult.userUpdated?.login,
-                  company: userResult.userUpdated?.company,
                   created: userResult.userUpdated?.created,
                 },
               })
             );
           });
-        } else if (isPossible) {
+        } else {
           await User.update(id, name, user_type_id).then((userResult) => {
             response.status(200).send(
               JSON.stringify({
@@ -256,19 +228,12 @@ export default class UserController {
                   id: userResult.userUpdated?.id,
                   name: userResult.userUpdated?.name,
                   login: userResult.userUpdated?.login,
-                  company: userResult.userUpdated?.company,
                   created: userResult.userUpdated?.created,
                 },
               })
             );
           });
-        } else {
-          response.status(400).send(
-            JSON.stringify({
-              message: "it is not possible to create more users of type",
-            })
-          );
-        }
+        } 
       } else {
         response.status(500).send(
           JSON.stringify({
@@ -290,11 +255,8 @@ export default class UserController {
         id: z.number().min(1, "id required minimum 1 character(s)"),
       });
       const { id } = user.parse(request.body);
-      const company_id = String(
-        verifyTokenCompany(request.headers.authorization)
-      );
 
-      const userId = await User.findUserById(id, company_id);
+      const userId = await User.findUserById(id);
       if (userId.status) {
         if (userId.user != undefined) {
           if (userId.user.user_type_id != 1) {
@@ -355,8 +317,7 @@ export default class UserController {
                 const token = jwt.sign(
                   {
                     id: userVerify.user.id,
-                    email: userVerify.user.email,
-                    company: userVerify.user.company_id,
+                    email: userVerify.user.email
                   },
                   knowkey!,
                   { expiresIn: "24h" }
@@ -502,11 +463,6 @@ export default class UserController {
     }
   }
 }
-function verifyTokenCompany(token) {
-  const headers = JSON.parse(atob(token.split(".")[1]));
-  const parseToken = Object.values(headers)[2];
-  return parseToken;
-}
 function generatorHATEOAS(user) {
   user =
     user == undefined ? ((user.user_name = " "), (user.user_id = 0)) : user;
@@ -558,61 +514,7 @@ function generatorHATEOAS(user) {
     },
   ];
 }
-async function LimitOfUser(company_id, user_type_id) {
-  try {
-    const planOfCompany = await User.verifyTypeOfPlanCompany(company_id);
-    const quantityUserOfCompany = await User.listOfUsersOfCompany(
-      company_id,
-      user_type_id
-    );
 
-    const quantityOfUserForPlan = selectQuantityOfUsers(
-      planOfCompany?.type?.subscription_plans
-    );
-
-    const selectParameterOfQuantityUser = Object.values(quantityOfUserForPlan)[
-      user_type_id - 1
-    ];
-    return selectParameterOfQuantityUser ==
-      quantityUserOfCompany.userList?.length
-      ? false
-      : true;
-  } catch (error) {
-    return error;
-  }
-}
-function selectQuantityOfUsers(plan_id) {
-  var quantityOfAdminUsers,
-    quantityOfSupervisorUsers,
-    quantityOfCommonUsers = 0;
-
-  switch (plan_id) {
-    case 1:
-      quantityOfAdminUsers = 1;
-      quantityOfSupervisorUsers = 0;
-      quantityOfCommonUsers = 0;
-      break;
-    case 2:
-      quantityOfAdminUsers = 1;
-      quantityOfSupervisorUsers = 1;
-      quantityOfCommonUsers = 1;
-      break;
-    case 3:
-      quantityOfAdminUsers = 1;
-      quantityOfSupervisorUsers = 2;
-      quantityOfCommonUsers = 2;
-      break;
-    default:
-      quantityOfAdminUsers = 1;
-      quantityOfSupervisorUsers = 0;
-      quantityOfCommonUsers = 0;
-  }
-  return {
-    Admin: quantityOfAdminUsers,
-    Supervisor: quantityOfSupervisorUsers,
-    Common: quantityOfCommonUsers,
-  };
-}
 function cryptPassword(password) {
   const salt = bcrypt.genSaltSync(10);
   const hash = bcrypt.hashSync(password, salt);

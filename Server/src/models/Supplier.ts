@@ -1,12 +1,9 @@
 import { prisma } from "../config/prisma";
 
 export default class Supplier {
-  static async findAll(company_id) {
+  static async findAll() {
     try {
       const supplierResult = await prisma.supplier.findMany({
-        where: {
-          company_id: company_id,
-        },
         select: {
           id: true,
           name: true,
@@ -46,7 +43,6 @@ export default class Supplier {
           data: {
             name: supplierObject.name,
             email: supplierObject.email,
-            company_id: supplierObject.company_id,
           },
           select: {
             id: true,
@@ -57,7 +53,6 @@ export default class Supplier {
         const first_phone = await prisma.phone.create({
           data: {
             phone: supplierObject.phones[0],
-            company_id: supplierObject.company_id,
             supplier_id: supplier.id,
           },
           select: {
@@ -69,7 +64,6 @@ export default class Supplier {
         const second_phone = await prisma.phone.create({
           data: {
             phone: supplierObject.phones[1],
-            company_id: supplierObject.company_id,
             supplier_id: supplier.id,
           },
           select: {
@@ -80,7 +74,6 @@ export default class Supplier {
         });
         const address = await prisma.address.create({
           data: {
-            company_id: supplierObject.company_id,
             supplier_id: supplier.id,
             cep: supplierObject.address.cep,
             street: supplierObject.address.street,
@@ -92,7 +85,6 @@ export default class Supplier {
           },
           select: {
             id: true,
-            company_id: false,
             supplier_id: true,
             cep: true,
             street: true,
@@ -153,12 +145,22 @@ export default class Supplier {
       return { status: false, error: error };
     }
   }
+<<<<<<< Updated upstream
   static async updateSupplier(supplierObject) {
     try {
       const supplier = await prisma.supplier.update({
         data:{
           name: supplierObject.name,
           email: supplierObject.email
+=======
+  static async getBatchs(supplier_id) {
+    try {
+      const batchs = await prisma.batch.findMany({
+        where: {
+          AND: {
+            supplier_id: supplier_id,
+          },
+>>>>>>> Stashed changes
         },
         where:{
           id: supplierObject.id
@@ -181,8 +183,17 @@ export default class Supplier {
           city: supplierObject.address.city,
           complement: supplierObject.address.complement
         },
+<<<<<<< Updated upstream
         where:{
           id: supplierObject.address.id
+=======
+      });
+      const findPhones = await prisma.phone.findMany({
+        where: {
+          AND: {
+            supplier_id: supplierObject.id,
+          },
+>>>>>>> Stashed changes
         },
         select:{
           id: true,

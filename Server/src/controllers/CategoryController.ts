@@ -3,8 +3,7 @@ import Category from "../models/Category";
 export default class CategoryController {
   static async listOfCategory(request, response) {
     try {
-      const company_id = verifyTokenCompany(request.headers.authorization);
-      const lisOfCategories = await Category.findAll(company_id);
+      const lisOfCategories = await Category.findAll();
 
       if (lisOfCategories.status) {
         response.status(200).send(
@@ -33,10 +32,8 @@ export default class CategoryController {
         name: z.string().trim().min(3).max(15),
       });
       const { name } = category_name.parse(request.body);
-      const company_id = verifyTokenCompany(request.headers.authorization);
 
       const categoryAlreadyExists = await Category.verifyDuplicateName(
-        company_id,
         name
       );
 
@@ -44,7 +41,7 @@ export default class CategoryController {
         categoryAlreadyExists.status &&
         categoryAlreadyExists.category == undefined
       ) {
-        const categoryCreated = await Category.create(company_id, name);
+        const categoryCreated = await Category.create(name);
 
         if (categoryCreated.status) {
           response.status(201).send(
@@ -52,7 +49,6 @@ export default class CategoryController {
               category: {
                 id: categoryCreated.category?.category_id,
                 name: categoryCreated.category?.category_name,
-                company_id: categoryCreated.category?.category_company_id,
               },
             })
           );
@@ -85,9 +81,8 @@ export default class CategoryController {
         id: z.string(),
       });
       const { id } = category_id.parse(request.params);
-      const company_id = verifyTokenCompany(request.headers.authorization);
 
-      const findCategory = await Category.findById(company_id, Number(id));
+      const findCategory = await Category.findById(Number(id));
 
       if (findCategory.status) {
         response.status(200).send(
@@ -118,9 +113,8 @@ export default class CategoryController {
       });
 
       const { name } = category_name.parse(request.params);
-      const company_id = verifyTokenCompany(request.headers.authorization);
 
-      const findCategory = await Category.findByName(company_id, name);
+      const findCategory = await Category.findByName(name);
 
       if (findCategory.status) {
         response.status(200).send(
@@ -151,10 +145,8 @@ export default class CategoryController {
         name: z.string().trim().min(3).max(15),
       });
       const { id, name } = category.parse(request.body);
-      const company_id = verifyTokenCompany(request.headers.authorization);
 
       const categoryAlredyExists = await Category.verifyDuplicateName(
-        company_id,
         name
       );
 
@@ -231,9 +223,4 @@ export default class CategoryController {
       );
     }
   }
-}
-function verifyTokenCompany(token) {
-  const headers = JSON.parse(atob(token.split(".")[1]));
-  const parseToken = Object.values(headers)[2];
-  return parseToken;
 }

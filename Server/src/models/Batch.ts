@@ -1,24 +1,19 @@
 import { prisma } from "../config/prisma";
 
 export default class Batch{
-    static async findAll(company_id){
+    static async findAll(){
         try {
-            const batchs = await prisma.batch.findMany({
-                where:{
-                    company_id: company_id
-                }
-            });
+            const batchs = await prisma.batch.findMany({});
             return {status: true, batchs:batchs};
         } catch (error) {
             return {status: false, error:error};
         };
     };
-    static async findByProduct(company_id, product_id){
+    static async findByProduct(product_id){
         try {
             const batch = await prisma.batch.findMany({
                 where:{
                     AND:{
-                        company_id: company_id,
                         product_id:product_id
                     }
                 },
@@ -31,7 +26,7 @@ export default class Batch{
             return {status: false, error:error};
         };
     };
-    static async findBySupplier(company_id, supplier_id){
+    static async findBySupplier(supplier_id){
         try {
             const batch = await prisma.$queryRaw
             `

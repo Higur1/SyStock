@@ -1,12 +1,9 @@
 import { prisma } from "../config/prisma";
 
 export default class User {
-  static async findAll(company_id) {
+  static async findAll() {
     try {
       const listUsers = await prisma.user.findMany({
-        where: {
-          company_id: company_id,
-        },
         select: {
           id: true,
           name: true,
@@ -28,7 +25,6 @@ export default class User {
     hash_password,
     email,
     user_type_id,
-    company_id
   ) {
     try {
       const user = await prisma.user.create({
@@ -38,7 +34,6 @@ export default class User {
           user_password: hash_password,
           email,
           user_type_id,
-          company_id,
         },
       });
       return {
@@ -47,7 +42,6 @@ export default class User {
           name: user.name,
           user_login: user.user_login,
           email: user.email,
-          company_id: user.company_id,
         },
       };
     } catch (error) {
@@ -78,14 +72,13 @@ export default class User {
       return { status: false, error: error };
     }
   }
-  static async findNameStartWith(name, company_id) {
+  static async findNameStartWith(name) {
     try {
       const user = await prisma.user.findFirst({
         where: {
           name: {
             startsWith: name,
           },
-          company_id: company_id,
         },
         select: {
           id: true,
@@ -101,12 +94,11 @@ export default class User {
       return { status: false, error: error };
     }
   }
-  static async findName(name, company_id) {
+  static async findName(name) {
     try {
       const user = await prisma.user.findFirst({
         where: {
           name: name,
-          company_id: company_id,
         },
         select: {
           id: true,
@@ -122,12 +114,11 @@ export default class User {
       return { status: false, error: error };
     }
   }
-  static async findUserById(id, company_id) {
+  static async findUserById(id) {
     try {
       const user = await prisma.user.findFirst({
         where: {
           id: id,
-          company_id: company_id,
         },
       });
       return user != null
@@ -137,12 +128,11 @@ export default class User {
       return { status: false, error: error };
     }
   }
-  static async findUserByTypeId(user_type, company_id) {
+  static async findUserByTypeId(user_type) {
     try {
       const listOfUsers = await prisma.user.findMany({
         where: {
           user_type_id: user_type,
-          company_id: company_id,
         },
         select: {
           id: true,
@@ -175,7 +165,6 @@ export default class User {
             userUpdated: {
               id: result.id,
               name: result.name,
-              company: result.company_id,
               login: result.user_login,
               created: result.createdAt,
             },
@@ -209,25 +198,10 @@ export default class User {
       return { status: false, error: error };
     }
   }
-  static async verifyTypeOfPlanCompany(company_id) {
-    try {
-      const type_plan = await prisma.company.findFirst({
-        where: {
-          id: company_id,
-        },
-        select: {
-          subscription_plans: true,
-        },
-      });
-      return { status: true, type: type_plan };
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async listOfUsersOfCompany(company_id, user_type_id) {
+  static async listOfUsersOfCompany( user_type_id) {
     try {
       const userList = await prisma.user.findMany({
-        where: { company_id: company_id, user_type_id: user_type_id },
+        where: { user_type_id: user_type_id },
       });
       return userList.length > 0
         ? { status: true, userList: userList }
@@ -241,7 +215,6 @@ export default class User {
       const result = await prisma.token_Recovery.create({
         data: {
           user_id: user.id,
-          company_id: user.company_id,
         },
       });
       return result != null

@@ -1,12 +1,10 @@
-import { verifyTokenCompany } from "../functions/verifyTokenCompany";
 import Product from "../models/Product";
 import { z } from "zod";
 
 export default class ProductController {
   static async findAll(request, response) {
     try {
-      const company_id = verifyTokenCompany(request.headers.authorization);
-      const products = await Product.findAll(company_id);
+      const products = await Product.findAll();
 
       if (products.status) {
         response.status(200).send(
@@ -38,7 +36,6 @@ export default class ProductController {
         supplier: z.string().trim().min(36).max(36).optional(),
         quantity: z.number().positive(),
       });
-      const company_id = verifyTokenCompany(request.headers.authorization);
       const { name, category, price, quantity, supplier } =
         productValidation.parse(request.body);
 
@@ -48,7 +45,6 @@ export default class ProductController {
         price,
         quantity,
         supplier,
-        company_id,
       };
       const productCreated = await Product.create(product);
 
@@ -113,9 +109,7 @@ export default class ProductController {
 
       const { category_id } = category.parse(request.params);
 
-      const company_id = verifyTokenCompany(request.headers.authorization);
-
-      const listProductsByCategory = await Product.findByCategory(Number(category_id), company_id);
+      const listProductsByCategory = await Product.findByCategory(Number(category_id));
 
       if(listProductsByCategory.status){
         response.status(200).send(
@@ -149,19 +143,16 @@ export default class ProductController {
         price: z.number().positive(),
       });
 
-      const company_id = verifyTokenCompany(request.headers.authorization);
-
       const { id, name, price, category_id} = productValidation.parse(request.body);
 
       const product = {
         id,
         name,
         price,
-        category_id,
-        company_id
+        category_id
       }
 
-      const verifyDuplicateName = await Product.verifyDuplicateName(name, company_id);
+      const verifyDuplicateName = await Product.verifyDuplicateName(name);
    
       if(!verifyDuplicateName.exists || verifyDuplicateName.product?.id == product.id){
         const productUpdated = await Product.update(product);
