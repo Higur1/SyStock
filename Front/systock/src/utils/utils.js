@@ -43,7 +43,8 @@ export function addSuppliersEntityToProducts(products, suppliers) {
       if(supplierObj === undefined) console.log("UNDEFINED: ", sup);
       return supplierObj;
     });
-    return {...obj, suppliers: nextSuppliers};
+    const expiry = new Date(obj.expiry);
+    return {...obj, suppliers: nextSuppliers, expiry};
   });
 
   return arr;

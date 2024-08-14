@@ -1,11 +1,12 @@
-import { Error } from '@mui/icons-material';
-import { Link, TextField } from '@mui/material';
+import { Error, Visibility, VisibilityOff } from '@mui/icons-material';
+import { IconButton, Link, TextField } from '@mui/material';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import SupplierFastViewDialog from '../Supplier/dialogs/SupplierFastViewDialog';
 import { ENTITIES, getData, getDB } from '../../utils/debug-local-helper';
 import CircularLoading from '../../components/common/CircularLoading';
 import { addSuppliersEntityToProducts } from '../../utils/utils';
+import ViewAdvicesDialog from '../Supplier/dialogs/ViewAdvicesDialog';
 
 export const ADVICE_VARIANT = {
   "ERROR": 0,
@@ -14,41 +15,84 @@ export const ADVICE_VARIANT = {
 };
 
 export const ADVICE_TYPE = {
-  PRODUCT_ENDING: 0
-}
+  PRODUCT_ENDING: 0,
+  PRODUCT_EXPIRED: 1,
+  PRODUCT_EMPTY: 2,
+  PRODUCT_NEXT_TO_EXPIRE: 3
+};
 
 export default function Home() {
   
-  const [advices, setAdvices] = useState(null);
   const [suppliersDialog, setSuppliersDialog] = useState({open: false, obj: null});
-  const [quantityAdvice, setQuantityAdvice] = useState(0);  
+  const [table, setTable] = useState([
+    {
+      type: ADVICE_TYPE.PRODUCT_EXPIRED,
+      list: [],
+      label: "Vencidos"
+    },
+    {
+      type: ADVICE_TYPE.PRODUCT_EMPTY,
+      list: [],
+      label: "Estoque Zerado"
+    },
+    {
+      type: ADVICE_TYPE.PRODUCT_NEXT_TO_EXPIRE,
+      list: [],
+      label: "Próximos ao vencimento"
+    },
+    {
+      type: ADVICE_TYPE.PRODUCT_ENDING,
+      list: [],
+      label: "Baixa Quantidade (Quantidade menor que 20)"
+    },
+  ]);
+  const [openDialogViewAdvices, setOpenDialogViewAdvices] = useState({open: false, obj: null});
 
   useEffect(() => {
     handleInitialData();
   }, []);
 
-  useEffect(() => {
-    getAdvices();
-  }, [quantityAdvice]);
 
   function getAdvices() {
     const { products, suppliers } = getDB();
 
-    const arrProducts = addSuppliersEntityToProducts(products, suppliers).filter(obj => obj.quantity < quantityAdvice);
+    const arrProducts = addSuppliersEntityToProducts(products, suppliers);
 
-    const nextAdvices = arrProducts.map(obj => ({
-      typeVariant: ADVICE_VARIANT.ERROR,
-      adviceType: ADVICE_TYPE.PRODUCT_ENDING,
-      productAdvice: obj
+    setTable(prevTable => prevTable.map(table => {
+      switch(table.type) {
+        case ADVICE_TYPE.PRODUCT_EMPTY: {
+          const list = arrProducts.filter(product => product.quantity === 0);
+
+          return {...table, list};
+        }
+        case ADVICE_TYPE.PRODUCT_ENDING: {
+          const list = arrProducts.filter(product => product.quantity < 20);
+
+          return {...table, list};
+        }
+        case ADVICE_TYPE.PRODUCT_EXPIRED: {
+          const list = arrProducts.filter(product => product.expiry < new Date());
+
+          return {...table, list};
+        }
+        case ADVICE_TYPE.PRODUCT_NEXT_TO_EXPIRE: {
+          const daysDiff = 7;
+          const nextDay = new Date();
+          nextDay.setDate(new Date().getDate() + daysDiff);
+          const list = arrProducts.filter(product => (nextDay - product.expiry) < daysDiff);
+
+          return {...table, list};
+        }
+        default: return table;
+      };
     }));
-
-    setAdvices(nextAdvices);
   }
 
   function handleInitialData() {
-    const homeObject = getData(ENTITIES.HOME_PAGE);
+    // const homeObject = getData(ENTITIES.HOME_PAGE);
 
-    setQuantityAdvice(homeObject);
+    // setQuantityAdvice(homeObject);
+    getAdvices();
   }
 
   function openSuppliers(obj) {
@@ -62,16 +106,10 @@ export default function Home() {
   return (
     <>
       <div style={{padding: 32, display: 'flex', flexDirection: 'column', gap: 16}}>
-        <div style={{display: 'flex', alignItems: 'center'}}>
-          <TextField style={{width: 400}} InputProps={{type: "number"}} label={"Avisar-me sobre produtos com a quantidade menor que:"} onChange={e => setQuantityAdvice(e.target.value)}>{quantityAdvice}</TextField>
-        </div>
         <h1>Avisos</h1>
         
-        <div className="customScroll">
-          {advices === null && (
-            <CircularLoading />
-          )}
-          <div style={{display: 'flex', flexDirection: 'column', gap: 16}}>
+        <div className="customScroll" style={{display: 'flex', justifyContent: 'center'}}>
+          {/* <div style={{display: 'flex', flexDirection: 'column', gap: 16}}>
             {(advices !== null && advices.length > 0) && advices.map((advice, index) => {
 
               const { name, quantity, suppliers } = advice.productAdvice;
@@ -90,10 +128,40 @@ export default function Home() {
                 </div>
               );
               })}
+          </div> */}
+          <div style={{display: 'flex', flexDirection: 'column', border: '1px solid #DCDCDC', borderRadius: 8, width: "70%"}}>
+            <div style={{display: 'flex', height: 48, alignItems: 'center', fontWeight: 600}}>
+              <div style={{flex: 1, textAlign: 'center'}}>
+                <span>{"Produtos"}</span>
+              </div>
+              <div style={{flexBasis: "35%", textAlign: 'center'}}>
+                <span>{"Quantidade"}</span>
+              </div>
+              <div style={{flexBasis: "20%", textAlign: 'center'}}>
+                <span>{"Visualizar"}</span>
+              </div>
+            </div>
+            {table.map((item, i) => (
+              <div style={{display: 'flex', height: 48, alignItems: 'center', borderTop: '1px solid #DCDCDC'}} key={i}>
+                <div style={{flex: 1, textAlign: 'center'}}>
+                  <span>{item.label}</span>
+                </div>
+                <div style={{flexBasis: "35%", textAlign: 'center'}}>
+                  <span>{item.list.length}</span>
+                </div>
+                <div style={{flexBasis: "20%", display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                  <IconButton onClick={() => setOpenDialogViewAdvices({open: true, obj: item})} disabled={item.list.length === 0}>
+                    <Visibility />
+                  </IconButton>
+                </div>
+              </div>
+            ))}
           </div>
           
         </div>
       </div>
+      
+      {openDialogViewAdvices.open && (<ViewAdvicesDialog obj={openDialogViewAdvices.obj} openSuppliers={openSuppliers} onClose={() => setOpenDialogViewAdvices({open: false, obj: null})}/>)}
       {suppliersDialog.open && (<SupplierFastViewDialog obj={suppliersDialog.obj} onClose={closeSuppliers}/>)}
     </>
     

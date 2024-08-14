@@ -556,7 +556,8 @@ export const products = [
     category: "Construção",
     price: 30.00,
     quantity: 100,
-    suppliers: ["Construbras", "Material Forte", "Cimento & Cia"]
+    suppliers: ["Construbras", "Material Forte", "Cimento & Cia"],
+    expiry: new Date("2023-11-15")
   },
   {
     name: "Tijolo de Barro",
@@ -564,7 +565,8 @@ export const products = [
     category: "Construção",
     price: 0.80,
     quantity: 1000,
-    suppliers: ["Tijolarte", "Barro Bom", "Construpedras"]
+    suppliers: ["Tijolarte", "Barro Bom", "Construpedras"],
+    expiry: new Date("2024-05-01")
   },
   {
     name: "Areia Fina",
@@ -572,7 +574,8 @@ export const products = [
     category: "Construção",
     price: 50.00,
     quantity: 200,
-    suppliers: ["Areial Top", "Construmais", "Areia & Pedra"]
+    suppliers: ["Areial Top", "Construmais", "Areia & Pedra"],
+    expiry: new Date("2024-02-20")
   },
   {
     name: "Pedra Brita",
@@ -580,7 +583,8 @@ export const products = [
     category: "Construção",
     price: 60.00,
     quantity: 150,
-    suppliers: ["Brita Forte", "Pedregulho", "Construpedras"]
+    suppliers: ["Brita Forte", "Pedregulho", "Construpedras"],
+    expiry: new Date("2023-09-25")
   },
   {
     name: "Bloco de Concreto",
@@ -588,7 +592,8 @@ export const products = [
     category: "Construção",
     price: 2.00,
     quantity: 500,
-    suppliers: ["Bloco & Cia", "Construbras", "Blocos Construtor"]
+    suppliers: ["Bloco & Cia", "Construbras", "Blocos Construtor"],
+    expiry: new Date("2024-03-15")
   },
   {
     name: "Telha de Cerâmica",
@@ -596,7 +601,8 @@ export const products = [
     category: "Cobertura",
     price: 3.50,
     quantity: 300,
-    suppliers: ["Telharte", "Coberturas ABC", "Telha Boa"]
+    suppliers: ["Telharte", "Coberturas ABC", "Telha Boa"],
+    expiry: new Date("2024-07-10")
   },
   {
     name: "Tubo PVC 100mm",
@@ -604,7 +610,8 @@ export const products = [
     category: "Hidráulica",
     price: 25.00,
     quantity: 200,
-    suppliers: ["Tubos & Cia", "Hidrotubos", "PVC Master"]
+    suppliers: ["Tubos & Cia", "Hidrotubos", "PVC Master"],
+    expiry: new Date("2023-10-30")
   },
   {
     name: "Joelho PVC 90º 100mm",
@@ -612,7 +619,8 @@ export const products = [
     category: "Hidráulica",
     price: 5.00,
     quantity: 400,
-    suppliers: ["Conexões Hidra", "PVC Center", "Joelho Forte"]
+    suppliers: ["Conexões Hidra", "PVC Center", "Joelho Forte"],
+    expiry: new Date("2024-04-20")
   },
   {
     name: "Fio Elétrico 2,5mm",
@@ -620,7 +628,8 @@ export const products = [
     category: "Elétrica",
     price: 120.00,
     quantity: 100,
-    suppliers: ["Eletrofios", "Fio & Luz", "Eletricall"]
+    suppliers: ["Eletrofios", "Fio & Luz", "Eletricall"],
+    expiry: new Date("2023-12-12")
   },
   {
     name: "Interruptor Simples",
@@ -628,7 +637,8 @@ export const products = [
     category: "Elétrica",
     price: 10.00,
     quantity: 300,
-    suppliers: ["Interruptores Brasil", "Eletro Luz", "Interruptor Max"]
+    suppliers: ["Interruptores Brasil", "Eletro Luz", "Interruptor Max"],
+    expiry: new Date("2024-06-18")
   },
   {
     name: "Piso Cerâmico 60x60",
@@ -636,7 +646,8 @@ export const products = [
     category: "Acabamento",
     price: 25.00,
     quantity: 200,
-    suppliers: ["Pisos & Cia", "Ceramika", "Acabamentos ABC"]
+    suppliers: ["Pisos & Cia", "Ceramika", "Acabamentos ABC"],
+    expiry: new Date("2023-08-10")
   },
   {
     name: "Rejunte Cinza",
@@ -644,7 +655,8 @@ export const products = [
     category: "Acabamento",
     price: 7.00,
     quantity: 400,
-    suppliers: ["Rejunte Mais", "Rejuntex", "Construrejunte"]
+    suppliers: ["Rejunte Mais", "Rejuntex", "Construrejunte"],
+    expiry: new Date("2024-01-05")
   },
   {
     name: "Tinta Látex Branco",
@@ -652,7 +664,8 @@ export const products = [
     category: "Pintura",
     price: 90.00,
     quantity: 100,
-    suppliers: ["Tintas & Cores", "Latex Pro", "Pintura Perfeita"]
+    suppliers: ["Tintas & Cores", "Latex Pro", "Pintura Perfeita"],
+    expiry: new Date("2023-11-22")
   },
   {
     name: "Rolo de Pintura 23cm",
@@ -660,7 +673,8 @@ export const products = [
     category: "Pintura",
     price: 15.00,
     quantity: 200,
-    suppliers: ["Rolos Brasil", "Pintar Fácil", "Rolo & Cia"]
+    suppliers: ["Rolos Brasil", "Pintar Fácil", "Rolo & Cia"],
+    expiry: new Date("2024-02-28")
   },
   {
     name: "Porta de Madeira",
@@ -668,7 +682,8 @@ export const products = [
     category: "Esquadrias",
     price: 200.00,
     quantity: 50,
-    suppliers: ["Portas & Cia", "Madeirarte", "Esquadrias Brasil"]
+    suppliers: ["Portas & Cia", "Madeirarte", "Esquadrias Brasil"],
+    expiry: new Date("2023-09-15")
   },
   {
     name: "Janela de Alumínio",
@@ -676,7 +691,8 @@ export const products = [
     category: "Esquadrias",
     price: 300.00,
     quantity: 40,
-    suppliers: ["Janelas Alumínio", "Alumiforte", "Esquadrias ABC"]
+    suppliers: ["Janelas Alumínio", "Alumiforte", "Esquadrias ABC"],
+    expiry: new Date("2024-03-01")
   },
   {
     name: "Luminária de LED",
@@ -684,7 +700,8 @@ export const products = [
     category: "Iluminação",
     price: 50.00,
     quantity: 100,
-    suppliers: ["LumiLED", "IluminaMais", "Luzes & Cia"]
+    suppliers: ["LumiLED", "IluminaMais", "Luzes & Cia"],
+    expiry: new Date("2023-10-05")
   },
   {
     name: "Spot LED Embutido",
@@ -692,7 +709,8 @@ export const products = [
     category: "Iluminação",
     price: 20.00,
     quantity: 200,
-    suppliers: ["SpotLED", "Luzes & Cia", "Ilumina Pro"]
+    suppliers: ["SpotLED", "Luzes & Cia", "Ilumina Pro"],
+    expiry: new Date("2024-05-25")
   },
   {
     name: "Vaso Sanitário",
@@ -700,7 +718,8 @@ export const products = [
     category: "Banheiro",
     price: 250.00,
     quantity: 30,
-    suppliers: ["Sanitários Brasil", "Vasos & Cia", "Banheiro Top"]
+    suppliers: ["Sanitários Brasil", "Vasos & Cia", "Banheiro Top"],
+    expiry: new Date("2024-07-30")
   },
   {
     name: "Pia de Granito",
@@ -708,7 +727,8 @@ export const products = [
     category: "Banheiro",
     price: 400.00,
     quantity: 20,
-    suppliers: ["Granitos & Cia", "Pias Brasil", "Banheiro Perfeito"]
+    suppliers: ["Granitos & Cia", "Pias Brasil", "Banheiro Perfeito"],
+    expiry: new Date("2023-12-01")
   },
   {
     name: "Box de Vidro",
@@ -716,7 +736,8 @@ export const products = [
     category: "Banheiro",
     price: 600.00,
     quantity: 15,
-    suppliers: ["Vidrobox", "Boxes & Cia", "Banho Mais"]
+    suppliers: ["Vidrobox", "Boxes & Cia", "Banho Mais"],
+    expiry: new Date("2024-04-10")
   },
   {
     name: "Torneira para Cozinha",
@@ -724,7 +745,8 @@ export const products = [
     category: "Cozinha",
     price: 100.00,
     quantity: 50,
-    suppliers: ["Cozinha Mais", "Torneiras & Cia", "Cozinha Top"]
+    suppliers: ["Cozinha Mais", "Torneiras & Cia", "Cozinha Top"],
+    expiry: new Date("2023-08-20")
   },
   {
     name: "Pia Inox",
@@ -732,7 +754,8 @@ export const products = [
     category: "Cozinha",
     price: 300.00,
     quantity: 25,
-    suppliers: ["Pias Inox", "Cozinha & Cia", "Inox Mais"]
+    suppliers: ["Pias Inox", "Cozinha & Cia", "Inox Mais"],
+    expiry: new Date("2024-06-05")
   },
   {
     name: "Misturador Monocomando",
@@ -740,7 +763,8 @@ export const products = [
     category: "Cozinha",
     price: 200.00,
     quantity: 40,
-    suppliers: ["Misturadores Brasil", "Cozinha Pro", "Torneiras Top"]
+    suppliers: ["Misturadores Brasil", "Cozinha Pro", "Torneiras Top"],
+    expiry: new Date("2023-09-30")
   },
   {
     name: "Arame Farpado",
@@ -748,209 +772,29 @@ export const products = [
     category: "Ferragens",
     price: 120.00,
     quantity: 30,
-    suppliers: ["Farpados & Cia", "Arames Brasil", "Ferro Forte"]
+    suppliers: ["Farpados & Cia", "Arames Brasil", "Ferro Forte"],
+    expiry: new Date("2024-01-15")
   },
   {
     name: "Tela de Alambrado",
     refCode: "TDA-026",
     category: "Ferragens",
-    price: 150.00,
-    quantity: 20,
-    suppliers: ["Alambrados Brasil", "Telarte", "Ferragens & Cia"]
+    price: 70.00,
+    quantity: 50,
+    suppliers: ["Telar", "Alambrados Brasil", "Ferro Mais"],
+    expiry: new Date("2023-11-10")
   },
   {
-    name: "Prego 17x27",
-    refCode: "PRG-027",
+    name: "Chapa de Aço 3mm",
+    refCode: "CDA-027",
     category: "Ferragens",
-    price: 10.00,
-    quantity: 500,
-    suppliers: ["Pregos & Cia", "Ferragens Mais", "Construpregos"]
-  },
-  {
-    name: "Martelo Unha",
-    refCode: "MRU-028",
-    category: "Ferramentas",
-    price: 25.00,
-    quantity: 100,
-    suppliers: ["Ferramentas Top", "Martelos Brasil", "Construmartelo"]
-  },
-  {
-    name: "Serra Tico-Tico",
-    refCode: "STT-029",
-    category: "Ferramentas",
-    price: 150.00,
-    quantity: 30,
-    suppliers: ["Serras & Cia", "Ferramentas Pro", "Serra Forte"]
-  },
-  {
-    name: "Parafusadeira Elétrica",
-    refCode: "PFE-030",
-    category: "Ferramentas",
-    price: 200.00,
-    quantity: 25,
-    suppliers: ["Parafusos & Cia", "Ferramentas Top", "Eletroutil"]
-  },
-  {
-    name: "Trena 5m",
-    refCode: "TRN-031",
-    category: "Ferramentas",
-    price: 30.00,
-    quantity: 150,
-    suppliers: ["Trenas Brasil", "Ferramentas & Cia", "Medir Top"]
-  },
-  {
-    name: "Chave de Fenda",
-    refCode: "CDF-032",
-    category: "Ferramentas",
-    price: 10.00,
-    quantity: 200,
-    suppliers: ["Chaves & Cia", "Ferramentas ABC", "Construchave"]
-  },
-  {
-    name: "Plaina Elétrica",
-    refCode: "PLE-033",
-    category: "Ferramentas",
-    price: 250.00,
-    quantity: 10,
-    suppliers: ["Ferramentas Pro", "Plaina & Cia", "Eletroutil"]
-  },
-  {
-    name: "Nível de Bolha",
-    refCode: "NVB-034",
-    category: "Ferramentas",
-    price: 40.00,
-    quantity: 120,
-    suppliers: ["Ferramentas Top", "Níveis Brasil", "Construnível"]
-  },
-  {
-    name: "Serra Circular",
-    refCode: "SRC-035",
-    category: "Ferramentas",
-    price: 300.00,
-    quantity: 15,
-    suppliers: ["Serras Brasil", "Ferramentas & Cia", "Circular Forte"]
-  },
-  {
-    name: "Escada Alumínio 6 degraus",
-    refCode: "ESC-036",
-    category: "Ferramentas",
     price: 180.00,
-    quantity: 20,
-    suppliers: ["Escadas & Cia", "Alumínio Forte", "Escadas Brasil"]
+    quantity: 10,
+    suppliers: ["Chapas & Cia", "Aços Brasil", "Ferragens Mais"],
+    expiry: new Date("2024-07-15")
   },
-  {
-    name: "Alicate Universal",
-    refCode: "ALU-037",
-    category: "Ferramentas",
-    price: 20.00,
-    quantity: 100,
-    suppliers: ["Ferramentas ABC", "Alicates & Cia", "Construalicate"]
-  },
-  {
-    name: "Disco de Corte 115mm",
-    refCode: "DCT-038",
-    category: "Ferramentas",
-    price: 15.00,
-    quantity: 300,
-    suppliers: ["Discos Brasil", "Ferramentas Top", "Corte & Cia"]
-  },
-  {
-    name: "Cola Madeira",
-    refCode: "CLM-039",
-    category: "Adesivos",
-    price: 25.00,
-    quantity: 80,
-    suppliers: ["Colas & Cia", "Madeira Forte", "Construcola"]
-  },
-  {
-    name: "Silicone Acético",
-    refCode: "SIL-040",
-    category: "Adesivos",
-    price: 30.00,
-    quantity: 100,
-    suppliers: ["Siliconemais", "Adesivos Brasil", "Construsil"]
-  },
-  {
-    name: "Fita Veda Rosca",
-    refCode: "FVR-041",
-    category: "Adesivos",
-    price: 3.00,
-    quantity: 200,
-    suppliers: ["Fitas & Cia", "Vedaforte", "Construfita"]
-  },
-  {
-    name: "Massa Corrida",
-    refCode: "MSC-042",
-    category: "Pintura",
-    price: 60.00,
-    quantity: 70,
-    suppliers: ["Massas & Cia", "Pintura Forte", "Construmassa"]
-  },
-  {
-    name: "Verniz Marítimo",
-    refCode: "VNM-043",
-    category: "Pintura",
-    price: 90.00,
-    quantity: 50,
-    suppliers: ["Vernizes Brasil", "Pintura & Cia", "Verniz Top"]
-  },
-  {
-    name: "Lixa Madeira",
-    refCode: "LXM-044",
-    category: "Pintura",
-    price: 5.00,
-    quantity: 300,
-    suppliers: ["Lixas & Cia", "Madeira Lixa", "Construlixa"]
-  },
-  {
-    name: "Cabo Flexível 6mm",
-    refCode: "CBF-045",
-    category: "Elétrica",
-    price: 200.00,
-    quantity: 50,
-    suppliers: ["Cabos & Cia", "Eletricall", "FlexiCabo"]
-  },
-  {
-    name: "Tomada 20A",
-    refCode: "TOM-046",
-    category: "Elétrica",
-    price: 8.00,
-    quantity: 250,
-    suppliers: ["Tomadas Brasil", "Eletricall", "Conexões & Cia"]
-  },
-  {
-    name: "Caixa de Luz 4x2",
-    refCode: "CXL-047",
-    category: "Elétrica",
-    price: 5.00,
-    quantity: 300,
-    suppliers: ["Caixas & Cia", "Luz Forte", "Construluz"]
-  },
-  {
-    name: "Parafuso Philips 3,5x40mm",
-    refCode: "PFP-048",
-    category: "Ferragens",
-    price: 0.20,
-    quantity: 1000,
-    suppliers: ["Parafusos & Cia", "Ferragens Brasil", "Construparafuso"]
-  },
-  {
-    name: "Porca Sextavada 1/4",
-    refCode: "PSC-049",
-    category: "Ferragens",
-    price: 0.10,
-    quantity: 2000,
-    suppliers: ["Porcas & Cia", "Ferragens Top", "Construporca"]
-  },
-  {
-    name: "Broca de Aço 10mm",
-    refCode: "BRC-050",
-    category: "Ferramentas",
-    price: 15.00,
-    quantity: 100,
-    suppliers: ["Brocas & Cia", "Ferramentas Brasil", "Construbroca"]
-  }
 ];
+
 
 export const accounts = [
   { user: "gabriel.akio", password: "123" },
