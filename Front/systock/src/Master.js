@@ -14,7 +14,7 @@ export default function Master() {
       {({ isLoggedIn, actions }) => {
 
         return (
-          <div style={{ margin: isLoggedIn ? "16px" : "0px", flex: isLoggedIn ? 0 : 1, overflow: "auto" }}>
+          <div style={{ padding: "0px", flex: isLoggedIn ? 0 : 1 }}>
             <Routes>
               <Route path="login" element={
                 !isLoggedIn ? <Login /> : null

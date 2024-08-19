@@ -71,7 +71,7 @@ export default function Home() {
           return {...table, list};
         }
         case ADVICE_TYPE.PRODUCT_EXPIRED: {
-          const list = arrProducts.filter(product => product.expiry < new Date());
+          const list = arrProducts.filter(product => product.expiry <= new Date());
 
           return {...table, list};
         }
