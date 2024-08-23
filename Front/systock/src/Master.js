@@ -3,14 +3,14 @@ import { Route, Routes } from 'react-router-dom'
 import Category from './pages/Category/Category'
 import Product from './pages/Product/Product'
 import Supplier from './pages/Supplier/Supplier'
-import { LoginContext } from './App'
+import { MainContext } from './App'
 import Login from './pages/Login/Login'
 import ResetPassword from './pages/Login/ResetPassword/ResetPassword'
 import Home from './pages/Home/Home'
 
 export default function Master() {
   return (
-    <LoginContext.Consumer>
+    <MainContext.Consumer>
       {({ isLoggedIn, actions }) => {
 
         return (
@@ -32,6 +32,6 @@ export default function Master() {
           </div>
         );
       }}
-    </LoginContext.Consumer>
+    </MainContext.Consumer>
   )
 }

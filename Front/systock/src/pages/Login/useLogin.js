@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { performFetch, performFetchNoResult } from "../../apiBase";
-import { ENTITIES, getData } from "../../utils/debug-local-helper";
-import { DEBUG_LOCAL } from "../../App";
+import { ENTITIES } from "../../utils/debug-local-helper";
+import { DEBUG_LOCAL, MainContext } from "../../App";
 
 export const useLogin = () => {
 
@@ -22,6 +22,8 @@ export const useLogin = () => {
     autoHide: 5000,
     handleClose: null
   });
+
+  const { getData } = useContext(MainContext);
 
   const onChangeUser = (event) => {
     setError({...error, user: ''});
@@ -67,7 +69,7 @@ export const useLogin = () => {
       }
 
       return setLoading(false);
-    };     
+    }
 
     try {
       const result = await performFetch("/auth", {

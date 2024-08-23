@@ -1,16 +1,18 @@
+import React from 'react';
 import Master from './Master.js';
 import './App.css';
 import Sidebar from './pages/Sidebar/Sidebar.js';
 import { createContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { setInitialData, verifyHasContent } from './utils/debug-local-helper.js';
+import { DB_DEBUG_NAME, getDBBase, setInitialData, verifyHasContent } from './utils/debug-local-helper.js';
 
-export const LoginContext = createContext();
+export const MainContext = createContext();
 export const DEBUG_LOCAL = true;
 
 function App() {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false); 
+  const [dbBase, setDbBase] = useState(null);
 
   useEffect(() => {
     if(DEBUG_LOCAL) {
@@ -24,6 +26,7 @@ function App() {
     if(DEBUG_LOCAL) {
       if(payload === "connectLocal") {
         setIsLoggedIn(true);
+        getDB();
         return navigate(window.location.pathname);
       } else {
         setIsLoggedIn(false);
@@ -47,6 +50,7 @@ function App() {
         return;
       } else {
         setIsLoggedIn(true);
+        getDB();
         navigate(window.location.pathname);
       }
     } else {
@@ -60,6 +64,26 @@ function App() {
     }
   }
 
+  function getDB() {
+    const db =  getDBBase();
+    setDbBase(db);
+  }
+
+  function updateData(type, value) {
+    if(!verifyHasContent()) return;
+  
+    const nextDB = {...dbBase, [type]: value};
+    setDbBase(nextDB);
+  
+    window.localStorage.setItem(DB_DEBUG_NAME, JSON.stringify(nextDB));
+  }
+
+  function getData(type) {
+    if(!verifyHasContent()) return;
+
+    return dbBase[type];
+  }
+
   const logOff = () => {
     window.localStorage.removeItem('tokenLogin');
     setIsLoggedIn(false);
@@ -69,18 +93,21 @@ function App() {
 
 
   return (
-    <LoginContext.Provider value={{
+    <MainContext.Provider value={{
       isLoggedIn, navigate, setIsLoggedIn,
       actions: {
         setIsLoggedIn,
-        logOff
-      }
+        logOff,
+      },
+      dbBase,
+      updateData,
+      getData
     }}>
       <div className='main' style={{display: !isLoggedIn ? 'flex' : 'grid'}}>
         {isLoggedIn && <Sidebar logOff={logOff}/>}
         <Master />
       </div>
-    </LoginContext.Provider>
+    </MainContext.Provider>
     
   );
 }

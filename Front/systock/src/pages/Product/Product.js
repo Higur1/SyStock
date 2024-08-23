@@ -8,7 +8,8 @@ import CreateProductDialog from "./dialogs/CreateProductDialog";
 import CustomizedSnackbars from "../../components/CustomizedSnackBar";
 import EditProductDialog from "./dialogs/EditProductDialog";
 import CircularLoading from "../../components/common/CircularLoading";
-import ChangeQuantityProductDialog from "./dialogs/ChangeQuantityProductDialog";
+import ChangeQuantityProductDialog from "./dialogs/AddSupply";
+import AddSupply from "./dialogs/AddSupply";
 
 export const FILTER_TYPES = {
   ALL: "ALL",
@@ -26,6 +27,57 @@ export const filtersBase = [
   { type: FILTER_TYPES.EXPIRED, value: "Vencidos" }
 ];
 
+const columns = {
+  [FILTER_TYPES.ALL]: [
+    { label: "Código de Referência", value: "codRef" },
+    { label: "Nome", value: "name" },
+    { label: "Categoria", value: "category" },
+    { label: "Preço de Venda", value: "priceSellBase" },
+    { label: "Quantidade", value: "quantity" },
+    { label: "", value: "menu" }
+  ],
+  [FILTER_TYPES.NEXT_TO_EXPIRY]: [
+    { label: "Data de Vencimento", value: "expiry" },
+    { label: "Código de Referência", value: "codRef" },
+    { label: "Nome", value: "name" },
+    { label: "Categoria", value: "category" },
+    { label: "Quantidade Total", value: "quantity" },
+    { label: "Quantidade nessa Validade", value: "quantity" },
+    { label: "", value: "menu" }
+  ],
+  [FILTER_TYPES.LOW_QUANTITY]: [
+    { label: "Código de Referência", value: "codRef" },
+    { label: "Nome", value: "name" },
+    { label: "Categoria", value: "category" },
+    { label: "Quantidade Mínima Informada", value: "quantity" },
+    { label: "Quantidade", value: "quantity" },
+    { label: "", value: "menu" }
+  ],
+  [FILTER_TYPES.EMPTY]: [
+    { label: "Código de Referência", value: "codRef" },
+    { label: "Nome", value: "name" },
+    { label: "Categoria", value: "category" },
+    { label: "", value: "menu" }
+  ],
+  [FILTER_TYPES.EXPIRED]: [
+    { label: "Data de Vencimento", value: "expiry" },
+    { label: "Código de Referência", value: "codRef" },
+    { label: "Nome", value: "name" },
+    { label: "Categoria", value: "category" },
+    { label: "Quantidade Total", value: "quantity" },
+    { label: "Quantidade Vencida", value: "quantity" },
+    { label: "", value: "menu" }
+  ],
+}
+
+const TYPES_DIALOG = {
+  NONE: 0,
+  ADD_PRODUCT: 1,
+  ADD_SUPPLY: 2,
+  EDIT_PRODUCT: 3,
+  DELETE_PRODUCT: 4,
+}
+
 export default function Product() {
 
   const { productsBase, productsFiltered, createProduct, errorInsert,
@@ -34,11 +86,7 @@ export default function Product() {
   } = useProduct();
   const [menuOption, setMenuOption] = useState(false);
   const [idMenu, setIdMenu] = useState(null);
-  const [idEditProduct, setIdEditProduct] = useState(null);
-  const [openCreateProduct, setOpenCreateProduct] = useState(false);
-  const [openEditProduct, setOpenEditProduct] = useState(false);
-  const [deleteProduct, setDeleteProduct] = useState(false);
-  const [openQuantity, setOpenQuantity] = useState({open: false, index: -1});
+  const [dialog, setDialog] = useState({ type: TYPES_DIALOG.NONE});
 
   function handleMenuOptions(id) {
     setMenuOption(true);
@@ -51,7 +99,7 @@ export default function Product() {
   }
 
   function handleQuantityDialog(index) {
-    setOpenQuantity({open: true, index});
+    setDialog({ type: TYPES_DIALOG.ADD_PRODUCT, index});
   }
 
   return (
@@ -93,60 +141,65 @@ export default function Product() {
           <Button
             variant="contained"
             style={{ minWidth: '236px' }}
-            onClick={() => setOpenCreateProduct(true)}
+            onClick={() => setDialog({type: TYPES_DIALOG.ADD_PRODUCT})}
             size="small"
           >
             Adicionar Produto
           </Button>
+          <Button
+            variant="contained"
+            style={{ minWidth: '236px' }}
+            onClick={() => setDialog({type: TYPES_DIALOG.ADD_SUPPLY})}
+            size="small"
+          >
+            Adicionar Abastecimento
+          </Button>
         </HeaderContainer>
-        <div style={{gridArea: "table", height: "100%", overflow: 'hidden'}}>
+        <div style={{ gridArea: "table", height: "100%", overflow: 'hidden' }}>
           {productsBase === null || productsFiltered === null ? (
             <CircularLoading />
           ) : (
             <TableContainer>
               <TableRow style={{ background: '#DCDCDC', borderRadius: '8px 8px 0px 0px' }}>
-                {/* <TableData width={"32%"} minWidth={'200px'}>{"Nome"}</TableData> */}
-                <TableData style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{"Código de Referência"}</TableData>
-                <TableData style={{ flex: 1 }}>{"Nome"}</TableData>
-                <TableData style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{"Categoria"}</TableData>
-                <TableData style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{"Preço"}</TableData>
-                <TableData style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{"Quantidade"}</TableData>
-                {/* <TableData width={"7%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{"Supplier"}</TableData> */}
-                <TableData style={{ justifyContent: 'center', width: 40 }} />
+                {columns[filter].map((column, i) => (
+                  <TableData style={{ justifyContent: 'center', width: 150, maxWidth: 150 }} key={`header-column-${i}`}>{column.label}</TableData>
+                ))}
               </TableRow>
               <div className="customScroll">
                 {(productsFiltered.length > 0) && productsFiltered.map((prod, index) => (
-                  <TableRow key={index} style={{
+                  <TableRow key={`row-${index}`} style={{
                     borderRadius: index === productsFiltered.length - 1 ? '0px 0px 8px 8px' : '0px',
                     borderBottom: index === productsFiltered.length - 1 ? '0px' : '1px solid #d3D3D3',
                     background: index & 2 === 0 ? "#ebebeb" : "#F5f5f5"
                   }}>
-                    {/* <TableData width={"32%"} minWidth={'200px'}>{prod.name}</TableData> */}
-                    <TableData style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{prod.refCode}</TableData>
-                    <TableData style={{ flex: 1 }}>{prod.name}</TableData>
-                    <TableData style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{prod.category}</TableData>
-                    <TableData style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{prod.price}</TableData>
-                    <TableData style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{prod.quantity}</TableData>
-                    {/* <TableData width={"7%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{prod.supplier_id}</TableData> */}
-                    <TableData style={{ justifyContent: 'center', width: 40 }}>
-                      <IconButton onClick={() => handleMenuOptions(index)}>
-                        <MoreVertIcon fontSize='small' />
-                        {menuOption && idMenu === index && (
-                          <ClickAwayListener onClickAway={handleCloseMenu}>
-                            <Menu>
-                              <MenuOption style={{ borderRadius: '16px 16px 0px 0px' }}>{"Visualizar Produto"}</MenuOption>
-                              <MenuOption onClick={() => {
-                                setOpenEditProduct(true);
-                                setIdEditProduct(index);
-                              }}>{"Editar Produto"}</MenuOption>
-                              <MenuOption onClick={() => handleQuantityDialog(index)}>{"Alterar Quantidade"}</MenuOption>
-                              <MenuOption onClick={() => setDeleteProduct(true)} style={{ borderBottom: '0px', borderRadius: '0px 0px 16px 16px' }} >{"Apagar Produto"}</MenuOption>
-                            </Menu>
-                          </ClickAwayListener>
+                    {columns[filter].map((column, i) => {
 
-                        )}
-                      </IconButton>
-                    </TableData>
+                      if(column.value === "menu") {
+                        return (
+                          <TableData style={{ justifyContent: 'center', width: 40 }} key={`row-${index}-${i}`}>
+                            <IconButton onClick={() => handleMenuOptions(index)}>
+                              <MoreVertIcon fontSize='small' />
+                              {menuOption && idMenu === index && (
+                                <ClickAwayListener onClickAway={handleCloseMenu}>
+                                  <Menu>
+                                    <MenuOption style={{ borderRadius: '16px 16px 0px 0px' }}>{"Visualizar Produto"}</MenuOption>
+                                    <MenuOption onClick={() => {
+                                      setDialog({type: TYPES_DIALOG.EDIT_PRODUCT, id: index});
+                                    }}>{"Editar Produto"}</MenuOption>
+                                    <MenuOption onClick={() => handleQuantityDialog(index)}>{"Alterar Quantidade"}</MenuOption>
+                                    <MenuOption onClick={() => setDialog({type: TYPES_DIALOG.DELETE_PRODUCT})} style={{ borderBottom: '0px', borderRadius: '0px 0px 16px 16px' }} >{"Apagar Produto"}</MenuOption>
+                                  </Menu>
+                                </ClickAwayListener>
+                              )}
+                            </IconButton>
+                          </TableData>
+                        )
+                      }
+
+                      return (
+                        <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{prod[column.value]}</TableData>
+                      );
+                    })}
                   </TableRow>
                 ))}
               </div>
@@ -157,43 +210,42 @@ export default function Product() {
 
       </Container >
 
-      {openCreateProduct && <CreateProductDialog
+      {dialog.type === TYPES_DIALOG.ADD_PRODUCT && <CreateProductDialog
         handleCreate={(prod) => {
           createProduct(prod);
-          setOpenCreateProduct(false);
+          setDialog({type: TYPES_DIALOG.NONE});
         }}
-        handleClose={() => setOpenCreateProduct(false)}
+        handleClose={() => setDialog({type: TYPES_DIALOG.NONE})}
         error={errorInsert}
-        open={openCreateProduct}
+        open  
       />}
 
-      {
-        openEditProduct && <EditProductDialog
+      {(dialog.type === TYPES_DIALOG.EDIT_PRODUCT) && <EditProductDialog
           handleEdit={(prod) => {
             updateProduct(prod);
-            setOpenEditProduct(false);
+            setDialog({type: TYPES_DIALOG.NONE});
           }}
-          handleClose={() => setOpenEditProduct(false)}
+          handleClose={() => setDialog({type: TYPES_DIALOG.NONE})}
           error={errorInsert}
-          open={openEditProduct}
-          product={productsFiltered[idEditProduct]}
+          open
+          product={productsFiltered[dialog.index]}
 
         />
       }
 
       {
-        deleteProduct && (
+        dialog.type === TYPES_DIALOG.DELETE_PRODUCT && (
           <Dialog
-            open={deleteProduct}
+            open
             maxWidth="md"
             fullWidth
           >
             <DialogTitle>{"Deseja  mesmo apagar essa categoria?"}</DialogTitle>
             <DialogActions>
-              <Button onClick={() => setDeleteProduct(false)}>Cancelar</Button>
+              <Button onClick={() => setDialog({type: TYPES_DIALOG.NONE})}>Cancelar</Button>
               <Button onClick={() => {
                 handleDeleteProduct({ product_id: productsFiltered.find((p, i) => i === idMenu).id });
-                setDeleteProduct(false);
+                setDialog({type: TYPES_DIALOG.NONE});
               }}>Confirmar</Button>
             </DialogActions>
           </Dialog>
@@ -213,11 +265,12 @@ export default function Product() {
       }
 
       {
-        openQuantity.open && (
-          <ChangeQuantityProductDialog onConfirm={updateProduct} onClose={() => setOpenQuantity({open: false, index: -1})} product={productsFiltered[openQuantity.index]} />
+        dialog.type === TYPES_DIALOG.ADD_SUPPLY && (
+          <AddSupply onConfirm={() => {}} onClose={() => setDialog({type: TYPES_DIALOG.NONE})} />
         )
       }
     </>
   )
 }
 
+  

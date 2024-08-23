@@ -1,11 +1,11 @@
 import { Backdrop, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputAdornment, InputLabel, MenuItem, Select, Slide, TextField } from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import PropTypes from 'prop-types';
 import { CurrencyInput } from "react-currency-mask";
 import styled from "styled-components";
 import { performFetch } from "../../../apiBase";
-import { DEBUG_LOCAL } from "../../../App";
-import { ENTITIES, getData } from "../../../utils/debug-local-helper";
+import { DEBUG_LOCAL, MainContext } from "../../../App";
+import { ENTITIES} from "../../../utils/debug-local-helper";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
@@ -24,13 +24,6 @@ const Container = styled.div`
   padding-top: 16px;
 `
 
-const CurrencyInputCustom = () => {
-  return (
-    <CurrencyInput
-    />
-  );
-};
-
 export default function EditProductDialog(props) {
   const { handleEdit, handleClose, error, open, product } = props;
 
@@ -46,12 +39,13 @@ export default function EditProductDialog(props) {
   const isMount = useRef();
   const currencyRegex = /^[0-9]+(\.[0-9]{1,2})?$/;
 
+  const { getData } = useContext(MainContext);
+
   useEffect(() => {
     if(isMount.current) return;
     
     isMount.current = true;
     getCategories();
-    getSupplier();
   }, []);
 
   async function getCategories() {
@@ -72,7 +66,7 @@ export default function EditProductDialog(props) {
     let value = e.target.value;
     
     if(!currencyRegex.test(value)) {
-      setHasErrorPrice(true);
+      // setHasErrorPrice(true);
     }
     setPriceBuy(e.target.value);
   }
@@ -81,7 +75,7 @@ export default function EditProductDialog(props) {
     let value = e.target.value;
     
     if(!currencyRegex.test(value)) {
-      setHasErrorPrice(true);
+      // setHasErrorPrice(true);
     }
     setPriceSell(e.target.value);
   }
@@ -163,24 +157,31 @@ export default function EditProductDialog(props) {
         <DialogActions>
           <Button onClick={handleClose}>Cancelar</Button>
           <Button onClick={() => {
-            if(ncmsh === '' || description === '' ||
-              price === 0 || categoryID === '') {
+            if(product.ncmSh === '' || description === '' ||
+              priceBuy === 0 || priceSell === 0 || categoryID === '') {
               setHasError(true);
               return;
             }
 
-            if(!currencyRegex.test(price)) {
-              setHasErrorPrice(true);
+            if(!currencyRegex.test(priceBuy)) {
+              // setHasErrorPrice(true);
+              return;
+            }
+
+            if(!currencyRegex.test(priceSell)) {
+              // setHasErrorPrice(true);
               return;
             }
 
             setIsLoading(true);
-            const priceString = parseFloat(price);
+            const strpriceSell = parseFloat(priceSell);
+            const strpriceBuy = parseFloat(priceBuy);
             const product = {
+              ...product,
               id,
-              ncmSh: ncmsh,
               description,
-              price: priceString,
+              priceBuy: strpriceBuy,
+              priceSell: strpriceSell,
               category_id: categoryID,
               // supplier_id: supplierID
             };

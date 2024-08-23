@@ -1,12 +1,9 @@
-import { Error, Visibility, VisibilityOff } from '@mui/icons-material';
-import { IconButton, Link, TextField } from '@mui/material';
-import React, { useEffect } from 'react';
+import { Visibility } from '@mui/icons-material';
+import { IconButton} from '@mui/material';
+import React, { useContext, useEffect } from 'react';
 import { useState } from 'react';
-import SupplierFastViewDialog from '../Supplier/dialogs/SupplierFastViewDialog';
-import { ENTITIES, getData, getDB } from '../../utils/debug-local-helper';
-import CircularLoading from '../../components/common/CircularLoading';
-import { addSuppliersEntityToProducts } from '../../utils/utils';
 import ViewAdvicesDialog from '../Supplier/dialogs/ViewAdvicesDialog';
+import { MainContext } from '../../App';
 
 export const ADVICE_VARIANT = {
   "ERROR": 0,
@@ -22,8 +19,9 @@ export const ADVICE_TYPE = {
 };
 
 export default function Home() {
+  const { dbBase } = useContext(MainContext);
   
-  const [suppliersDialog, setSuppliersDialog] = useState({open: false, obj: null});
+  // const [suppliersDialog, setSuppliersDialog] = useState({open: false, obj: null});
   const [table, setTable] = useState([
     {
       type: ADVICE_TYPE.PRODUCT_EXPIRED,
@@ -52,56 +50,61 @@ export default function Home() {
     handleInitialData();
   }, []);
 
-
   function getAdvices() {
-    const { products, suppliers } = getDB();
+    const { supplyList } = dbBase;
 
-    const arrProducts = addSuppliersEntityToProducts(products, suppliers);
+    const supplyListFiltered = supplyList.map(supply => {
+
+      return {
+        [ADVICE_TYPE.PRODUCT_EMPTY]: supply.getBatchesEmpty(),
+        [ADVICE_TYPE.PRODUCT_ENDING]: supply.getBatchesEnding(),
+        [ADVICE_TYPE.PRODUCT_EXPIRED]: supply.getBatchesExpired(),
+        [ADVICE_TYPE.PRODUCT_NEXT_TO_EXPIRE]: supply.getBatchesExpired(),
+      }
+    });
+
+    const emptyProducts = [];
+    const endingProducts = [];
+    const expiredProducts = [];
+    const nextToExpireProducts = [];
+
+    supplyListFiltered.forEach(objSupplyList => {
+      emptyProducts.push(...objSupplyList[ADVICE_TYPE.PRODUCT_EMPTY]);
+      endingProducts.push(...objSupplyList[ADVICE_TYPE.PRODUCT_ENDING]);
+      expiredProducts.push(...objSupplyList[ADVICE_TYPE.PRODUCT_EXPIRED]);
+      nextToExpireProducts.push(...objSupplyList[ADVICE_TYPE.PRODUCT_NEXT_TO_EXPIRE]);
+    });
 
     setTable(prevTable => prevTable.map(table => {
       switch(table.type) {
         case ADVICE_TYPE.PRODUCT_EMPTY: {
-          const list = arrProducts.filter(product => product.quantity === 0);
-
-          return {...table, list};
+          return {...table, list: emptyProducts};
         }
         case ADVICE_TYPE.PRODUCT_ENDING: {
-          const list = arrProducts.filter(product => product.quantity < 20);
-
-          return {...table, list};
+          return {...table, list: endingProducts};
         }
         case ADVICE_TYPE.PRODUCT_EXPIRED: {
-          const list = arrProducts.filter(product => product.expiry <= new Date());
-
-          return {...table, list};
+          return {...table, list: expiredProducts};
         }
         case ADVICE_TYPE.PRODUCT_NEXT_TO_EXPIRE: {
-          const daysDiff = 7;
-          const nextDay = new Date();
-          nextDay.setDate(new Date().getDate() + daysDiff);
-          const list = arrProducts.filter(product => (nextDay - product.expiry) < daysDiff);
-
-          return {...table, list};
+          return {...table, list: nextToExpireProducts};
         }
         default: return table;
-      };
+      }
     }));
   }
 
   function handleInitialData() {
-    // const homeObject = getData(ENTITIES.HOME_PAGE);
-
-    // setQuantityAdvice(homeObject);
     getAdvices();
   }
 
-  function openSuppliers(obj) {
-    setSuppliersDialog({open: true, obj});
-  }
+  // function openSuppliers(obj) {
+  //   setSuppliersDialog({open: true, obj});
+  // }
 
-  function closeSuppliers() {
-    setSuppliersDialog({open: false, obj: null});
-  }
+  // function closeSuppliers() {
+  //   setSuppliersDialog({open: false, obj: null});
+  // }
 
   return (
     <>
@@ -161,8 +164,8 @@ export default function Home() {
         </div>
       </div>
       
-      {openDialogViewAdvices.open && (<ViewAdvicesDialog obj={openDialogViewAdvices.obj} openSuppliers={openSuppliers} onClose={() => setOpenDialogViewAdvices({open: false, obj: null})}/>)}
-      {suppliersDialog.open && (<SupplierFastViewDialog obj={suppliersDialog.obj} onClose={closeSuppliers}/>)}
+      {openDialogViewAdvices.open && (<ViewAdvicesDialog obj={openDialogViewAdvices.obj} onClose={() => setOpenDialogViewAdvices({open: false, obj: null})}/>)}
+      {/* {suppliersDialog.open && (<SupplierFastViewDialog obj={suppliersDialog.obj} onClose={closeSuppliers}/>)} */}
     </>
     
   )

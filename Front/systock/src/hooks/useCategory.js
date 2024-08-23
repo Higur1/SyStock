@@ -1,10 +1,10 @@
 /* eslint-disable no-debugger */
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { deepCopy } from "../utils/utils";
 import { performFetch, performFetchNoResult } from "../apiBase";
-import { DEBUG_LOCAL } from "../App";
+import { DEBUG_LOCAL, MainContext } from "../App";
 import { products } from "../utils/data";
-import { ENTITIES, getData, updateData } from "../utils/debug-local-helper";
+import { ENTITIES } from "../utils/debug-local-helper";
 
 export default function useCategory() {
 
@@ -22,6 +22,8 @@ export default function useCategory() {
   const [autoHideSnackBar, setAutoHideSnackBar] = useState(3000);
   const [severitySnackBar, setSeveritySnackBar] = useState("info");
   const [snackMessageSnackBar, setSnackMessageSnackBar] = useState("");
+
+  const { updateData, getData } = useContext(MainContext);
 
   function handleOpenSnackBar(severity, message="Unexpected Error Occurred", autoHide=3000) {
     setSnackMessageSnackBar(message);

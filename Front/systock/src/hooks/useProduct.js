@@ -1,9 +1,9 @@
 /* eslint-disable no-debugger */
 /* eslint-disable no-unused-vars */
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { performFetch, performFetchNoResult } from "../apiBase";
-import { ENTITIES, getData, updateData } from "../utils/debug-local-helper";
-import { DEBUG_LOCAL } from "../App";
+import { ENTITIES } from "../utils/debug-local-helper";
+import { DEBUG_LOCAL, MainContext } from "../App";
 import { FILTER_TYPES } from "../pages/Product/Product";
 
 export default function useCategory() {
@@ -18,6 +18,8 @@ export default function useCategory() {
   const [autoHideSnackBar, setAutoHideSnackBar] = useState(3000);
   const [severitySnackBar, setSeveritySnackBar] = useState("info");
   const [snackMessageSnackBar, setSnackMessageSnackBar] = useState("");
+
+  const { updateData, getData } = useContext(MainContext);
 
   useEffect(() => {
     getProducts();

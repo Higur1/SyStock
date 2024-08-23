@@ -1,10 +1,10 @@
 import { Backdrop, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputAdornment, InputLabel, MenuItem, Select, Slide, TextField } from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import PropTypes from 'prop-types';
 import { CurrencyInput } from "react-currency-mask";
 import styled from "styled-components";
 import { performFetch } from "../../../apiBase";
-import { DEBUG_LOCAL } from "../../../App";
+import { DEBUG_LOCAL, MainContext } from "../../../App";
 import { ENTITIES } from "../../../utils/debug-local-helper";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -22,39 +22,30 @@ const Container = styled.div`
   justify-content: center;
   gap: 32px;
   padding-top: 16px;
-`
-
-const CurrencyInputCustom = () => {
-  return (
-    <CurrencyInput
-    />
-  );
-};
-
+`;
 export default function CreateProductDialog(props) {
   const { handleCreate, handleClose, error, open } = props;
 
 
   const [name, setName] = useState("");
-  const [ncmsh, setNcmsh] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState(0);
   const [categoryID, setCategoryID] = useState("");
-  const [supplierID, setSupplierID] = useState(1);
   const [categories, setCategories] = useState([])
   const [hasError, setHasError] = useState(false);
   const [hasErrorPrice, setHasErrorPrice] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [suppliers, setSuppliers] = useState([]);
+  const [minimumQuantity, setMinimumQuantity] = useState(false);
   const isMount = useRef();
   const currencyRegex = /^[0-9]+(\.[0-9]{1,2})?$/;
+
+  const { getData } = useContext(MainContext);
 
   useEffect(() => {
     if(isMount.current) return;
     
     isMount.current = true;
     getCategories();
-    getSupplier();
   }, []);
 
   async function getCategories() {
@@ -66,19 +57,6 @@ export default function CreateProductDialog(props) {
     try {
       const categories = await performFetch("/categories", {method: 'GET'});
       setCategories(categories);
-    } catch (error) {
-      console.log(error.message);
-    }
-  }
-
-  async function getSupplier() {
-    if(DEBUG_LOCAL) {
-      const suppliers = getData(ENTITIES.SUPPLIERS);
-      return setSuppliers(suppliers);
-    }
-    try {
-      const suppliers = await performFetch("/suppliers", {method: 'GET'});
-      setSuppliers(suppliers);
     } catch (error) {
       console.log(error.message);
     }
@@ -104,28 +82,15 @@ export default function CreateProductDialog(props) {
         <DialogTitle><Title>{"Adicionar Produto"}</Title></DialogTitle>
         <DialogContent>
           <Container>
-          {/* <TextField
+          <TextField
               required
               label="Nome do Produto"
               value={name}
               onChange={(e) => setName(e.target.value.slice(0,50))}
               disabled={isLoading}
-            /> */}
-            <TextField
-              required
-              label="NCM/SH"
-              value={ncmsh}
-              onChange={(e) => setNcmsh(e.target.value.slice(0,8))}
-              disabled={isLoading}
             />
             <TextField
-              label="Descrição"
-              value={description}
-              onChange={(e) => setDescription(e.target.value.slice(0,255))}
-              disabled={isLoading}
-            />
-            <TextField
-              label="Preço"
+              label="Preço de Venda"
               value={price}
               onChange={handlePriceChange}
               placeholder={"ex: 100.00"}
@@ -136,6 +101,32 @@ export default function CreateProductDialog(props) {
               InputProps={{
                 startAdornment: <InputAdornment position="start">R$</InputAdornment>
               }}
+            />
+            <TextField
+              label="Preço de Compra"
+              value={price}
+              onChange={handlePriceChange}
+              placeholder={"ex: 100.00"}
+              name="numberformat"
+              id="formatted-numberformat-input"
+              disabled={isLoading}
+              error={hasErrorPrice}
+              InputProps={{
+                startAdornment: <InputAdornment position="start">R$</InputAdornment>
+              }}
+            />
+            <TextField
+              label="Quantidade Mínima"
+              value={minimumQuantity}
+              onChange={(e) => setMinimumQuantity(e.target.value.slice(0,255))}
+              disabled={isLoading}
+              type="number"
+            />
+            <TextField
+              label="Descrição"
+              value={description}
+              onChange={(e) => setDescription(e.target.value.slice(0,255))}
+              disabled={isLoading}
             />
             <FormControl>
               <InputLabel id="test-select-label">Categoria do Produto</InputLabel>
@@ -185,7 +176,7 @@ export default function CreateProductDialog(props) {
         <DialogActions>
           <Button onClick={handleClose}>Cancelar</Button>
           <Button onClick={() => {
-            if(ncmsh === '' || description === '' ||
+            if(description === '' ||
               price === 0 || categoryID === '') {
               setHasError(true);
               return;
@@ -199,7 +190,6 @@ export default function CreateProductDialog(props) {
             setIsLoading(true);
             const priceString = parseFloat(price);
             const product = {
-              ncmSh: ncmsh,
               description,
               price: priceString,
               category_id: categoryID,

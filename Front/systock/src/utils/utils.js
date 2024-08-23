@@ -1,6 +1,11 @@
+import Batch from "../classes/Batch";
+import { products, suppliers } from "./data";
+
 export function deepCopy(object) {
   return JSON.parse(JSON.stringify(object));
 }
+
+export const generateID = () => Math.random().toString().slice(2);
 
 export const states = [
   {name: "Acre", acronym: "AC"},
@@ -32,20 +37,3 @@ export const states = [
   {name: "Tocantins", acronym: "TO"}
 
 ];
-
-export function addSuppliersEntityToProducts(products, suppliers) {
-  
-  const arr = products
-  .map(obj => {
-    const nextSuppliers = obj.suppliers.map(sup => {
-      const supplierObj = suppliers.find(supp => supp.name === sup);
-      if(supplierObj !== undefined) console.log(supplierObj);
-      if(supplierObj === undefined) console.log("UNDEFINED: ", sup);
-      return supplierObj;
-    });
-    const expiry = new Date(obj.expiry);
-    return {...obj, suppliers: nextSuppliers, expiry};
-  });
-
-  return arr;
-}

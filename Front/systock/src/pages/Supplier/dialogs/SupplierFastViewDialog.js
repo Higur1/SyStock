@@ -1,10 +1,11 @@
 import { Title } from '@mui/icons-material';
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import React from 'react';
+import Batch from '../../../classes/Batch';
 
 export default function SupplierFastViewDialog(props) {
 
-  const { onClose, obj } = props;
+  const { onClose, obj = new Batch() } = props;
   const { suppliers, name, quantity} = obj; 
 
   console.log(suppliers);
@@ -29,7 +30,7 @@ export default function SupplierFastViewDialog(props) {
               <div style={{display: 'flex',alignItems: 'center', flexBasis: 250, fontWeight: 700}}>{"E-mail"}</div>
             </div>
             {suppliers.map((sup, index) => (
-              <div style={{display: 'flex', alignItems: 'center', height: 48, border: "1px solid #dcdcdc", width: "100%", borderRadius: 16}}>
+              <div style={{display: 'flex', alignItems: 'center', height: 48, border: "1px solid #dcdcdc", width: "100%", borderRadius: 16}} key={index}>
                 <div style={{textAlign: 'center', width: 36}}>{index + 1}</div>
                 <div style={{display: 'flex',alignItems: 'center', flex: 1, fontWeight: 500}}>{sup.name}</div>
                 <div style={{display: 'flex',alignItems: 'center', flexBasis: 150}}>{sup.phone}</div>
