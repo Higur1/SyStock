@@ -5,6 +5,7 @@ import { performFetch, performFetchNoResult } from "../apiBase";
 import { ENTITIES } from "../utils/debug-local-helper";
 import { DEBUG_LOCAL, MainContext } from "../App";
 import { FILTER_TYPES } from "../pages/Product/Product";
+import { convertMsToDay } from "../utils/utils";
 
 export default function useCategory() {
   const [productsBase, setProductsBase] = useState(null);
@@ -26,25 +27,94 @@ export default function useCategory() {
   }, []);
 
   function setFilteredProducts(products = productsBase, filterBase = filter) {
-    console.log(filterBase);
 
-    let nextProducts = products;
-    if (filterBase === FILTER_TYPES.LOW_QUANTITY) nextProducts = nextProducts.filter(product => product.quantity < 20);
-    if (filterBase === FILTER_TYPES.EMPTY) nextProducts = nextProducts.filter(product => product.quantity === 0);
-    if (filterBase === FILTER_TYPES.EXPIRED) nextProducts = nextProducts.filter(product => new Date(product.expiry) <= new Date());
+    let nextProducts = [];
+    if (filterBase === FILTER_TYPES.LOW_QUANTITY) {
+      nextProducts = products.filter(batch => batch.quantity < batch.minimumQuantity);
+    }
+    if (filterBase === FILTER_TYPES.EMPTY) {
+      nextProducts = products.filter(batch => batch.quantity === 0);
+    }
+    if (filterBase === FILTER_TYPES.EXPIRED) {
+  
+      const filteredProducts = products.filter(batch => batch.expiry !== null && (new Date(batch.expiry) - new Date()) < 0);
+
+      
+      for(let i = 0; i < filteredProducts.length; i++) {
+        const currentProduct = filteredProducts[i];
+
+        const productInsideNextProducts= nextProducts.find(prod => prod.refCode === currentProduct.refCode && prod.expiryToString() === currentProduct.expiryToString());
+
+        if(productInsideNextProducts) continue;
+
+        const equalProducts = filteredProducts.filter((prod, index) => prod.refCode === currentProduct.refCode).map(prod => prod.quantity);
+        const equalProductsSameSupply = filteredProducts.filter((prod, index) => prod.refCode === currentProduct.refCode && prod.expiryToString() === currentProduct.expiryToString()).map(prod => prod.quantity);
+        
+        const totalQuantity = equalProducts.reduce((acumulator, prod) => {
+          const total = prod + acumulator;
+          return acumulator + total;
+        });
+        const totalQuantitySameExpiry = equalProductsSameSupply.reduce((acumulator, prod) => {
+          const total = prod + acumulator;
+          return acumulator + total;
+        });
+
+        nextProducts.push({...currentProduct, totalQuantity, totalQuantitySameExpiry});
+      }
+    }
     if (filterBase === FILTER_TYPES.NEXT_TO_EXPIRY) {
+
       const daysDiff = 7;
       const nextDay = new Date();
       nextDay.setDate(new Date().getDate() + daysDiff);
+  
+      const filteredProducts = products.filter(batch => batch.expiry !== null && (convertMsToDay(new Date(batch.expiry) - nextDay) < daysDiff));
 
-      nextProducts = nextProducts.filter(product => (nextDay - new Date(product.expiry)) < daysDiff);
+      
+      for(let i = 0; i < filteredProducts.length; i++) {
+        const currentProduct = filteredProducts[i];
+
+        const productInsideNextProducts= nextProducts.find(prod => prod.refCode === currentProduct.refCode && prod.expiryToString() === currentProduct.expiryToString());
+
+        if(productInsideNextProducts) continue;
+
+        const equalProducts = filteredProducts.filter((prod, index) => prod.refCode === currentProduct.refCode).map(prod => prod.quantity);
+        const equalProductsSameSupply = filteredProducts.filter((prod, index) => prod.refCode === currentProduct.refCode && prod.expiryToString() === currentProduct.expiryToString()).map(prod => prod.quantity);
+        
+        const totalQuantity = equalProducts.reduce((acumulator, prod) => {
+          const total = prod + acumulator;
+          return acumulator + total;
+        });
+        const totalQuantitySameExpiry = equalProductsSameSupply.reduce((acumulator, prod) => {
+          const total = prod + acumulator;
+          return acumulator + total;
+        });
+
+        nextProducts.push({...currentProduct, totalQuantity, totalQuantitySameExpiry});
+      }
+    }
+    if(filterBase === FILTER_TYPES.ALL) {
+      for(let i = 0; i < products.length; i++) {
+        const currentProduct = products[i];
+
+        const productInsideNextProducts= nextProducts.find(prod => prod.refCode === currentProduct.refCode);
+
+        if(productInsideNextProducts) continue;
+
+        const equalProducts = products.filter((prod, index) => prod.refCode === currentProduct.refCode).map(prod => prod.quantity);
+        const totalQuantity = equalProducts.reduce((acumulator, prod) => {
+          const total = prod + acumulator;
+          return acumulator + total;
+        });
+
+        nextProducts.push({...currentProduct, totalQuantity});
+      }
     }
 
     console.log(nextProducts);
 
     setProductsFiltered(nextProducts);
   }
-
 
   function handleOpenSnackBar(severity, message = "Unexpected Error Occurred", autoHide = 3000) {
     setSnackMessageSnackBar(message);
@@ -62,7 +132,13 @@ export default function useCategory() {
 
   async function getProducts() {
     if (DEBUG_LOCAL) {
-      const products = getData(ENTITIES.PRODUCTS);
+      const supplies = getData(ENTITIES.SUPPLY_LIST);
+
+      const products = [];
+      supplies.forEach(supply => {
+        products.push(...supply.batches);
+      });
+
       setFilteredProducts(products);
       return setProductsBase(products);
     }

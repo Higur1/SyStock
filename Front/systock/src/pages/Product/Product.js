@@ -10,6 +10,7 @@ import EditProductDialog from "./dialogs/EditProductDialog";
 import CircularLoading from "../../components/common/CircularLoading";
 import ChangeQuantityProductDialog from "./dialogs/AddSupply";
 import AddSupply from "./dialogs/AddSupply";
+import { formatDate } from "../../utils/utils";
 
 export const FILTER_TYPES = {
   ALL: "ALL",
@@ -29,43 +30,43 @@ export const filtersBase = [
 
 const columns = {
   [FILTER_TYPES.ALL]: [
-    { label: "Código de Referência", value: "codRef" },
+    { label: "Código de Referência", value: "refCode" },
     { label: "Nome", value: "name" },
     { label: "Categoria", value: "category" },
-    { label: "Preço de Venda", value: "priceSellBase" },
-    { label: "Quantidade", value: "quantity" },
+    { label: "Preço de Venda", value: "priceBaseSell" },
+    { label: "Quantidade", value: "totalQuantity" },
     { label: "", value: "menu" }
   ],
   [FILTER_TYPES.NEXT_TO_EXPIRY]: [
     { label: "Data de Vencimento", value: "expiry" },
-    { label: "Código de Referência", value: "codRef" },
+    { label: "Código de Referência", value: "refCode" },
     { label: "Nome", value: "name" },
     { label: "Categoria", value: "category" },
-    { label: "Quantidade Total", value: "quantity" },
-    { label: "Quantidade nessa Validade", value: "quantity" },
+    { label: "Quantidade Total", value: "totalQuantity" },
+    { label: "Quantidade nessa Validade", value: "totalQuantitySameExpiry" },
     { label: "", value: "menu" }
   ],
   [FILTER_TYPES.LOW_QUANTITY]: [
-    { label: "Código de Referência", value: "codRef" },
+    { label: "Código de Referência", value: "refCode" },
     { label: "Nome", value: "name" },
     { label: "Categoria", value: "category" },
-    { label: "Quantidade Mínima Informada", value: "quantity" },
+    { label: "Quantidade Mínima Informada", value: "minimumQuantity" },
     { label: "Quantidade", value: "quantity" },
     { label: "", value: "menu" }
   ],
   [FILTER_TYPES.EMPTY]: [
-    { label: "Código de Referência", value: "codRef" },
+    { label: "Código de Referência", value: "refCode" },
     { label: "Nome", value: "name" },
     { label: "Categoria", value: "category" },
     { label: "", value: "menu" }
   ],
   [FILTER_TYPES.EXPIRED]: [
     { label: "Data de Vencimento", value: "expiry" },
-    { label: "Código de Referência", value: "codRef" },
+    { label: "Código de Referência", value: "refCode" },
     { label: "Nome", value: "name" },
     { label: "Categoria", value: "category" },
-    { label: "Quantidade Total", value: "quantity" },
-    { label: "Quantidade Vencida", value: "quantity" },
+    { label: "Quantidade Total", value: "totalQuantity" },
+    { label: "Quantidade Vencida", value: "totalQuantitySameExpiry" },
     { label: "", value: "menu" }
   ],
 }
@@ -194,6 +195,17 @@ export default function Product() {
                             </IconButton>
                           </TableData>
                         )
+                      }
+
+                      if(column.value === "category") {
+                        return (
+                          <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{prod[column.value].name}</TableData>
+                        );
+                      }
+                      if(column.value === "expiry") {
+                        return (
+                          <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{formatDate(prod[column.value])}</TableData>
+                        );
                       }
 
                       return (
