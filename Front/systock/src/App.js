@@ -5,17 +5,30 @@ import Sidebar from './pages/Sidebar/Sidebar.js';
 import { createContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DB_DEBUG_NAME, getDBBase, setInitialData, verifyHasContent } from './utils/debug-local-helper.js';
+import CustomizedSnackbars from './components/CustomizedSnackBar.js';
 
 export const MainContext = createContext();
 export const DEBUG_LOCAL = true;
+const initialStateSnack = {open: false, autoHide: 3000, severity: "info", message: ""}
 
 function App() {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false); 
   const [dbBase, setDbBase] = useState(null);
+  const [snackbar, setSnackbar] = useState(initialStateSnack);
+
+  function handleOpenSnackBar(severity, message="Unexpected Error Occurred", autoHide=3000) {
+    setSnackbar({open: true, severity, message, autoHide});
+  }
+
+  function handleCloseSnackBar() {
+    setSnackbar(initialStateSnack);
+  }
+
 
   useEffect(() => {
     if(DEBUG_LOCAL) {
+      getDB();
       if(!verifyHasContent()) setInitialData();
     }
     verifyToken();
@@ -99,6 +112,7 @@ function App() {
         setIsLoggedIn,
         logOff,
       },
+      handleOpenSnackBar,
       dbBase,
       updateData,
       getData
@@ -107,8 +121,16 @@ function App() {
         {isLoggedIn && <Sidebar logOff={logOff}/>}
         <Master />
       </div>
+      {snackbar.open && (
+        <CustomizedSnackbars 
+          open
+          autoHide={snackbar.autoHide}
+          handleClose={handleCloseSnackBar}
+          severity={snackbar.severity}
+          snackMessage={snackbar.message}
+        />
+      )}
     </MainContext.Provider>
-    
   );
 }
 

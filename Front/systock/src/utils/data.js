@@ -34,8 +34,6 @@ export const suppliers = [
   new Supplier({ name: "Ferragens & Cia", phone: "11 6254-5678", email: "contato@ferragensecia.com" }),
   new Supplier({ name: "Ferramentas Pro", phone: "11 7254-5678", email: "contato@ferramentaspro.com" }),
   new Supplier({ name: "Ferramentas & Cia", phone: "11 8254-5678", email: "contato@ferramentasecia.com" }),
-  new Supplier({ name: "Ferramentas Pro", phone: "11 7254-5678", email: "contato@ferramentaspro.com" }),
-  new Supplier({ name: "Ferramentas & Cia", phone: "11 8254-5678", email: "contato@ferramentasecia.com" }),
   new Supplier({ name: "Pintura & Cia", phone: "11 9254-5678", email: "contato@pinturaecia.com" }),
   new Supplier({ name: "Ferragens Brasil", phone: "11 1264-5678", email: "contato@ferragensbrasil.com" }),
   new Supplier({ name: "Construparafuso", phone: "11 2264-5678", email: "contato@construparafuso.com" }),

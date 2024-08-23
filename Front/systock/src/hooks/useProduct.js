@@ -111,7 +111,6 @@ export default function useCategory() {
       }
     }
 
-    console.log(nextProducts);
 
     setProductsFiltered(nextProducts);
   }
@@ -217,7 +216,6 @@ export default function useCategory() {
 
   function handleFilter(value) {
     setFilter(value);
-    console.log(value, typeof value);
     setFilteredProducts(productsBase, value);
   }
 

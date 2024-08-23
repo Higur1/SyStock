@@ -41,7 +41,7 @@ export default function Home() {
     {
       type: ADVICE_TYPE.PRODUCT_ENDING,
       list: [],
-      label: "Baixa Quantidade (Quantidade menor que 20)"
+      label: "Baixa Quantidade"
     },
   ]);
   const [openDialogViewAdvices, setOpenDialogViewAdvices] = useState({open: false, obj: null});

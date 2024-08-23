@@ -7,6 +7,8 @@ import SectionCollapser from '../../../components/common/SectionCollapser';
 import { TableContainer, TableData, TableRow } from '../styles';
 import Batch from '../../../classes/Batch';
 import { MainContext } from '../../../App';
+import { ENTITIES } from '../../../utils/debug-local-helper';
+import Supply from '../../../classes/Supply';
 
 const TYPES = {
   MINUS: "MINUS",
@@ -24,14 +26,15 @@ const columns = [
 ]
 
 const initialConfigProduct = { priceBuy: 0, priceSell: 0, expiry: null, quantity: 0 };
-const initialAddProduct = { open: false, name: "", category: "" };
 const noneItem = { value: -1, label: "Nenhum" };
 
 function total(arr) {
   try {
-    const nextArr = arr.filter(prod => prod.quantity);
+    const nextArr = arr.map(prod => (prod.quantity * prod.priceBuy));
+
     const sum = nextArr.reduce((accumulator, currentValue) => {
-      return accumulator + currentValue;
+      const total = accumulator + currentValue;
+      return total;
     }, 0);
 
     return sum;
@@ -50,16 +53,20 @@ export default function AddSupply(props) {
   const [suppliers, setSuppliers] = useState([]);
   const [products, setProducts] = useState([]);
   const [description, setDescription] = useState("");
+  const [productsBase, setProductsBase] = useState([]);
+  const [suppliersBase, setSuppliersBase] = useState([]);
 
-  const { getData } = useContext(MainContext);
+  const { getData, updateData, handleOpenSnackBar } = useContext(MainContext);
 
   useEffect(() => {
     const suppliers = getData("suppliers");
     const products = getData("products");
 
-    const nextSuppliers = suppliers.map((sup, index) => ({ label: sup.name, value: index }));
+    const nextSuppliers = suppliers.map((sup) => ({ label: sup.name, value: sup.email }));
     const nextProducts = products.map((prod) => ({ label: prod.name, value: prod.refCode }));
 
+    setSuppliersBase(suppliers);
+    setProductsBase(products);
     setSuppliers([noneItem, ...nextSuppliers]);
     setProducts([noneItem, ...nextProducts]);
 
@@ -84,13 +91,40 @@ export default function AddSupply(props) {
   function handleAddProduct() {
     const { value } = product;
 
-    const product = getData("products").find(prod => prod.refCode === value);
+    const nextProduct = productsBase.find(prod => prod.refCode === value);
+    const productToAdd = new Batch({product: nextProduct, ...extraProps, supplier: null});
 
-    const productToAdd = new Batch({product, ...extraProps});
 
     setProductsToAdd(prevList => [...prevList, productToAdd]);
     setExtraProps(initialConfigProduct);
     setProduct(null);
+  }
+
+  function handleChangeProduct(result) {
+    console.log(result);
+    setProduct(result);
+
+    const product = productsBase.find(prod => prod.refCode === result.value);
+    if(!product) return;
+    setExtraProps(prevExtra => ({...prevExtra, priceBuy: product.priceBaseBuy, priceSell: product.priceBaseSell}));
+  }
+
+  function handleCreateSupply() {
+    const nextSupplier = supplier ? suppliersBase.find(sup => sup.email === supplier.value) : null;
+
+    const batches = productsToAdd.map(prod => {
+      const supplier = nextSupplier ? nextSupplier : null;
+
+      prod.setSupplier(supplier);
+
+      return prod;
+    });
+
+    const currentSupplies = getData(ENTITIES.SUPPLY_LIST);
+
+    updateData(ENTITIES.SUPPLY_LIST, [...currentSupplies, new Supply({batches, description, supplier: nextSupplier ? nextSupplier : null})]);
+    handleOpenSnackBar("success", "Abastecimento Criado", 5000);
+    onClose();
   }
 
   return (
@@ -124,7 +158,7 @@ export default function AddSupply(props) {
               options={products}
               value={product}
               onChange={(event, newInputValue) => {
-                setProduct(newInputValue);
+                handleChangeProduct(newInputValue);
               }}
               getOptionLabel={(option) => option.label}
               sx={{ flex: 1 }}
@@ -199,7 +233,7 @@ export default function AddSupply(props) {
               onChange={e => handleChangeExtraProps("expiry", e.target.value)}
             />
           </div>
-          <Button onClick={handleAddProduct} startIcon={<Add />} style={{ width: 150, alignSelf: 'center' }} variant='contained'>Adicionar</Button>
+          <Button onClick={handleAddProduct} disabled={extraProps.quantity === 0 || product === null || (product && product.value === -1)} startIcon={<Add />} style={{ width: 150, alignSelf: 'center' }} variant='contained'>Adicionar</Button>
           <Divider />
           <TableContainer>
             <TableRow style={{ background: '#DCDCDC', borderRadius: '8px 8px 0px 0px' }}>
@@ -216,6 +250,11 @@ export default function AddSupply(props) {
                 }}>
                   {columns.map((column, i) => {
 
+                    if(column.value === "subTotal") {
+                      return (
+                        <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{prod.getSubTotal()}</TableData>
+                      );
+                    }
                     return (
                       <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{prod[column.value]}</TableData>
                     );
@@ -250,8 +289,8 @@ export default function AddSupply(props) {
         </div>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancelar</Button>
-        <Button onClick={() => { }}>Confirmar</Button>
+        <Button variant="contained" onClick={onClose}>Cancelar</Button>
+        <Button variant="contained" onClick={handleCreateSupply}>Confirmar</Button>
       </DialogActions>
     </Dialog>
   )

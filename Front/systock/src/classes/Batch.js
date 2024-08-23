@@ -64,4 +64,12 @@ export default class Batch extends Product {
 
     return formatDate;
   }
+
+  getSubTotal() {
+    return this.quantity * this.priceBaseBuy;
+  }
+
+  setSupplier(supplier) {
+    this.supplier = supplier;
+  }
 }
