@@ -8,6 +8,7 @@ import { FILTER_TYPES } from "../pages/Product/Product";
 import { convertMsToDay } from "../utils/utils";
 
 export default function useCategory() {
+  const [productsWithoutSupply, setProductsWithoutSupply] = useState([]);
   const [productsBase, setProductsBase] = useState(null);
   const [productsFiltered, setProductsFiltered] = useState(null);
   const [filter, setFilter] = useState(FILTER_TYPES.ALL);
@@ -33,13 +34,13 @@ export default function useCategory() {
       nextProducts = products.filter(batch => batch.quantity < batch.minimumQuantity);
     }
     if (filterBase === FILTER_TYPES.EMPTY) {
-      nextProducts = products.filter(batch => batch.quantity === 0);
+      const nextProductsWithoutSupply = productsWithoutSupply.filter(prod => !(products.some(batch => batch.refCode === prod.refCode)));
+      nextProducts = [...products.filter(batch => batch.quantity === 0), ...nextProductsWithoutSupply];
     }
     if (filterBase === FILTER_TYPES.EXPIRED) {
   
       const filteredProducts = products.filter(batch => batch.expiry !== null && (new Date(batch.expiry) - new Date()) < 0);
 
-      
       for(let i = 0; i < filteredProducts.length; i++) {
         const currentProduct = filteredProducts[i];
 
@@ -137,6 +138,8 @@ export default function useCategory() {
       supplies.forEach(supply => {
         products.push(...supply.batches);
       });
+      
+      setProductsWithoutSupply(getData(ENTITIES.PRODUCTS));
 
       setFilteredProducts(products);
       return setProductsBase(products);

@@ -3,10 +3,11 @@ import styled from 'styled-components';
 export const Container = styled.div`
   display: grid;
   grid-template:
-    "span" 32px
-    "filter" 60px
+    "tab" 48px
+    "span" 24px
+    "filter" 64px
     "divider" 1px
-    "buttons" 48px
+    "buttons" 36px
     "table" 1fr
     / 1fr;
   gap: 16px;

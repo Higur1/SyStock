@@ -28,8 +28,9 @@ function App() {
 
   useEffect(() => {
     if(DEBUG_LOCAL) {
-      getDB();
       if(!verifyHasContent()) setInitialData();
+      
+      getDB();
     }
     verifyToken();
   }, []);

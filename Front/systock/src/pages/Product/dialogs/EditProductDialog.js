@@ -32,10 +32,10 @@ export default function EditProductDialog(props) {
   const [description, setDescription] = useState(product.description || "");
   const [priceBuy, setPriceBuy] = useState(product.priceBuy || 0);
   const [priceSell, setPriceSell] = useState(product.priceSell || 0);
-  const [categoryID, setCategoryID] = useState(product.category_id || "");
   const [categories, setCategories] = useState([])
   const [hasError, setHasError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [category, setCategory] = useState(product.category || null);
   const isMount = useRef();
   const currencyRegex = /^[0-9]+(\.[0-9]{1,2})?$/;
 
@@ -94,7 +94,7 @@ export default function EditProductDialog(props) {
             <TextField
               required
               label="NCM/SH"
-              value={product.ncmsh}
+              value={product.refCode}
               disabled
             />
             <TextField
@@ -130,8 +130,8 @@ export default function EditProductDialog(props) {
             <FormControl>
               <InputLabel id="test-select-label">Categoria do Produto</InputLabel>
               <Select
-                value={categoryID}
-                onChange={(e) => setCategoryID(e.target.value)}
+                value={category}
+                onChange={(e, target) => setCategory(target)}
                 labelId="test-select-label"
                 label="Categoria"
                 disabled={isLoading}
@@ -158,7 +158,7 @@ export default function EditProductDialog(props) {
           <Button onClick={handleClose}>Cancelar</Button>
           <Button onClick={() => {
             if(product.ncmSh === '' || description === '' ||
-              priceBuy === 0 || priceSell === 0 || categoryID === '') {
+              priceBuy === 0 || priceSell === 0 || categories === null) {
               setHasError(true);
               return;
             }
@@ -182,7 +182,6 @@ export default function EditProductDialog(props) {
               description,
               priceBuy: strpriceBuy,
               priceSell: strpriceSell,
-              category_id: categoryID,
               // supplier_id: supplierID
             };
 

@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import useProduct from "../../hooks/useProduct"
 import { Container, HeaderContainer, MenuOption, TableContainer, TableData, TableRow, Menu } from "./styles";
-import { Box, Button, Chip, ClickAwayListener, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl, FormControlLabel, IconButton, InputLabel, MenuItem, OutlinedInput, Radio, RadioGroup, Select } from "@mui/material";
+import { Box, Button, Chip, ClickAwayListener, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl, FormControlLabel, IconButton, InputLabel, MenuItem, OutlinedInput, Paper, Radio, RadioGroup, Select, Tab, Tabs } from "@mui/material";
 import ToolTipAndEllipsis from "../../components/dialogs/ComponentUtils/ToolTipAndEllipsis";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CreateProductDialog from "./dialogs/CreateProductDialog";
 import CustomizedSnackbars from "../../components/CustomizedSnackBar";
 import EditProductDialog from "./dialogs/EditProductDialog";
 import CircularLoading from "../../components/common/CircularLoading";
-import ChangeQuantityProductDialog from "./dialogs/AddSupply";
 import AddSupply from "./dialogs/AddSupply";
 import { formatDate } from "../../utils/utils";
 
@@ -19,6 +18,13 @@ export const FILTER_TYPES = {
   EMPTY: "EMPTY",
   EXPIRED: "EXPIRED"
 };
+
+export const TABS = {
+  PRODUCTS_LIST: "PRODUCTS_LIST",
+  CREATE_PRODUCT: "CREATE_PRODUCT",
+  CHANGE_QUANTITY: "CHANGE_QUANTITY",
+  VIEW_SUPPLIES: "VIEW_SUPPLIES",
+}
 
 export const filtersBase = [
   { type: FILTER_TYPES.ALL, value: "Todos" },
@@ -77,7 +83,15 @@ const TYPES_DIALOG = {
   ADD_SUPPLY: 2,
   EDIT_PRODUCT: 3,
   DELETE_PRODUCT: 4,
+  VIEW_SUPPLIES: 5
 }
+
+const tabsList = [
+  {type: TABS.PRODUCTS_LIST, label: "Lista de Produtos"},
+  {type: TABS.CREATE_PRODUCT, label: "Criar Produto"},
+  {type: TABS.CHANGE_QUANTITY, label: "Alterar Quantidade"},
+  {type: TABS.VIEW_SUPPLIES, label: "Visualizar Abastecimentos"},
+];
 
 export default function Product() {
 
@@ -88,6 +102,7 @@ export default function Product() {
   const [menuOption, setMenuOption] = useState(false);
   const [idMenu, setIdMenu] = useState(null);
   const [dialog, setDialog] = useState({ type: TYPES_DIALOG.NONE});
+  const [tab, setTab] = useState(TABS.PRODUCTS_LIST);
 
   function handleMenuOptions(id) {
     setMenuOption(true);
@@ -103,9 +118,20 @@ export default function Product() {
     setDialog({ type: TYPES_DIALOG.ADD_PRODUCT, index});
   }
 
+  const handleChange = (event, newValue) => {
+    setTab(newValue);
+  };
+
   return (
     <>
       <Container>
+        <div style={{display: 'flex', flexDirection: 'column', width: "100%", gridArea: "tab"}}>
+          <Tabs onChange={handleChange} value={tab}>
+            {tabsList.map((tab, i) => (<Tab label={tab.label} value={tab.type} key={i} />))}
+          </Tabs>
+          <Divider />
+        </div>
+        
         <span style={{ fontWeight: 600 }}>Filtros</span>
         <RadioGroup row aria-label="position" name="position" value={filter} onChange={(_, value) => handleFilter(value)}>
           {filtersBase.map((filter, i) => (
@@ -118,6 +144,7 @@ export default function Product() {
             />
           ))}
         </RadioGroup>
+
         <Divider />
         <HeaderContainer>
           {/* <Autocomplete
@@ -155,7 +182,17 @@ export default function Product() {
           >
             Adicionar Abastecimento
           </Button>
+          <Button
+            variant="contained"
+            style={{ minWidth: '236px' }}
+            onClick={() => setDialog({type: TYPES_DIALOG.VIEW_SUPPLIES})}
+            size="small"
+          >
+            Visualizar Abastecimentos
+          </Button>
         </HeaderContainer>
+
+        
         <div style={{ gridArea: "table", height: "100%", overflow: 'hidden' }}>
           {productsBase === null || productsFiltered === null ? (
             <CircularLoading />
@@ -187,7 +224,6 @@ export default function Product() {
                                     <MenuOption onClick={() => {
                                       setDialog({type: TYPES_DIALOG.EDIT_PRODUCT, id: index});
                                     }}>{"Editar Produto"}</MenuOption>
-                                    <MenuOption onClick={() => handleQuantityDialog(index)}>{"Alterar Quantidade"}</MenuOption>
                                     <MenuOption onClick={() => setDialog({type: TYPES_DIALOG.DELETE_PRODUCT})} style={{ borderBottom: '0px', borderRadius: '0px 0px 16px 16px' }} >{"Apagar Produto"}</MenuOption>
                                   </Menu>
                                 </ClickAwayListener>
@@ -273,6 +309,12 @@ export default function Product() {
             severity={severitySnackBar}
             snackMessage={snackMessageSnackBar}
           />
+        )
+      }
+
+      {
+        dialog.type === TYPES_DIALOG.ADD_SUPPLY && (
+          <AddSupply onConfirm={() => {}} onClose={() => setDialog({type: TYPES_DIALOG.NONE})} />
         )
       }
 

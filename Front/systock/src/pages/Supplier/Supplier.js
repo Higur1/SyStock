@@ -98,8 +98,6 @@ export default function Supplier() {
             <TableData style={{flex: 1, minWidth: '10%', maxWidth: 'calc(100% - (75% + 40px + 96px))'}}>{"Nome"}</TableData>
             <TableData style={{flexBasis: '25%', maxWidth: '25%', minWidth: '25%'}}>{"E-mail"}</TableData>
             <TableData style={{flexBasis: '20%', maxWidth: '20%', minWidth: '20%'}}>{"Telefone"}</TableData>
-            <TableData style={{flexBasis: '25%', maxWidth: '25%', minWidth: '25%'}}>{"Endereço"}</TableData>
-            <TableData style={{flexBasis: '5%', maxWidth: '5%', minWidth: '5%'}}>{"Lotes"}</TableData>
             <TableData style={{flex: 1, justifyContent: 'flex-end'}} />
           </TableRow>
           {Boolean(suppliers.length) && suppliers.map((sup, index) => (
@@ -110,32 +108,7 @@ export default function Supplier() {
             }}>
               <TableData style={{flex: 1, minWidth: '10%', maxWidth: 'calc(100% - (75% + 40px + 96px))'}}><ToolTipAndEllipsis item={sup.name} /></TableData>
               <TableData style={{flexBasis: '25%', maxWidth: '25%', minWidth: '25%'}}><ToolTipAndEllipsis item={sup.email} /></TableData>
-              <TableData style={{flexBasis: '20%', maxWidth: '20%', minWidth: '20%', gap: 8}}>
-                {
-                  <>
-                    <ButtonGroupCustom 
-                      options={[
-                        {id: 0, label: 1},
-                        {id: 1, label: 2}
-                      ]}
-                      value={sup.Phone.findIndex(phone => phone.isSelected)}
-                      onChange={(v) => handleChangeSelectedPhone(v, index)}
-                    />
-                    {sup.Phone.find(phone => phone.isSelected).phone}  
-                  </>
-                }
-              </TableData>
-              <TableData style={{flexBasis: '25%', maxWidth: '25%', minWidth: '25%', cursor: 'pointer'}} onClick={() => setOpenLocationDialog({open: true, index})}>
-                <LocationOn />
-                <ToolTipAndEllipsis item={`${sup.Address[0].street}, ${sup.Address[0].number}`} />
-              </TableData>
-              <TableData style={{flexBasis: '5%', maxWidth: '5%', minWidth: '5%'}}>
-                {76}
-                <IconButton onClick={() => handleBatchList(index)}>
-                  <Visibility />
-                </IconButton>
-                
-              </TableData>
+              <TableData style={{flexBasis: '20%', maxWidth: '20%', minWidth: '20%', gap: 8}}><ToolTipAndEllipsis item={sup.phone} /></TableData>
               <TableData style={{flex: 1, justifyContent: 'flex-end'}}>
                 <IconButton onClick={(e) => handleMenuOptions(e, index)}>
                   <MoreVertIcon fontSize='small'/>
