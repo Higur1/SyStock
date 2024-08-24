@@ -1,12 +1,12 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
 import Category from './pages/Category/Category'
-import Product from './pages/Product/Product'
 import Supplier from './pages/Supplier/Supplier'
 import { MainContext } from './App'
 import Login from './pages/Login/Login'
 import ResetPassword from './pages/Login/ResetPassword/ResetPassword'
 import Home from './pages/Home/Home'
+import ProductPage from './pages/Product/ProductPage'
 
 export default function Master() {
   return (
@@ -26,7 +26,7 @@ export default function Master() {
               />
               <Route path="home" element={isLoggedIn ? <Home /> : null} />
               <Route path="categories" element={isLoggedIn ? <Category /> : null} />
-              <Route path="products" element={isLoggedIn ? <Product /> : null} />
+              <Route path="products" element={isLoggedIn ? <ProductPage /> : null} />
               <Route path="suppliers" element={isLoggedIn ? <Supplier /> : null} />
             </Routes>
           </div>

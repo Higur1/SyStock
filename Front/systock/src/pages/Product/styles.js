@@ -4,16 +4,21 @@ export const Container = styled.div`
   display: grid;
   grid-template:
     "tab" 48px
-    "span" 24px
-    "filter" 64px
-    "divider" 1px
-    "buttons" 36px
-    "table" 1fr
+    "tabcontent" 1fr
     / 1fr;
   gap: 16px;
   width: 100%;
   height: 100vh;
   padding: 16px;
+`
+
+export const ContainerProductsList = styled.div`
+  display: grid;
+  grid-template: 24px 60px 1px 1fr /1fr;
+  gap: 16px;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 `
 
 export const HeaderContainer = styled.div`

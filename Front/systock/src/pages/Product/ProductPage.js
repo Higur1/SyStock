@@ -1,13 +1,15 @@
-/* eslint-disable no-debugger */
-/* eslint-disable no-unused-vars */
-import { useContext, useEffect, useState } from "react";
-import { performFetch, performFetchNoResult } from "../apiBase";
-import { ENTITIES } from "../utils/debug-local-helper";
-import { DEBUG_LOCAL, MainContext } from "../App";
-import { FILTER_TYPES } from "../pages/Product/Product";
-import { convertMsToDay } from "../utils/utils";
+import React, { createContext, useContext, useEffect, useState } from 'react'
+import Product from './Product';
+import { DEBUG_LOCAL, MainContext } from '../../App';
+import { FILTER_TYPES } from './tabs/productList';
+import { convertMsToDay } from '../../utils/utils';
+import { ENTITIES } from '../../utils/debug-local-helper';
+import { performFetch, performFetchNoResult } from '../../apiBase';
 
-export default function useCategory() {
+export const ProductContext = createContext();
+
+export default function ProductPage() {
+
   const [productsWithoutSupply, setProductsWithoutSupply] = useState([]);
   const [productsBase, setProductsBase] = useState(null);
   const [productsFiltered, setProductsFiltered] = useState(null);
@@ -15,13 +17,7 @@ export default function useCategory() {
 
   const [errorInsert, setErrorInsert] = useState(null);
 
-  //* snackBar
-  const [openSnackBar, setOpenSnackBar] = useState(false);
-  const [autoHideSnackBar, setAutoHideSnackBar] = useState(3000);
-  const [severitySnackBar, setSeveritySnackBar] = useState("info");
-  const [snackMessageSnackBar, setSnackMessageSnackBar] = useState("");
-
-  const { updateData, getData } = useContext(MainContext);
+  const { updateData, getData, handleOpenSnackBar } = useContext(MainContext);
 
   useEffect(() => {
     getProducts();
@@ -38,19 +34,19 @@ export default function useCategory() {
       nextProducts = [...products.filter(batch => batch.quantity === 0), ...nextProductsWithoutSupply];
     }
     if (filterBase === FILTER_TYPES.EXPIRED) {
-  
+
       const filteredProducts = products.filter(batch => batch.expiry !== null && (new Date(batch.expiry) - new Date()) < 0);
 
-      for(let i = 0; i < filteredProducts.length; i++) {
+      for (let i = 0; i < filteredProducts.length; i++) {
         const currentProduct = filteredProducts[i];
 
-        const productInsideNextProducts= nextProducts.find(prod => prod.refCode === currentProduct.refCode && prod.expiryToString() === currentProduct.expiryToString());
+        const productInsideNextProducts = nextProducts.find(prod => prod.refCode === currentProduct.refCode && prod.expiryToString() === currentProduct.expiryToString());
 
-        if(productInsideNextProducts) continue;
+        if (productInsideNextProducts) continue;
 
         const equalProducts = filteredProducts.filter((prod, index) => prod.refCode === currentProduct.refCode).map(prod => prod.quantity);
         const equalProductsSameSupply = filteredProducts.filter((prod, index) => prod.refCode === currentProduct.refCode && prod.expiryToString() === currentProduct.expiryToString()).map(prod => prod.quantity);
-        
+
         const totalQuantity = equalProducts.reduce((acumulator, prod) => {
           const total = prod + acumulator;
           return acumulator + total;
@@ -60,7 +56,7 @@ export default function useCategory() {
           return acumulator + total;
         });
 
-        nextProducts.push({...currentProduct, totalQuantity, totalQuantitySameExpiry});
+        nextProducts.push({ ...currentProduct, totalQuantity, totalQuantitySameExpiry });
       }
     }
     if (filterBase === FILTER_TYPES.NEXT_TO_EXPIRY) {
@@ -68,20 +64,20 @@ export default function useCategory() {
       const daysDiff = 7;
       const nextDay = new Date();
       nextDay.setDate(new Date().getDate() + daysDiff);
-  
+
       const filteredProducts = products.filter(batch => batch.expiry !== null && (convertMsToDay(new Date(batch.expiry) - nextDay) < daysDiff));
 
-      
-      for(let i = 0; i < filteredProducts.length; i++) {
+
+      for (let i = 0; i < filteredProducts.length; i++) {
         const currentProduct = filteredProducts[i];
 
-        const productInsideNextProducts= nextProducts.find(prod => prod.refCode === currentProduct.refCode && prod.expiryToString() === currentProduct.expiryToString());
+        const productInsideNextProducts = nextProducts.find(prod => prod.refCode === currentProduct.refCode && prod.expiryToString() === currentProduct.expiryToString());
 
-        if(productInsideNextProducts) continue;
+        if (productInsideNextProducts) continue;
 
         const equalProducts = filteredProducts.filter((prod, index) => prod.refCode === currentProduct.refCode).map(prod => prod.quantity);
         const equalProductsSameSupply = filteredProducts.filter((prod, index) => prod.refCode === currentProduct.refCode && prod.expiryToString() === currentProduct.expiryToString()).map(prod => prod.quantity);
-        
+
         const totalQuantity = equalProducts.reduce((acumulator, prod) => {
           const total = prod + acumulator;
           return acumulator + total;
@@ -91,16 +87,16 @@ export default function useCategory() {
           return acumulator + total;
         });
 
-        nextProducts.push({...currentProduct, totalQuantity, totalQuantitySameExpiry});
+        nextProducts.push({ ...currentProduct, totalQuantity, totalQuantitySameExpiry });
       }
     }
-    if(filterBase === FILTER_TYPES.ALL) {
-      for(let i = 0; i < products.length; i++) {
+    if (filterBase === FILTER_TYPES.ALL) {
+      for (let i = 0; i < products.length; i++) {
         const currentProduct = products[i];
 
-        const productInsideNextProducts= nextProducts.find(prod => prod.refCode === currentProduct.refCode);
+        const productInsideNextProducts = nextProducts.find(prod => prod.refCode === currentProduct.refCode);
 
-        if(productInsideNextProducts) continue;
+        if (productInsideNextProducts) continue;
 
         const equalProducts = products.filter((prod, index) => prod.refCode === currentProduct.refCode).map(prod => prod.quantity);
         const totalQuantity = equalProducts.reduce((acumulator, prod) => {
@@ -108,27 +104,13 @@ export default function useCategory() {
           return acumulator + total;
         });
 
-        nextProducts.push({...currentProduct, totalQuantity});
+        nextProducts.push({ ...currentProduct, totalQuantity });
       }
     }
 
 
     setProductsFiltered(nextProducts);
   }
-
-  function handleOpenSnackBar(severity, message = "Unexpected Error Occurred", autoHide = 3000) {
-    setSnackMessageSnackBar(message);
-    setSeveritySnackBar(severity);
-    setAutoHideSnackBar(autoHide);
-    setOpenSnackBar(true);
-  }
-
-
-  function handleCloseSnackBar() {
-    setOpenSnackBar(false);
-  }
-
-
 
   async function getProducts() {
     if (DEBUG_LOCAL) {
@@ -138,7 +120,7 @@ export default function useCategory() {
       supplies.forEach(supply => {
         products.push(...supply.batches);
       });
-      
+
       setProductsWithoutSupply(getData(ENTITIES.PRODUCTS));
 
       setFilteredProducts(products);
@@ -197,9 +179,10 @@ export default function useCategory() {
    * * delete product by id
    * @param {*} id 
    */
-  async function handleDeleteProduct(id) {
+  async function handleDeleteProduct(index) {
+    const obj = productsFiltered.find(prod => prod.id === index);
     if (DEBUG_LOCAL) {
-      const nextProducts = productsBase.filter(cat => cat.id !== id.product_id);
+      const nextProducts = productsBase.filter(cat => cat.id !== obj.id);
 
       setFilteredProducts(nextProducts);
       setProductsBase(nextProducts);
@@ -208,9 +191,9 @@ export default function useCategory() {
 
     const url = "/products/delete";
 
-    performFetchNoResult(url, { method: 'DELETE', body: JSON.stringify(id) })
+    performFetchNoResult(url, { method: 'DELETE', body: JSON.stringify(obj.id) })
       .then(() => {
-        const updatedProducts = productsBase.filter(cat => cat.id !== id.product_id);
+        const updatedProducts = productsBase.filter(cat => cat.id !== obj.id);
         setFilteredProducts(updatedProducts);
         setProductsBase(updatedProducts);
       })
@@ -222,10 +205,16 @@ export default function useCategory() {
     setFilteredProducts(productsBase, value);
   }
 
-  return { productsBase,
-    productsFiltered, filter, handleFilter,
-    createProduct, updateProduct,
-    errorInsert, handleDeleteProduct,
-    handleCloseSnackBar, openSnackBar, autoHideSnackBar, snackMessageSnackBar, severitySnackBar
-  }
+  return (
+    <ProductContext.Provider
+      value={{
+        productsBase,
+        productsFiltered, filter, handleFilter,
+        createProduct, updateProduct,
+        errorInsert, handleDeleteProduct
+      }}
+    >
+      <Product />
+    </ProductContext.Provider>
+  )
 }
