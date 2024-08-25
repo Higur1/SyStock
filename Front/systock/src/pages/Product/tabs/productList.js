@@ -69,7 +69,7 @@ const columns = {
 
 export default function ProductList(props) {
 
-  const { handleQuantityDialog, handleEditProductDialog, handleDeleteProductDialog } = props;
+  const { handleEditProductDialog, handleDeleteProductDialog } = props;
   const { productsBase, productsFiltered, filter, handleFilter } = useContext(ProductContext);
 
   const [menuOption, setMenuOption] = useState(false);

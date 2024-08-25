@@ -38,7 +38,7 @@ export const states = [
 
 ];
 
-export function formatDate(dateString = null) {
+export function formatDate(dateString = null, addHours = false) {
   if(dateString === null) return "";
 
   const date = new Date(dateString);
@@ -46,7 +46,10 @@ export function formatDate(dateString = null) {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const year = date.getFullYear();
 
-  const formatDate = `${day}/${month}/${year}`;
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+
+  const formatDate = `${day}/${month}/${year} ${hours}:${minutes}`;
 
   return formatDate;
 }

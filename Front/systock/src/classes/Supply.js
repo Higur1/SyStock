@@ -39,9 +39,10 @@ export default class Supply {
    */
   getTotalValue() {
     try {
-      const sum = this.batches.reduce((accumulator, batch) => {
-        const totalBatch = batch.quantity * batch.priceBuy;
-        return accumulator + totalBatch;
+      const arr = this.batches.map(batch => batch.getSubTotal());
+      console.log(arr);
+      const sum = arr.reduce((accumulator, batch) => {
+        return accumulator + batch;
       }, 0);
 
       return sum;

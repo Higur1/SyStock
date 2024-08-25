@@ -1,8 +1,9 @@
 import { Add, Delete, Remove } from '@mui/icons-material';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton } from '@mui/material';
-import React from 'react'
+import { Autocomplete, Button, IconButton, Popper, TextField } from '@mui/material';
+import React, { useContext } from 'react'
 import { useState } from 'react';
 import styled from 'styled-components';
+import { ProductContext } from '../ProductPage';
 
 const TYPES = {
   MINUS: "MINUS",
@@ -17,12 +18,15 @@ const InputStyled = styled("input")({
     "-webkit-appearance": "none"
   },
   width: 50, fontWeight: 600, border: 'none', fontSize: "1rem",
-   textAlign: "center"
+  textAlign: "center"
 });
 
 export default function ChangeQuantityProductDialog(props) {
-  const { product, onClose } = props;
-  const [nextQuantity, setNextQuantity] = useState(product.quantity);
+  const { onClose } = props;
+  const [product, setProduct] = useState(null);
+  const [nextQuantity, setNextQuantity] = useState(0);
+
+  const { productsWithoutSupply } = useContext(ProductContext);
 
   function handleQuantity(type) {
     const nextValue = type === TYPES.MINUS ? nextQuantity - 1 : nextQuantity + 1;
@@ -39,33 +43,46 @@ export default function ChangeQuantityProductDialog(props) {
     setNextQuantity(e.target.value);
   }
 
+  function handleChangeProduct(value) {
+    setProduct(value);
+  }
+  console.log({product});
+
   return (
-    <Dialog
-      open
-      maxWidth="xs"
-      fullWidth
-    >
-      <DialogTitle>{`Alterar quantidade - ${product.name}`}</DialogTitle>
-      <Divider/>
-      <DialogContent>
-        <span>Quantidade Atual: <strong>{product.quantity}</strong></span>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <Autocomplete
+        disablePortal
+        options={productsWithoutSupply}
+        value={product}
+        onChange={(event, newInputValue) => {
+          handleChangeProduct(newInputValue);
+        }}
+        getOptionLabel={(option) => option.name}
+        sx={{ flex: 1 }}
+        renderInput={(params) => <TextField {...params} label="Produto" />}
+        placeholder='Selecione o produto a ser abastecido'
+        ListboxProps={{ style: { zIndex: 100 } }}
+        PopperComponent={props => <Popper {...props} style={{ ...props.style, zIndex: 100000 }} disablePortal={false} />}
+      />
+      <div>
+        <span>Quantidade Atual: <strong>{product ? product.quantity : ""}</strong></span>
         <div style={{ display: 'flex', gap: 16, paddingTop: 16, alignItems: 'center' }}>
           <span>{"Quantidade:"}</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, borderRadius: 12, border: "1px solid #DCDCDC" }}>
             <IconButton onClick={() => handleQuantity(TYPES.MINUS)} disabled={nextQuantity === 0}>
               {nextQuantity === 1 ? <Delete /> : <Remove />}
             </IconButton>
-            <InputStyled type="number" onChange={handleChangeInput} value={nextQuantity} style={{color: nextQuantity === product.quantity ? "#4a7b9d": "black"}}/>
+            <InputStyled type="number" onChange={handleChangeInput} value={nextQuantity} style={{ color: product && nextQuantity === product.quantity ? "#4a7b9d" : "black" }} />
             <IconButton onClick={() => handleQuantity(TYPES.PLUS)}>
               <Add />
             </IconButton>
           </div>
         </div>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Cancelar</Button>
-        <Button onClick={onConfirm}>Confirmar</Button>
-      </DialogActions>
-    </Dialog>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 16 }}>
+        <Button variant={"contained"} onClick={onClose}>Cancelar</Button>
+        <Button variant={"contained"} onClick={onConfirm}>Confirmar</Button>
+      </div>
+    </div>
   )
 }

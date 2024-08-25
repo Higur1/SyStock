@@ -17,6 +17,8 @@ export default function ProductPage() {
 
   const [errorInsert, setErrorInsert] = useState(null);
 
+  const [productsListAutoComplete, setProductsListAutoComplete] = useState([]);
+
   const { updateData, getData, handleOpenSnackBar } = useContext(MainContext);
 
   useEffect(() => {
@@ -115,13 +117,15 @@ export default function ProductPage() {
   async function getProducts() {
     if (DEBUG_LOCAL) {
       const supplies = getData(ENTITIES.SUPPLY_LIST);
+      const productsData = getData(ENTITIES.PRODUCTS); 
 
       const products = [];
       supplies.forEach(supply => {
         products.push(...supply.batches);
       });
 
-      setProductsWithoutSupply(getData(ENTITIES.PRODUCTS));
+      setProductsWithoutSupply(productsData);
+      setProductsListAutoComplete(productsData.map((prod) => ({ label: prod.name, value: prod.refCode })));
 
       setFilteredProducts(products);
       return setProductsBase(products);
@@ -211,7 +215,8 @@ export default function ProductPage() {
         productsBase,
         productsFiltered, filter, handleFilter,
         createProduct, updateProduct,
-        errorInsert, handleDeleteProduct
+        errorInsert, handleDeleteProduct,
+        productsWithoutSupply
       }}
     >
       <Product />

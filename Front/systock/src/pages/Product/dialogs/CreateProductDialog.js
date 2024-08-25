@@ -42,20 +42,20 @@ export default function CreateProductDialog(props) {
   const { getData } = useContext(MainContext);
 
   useEffect(() => {
-    if(isMount.current) return;
-    
+    if (isMount.current) return;
+
     isMount.current = true;
     getCategories();
   }, []);
 
   async function getCategories() {
-    if(DEBUG_LOCAL) {
+    if (DEBUG_LOCAL) {
       const categArr = getData(ENTITIES.CATEGORIES);
 
       return setTimeout(() => setCategories(categArr), 350);
     }
     try {
-      const categories = await performFetch("/categories", {method: 'GET'});
+      const categories = await performFetch("/categories", { method: 'GET' });
       setCategories(categories);
     } catch (error) {
       console.log(error.message);
@@ -64,89 +64,81 @@ export default function CreateProductDialog(props) {
 
   const handlePriceChange = e => {
     let value = e.target.value;
-    
-    if(!currencyRegex.test(value)) {
+
+    if (!currencyRegex.test(value)) {
       setHasErrorPrice(true);
     }
     setPrice(e.target.value);
   }
-  
+
   return (
-    <>
-      <Dialog
-        open={open}
-        TransitionComponent={Transition}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle><Title>{"Adicionar Produto"}</Title></DialogTitle>
-        <DialogContent>
-          <Container>
-          <TextField
-              required
-              label="Nome do Produto"
-              value={name}
-              onChange={(e) => setName(e.target.value.slice(0,50))}
-              disabled={isLoading}
-            />
-            <TextField
-              label="Preço de Venda"
-              value={price}
-              onChange={handlePriceChange}
-              placeholder={"ex: 100.00"}
-              name="numberformat"
-              id="formatted-numberformat-input"
-              disabled={isLoading}
-              error={hasErrorPrice}
-              InputProps={{
-                startAdornment: <InputAdornment position="start">R$</InputAdornment>
-              }}
-            />
-            <TextField
-              label="Preço de Compra"
-              value={price}
-              onChange={handlePriceChange}
-              placeholder={"ex: 100.00"}
-              name="numberformat"
-              id="formatted-numberformat-input"
-              disabled={isLoading}
-              error={hasErrorPrice}
-              InputProps={{
-                startAdornment: <InputAdornment position="start">R$</InputAdornment>
-              }}
-            />
-            <TextField
-              label="Quantidade Mínima"
-              value={minimumQuantity}
-              onChange={(e) => setMinimumQuantity(e.target.value.slice(0,255))}
-              disabled={isLoading}
-              type="number"
-            />
-            <TextField
-              label="Descrição"
-              value={description}
-              onChange={(e) => setDescription(e.target.value.slice(0,255))}
-              disabled={isLoading}
-            />
-            <FormControl>
-              <InputLabel id="test-select-label">Categoria do Produto</InputLabel>
-              <Select
-                value={categoryID}
-                onChange={(e) => setCategoryID(e.target.value)}
-                labelId="test-select-label"
-                label="Categoria"
-                disabled={isLoading}
-              >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                {categories.map((cat, index) => (
-                  <MenuItem value={cat.id} key={index}>{cat.name}</MenuItem>
-                )
-                )}
-              </Select>
-            </FormControl>
-            {/* <FormControl>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, width: "100%", height: "100%" }}>
+      <Container>
+        <TextField
+          required
+          label="Nome do Produto"
+          value={name}
+          onChange={(e) => setName(e.target.value.slice(0, 50))}
+          disabled={isLoading}
+        />
+        <TextField
+          label="Preço de Venda"
+          value={price}
+          onChange={handlePriceChange}
+          placeholder={"ex: 100.00"}
+          name="numberformat"
+          id="formatted-numberformat-input"
+          disabled={isLoading}
+          error={hasErrorPrice}
+          InputProps={{
+            startAdornment: <InputAdornment position="start">R$</InputAdornment>
+          }}
+        />
+        <TextField
+          label="Preço de Compra"
+          value={price}
+          onChange={handlePriceChange}
+          placeholder={"ex: 100.00"}
+          name="numberformat"
+          id="formatted-numberformat-input"
+          disabled={isLoading}
+          error={hasErrorPrice}
+          InputProps={{
+            startAdornment: <InputAdornment position="start">R$</InputAdornment>
+          }}
+        />
+        <TextField
+          label="Quantidade Mínima"
+          value={minimumQuantity}
+          onChange={(e) => setMinimumQuantity(e.target.value.slice(0, 255))}
+          disabled={isLoading}
+          type="number"
+        />
+        <TextField
+          label="Descrição"
+          value={description}
+          onChange={(e) => setDescription(e.target.value.slice(0, 255))}
+          disabled={isLoading}
+        />
+        <FormControl>
+          <InputLabel id="test-select-label">Categoria do Produto</InputLabel>
+          <Select
+            value={categoryID}
+            onChange={(e) => setCategoryID(e.target.value)}
+            labelId="test-select-label"
+            label="Categoria"
+            disabled={isLoading}
+          >
+            <MenuItem value="">
+              <em>None</em>
+            </MenuItem>
+            {categories.map((cat, index) => (
+              <MenuItem value={cat.id} key={index}>{cat.name}</MenuItem>
+            )
+            )}
+          </Select>
+        </FormControl>
+        {/* <FormControl>
               <InputLabel id="test-select-label">Supplier</InputLabel>
               <Select
                 value={supplierID}
@@ -165,51 +157,39 @@ export default function CreateProductDialog(props) {
                 )}
               </Select>
             </FormControl> */}
-            <div style={{color: 'red', display:'flex', flexDirection: 'column'}}>
-              {hasErrorPrice && <>{"Vírgulas não são necessárias, apenas pontos."}</>}
-              {hasError && <>{"Preencha os campos obrigatórios!"}</>}
-              {error !== null && <>{error.message}</>}
-            </div>
-          </Container>
+        <div style={{ color: 'red', display: 'flex', flexDirection: 'column' }}>
+          {hasErrorPrice && <>{"Vírgulas não são necessárias, apenas pontos."}</>}
+          {hasError && <>{"Preencha os campos obrigatórios!"}</>}
+          {error !== null && <>{error.message}</>}
+        </div>
+      </Container>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 16 }}>
+        <Button variant={"contained"} onClick={handleClose}>Cancelar</Button>
+        <Button variant={"contained"} onClick={() => {
+          if (description === '' ||
+            price === 0 || categoryID === '') {
+            setHasError(true);
+            return;
+          }
 
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancelar</Button>
-          <Button onClick={() => {
-            if(description === '' ||
-              price === 0 || categoryID === '') {
-              setHasError(true);
-              return;
-            }
+          if (!currencyRegex.test(price)) {
+            setHasErrorPrice(true);
+            return;
+          }
 
-            if(!currencyRegex.test(price)) {
-              setHasErrorPrice(true);
-              return;
-            }
+          setIsLoading(true);
+          const priceString = parseFloat(price);
+          const product = {
+            description,
+            price: priceString,
+            category_id: categoryID,
+            // supplier_id: supplierID
+          };
 
-            setIsLoading(true);
-            const priceString = parseFloat(price);
-            const product = {
-              description,
-              price: priceString,
-              category_id: categoryID,
-              // supplier_id: supplierID
-            };
-
-            handleCreate(product);
-            }}>Adicionar</Button>
-        </DialogActions>
-
-      </Dialog>
-
-      <Backdrop
-      sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-      open={isLoading}
-      >
-      <CircularProgress color="inherit" />
-      </Backdrop>
-    
-    </>
+          handleCreate(product);
+        }}>Adicionar</Button>
+      </div>
+    </div>
   );
 }
 
