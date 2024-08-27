@@ -11,7 +11,7 @@ const columns = [
   { value: "id", label: "Código do Abastecimento"},
   { value: "supplier", label: "Fornecedor"},
   { value: "totalCost", label: "Total do Custo"},
-  { value: "Observação", label: "description"},
+  { value: "description", label: "Observação"},
   { value: "products", label: "Produtos"}
 ];
 
@@ -57,13 +57,13 @@ export default function ViewSupplies({handleViewProducts}) {
         onChange={(event, newInputValue) => {
           setFilteredSupplier(newInputValue);
         }}
-        getOptionLabel={(option) => option.label}
+        getOptionLabel={(option) => option.name}
         sx={{ width: "100%" }}
         renderInput={(params) => <TextField {...params} label="Fornecedor do Abastecimento" />}
         placeholder='Selecione o fornecedor para o abastecimento'
-        PopperComponent={props => <Popper {...props} style={{ ...props.style, zIndex: 100000 }} disablePortal={false} />}
+        // PopperComponent={props => <Popper {...props} style={{ ...props.style, zIndex: 100000 }} disablePortal={false} />}
         // PopperComponent={<Popper style={{zIndex: 2}}/>}
-        ListboxProps={{ style: { zIndex: 5 } }}
+        // ListboxProps={{ style: { zIndex: 5 } }}
       />
       <div style={{ height: "100%", overflow: "hidden" }}>
         <TableContainer>

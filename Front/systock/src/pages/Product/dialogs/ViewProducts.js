@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, TextField } from '@mui/material';
 import React from 'react'
 import { formatDate } from '../../../utils/utils';
 import { TableContainer, TableData, TableRow } from '../styles';
@@ -93,6 +93,9 @@ export default function ViewProducts({ supply = new Supply(), onClose }) {
               </TableContainer>
             </div>
 
+          </div>
+          <div style={{width: "100%", display: "flex", alignItems: 'center', justifyContent: 'flex-end'}}>
+            <TextField style={{width: 150}} disabled value={supply.getTotalValue()} variant="outlined" label="Total"/>
           </div>
         </div>
       </DialogContent>

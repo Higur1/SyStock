@@ -6,6 +6,7 @@ export const Container = styled.div`
   gap: 32px;
   width: 100%;
   height: 100%;
+  padding: 16px;
 `
 
 export const HeaderContainer = styled.div`
