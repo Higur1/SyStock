@@ -133,47 +133,6 @@ export default class SupplierController {
       );
     }
   }
-<<<<<<< Updated upstream
-=======
-  static async findBatchs(request, response) {
-    try {
-      const supplier = z.object({
-        supplier_id: z.string().min(36).max(36),
-      });
-
-      const { supplier_id } = supplier.parse(request.params);
-
-      const listBatch = await Supplier.getBatchs(supplier_id);
-
-      if (listBatch.status) {
-        if (listBatch.batchs != undefined) {
-          response.status(200).send(
-            JSON.stringify(listBatch.batchs)
-          );
-        } else {
-          response.status(400).send(
-            JSON.stringify({
-              message: "Not found",
-            })
-          );
-        }
-      } else {
-        response.status(500).send(
-          JSON.stringify({
-            error: listBatch.error,
-          })
-        );
-      }
-    } catch (error) {
-      response.status(400).send(
-        JSON.stringify({
-          path: error.issues[0].path,
-          error: error.issues[0].message,
-        })
-      );
-    }
-  }
->>>>>>> Stashed changes
   static async update(request, response) {
     try {
       const supplierValidation = z.object({
@@ -195,11 +154,7 @@ export default class SupplierController {
           complement: z.string().optional(),
         }),
       });
-<<<<<<< Updated upstream
 
-      const company_id = verifyTokenCompany(request.headers.authorization);
-=======
->>>>>>> Stashed changes
       const { id, name, email, phones, address } = supplierValidation.parse(
         request.body
       );

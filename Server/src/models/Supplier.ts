@@ -145,22 +145,12 @@ export default class Supplier {
       return { status: false, error: error };
     }
   }
-<<<<<<< Updated upstream
   static async updateSupplier(supplierObject) {
     try {
       const supplier = await prisma.supplier.update({
         data:{
           name: supplierObject.name,
           email: supplierObject.email
-=======
-  static async getBatchs(supplier_id) {
-    try {
-      const batchs = await prisma.batch.findMany({
-        where: {
-          AND: {
-            supplier_id: supplier_id,
-          },
->>>>>>> Stashed changes
         },
         where:{
           id: supplierObject.id
@@ -183,17 +173,8 @@ export default class Supplier {
           city: supplierObject.address.city,
           complement: supplierObject.address.complement
         },
-<<<<<<< Updated upstream
         where:{
           id: supplierObject.address.id
-=======
-      });
-      const findPhones = await prisma.phone.findMany({
-        where: {
-          AND: {
-            supplier_id: supplierObject.id,
-          },
->>>>>>> Stashed changes
         },
         select:{
           id: true,
