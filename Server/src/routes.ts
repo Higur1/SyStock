@@ -30,20 +30,11 @@ async function category_routes(app: FastifyInstance){
   app.delete("/category", /*{ preHandler: auth_middleware },*/ CategoryController.remove);
 };
 async function supplier_routes(app: FastifyInstance){
-<<<<<<< Updated upstream
   app.get("/suppliers", { preHandler: auth_middleware }, SupplierController.findAll);
   app.post("/supplier", { preHandler: auth_middleware }, SupplierController.create);
   app.get("/supplier/:id", { preHandler: auth_middleware }, SupplierController.findById);
   app.put("/supplier", { preHandler: auth_middleware }, SupplierController.update);
   app.delete("/supplier", { preHandler: auth_middleware }, SupplierController.delete);
-=======
-  app.get("/suppliers", /*{ preHandler: auth_middleware },*/ SupplierController.findAll);
-  app.post("/supplier", /*{ preHandler: auth_middleware },*/ SupplierController.create);
-  app.get("/supplier/:id", /*{ preHandler: auth_middleware },*/ SupplierController.findById);
-  app.put("/supplier", /*{ preHandler: auth_middleware },*/ SupplierController.update);
-  app.delete("/supplier", /*{ preHandler: auth_middleware },*/ SupplierController.delete);
-  app.get("/supplier/batchs/:supplier_id", /*{ preHandler: auth_middleware },*/ SupplierController.findBatchs);
->>>>>>> Stashed changes
 };
 async function product_routes(app: FastifyInstance){
   app.get("/products", /*{ preHandler: auth_middleware },*/ ProductController.findAll);

@@ -11,7 +11,7 @@ generator erd {
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
+  url      = "file:./dev.db"
 }
 
 model eTypeUser{
@@ -58,6 +58,7 @@ model User{
   user_type_fk eTypeUser @relation(fields: [user_type], references: [id])
 
   Sales Sales[]
+  Fill Fill[]
 
   @@map("user")
 }
@@ -76,7 +77,7 @@ model Supplier{
   phone String
   email String
 
-  Supplier_Fill Supplier_Fill[]
+  Fill Fill []
 
   @@map("supplier")
 }
@@ -85,24 +86,14 @@ model Fill{
   totalPrice Decimal
   dateTime DateTime
   observation String
-
-  Supplier_Fill Supplier_Fill[]
-
-  @@map("fill")
-}
-
-model Supplier_Fill{
-  id Int @id @default(autoincrement())
   supplier_id Int
-  fill_id Int
-  quantity Int
-  subPrice Decimal
-  costPrice Decimal
- 
-  supplier_id_fk Supplier @relation(fields: [supplier_id], references: [id])
-  fill_id_fk Fill @relation(fields: [fill_id], references: [id])
+  user_id Int
 
-  @@map("supplier_fill")
+  Batch_Fill Batch_Fill []
+
+  supplier_id_fk Supplier @relation(fields: [supplier_id], references: [id])
+  user_id_fk User @relation(fields: [user_id], references: [id])
+  @@map("fill")
 }
 
 model Category{
@@ -139,13 +130,25 @@ model Batch{
   product_id Int
   eValidationSattus Int
 
+  Batch_Fill Batch_Fill []
+
   eValidationStatus_fk eValitadionStatus @relation(fields: [eValidationSattus], references: [id])
   product_id_fk Product @relation(fields: [product_id], references: [id])
 
   @@map("batch")
 }
 
+model Batch_Fill{
+  id Int @id @default(autoincrement())
+  batch_id Int
+  fill_id Int
+  quantity Int
+  costPrice Decimal
+  subTotal Decimal
 
+  batch_id_fk Batch @relation(fields: [batch_id], references: [id])
+  fill_id_fk Fill @relation(fields: [fill_id], references: [id])
+}
 model Sales{
   id Int @id @default(autoincrement())
   dateTime DateTime

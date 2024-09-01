@@ -16,6 +16,7 @@ export default class Category{
                     name: name
                 }
             });
+
             return category != undefined ? {status: true, category:{category_id: category.id, category_name: category.name, category_company_id: category.company_id}} : {status: true, category: {}};
         } catch (error) {
             return {status: false, error:error};
