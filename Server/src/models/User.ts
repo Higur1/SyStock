@@ -8,8 +8,7 @@ export default class User {
           id: true,
           name: true,
           email: true,
-          user_login: true,
-          user_type_id: true,
+          login: true,
         },
       });
       return listUsers.length > 0

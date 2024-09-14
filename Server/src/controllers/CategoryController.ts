@@ -33,9 +33,7 @@ export default class CategoryController {
       });
       const { name } = category_name.parse(request.body);
 
-      const categoryAlreadyExists = await Category.verifyDuplicateName(
-        name
-      );
+      const categoryAlreadyExists = await Category.verifyDuplicateName(name);
 
       if (
         categoryAlreadyExists.status &&
@@ -146,9 +144,7 @@ export default class CategoryController {
       });
       const { id, name } = category.parse(request.body);
 
-      const categoryAlredyExists = await Category.verifyDuplicateName(
-        name
-      );
+      const categoryAlredyExists = await Category.verifyDuplicateName(name);
 
       if (
         categoryAlredyExists.status &&

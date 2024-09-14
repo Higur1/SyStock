@@ -8,24 +8,7 @@ export default class Supplier {
           id: true,
           name: true,
           email: true,
-          Phone: {
-            select: {
-              id: true,
-              phone: true,
-            },
-          },
-          Address: {
-            select: {
-              id: true,
-              cep: true,
-              street: true,
-              number: true,
-              district: true,
-              state: true,
-              city: true,
-              complement: true,
-            },
-          },
+          phone: true,
         },
       });
       return supplierResult != undefined
@@ -37,75 +20,20 @@ export default class Supplier {
   }
   static async create(supplierObject) {
     try {
-      let supplierIsCreated = {};
-      await prisma.$transaction(async (result) => {
-        const supplier = await prisma.supplier.create({
-          data: {
-            name: supplierObject.name,
-            email: supplierObject.email,
-          },
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        });
-        const first_phone = await prisma.phone.create({
-          data: {
-            phone: supplierObject.phones[0],
-            supplier_id: supplier.id,
-          },
-          select: {
-            id: true,
-            phone: true,
-            supplier_id: true,
-          },
-        });
-        const second_phone = await prisma.phone.create({
-          data: {
-            phone: supplierObject.phones[1],
-            supplier_id: supplier.id,
-          },
-          select: {
-            id: true,
-            phone: true,
-            supplier_id: true,
-          },
-        });
-        const address = await prisma.address.create({
-          data: {
-            supplier_id: supplier.id,
-            cep: supplierObject.address.cep,
-            street: supplierObject.address.street,
-            number: supplierObject.address.number,
-            district: supplierObject.address.district,
-            state: supplierObject.address.state,
-            city: supplierObject.address.city,
-            complement: supplierObject.address.complement,
-          },
-          select: {
-            id: true,
-            supplier_id: true,
-            cep: true,
-            street: true,
-            number: true,
-            district: true,
-            state: true,
-            city: true,
-            complement: true,
-          },
-        });
-        supplierIsCreated = {
-          supplier,
-          Phones: { first_phone, second_phone },
-          address,
-        };
+      const supplierResult = await prisma.supplier.create({
+        data: {
+          name: supplierObject.name,
+          email: supplierObject.email,
+          phone: supplierObject.phone,
+        },
       });
-      return supplierIsCreated != undefined
-        ? { status: true, supplier: supplierIsCreated }
-        : { status: true, supplier: undefined };
+      return supplierResult != undefined
+        ? {
+            status: true,
+            supplier: supplierResult,
+          }
+        : { status: true, supplier: {} };
     } catch (error) {
-      console.log(error);
       return { status: false, error: error };
     }
   }
@@ -119,23 +47,7 @@ export default class Supplier {
           id: true,
           name: true,
           email: true,
-          Phone: {
-            select: {
-              id: true,
-              phone: true,
-            },
-          },
-          Address: {
-            select: {
-              cep: true,
-              street: true,
-              number: true,
-              district: true,
-              state: true,
-              city: true,
-              complement: true,
-            },
-          },
+          phone: true,
         },
       });
       return supplierResult != undefined
@@ -148,134 +60,46 @@ export default class Supplier {
   static async updateSupplier(supplierObject) {
     try {
       const supplier = await prisma.supplier.update({
-        data:{
+        data: {
           name: supplierObject.name,
-          email: supplierObject.email
+          email: supplierObject.email,
+          phone: supplierObject.phone,
         },
-        where:{
-          id: supplierObject.id
-        }
-      })
-      return supplier != null ? {status: true, supplier: supplier} : {status: true, supplier: {}};
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async updateAddress(supplierObject){
-    try {
-      const address = await prisma.address.update({
-        data:{
-          cep: supplierObject.address.cep,
-          street: supplierObject.address.street,
-          number: supplierObject.address.number,
-          district: supplierObject.address.district,
-          state: supplierObject.address.state,
-          city: supplierObject.address.city,
-          complement: supplierObject.address.complement
+        where: {
+          id: supplierObject.id,
         },
-        where:{
-          id: supplierObject.address.id
-        },
-        select:{
-          id: true,
-          cep: true,
-          street: true,
-          number: true,
-          district: true,
-          state: true,
-          city: true,
-          complement: true,
-          supplier_id: true
-        }
-      })
-      return address != null ? {status: true, address: address} : {status:true, address:{}};
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async updatePhones(supplierObject){
-    try {
-      const first_phone = await prisma.phone.update({
-        data:{phone: supplierObject.phones[0].phone},
-        where:{id: supplierObject.phones[0].id},
-        select:{id: true, phone:true}
       });
-      const second_phone = await prisma.phone.update({
-        data:{phone: supplierObject.phones[1].phone},
-        where:{id: supplierObject.phones[1].id},
-        select:{id:true, phone: true}
-      })
-      return {status: true, phone:{first_phone, second_phone} }
+      return supplier != null
+        ? { status: true, supplier: supplier }
+        : { status: true, supplier: {} };
     } catch (error) {
       return { status: false, error: error };
     }
   }
-  static async validatedSupplierData(supplierObject){
+  static async validatedSupplierData(supplierObject) {
     try {
       let message = "";
       const validSupplier = await prisma.supplier.findFirst({
-        where:{
-          id: supplierObject.id
-        }
+        where: {
+          id: supplierObject.id,
+        },
       });
-      message += (validSupplier == null) ? "could not update supplier, " : "" 
-      const validAddress = await prisma.address.findFirst({
-        where:{
-          id: supplierObject.address.id,
-          supplier_id: supplierObject.id
-        }
-      });
-      message += (validAddress == null) ? "could not update address, " : "" 
-      const validFirstPhone = await prisma.phone.findFirst({
-        where:{
-          id: supplierObject.phones[0].id,
-          supplier_id: supplierObject.id
-        }
-      });
-      const validSecondPhone = await prisma.phone.findFirst({
-        where:{
-          id: supplierObject.phones[1].id,
-          supplier_id: supplierObject.id
-        }
-      });
-      message += (validFirstPhone == null || validSecondPhone == null) ? "could not update phones " : "" 
-      return message.length == 0 ? {status: true, isValid: true} : {status: true, isValid: false, message:message};
+      message += validSupplier == null ? "could not update supplier, " : "";
+
+      return message.length == 0
+        ? { status: true, isValid: true }
+        : { status: true, isValid: false, message: message };
     } catch (error) {
       return { status: false, error: error };
     }
   }
   static async delete(supplier_id) {
     try {
-      const verifyAddress = await prisma.address.findFirst({
-        where: {
-          supplier_id: supplier_id,
-        },
-      });
-      const verifyPhones = await prisma.phone.findFirst({
-        where: {
-          supplier_id: supplier_id,
-        },
-      });
-      if (verifyAddress != null) {
-        await prisma.address.deleteMany({
-          where: {
-            supplier_id: supplier_id,
-          },
-        });
-      }
-      if (verifyPhones != null) {
-        await prisma.phone.deleteMany({
-          where: {
-            supplier_id: supplier_id,
-          },
-        });
-      }
       await prisma.supplier.delete({
         where: {
           id: supplier_id,
         },
       });
-
       return { status: true };
     } catch (error) {
       return { status: false, error: error };

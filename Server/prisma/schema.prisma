@@ -14,207 +14,211 @@ datasource db {
   url      = "file:./dev.db"
 }
 
-model eTypeUser{
-  id Int @id
+model eTypeUser {
+  id   Int    @id
   type String
 
   User User[]
 }
-model eValitadionStatus{
-  id Int @id
+
+model eValitadionStatus {
+  id   Int    @id
   type String
 
   Batch Batch[]
 }
-model eSalesStatus{
-  id Int @id
+
+model eSalesStatus {
+  id   Int    @id
   type String
 
   Sales Sales[]
 }
-model ePaymentMethod{
-  id Int @id
+
+model ePaymentMethod {
+  id   Int    @id
   type String
 
   Sales Sales[]
 }
-model eTypeAction{
-  id Int @id
+
+model eTypeAction {
+  id   Int    @id
   type String
-
-
 }
 
-model User{
-  id Int @id @default(autoincrement())
-  name String
-  login String 
-  password String
-  email String @unique
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  login     String
+  password  String
+  email     String   @unique
   createdAt DateTime @default(now())
-  updateAt DateTime @updatedAt
+  updateAt  DateTime @updatedAt
   user_type Int
 
   user_type_fk eTypeUser @relation(fields: [user_type], references: [id])
 
   Sales Sales[]
-  Fill Fill[]
+  Fill  Fill[]
 
   @@map("user")
 }
 
-model Pre_User{
-  id Int @id @default(autoincrement())
+model Pre_User {
+  id    Int    @id @default(autoincrement())
   email String @unique
-  name String
+  name  String
 
   @@map("pre_user")
 }
 
-model Supplier{
-  id Int @id @default(autoincrement())
-  name String @unique
+model Supplier {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
   phone String
   email String
 
-  Fill Fill []
+  Fill Fill[]
 
-  @@map("supplier")
+  @@map("suppliers")
 }
-model Fill{
-  id Int @id @default(autoincrement())
-  totalPrice Decimal
-  dateTime DateTime
+
+model Fill {
+  id          Int      @id @default(autoincrement())
+  totalPrice  Decimal
+  dateTime    DateTime
   observation String
   supplier_id Int
-  user_id Int
+  user_id     Int
 
-  Batch_Fill Batch_Fill []
+  Batch_Fill Batch_Fill[]
 
   supplier_id_fk Supplier @relation(fields: [supplier_id], references: [id])
-  user_id_fk User @relation(fields: [user_id], references: [id])
+  user_id_fk     User     @relation(fields: [user_id], references: [id])
+
   @@map("fill")
 }
 
-model Category{
-  id Int @id @default(autoincrement())
+model Category {
+  id   Int    @id @default(autoincrement())
   name String
 
   Product Product[]
-  
+
   @@map("category")
 }
 
-model Product{
-  id Int @id @default(autoincrement())
-  name String
-  price Decimal
-  costPrice Decimal
-  minimunQuantity Int
-  observation String
+model Product {
+  id                   Int             @id @default(autoincrement())
+  name                 String
+  price                Decimal
+  costPrice            Decimal
+  minimunQuantity      Int
+  observation          String
   totalQuantityInStock Int
-  category_id Int
-  Product_Sales Product_Sales[]
-  Batch Batch[]
+  category_id          Int
+  Product_Sales        Product_Sales[]
+  Batch                Batch[]
 
   category_id_fk Category @relation(fields: [category_id], references: [id])
 
   @@map("product")
 }
-model Batch{
-  id Int @id @default(autoincrement())
-  expirationDate DateTime
-  quantity Int
-  deletionStatus Boolean
-  dateTimeEmptyStock DateTime
-  product_id Int
-  eValidationSattus Int
 
-  Batch_Fill Batch_Fill []
+model Batch {
+  id                 Int      @id @default(autoincrement())
+  expirationDate     DateTime
+  quantity           Int
+  deletionStatus     Boolean
+  dateTimeEmptyStock DateTime
+  product_id         Int
+  eValidationSattus  Int
+
+  Batch_Fill Batch_Fill[]
 
   eValidationStatus_fk eValitadionStatus @relation(fields: [eValidationSattus], references: [id])
-  product_id_fk Product @relation(fields: [product_id], references: [id])
+  product_id_fk        Product           @relation(fields: [product_id], references: [id])
 
   @@map("batch")
 }
 
-model Batch_Fill{
-  id Int @id @default(autoincrement())
-  batch_id Int
-  fill_id Int
-  quantity Int
+model Batch_Fill {
+  id        Int     @id @default(autoincrement())
+  batch_id  Int
+  fill_id   Int
+  quantity  Int
   costPrice Decimal
-  subTotal Decimal
+  subTotal  Decimal
 
   batch_id_fk Batch @relation(fields: [batch_id], references: [id])
-  fill_id_fk Fill @relation(fields: [fill_id], references: [id])
+  fill_id_fk  Fill  @relation(fields: [fill_id], references: [id])
 }
-model Sales{
-  id Int @id @default(autoincrement())
-  dateTime DateTime
-  user_id Int
-  observation String
-  totalPrice Decimal
-  paymentMade Boolean
-  eSalesStatus Int
+
+model Sales {
+  id             Int      @id @default(autoincrement())
+  dateTime       DateTime
+  user_id        Int
+  observation    String
+  totalPrice     Decimal
+  paymentMade    Boolean
+  eSalesStatus   Int
   ePaymentMethod Int
 
   Product_Sales Product_Sales[]
 
-  eSalesStatus_fk eSalesStatus @relation(fields: [eSalesStatus], references: [id])
+  eSalesStatus_fk   eSalesStatus   @relation(fields: [eSalesStatus], references: [id])
   ePaymentMethod_fk ePaymentMethod @relation(fields: [ePaymentMethod], references: [id])
-  user_id_fk User @relation(fields: [user_id], references: [id])
+  user_id_fk        User           @relation(fields: [user_id], references: [id])
 
   @@map("sales")
 }
 
-model Product_Sales{
-  id Int @id @default(autoincrement())
+model Product_Sales {
+  id         Int     @id @default(autoincrement())
   product_id Int
-  sales_id Int
-  quantity Int
+  sales_id   Int
+  quantity   Int
   totalPrice Decimal
 
   product_id_fk Product @relation(fields: [product_id], references: [id])
-  sales_id_fk Sales @relation(fields: [sales_id], references: [id])
+  sales_id_fk   Sales   @relation(fields: [sales_id], references: [id])
 
   @@map("product_sales")
 }
 
-model logSales{
-  id Int @id @default(autoincrement())
-  sales_id Int
-  totalPrice Decimal
-  user_name String
-  dateTime DateTime @default(now())
+model logSales {
+  id             Int      @id @default(autoincrement())
+  sales_id       Int
+  totalPrice     Decimal
+  user_name      String
+  dateTime       DateTime @default(now())
   ePaymentMethod String
 
   @@map("log_sales")
 }
 
-model logProduct{
-  id Int @id @default(autoincrement())
-  product_id Int
+model logProduct {
+  id           Int      @id @default(autoincrement())
+  product_id   Int
   product_name String
-  quantity Int
-  user_name String
-  dateTime DateTime @default(now())
-  eTypeAction Int
-
-  
+  quantity     Int
+  user_name    String
+  dateTime     DateTime @default(now())
+  eTypeAction  Int
 
   @@map("log_product")
 }
 
-model logFill{
-  id Int @id @default(autoincrement())
-  observation String
-  dateTime DateTime @default(now())
-  user_name String
+model logFill {
+  id            Int      @id @default(autoincrement())
+  observation   String
+  dateTime      DateTime @default(now())
+  user_name     String
   supplier_name String
-  price Decimal
-  totalPrice Decimal
-  subTotal Decimal
+  price         Decimal
+  totalPrice    Decimal
+  subTotal      Decimal
 
   @@map("log_fill")
 }

@@ -30,11 +30,11 @@ async function category_routes(app: FastifyInstance){
   app.delete("/category", /*{ preHandler: auth_middleware },*/ CategoryController.remove);
 };
 async function supplier_routes(app: FastifyInstance){
-  app.get("/suppliers", { preHandler: auth_middleware }, SupplierController.findAll);
-  app.post("/supplier", { preHandler: auth_middleware }, SupplierController.create);
-  app.get("/supplier/:id", { preHandler: auth_middleware }, SupplierController.findById);
-  app.put("/supplier", { preHandler: auth_middleware }, SupplierController.update);
-  app.delete("/supplier", { preHandler: auth_middleware }, SupplierController.delete);
+  app.get("/suppliers", /*{ preHandler: auth_middleware },*/ SupplierController.findAll);
+  app.post("/supplier", /*{ preHandler: auth_middleware },*/ SupplierController.create);
+  app.get("/supplier/:id", /*{ preHandler: auth_middleware },*/ SupplierController.findById);
+  app.put("/supplier", /*{ preHandler: auth_middleware },*/ SupplierController.update);
+  app.delete("/supplier", /*{ preHandler: auth_middleware },*/ SupplierController.delete);
 };
 async function product_routes(app: FastifyInstance){
   app.get("/products", /*{ preHandler: auth_middleware },*/ ProductController.findAll);
