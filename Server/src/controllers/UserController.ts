@@ -34,18 +34,6 @@ export default class UserController {
         );
     }
   }
-  static async createPreUser(request, response) {
-    const preUser = z.object({
-      name : z
-        .string()
-        .trim()
-        .min(5, "Name required minimum 5 character(s)")
-        .max(20, "Name required Maximum 20 character(s)"),
-      email: z
-      .string().email("Valid e-mail required")
-      .trim()
-    });
-  }  
   static async create(request, response) {
     try {
       const user = z.object({

@@ -17,4 +17,28 @@ export default class PreUser {
       return { status: false, error: error };
     }
   }
+  static async create(
+    name, 
+    email
+  ) {
+    try {
+      const preuser = await prisma.pre_User.create({
+        data: {
+          name, 
+          email
+        },
+      });
+      return {
+        status: true,
+        preuser: {
+          id: preuser.id,
+          name: preuser.name,
+          email: preuser.email
+        },
+      };
+    } catch (error) {
+      return {status: false, error: error }
+    }
+  }
+  static async findPreUser(){}
 }

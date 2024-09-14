@@ -7,6 +7,7 @@ import CategoryController from "./controllers/CategoryController";
 import SupplierController from "./controllers/SupplierController";
 import ProductController from "./controllers/ProductController";
 import BatchController from "./controllers/BatchController";
+import PreUserController from "./controllers/PreUserController";
 
 const app = fastify();
 
@@ -20,6 +21,10 @@ async function user_routes(app: FastifyInstance) {
   app.post("/auth", UserController.auth);
   app.post("/recovery",UserController.recovery);
   app.put("/reset/password",UserController.resetPassword);
+};
+async function preuser_routes(app: FastifyInstance) {
+  app.get("/preusers",/*{ preHandler: auth_middleware },*/PreUserController.listOfPreUsers);
+  app.post("/preuser", PreUserController.create);
 };
 async function category_routes(app: FastifyInstance){
   app.post("/category", /*{ preHandler: auth_middleware },*/ CategoryController.create);
@@ -50,4 +55,4 @@ async function batch_routes(app: FastifyInstance){
   app.put("/batch", /*{ preHandler: auth_middleware },*/ BatchController.update);
   app.delete("/batch", /*{ preHandler: auth_middleware },*/ BatchController.delete);
 }
-export {user_routes, category_routes, supplier_routes, product_routes, batch_routes};
+export {user_routes, category_routes, supplier_routes, product_routes, batch_routes, preuser_routes};
