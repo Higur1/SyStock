@@ -12,9 +12,9 @@ import { formatDate } from "../../utils/utils";
 import ProductList from "./tabs/productList";
 import { ProductContext } from "./ProductPage";
 import DeleteProductDialog from "./dialogs/DeleteProductDialog";
-import ChangeQuantityProductDialog from "./dialogs/ChangeQuantityProductDialog";
 import ViewSupplies from "./tabs/ViewSupplies";
 import ViewProducts from "./dialogs/ViewProducts";
+import ChangeQuantityProduct from "./tabs/ChangeQuantityProductDialog";
 
 
 export const TABS = {
@@ -79,7 +79,7 @@ export default function Product() {
           <Divider />
         </div>
 
-        <div style={{ gridArea: "tabcontent" }}>
+        <div style={{ gridArea: "tabcontent", overflow: 'hidden' }}>
           {tab === TABS.PRODUCTS_LIST && (
             <ProductList
               handleEditProductDialog={handleEditProductDialog}
@@ -101,7 +101,7 @@ export default function Product() {
 
           {tab === TABS.ADD_SUPPLY && (<AddSupply />)}
 
-          {tab === TABS.DECREASE_QUANTITY && (<ChangeQuantityProductDialog />)}
+          {tab === TABS.DECREASE_QUANTITY && (<ChangeQuantityProduct />)}
 
           {tab === TABS.VIEW_SUPPLIES && (<ViewSupplies handleViewProducts={handleViewProducts}/>)}
         </div>

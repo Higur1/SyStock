@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Option, Container, CustomArrow } from './styles.js';
+import { Option, Container } from './styles.js';
 import CategoryIcon from '@mui/icons-material/Category';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import Estoque from '../../images/stock.png';

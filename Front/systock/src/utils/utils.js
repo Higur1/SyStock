@@ -8,38 +8,38 @@ export function deepCopy(object) {
 export const generateID = () => Math.random().toString().slice(2);
 
 export const states = [
-  {name: "Acre", acronym: "AC"},
-  {name: "Alagoas", acronym: "AL"},
-  {name: "Amapá", acronym: "AP"},
-  {name: "Amazonas", acronym: "AM"},
-  {name: "Bahia", acronym: "BA"},
-  {name: "Ceará", acronym: "CE"},
-  {name: "Distrito Federal", acronym: "DF"},
-  {name: "Espírito Santo", acronym: "ES"},
-  {name: "Goiás", acronym: "GO"},
-  {name: "Maranhão", acronym: "MA"},
-  {name: "Mato Grosso", acronym: "MT"},
-  {name: "Mato Grosso do Sul", acronym: "MS"},
-  {name: "Minas Gerais", acronym: "MG"},
-  {name: "Pará", acronym: "PA"},
-  {name: "Paraíba", acronym: "PB"},
-  {name: "Paraná", acronym: "PR"},
-  {name: "Pernambuco", acronym: "PE"},
-  {name: "Piauí", acronym: "PI"},
-  {name: "Rio de Janeiro", acronym: "RJ"},
-  {name: "Rio Grande do Norte", acronym: "RN"},
-  {name: "Rio Grande do Sul", acronym: "RS"},
-  {name: "Rondônia", acronym: "RO"},
-  {name: "Roraima", acronym: "RR"},
-  {name: "Santa Catarina", acronym: "SC"},
-  {name: "São Paulo", acronym: "SP"},
-  {name: "Sergipe", acronym: "SE"},
-  {name: "Tocantins", acronym: "TO"}
+  { name: "Acre", acronym: "AC" },
+  { name: "Alagoas", acronym: "AL" },
+  { name: "Amapá", acronym: "AP" },
+  { name: "Amazonas", acronym: "AM" },
+  { name: "Bahia", acronym: "BA" },
+  { name: "Ceará", acronym: "CE" },
+  { name: "Distrito Federal", acronym: "DF" },
+  { name: "Espírito Santo", acronym: "ES" },
+  { name: "Goiás", acronym: "GO" },
+  { name: "Maranhão", acronym: "MA" },
+  { name: "Mato Grosso", acronym: "MT" },
+  { name: "Mato Grosso do Sul", acronym: "MS" },
+  { name: "Minas Gerais", acronym: "MG" },
+  { name: "Pará", acronym: "PA" },
+  { name: "Paraíba", acronym: "PB" },
+  { name: "Paraná", acronym: "PR" },
+  { name: "Pernambuco", acronym: "PE" },
+  { name: "Piauí", acronym: "PI" },
+  { name: "Rio de Janeiro", acronym: "RJ" },
+  { name: "Rio Grande do Norte", acronym: "RN" },
+  { name: "Rio Grande do Sul", acronym: "RS" },
+  { name: "Rondônia", acronym: "RO" },
+  { name: "Roraima", acronym: "RR" },
+  { name: "Santa Catarina", acronym: "SC" },
+  { name: "São Paulo", acronym: "SP" },
+  { name: "Sergipe", acronym: "SE" },
+  { name: "Tocantins", acronym: "TO" }
 
 ];
 
-export function formatDate(dateString = null, addHours = false) {
-  if(dateString === null) return "";
+export function formatDate(dateString = null, addHours = true) {
+  if (dateString === null) return "";
 
   const date = new Date(dateString);
   const day = String(date.getDate()).padStart(2, '0');
@@ -49,7 +49,7 @@ export function formatDate(dateString = null, addHours = false) {
   const hours = date.getHours();
   const minutes = date.getMinutes();
 
-  const formatDate = `${day}/${month}/${year} ${hours}:${minutes}`;
+  const formatDate = `${day}/${month}/${year}${addHours ? ` ${hours}:${minutes}` : ""}`;
 
   return formatDate;
 }
@@ -60,4 +60,23 @@ export function convertMsToDay(ms) {
   const days = ms / millisecondsInADay;
 
   return days;
+}
+
+export function removeEquals(arr, comparisonStrategy = null) {
+  const nextArr = arr.filter((obj, i) => arr.findIndex(objFind => (comparisonStrategy === null ? obj : obj[comparisonStrategy]) === (comparisonStrategy === null ? objFind : objFind[comparisonStrategy])) === i);
+
+  return nextArr;
+}
+
+export function extraDateToString(expiry) {
+  if(expiry === null) return "";
+
+  const date = new Date(expiry);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+
+  const formatDate = `${day}/${month}/${year}`;
+
+  return formatDate;
 }

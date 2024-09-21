@@ -2,9 +2,10 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import Product from './Product';
 import { DEBUG_LOCAL, MainContext } from '../../App';
 import { FILTER_TYPES } from './tabs/productList';
-import { convertMsToDay } from '../../utils/utils';
+import { convertMsToDay, extraDateToString } from '../../utils/utils';
 import { ENTITIES } from '../../utils/debug-local-helper';
 import { performFetch, performFetchNoResult } from '../../apiBase';
+import { SuperArray } from '../../utils/arrayFunctions';
 
 export const ProductContext = createContext();
 
@@ -14,6 +15,7 @@ export default function ProductPage() {
   const [productsBase, setProductsBase] = useState(null);
   const [productsFiltered, setProductsFiltered] = useState(null);
   const [filter, setFilter] = useState(FILTER_TYPES.ALL);
+  const [loading, setLoading] = useState(true);
 
   const [errorInsert, setErrorInsert] = useState(null);
 
@@ -24,6 +26,12 @@ export default function ProductPage() {
   useEffect(() => {
     getProducts();
   }, []);
+
+  useEffect(() => {
+    if(productsFiltered === null) return;
+
+    setLoading(false);
+  }, [productsFiltered]);
 
   function setFilteredProducts(products = productsBase, filterBase = filter) {
 
@@ -42,12 +50,12 @@ export default function ProductPage() {
       for (let i = 0; i < filteredProducts.length; i++) {
         const currentProduct = filteredProducts[i];
 
-        const productInsideNextProducts = nextProducts.find(prod => prod.refCode === currentProduct.refCode && prod.expiryToString() === currentProduct.expiryToString());
+        const productInsideNextProducts = nextProducts.find(prod => prod.refCode === currentProduct.refCode && (extraDateToString(prod.expiry)) === (extraDateToString(currentProduct.expiry)));
 
         if (productInsideNextProducts) continue;
 
         const equalProducts = filteredProducts.filter((prod, index) => prod.refCode === currentProduct.refCode).map(prod => prod.quantity);
-        const equalProductsSameSupply = filteredProducts.filter((prod, index) => prod.refCode === currentProduct.refCode && prod.expiryToString() === currentProduct.expiryToString()).map(prod => prod.quantity);
+        const equalProductsSameSupply = filteredProducts.filter((prod, index) => prod.refCode === currentProduct.refCode && (extraDateToString(prod.expiry)) === (extraDateToString(currentProduct.expiry))).map(prod => prod.quantity);
 
         const totalQuantity = equalProducts.reduce((acumulator, prod) => {
           const total = prod + acumulator;
@@ -73,12 +81,12 @@ export default function ProductPage() {
       for (let i = 0; i < filteredProducts.length; i++) {
         const currentProduct = filteredProducts[i];
 
-        const productInsideNextProducts = nextProducts.find(prod => prod.refCode === currentProduct.refCode && prod.expiryToString() === currentProduct.expiryToString());
+        const productInsideNextProducts = nextProducts.find(prod => prod.refCode === currentProduct.refCode && (extraDateToString(prod.expiry)) === (extraDateToString(currentProduct.expiry)));
 
         if (productInsideNextProducts) continue;
 
         const equalProducts = filteredProducts.filter((prod, index) => prod.refCode === currentProduct.refCode).map(prod => prod.quantity);
-        const equalProductsSameSupply = filteredProducts.filter((prod, index) => prod.refCode === currentProduct.refCode && prod.expiryToString() === currentProduct.expiryToString()).map(prod => prod.quantity);
+        const equalProductsSameSupply = filteredProducts.filter((prod, index) => prod.refCode === currentProduct.refCode && (extraDateToString(prod.expiry)) === (extraDateToString(currentProduct.expiry))).map(prod => prod.quantity);
 
         const totalQuantity = equalProducts.reduce((acumulator, prod) => {
           const total = prod + acumulator;
@@ -112,6 +120,20 @@ export default function ProductPage() {
 
 
     setProductsFiltered(nextProducts);
+  }
+
+  function getProductTotalQuantity(refCode) {
+    try {
+      const productsQuantity = productsBase.filter(batch => batch.refCode === refCode).map(batch => batch.quantity);
+      const totalQuantity = productsQuantity.reduce((acumulator, prod) => {
+        const total = prod + acumulator;
+        return acumulator + total;
+      });
+
+      return totalQuantity;
+    } catch {
+      return 0;
+    }
   }
 
   async function getProducts() {
@@ -206,7 +228,18 @@ export default function ProductPage() {
 
   function handleFilter(value) {
     setFilter(value);
+    setLoading(true);
     setFilteredProducts(productsBase, value);
+  }
+
+  function getExpiryDatesByProduct(refCode) {
+    const thisProductBatches = productsBase.filter(batch => batch.refCode === refCode)
+      .map(batch => batch.expiry)
+      .filter(expiry => expiry !== null);
+
+    const expiryDates = new SuperArray(thisProductBatches).removeEquals();
+
+    return expiryDates;
   }
 
   return (
@@ -216,7 +249,9 @@ export default function ProductPage() {
         productsFiltered, filter, handleFilter,
         createProduct, updateProduct,
         errorInsert, handleDeleteProduct,
-        productsWithoutSupply
+        productsWithoutSupply, getProductTotalQuantity,
+        getExpiryDatesByProduct,
+        loading
       }}
     >
       <Product />
