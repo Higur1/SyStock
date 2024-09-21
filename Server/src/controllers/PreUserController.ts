@@ -42,15 +42,21 @@ export default class PreUserController {
       });
       const { name, email } = preUser.parse(request.body);
 
-      const preuserExists = await PreUser.
+      const preuserExists = await PreUser.findPreUser(email);
 
-      await PreUser.create(
-        name, 
-        email,
-      ).then((preUser) => {
-        response.status(201).send(preUser.preuser);
-      })
-
+      if (preuserExists.status && preuserExists.preuser == undefined) {
+        await PreUser.create(name, email).then((preUser) => {
+          response.status(201).send(preUser.preuser);
+        });
+      } else {
+        response.status(409).send(
+          JSON.stringify({
+            message:
+              "an operation could not be performed email already exists",
+            error: preuserExists.error,
+          })
+        );
+      }
     } catch (error) {
       response.status(400).send(
         JSON.stringify({

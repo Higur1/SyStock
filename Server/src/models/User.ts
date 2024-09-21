@@ -18,31 +18,37 @@ export default class User {
       return { status: false, error: error };
     }
   }
-  static async create(
-    name,
-    user_login,
-    hash_password,
-    email,
-    user_type_id,
-  ) {
+  static async create(name, user_login, hash_password, email, user_type_id) {
     try {
-      const user = await prisma.user.create({
-        data: {
-          name,
-          user_login,
-          user_password: hash_password,
-          email,
-          user_type_id,
+      const pre_User = await prisma.pre_User.findFirst({
+        where: {
+          AND: [{ name: name }, { email: email }],
         },
       });
-      return {
-        status: true,
-        user: {
-          name: user.name,
-          user_login: user.user_login,
-          email: user.email,
-        },
-      };
+      if (pre_User != undefined) {
+        const user = await prisma.user.create({
+          data: {
+            name: name,
+            login: user_login,
+            password: hash_password,
+            email: email,
+            user_type: user_type_id,
+          },
+        });
+        return {
+          status: true,
+          user: {
+            name: user.name,
+            user_login: user.login,
+            email: user.email,
+          },
+        };
+      } else {
+        return {
+          status: false,
+          error: "preuser don't exists"
+        };
+      }
     } catch (error) {
       return { status: false, error: error };
     }
@@ -61,7 +67,7 @@ export default class User {
     try {
       const user = await prisma.user.findFirst({
         where: {
-          OR: [{ email: email }, { user_login: login }],
+          OR: [{ email: email }, { login: login }],
         },
       });
       return user != null
@@ -197,7 +203,7 @@ export default class User {
       return { status: false, error: error };
     }
   }
-  static async listOfUsersOfCompany( user_type_id) {
+  static async listOfUsersOfCompany(user_type_id) {
     try {
       const userList = await prisma.user.findMany({
         where: { user_type_id: user_type_id },

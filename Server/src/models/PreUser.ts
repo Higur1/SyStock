@@ -17,15 +17,12 @@ export default class PreUser {
       return { status: false, error: error };
     }
   }
-  static async create(
-    name, 
-    email
-  ) {
+  static async create(name, email) {
     try {
       const preuser = await prisma.pre_User.create({
         data: {
-          name, 
-          email
+          name,
+          email,
         },
       });
       return {
@@ -33,12 +30,26 @@ export default class PreUser {
         preuser: {
           id: preuser.id,
           name: preuser.name,
-          email: preuser.email
+          email: preuser.email,
         },
       };
     } catch (error) {
-      return {status: false, error: error }
+      return { status: false, error: error };
     }
   }
-  static async findPreUser(){}
+  static async findPreUser(email) {
+    try {
+      const preuser = await prisma.pre_User.findFirst({
+        where: {
+          email: email,
+        },
+      });
+
+      return preuser != null
+        ? { status: true, preuser: preuser }
+        : { status: true, user: undefined };
+    } catch (error) {
+      return { status: false, error: error };
+    }
+  }
 }

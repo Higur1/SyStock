@@ -1,4 +1,5 @@
 import User from "../models/User";
+import PreUser from "../models/PreUser";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
@@ -57,29 +58,50 @@ export default class UserController {
         email: z.string().email("Valid e-mail required").trim(),
         user_type_id: z.number().gt(0),
       });
-      const {
-        name,
-        user_login,
-        user_password,
-        email,
-        user_type_id,
-      } = user.parse(request.body);
+      const { name, user_login, user_password, email, user_type_id } =
+        user.parse(request.body);
+
+      //verifica se existe um preusuario para o usuario que será cadastrado
 
       const userExists = await User.findUser(email, user_login);
       const hash_password = cryptPassword(user_password);
 
-      if (userExists.status && userExists.user == undefined){
-          await User.create(
-            name,
-            user_login,
-            hash_password,
-            email,
-            user_type_id,
-          ).then((user) => {
-            response.status(201).send(user.user);
-          });
-        } 
-      else {
+      if (userExists.status && userExists.user == undefined) {
+        const user_create = await User.create(
+          name,
+          user_login,
+          hash_password,
+          email,
+          user_type_id
+        );
+
+        if (user_create.status) {
+          response.status(201).send(user_create.user);
+        }
+        if (user_create.error == "preuser don't exists") {
+          response.status(409).send(
+            JSON.stringify({
+              message:
+                "preuser don't exists",
+            })
+          );
+        }
+        response.status(500).send(
+          JSON.stringify({
+            error:
+              user_create.error,
+          })
+        );
+        /*const user_create = await User.create(
+              name,
+              user_login,
+              hash_password,
+              email,
+              user_type_id,
+            ).then((user) => {
+              response.status(201).send(user.user);
+            });*/
+      } else {
         response.status(409).send(
           JSON.stringify({
             message:
@@ -107,7 +129,7 @@ export default class UserController {
       });
       const { name } = user.parse(request.params);
       const token = request.headers.authorization;
-    
+
       const userList = await User.findNameStartWith(name);
       if (userList.status) {
         if (userList.user != undefined) {
@@ -149,9 +171,7 @@ export default class UserController {
           .max(1, "type_id required maximum 1 character(s)"),
       });
       const { type_id } = user.parse(request.params);
-      const listOfUsers = await User.findUserByTypeId(
-        Number(type_id)
-      );
+      const listOfUsers = await User.findUserByTypeId(Number(type_id));
 
       if (listOfUsers.status) {
         if (listOfUsers.listOfUsers != undefined) {
@@ -233,7 +253,7 @@ export default class UserController {
               })
             );
           });
-        } 
+        }
       } else {
         response.status(500).send(
           JSON.stringify({
@@ -317,7 +337,7 @@ export default class UserController {
                 const token = jwt.sign(
                   {
                     id: userVerify.user.id,
-                    email: userVerify.user.email
+                    email: userVerify.user.email,
                   },
                   knowkey!,
                   { expiresIn: "24h" }

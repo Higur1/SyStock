@@ -69,14 +69,12 @@ export default class Supplier {
           id: supplierObject.id,
         },
       });
-      return supplier != null
-        ? { status: true, supplier: supplier }
-        : { status: true, supplier: {} };
+      return { supplier: supplier };
     } catch (error) {
-      return { status: false, error: error };
+      return { error: error };
     }
   }
-  static async validatedSupplierData(supplierObject) {
+  static async validatedSupplierExists(supplierObject) {
     try {
       let message = "";
       const validSupplier = await prisma.supplier.findFirst({
@@ -84,7 +82,41 @@ export default class Supplier {
           id: supplierObject.id,
         },
       });
-      message += validSupplier == null ? "could not update supplier, " : "";
+      message += validSupplier == null ? "O fornecedor não existe" : "";
+
+      return message.length == 0
+        ? { status: true, exists: true }
+        : { status: true, exists: false, message: message };
+    } catch (error) {
+      return { status: false, error: error };
+    }
+  }
+  static async validatedSupplierData(supplierObject) {
+    try {
+      let message = "";
+      const validNameSupplier = await prisma.supplier.findFirst({
+        where: {
+          name: supplierObject.name,
+        },
+      });
+      const validEmailSupplier = await prisma.supplier.findFirst({
+        where: {
+          email: supplierObject.email,
+        },
+      });
+      const validPhoneSupplier = await prisma.supplier.findFirst({
+        where: {
+          phone: supplierObject.phone,
+        },
+      });
+      message +=
+        validNameSupplier == null ? "" : "nome já cadastrado no sistema | ";
+
+      message +=
+        validEmailSupplier == null ? "" : "email já cadastrado no sistema | ";
+
+      message +=
+        validPhoneSupplier == null ? "" : "phone já cadastrado no sistema";
 
       return message.length == 0
         ? { status: true, isValid: true }
