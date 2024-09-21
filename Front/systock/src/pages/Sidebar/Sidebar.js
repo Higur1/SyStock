@@ -24,14 +24,14 @@ export default function Sidebar({logOff}) {
       openCollapse: false
     },
     {
-      type: 'categories', 
-      label: 'Categoria', 
+      type: 'products', 
+      label: 'Produto', 
       child: [],
       openCollapse: false
     },
     {
-      type: 'products', 
-      label: 'Produto', 
+      type: 'categories', 
+      label: 'Categoria', 
       child: [],
       openCollapse: false
     },
@@ -42,22 +42,21 @@ export default function Sidebar({logOff}) {
       openCollapse: false
     },
     {
-      type: 'stock', 
-      label: 'Estoque', 
+      type: 'history', 
+      label: 'Históricos', 
+      child: [],
+      openCollapse: false
+    },
+    {
+      type: 'sellRegisters', 
+      label: 'Registros de venda', 
       child: [],
       openCollapse: false
     },
     {
       type: 'settings', 
       label: 'Configurações', 
-      child: [
-        {
-          type: 'users', 
-          label: 'Usuários', 
-          child: [],
-          openCollapse: false
-        }
-      ],
+      child: [],
       openCollapse: false
     },
   ]);

@@ -12,10 +12,11 @@ import HomeIcon from '@mui/icons-material/Home';
 import Stock from '../../images/stock.png';
 import Supply from '../../images/parcela.png';
 import { SvgIcon } from '@mui/material';
+import { LocalAtm, Visibility } from '@mui/icons-material';
 
-const IconCustom = ({type, color="#424242"}) => {
+const IconCustom = ({ type, color = "#424242" }) => {
 
-  switch(type) {
+  switch (type) {
     case 'home': {
       return <HomeIcon />;
     }
@@ -33,17 +34,27 @@ const IconCustom = ({type, color="#424242"}) => {
     }
     case 'suppliers': {
       return (
-        <img src={Supply} alt={type} style={{width: 24, height: 24}}/>
+        <img src={Supply} alt={type} style={{ width: 24, height: 24 }} />
       );
     }
     case 'stock': {
       return (
-        <img src={Stock} alt={type} style={{width: 24, height: 24}}/>
+        <img src={Stock} alt={type} style={{ width: 24, height: 24 }} />
       );
     }
     case 'logOut': {
       return (
         <LogoutIcon />
+      );
+    }
+    case 'sellRegisters': {
+      return (
+        <LocalAtm />
+      );
+    }
+    case 'history': {
+      return (
+        <Visibility />
       );
     }
     case 'googleMaps': {
@@ -72,7 +83,7 @@ const IconCustom = ({type, color="#424242"}) => {
           </svg>
         </SvgIcon>
       );
-      
+
     }
     default:
       return null;

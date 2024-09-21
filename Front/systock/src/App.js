@@ -41,7 +41,7 @@ function App() {
       if(payload === "connectLocal") {
         setIsLoggedIn(true);
         getDB();
-        return navigate(window.location.pathname);
+        return initialNavigation();
       } else {
         setIsLoggedIn(false);
         return navigate('login');
@@ -65,7 +65,7 @@ function App() {
       } else {
         setIsLoggedIn(true);
         getDB();
-        navigate(window.location.pathname);
+        initialNavigation();
       }
     } else {
       window.localStorage.removeItem('tokenLogin');
@@ -76,6 +76,11 @@ function App() {
       return;
       // return window.location.pathname = 'login';
     }
+  }
+
+  function initialNavigation() {
+    if(window.location.pathname === '/') return navigate("/home");
+    navigate(window.location.pathname);
   }
 
   function getDB() {
