@@ -123,7 +123,7 @@ export default class SupplierController {
   static async update(request, response) {
     try {
       const supplierValidation = z.object({
-        id: z.string().regex(RegExp("[0-9][0-9]*")),
+        id: z.number(),
         name: z.string().trim().min(3).max(51),
         email: z.string().email(),
         phone: z.string().length(11).regex(RegExp("[0-9]{11}")),
@@ -131,7 +131,7 @@ export default class SupplierController {
 
       const { id, name, email, phone } = supplierValidation.parse(request.body);
       const supplier = {
-        id: Number(id),
+        id: id,
         name: name,
         email: email,
         phone: phone,
@@ -195,8 +195,7 @@ export default class SupplierController {
   static async delete(request, response) {
     try {
       const supplierValidation = z.object({
-        //        id: z.string().trim().min(36).max(36),
-        id: z.string(),
+        id: z.string().regex(RegExp("[0-9][0-9]*"))
       });
       const { id } = supplierValidation.parse(request.body);
       const supplierDeleted = await Supplier.delete(Number(id));
