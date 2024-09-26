@@ -8,6 +8,7 @@ import ResetPassword from './pages/Login/ResetPassword/ResetPassword'
 import Home from './pages/Home/Home'
 import ProductPage from './pages/Product/ProductPage'
 import HistoryPage from './pages/History/HistoryPage'
+import SellRegistersPage from './pages/SellRegisters/SellRegistersPage'
 
 export default function Master() {
   return (
@@ -30,6 +31,7 @@ export default function Master() {
               <Route path="products" element={isLoggedIn ? <ProductPage /> : null} />
               <Route path="suppliers" element={isLoggedIn ? <Supplier /> : null} />
               <Route path="history" element={isLoggedIn ? <HistoryPage /> : null} />
+              <Route path="sellRegisters" element={isLoggedIn ? <SellRegistersPage /> : null} />
             </Routes>
           </div>
         );
