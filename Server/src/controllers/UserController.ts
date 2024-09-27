@@ -61,9 +61,11 @@ export default class UserController {
       const { name, user_login, user_password, email, user_type_id } =
         user.parse(request.body);
 
+      //verifica se existe o usuario já existe antes de cadastra-lo
+      const userExists = await User.findUser(email, user_login);
+
       //verifica se existe um preusuario para o usuario que será cadastrado
 
-      const userExists = await User.findUser(email, user_login);
       const hash_password = cryptPassword(user_password);
 
       if (userExists.status && userExists.user == undefined) {
@@ -78,18 +80,16 @@ export default class UserController {
         if (user_create.status) {
           response.status(201).send(user_create.user);
         }
-        if (user_create.error == "preuser don't exists") {
+        if (user_create.error == "preuser não existe") {
           response.status(409).send(
             JSON.stringify({
-              message:
-                "preuser don't exists",
+              message: "preuser don't exists",
             })
           );
         }
         response.status(500).send(
           JSON.stringify({
-            error:
-              user_create.error,
+            error: user_create.error,
           })
         );
         /*const user_create = await User.create(
@@ -104,8 +104,7 @@ export default class UserController {
       } else {
         response.status(409).send(
           JSON.stringify({
-            message:
-              "an operation could not be performed email or login already exists",
+            message: "o email inserido já pertence a um usuário",
             error: userExists.error,
           })
         );
@@ -328,7 +327,7 @@ export default class UserController {
       if (userVerify.status) {
         if (userVerify.user != undefined) {
           await bcrypt
-            .compare(user_password, userVerify.user.user_password)
+            .compare(user_password, userVerify.user.password)
             .then(async (checkPassword) => {
               if (!checkPassword) {
                 return response.status(401).send({ message: "Unauthorized" });
@@ -377,17 +376,21 @@ export default class UserController {
     try {
       const recovery = z.object({
         email: z.string().trim().email("valid email required"),
-        instance: z
-          .string()
-          .trim()
-          .min(10, "instance required 10 character(s)"),
+        instance: z.string(),
       });
+
       const { email, instance } = recovery.parse(request.body);
+      console.log(email);
+      console.log(instance);
 
       const user = await User.findEmail(email);
+      console.log(user);
       if (user.status) {
         if (user.user != undefined) {
+          console.log("entrou aq");
           const tokenRecovery = await User.tokenCreate(user.user);
+          console.log(email);
+          console.log(tokenRecovery.result);
           sendEmail(email, tokenRecovery.result, instance);
           response.status(200).send(
             JSON.stringify({
@@ -411,7 +414,9 @@ export default class UserController {
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
+          path: error.issues[0].path,
           error: error.issues[0].message,
+          //          error: error.issues[0].message,
         })
       );
     }

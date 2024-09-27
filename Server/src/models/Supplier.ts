@@ -57,6 +57,28 @@ export default class Supplier {
       return { status: false, error: error };
     }
   }
+  static async findByName(supplier_name) {
+    try {
+      const supplierResult = await prisma.supplier.findMany({
+        where: {
+          name: {
+            startsWith: supplier_name,
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+        },
+      });
+      return supplierResult != undefined
+        ? { status: true, supplier: supplierResult }
+        : { status: true, supplier: undefined };
+    } catch (error) {
+      return { status: false, error: error };
+    }
+  }
   static async updateSupplier(supplierObject) {
     try {
       const supplier = await prisma.supplier.update({

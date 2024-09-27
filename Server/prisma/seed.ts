@@ -18,7 +18,7 @@ resetId();
 /*Delete */ await prisma.$transaction([
   prisma.token_Recovery.deleteMany(),
   prisma.user.deleteMany(),
-  prisma.user_Type.deleteMany(),
+  //prisma.user_Type.deleteMany(),
   prisma.batch.deleteMany(),
   prisma.product.deleteMany(),
   prisma.category.deleteMany(),

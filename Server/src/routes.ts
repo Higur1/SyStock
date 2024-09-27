@@ -12,7 +12,7 @@ import PreUserController from "./controllers/PreUserController";
 const app = fastify();
 
 async function user_routes(app: FastifyInstance) {
-  app.get("/users",/*{ preHandler: auth_middleware },*/UserController.listOfUsers);
+  app.get("/users",{ preHandler: auth_middleware },UserController.listOfUsers);
   app.post("/user", /*{ preHandler: auth_middleware },*/ UserController.create);
   app.get("/user/:name",/*{ preHandler: auth_middleware },*/ UserController.findUserByName);
   app.get("/user/type/:type_id",/*{ preHandler: auth_middleware },*/UserController.findUserByTypeId);
@@ -38,6 +38,7 @@ async function supplier_routes(app: FastifyInstance){
   app.get("/suppliers", /*{ preHandler: auth_middleware },*/ SupplierController.findAll);
   app.post("/supplier", /*{ preHandler: auth_middleware },*/ SupplierController.create);
   app.get("/supplier/:id", /*{ preHandler: auth_middleware },*/ SupplierController.findById);
+  app.get("/supplier/findByName/:name", /*{ preHandler: auth_middleware },*/ SupplierController.findByName);
   app.put("/supplier", /*{ preHandler: auth_middleware },*/ SupplierController.update);
   app.delete("/supplier", /*{ preHandler: auth_middleware },*/ SupplierController.delete);
 };

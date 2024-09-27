@@ -46,7 +46,7 @@ export default class User {
       } else {
         return {
           status: false,
-          error: "preuser don't exists"
+          error: "preuser não existe",
         };
       }
     } catch (error) {
@@ -193,7 +193,7 @@ export default class User {
     try {
       const user = await prisma.user.findFirst({
         where: {
-          user_login: user_login,
+          login: user_login,
         },
       });
       return user
@@ -203,27 +203,19 @@ export default class User {
       return { status: false, error: error };
     }
   }
-  static async listOfUsersOfCompany(user_type_id) {
-    try {
-      const userList = await prisma.user.findMany({
-        where: { user_type_id: user_type_id },
-      });
-      return userList.length > 0
-        ? { status: true, userList: userList }
-        : { status: true, userList: [] };
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
+
   static async tokenCreate(user: any) {
     try {
+      console.log("tokenCreate");
       const result = await prisma.token_Recovery.create({
         data: {
           user_id: user.id,
+          status: true,
         },
       });
+      console.log(result);
       return result != null
-        ? { status: true, result: result.id }
+        ? { status: true, result: result.token }
         : { status: true, result: undefined };
     } catch (error) {
       return { status: false, error: error };

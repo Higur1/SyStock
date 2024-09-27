@@ -2,13 +2,13 @@ import * as nodemailer from 'nodemailer'
 import { templateHtml } from './template';
 
 export const transport = nodemailer.createTransport({
-    service: "gmail",
+//    service: "gmail",
     host:"smtp.gmail.com",
-    port: 465,
-    secure: true,
+    port: 587,
+    secure: false,
     auth:{
         user: process.env.EMAIL,
-        pass: "jvxjybguyzjyzdxy"
+        pass: "syst78@Et"
     }
 });
 
@@ -17,6 +17,7 @@ export function sendEmail(email, token, instance){
         from: process.env.EMAIL,
         to:email,
         subject: "Solicitação de reinicio de senha",
+        text:"",
         html: templateHtml(Object.values(token)[0], instance)
     }).then(result =>{
         return result;

@@ -42,33 +42,27 @@ export default class SupplierController {
         phone: phone,
       };
 
-      const supplierCreated = await Supplier.create(supplier);
-      if (supplierCreated?.status) {
-        //if (supplierCreated.supplier != undefined) {
-        response.status(201).send(
-          JSON.stringify({
-            supplier: supplierCreated.supplier,
-          })
-        );
-      }
-      if (supplierCreated.error.meta.target.includes("name")) {
+      const supplierValidated = await Supplier.validatedSupplierData(supplier);
+
+      if (supplierValidated.status) {
+        if (supplierValidated.isValid) {
+          const supplierCreated = await Supplier.create(supplier);
+          if (supplierCreated.supplier != null) {
+            response.status(201).send(
+              JSON.stringify({
+                supplier: supplierCreated.supplier,
+              })
+            );
+          }
+          response.status(500).send(
+            JSON.stringify({
+              supplier: supplierCreated.error,
+            })
+          );
+        }
         response.status(400).send(
           JSON.stringify({
-            error: "nome já está cadastrado",
-          })
-        );
-      }
-      if (supplierCreated.error.meta.target.includes("email")) {
-        response.status(400).send(
-          JSON.stringify({
-            error: "email já existe",
-          })
-        );
-      }
-      if (supplierCreated.error.meta.target.includes("phone")) {
-        response.status(400).send(
-          JSON.stringify({
-            error: "phone já existe",
+            error: supplierValidated.message,
           })
         );
       }
@@ -84,7 +78,7 @@ export default class SupplierController {
   static async findById(request, response) {
     try {
       const supplierValidation = z.object({
-        id: z.string(),
+        id: z.string().trim(),
       });
       const { id } = supplierValidation.parse(request.params);
 
@@ -97,13 +91,50 @@ export default class SupplierController {
               supplier: supplierFound.supplier,
             })
           );
-        } else {
-          response.status(500).send(
+        }
+        response.status(404).send(
+          JSON.stringify({
+            error: "fornecedor não existe",
+          })
+        );
+      } else {
+        response.status(500).send(
+          JSON.stringify({
+            error: supplierFound.error,
+          })
+        );
+      }
+    } catch (error) {
+      response.status(400).send(
+        JSON.stringify({
+          path: error.issues[0].path,
+          error: error.issues[0].message,
+        })
+      );
+    }
+  }
+  static async findByName(request, response) {
+    try {
+      const supplierValidation = z.object({
+        name: z.string().trim().min(3).max(51),
+      });
+      const { name } = supplierValidation.parse(request.params);
+
+      const supplierFound = await Supplier.findByName(name);
+
+      if (supplierFound.status) {
+        if (supplierFound.supplier != undefined) {
+          response.status(200).send(
             JSON.stringify({
-              error: "An error has occurred",
+              supplier: supplierFound.supplier,
             })
           );
         }
+        response.status(404).send(
+          JSON.stringify({
+            error: "fornecedor não existe",
+          })
+        );
       } else {
         response.status(500).send(
           JSON.stringify({
@@ -195,20 +226,27 @@ export default class SupplierController {
   static async delete(request, response) {
     try {
       const supplierValidation = z.object({
-        id: z.string().regex(RegExp("[0-9][0-9]*"))
+        id: z.number(),
       });
       const { id } = supplierValidation.parse(request.body);
-      const supplierDeleted = await Supplier.delete(Number(id));
+
+      const supplierDeleted = await Supplier.delete(id);
 
       if (supplierDeleted.status) {
-        response.status(200);
-      } else {
-        response.status(500).send(
+        response.status(200).send(JSON.stringify({}));
+      }
+      if (supplierDeleted.error.meta.cause.includes("not exist")) {
+        response.status(404).send(
           JSON.stringify({
-            error: supplierDeleted.error,
+            error: "fornecedor não existe",
           })
         );
       }
+      response.status(500).send(
+        JSON.stringify({
+          error: supplierDeleted.error,
+        })
+      );
     } catch (error) {
       response.status(400).send(
         JSON.stringify({

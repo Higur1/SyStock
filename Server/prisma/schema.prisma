@@ -55,12 +55,13 @@ model User {
   email     String   @unique
   createdAt DateTime @default(now())
   updateAt  DateTime @updatedAt
-  user_type Int
+  user_type Int      @default(1)
 
   user_type_fk eTypeUser @relation(fields: [user_type], references: [id])
 
   Sales Sales[]
   Fill  Fill[]
+  token_Recovery token_Recovery[]
 
   @@map("user")
 }
@@ -221,4 +222,13 @@ model logFill {
   subTotal      Decimal
 
   @@map("log_fill")
+}
+
+model token_Recovery {
+  token         String   @id @default(uuid())
+  user_id       Int
+  status        Boolean 
+
+  user_id_token_fk User @relation(fields: [user_id], references: [id])
+  @@map("token_Recoverys")
 }
