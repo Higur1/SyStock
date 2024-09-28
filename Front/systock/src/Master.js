@@ -9,6 +9,8 @@ import Home from './pages/Home/Home'
 import ProductPage from './pages/Product/ProductPage'
 import HistoryPage from './pages/History/HistoryPage'
 import SellRegistersPage from './pages/SellRegisters/SellRegistersPage'
+import SettingsPage from './pages/Settings/SettingsPage'
+import SupportPage from './pages/Support/SupportPage'
 
 export default function Master() {
   return (
@@ -16,7 +18,8 @@ export default function Master() {
       {({ isLoggedIn, actions }) => {
 
         return (
-          <div style={{ padding: "0px", flex: isLoggedIn ? 0 : 1 }}>
+          <div style={{ padding: "0px", flex: isLoggedIn ? 0 : 1, position: 'relative' }}>
+            <SupportPage />
             <Routes>
               <Route path="login" element={
                 !isLoggedIn ? <Login /> : null
@@ -32,6 +35,7 @@ export default function Master() {
               <Route path="suppliers" element={isLoggedIn ? <Supplier /> : null} />
               <Route path="history" element={isLoggedIn ? <HistoryPage /> : null} />
               <Route path="sellRegisters" element={isLoggedIn ? <SellRegistersPage /> : null} />
+              <Route path="settings" element={isLoggedIn ? <SettingsPage /> : null} />
             </Routes>
           </div>
         );
