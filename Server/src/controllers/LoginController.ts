@@ -78,17 +78,11 @@ export default class LoginController {
       });
 
       const { email, instance } = recovery.parse(request.body);
-      console.log(email);
-      console.log(instance);
-
       const user = await User.findEmail(email);
-      console.log(user);
+
       if (user.status) {
         if (user.user != undefined) {
-          console.log("entrou aq");
           const tokenRecovery = await User.tokenCreate(user.user);
-          console.log(email);
-          console.log(tokenRecovery.result);
           sendEmail(email, tokenRecovery.result, instance);
           response.status(200).send(
             JSON.stringify({
@@ -112,9 +106,7 @@ export default class LoginController {
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
-          path: error.issues[0].path,
           error: error.issues[0].message,
-          //          error: error.issues[0].message,
         })
       );
     }

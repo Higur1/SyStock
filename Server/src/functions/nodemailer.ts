@@ -8,7 +8,7 @@ export const transport = nodemailer.createTransport({
     secure: false,
     auth:{
         user: process.env.EMAIL,
-        pass: "syst78@Et"
+        pass: process.env.PASSWORD
     }
 });
 
@@ -18,7 +18,7 @@ export function sendEmail(email, token, instance){
         to:email,
         subject: "Solicitação de reinicio de senha",
         text:"",
-        html: templateHtml(Object.values(token)[0], instance)
+        html: templateHtml(token, instance)
     }).then(result =>{
         return result;
     }).catch(error =>{

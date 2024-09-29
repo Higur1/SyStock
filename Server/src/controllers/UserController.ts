@@ -74,7 +74,6 @@ export default class UserController {
           email,
           user_type_id
         );
-
         if (user_create.status) {
           response.status(201).send(user_create.user);
         }
@@ -276,7 +275,7 @@ export default class UserController {
       const userId = await User.findUserById(id);
       if (userId.status) {
         if (userId.user != undefined) {
-          if (userId.user.user_type_id != 1) {
+          if (userId.user.id != 1) {
             await User.tokenDelete(userId.user.id);
             await User.delete(userId.user.id);
             response.status(200);
@@ -305,7 +304,7 @@ export default class UserController {
       );
     }
   }
-  
+
   static async resetPassword(request, response) {
     try {
       const passwordReset = z.object({
@@ -323,11 +322,13 @@ export default class UserController {
       const { user_password, token } = passwordReset.parse(request.body);
 
       const isValidToken = await User.tokenValited(token);
+
       if (isValidToken.status) {
         if (isValidToken.isValid) {
           if (isValidToken.status) {
             const result = await User.updatePassword(
               isValidToken.token?.user_id,
+              isValidToken.token?.id,
               user_password
             );
             if (result.status) {
@@ -367,7 +368,7 @@ export default class UserController {
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
-          error: error.issues[0].message,
+          error: error,
         })
       );
     }
@@ -430,5 +431,5 @@ function cryptPassword(password) {
   const hash = bcrypt.hashSync(password, salt);
   return hash;
 }
-function genericError(code) {}
+function genericError(code) { }
 export { UserController };

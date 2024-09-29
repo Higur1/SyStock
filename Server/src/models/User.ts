@@ -206,16 +206,14 @@ export default class User {
 
   static async tokenCreate(user: any) {
     try {
-      console.log("tokenCreate");
       const result = await prisma.token_Recovery.create({
-        data: {
+        data:{
           user_id: user.id,
-          status: true,
+          status: true
         },
       });
-      console.log(result);
       return result != null
-        ? { status: true, result: result.token }
+        ? { status: true, result: result.token}
         : { status: true, result: undefined };
     } catch (error) {
       return { status: false, error: error };
@@ -225,15 +223,16 @@ export default class User {
     try {
       const tokenIsValid = await prisma.token_Recovery.findUnique({
         where: {
-          id: token,
+          token: token
         },
       });
+      const teste = await prisma.token_Recovery.findMany();
       return tokenIsValid == undefined
         ? { status: true, isValid: false }
         : {
             status: true,
             isValid: true,
-            token: { id: tokenIsValid.id, user_id: tokenIsValid.user_id },
+            token: { id: tokenIsValid.token, user_id: tokenIsValid.user_id },
           };
     } catch (error) {
       return { status: false, error: error };
@@ -251,15 +250,23 @@ export default class User {
       return { status: false, error: error };
     }
   }
-  static async updatePassword(id, password) {
+  static async updatePassword(id, token, password,) {
     try {
       await prisma.user.update({
         where: {
           id: id,
         },
         data: {
-          user_password: password,
+          password: password,
         },
+      });
+      await prisma.token_Recovery.update({
+        where:{
+          token: token
+        },
+        data:{
+          status: false
+        }
       });
       return { status: true };
     } catch (error) {

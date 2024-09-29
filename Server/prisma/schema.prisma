@@ -230,5 +230,5 @@ model token_Recovery {
   status        Boolean 
 
   user_id_token_fk User @relation(fields: [user_id], references: [id])
-  @@map("token_Recoverys")
+  @@map("token_recovery")
 }
