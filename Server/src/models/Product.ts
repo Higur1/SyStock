@@ -8,9 +8,15 @@ export default class Product {
           id: true,
           name: true,
           price: true,
+          costPrice: true,
+          minimunQuantity: true,
+          observation: true,
+          totalQuantityInStock: true,
           category_id: true,
-          createAt: true,
         },
+        where:{
+          excludedStatus: false
+        }
       });
 
       return products != null
@@ -22,51 +28,38 @@ export default class Product {
   };
   static async create(productObject) {
     try {
-
-      let supplier_id = productObject.supplier;
-      let category_id = productObject.category;
-
+    
       let product_template = {name: "", id: 0};
 
       const verifyProductExists = await Product.verifyDuplicateName(
         productObject.name,
       );
-      
       if(!verifyProductExists.exists){
         const product = await prisma.product.create({
           data:{
             name: productObject.name,
             price: productObject.price,
-            category_id: category_id,
+            costPrice: productObject.costPrice,
+            minimunQuantity: productObject.minimunQuantity,
+            observation: productObject.observation,
+            totalQuantityInStock: 0,
+            category_id: productObject.category_id,
+            excludedStatus: false
           }
         });
         product_template.id = product.id;
         product_template.name = product.name;
+        return product != null ? {status: true, product_name: product_template.name} : {status: true, product: undefined};
       }else{
         const product = await prisma.product.findFirst({
           where:{
             name: productObject.name,
-            category_id: category_id,
+            category_id: productObject.category_id,
           }
         });
-        product_template.id = product!.id;
-        product_template.name = product!.name;
-      }
-      const batch_product = await prisma.batch.create({
-        data:{
-          product_id: product_template.id,
-          supplier_id: supplier_id,
-          quantity: productObject.quantity
-        },select:{
-          id: true,
-          product_id: true,
-          supplier_id: true,
-          createAt: true,
-          quantity: true
-        }
-      });
 
-      return batch_product != null ? {status: true, batch_product: batch_product, product_name: product_template.name} : {status: true, batch_product: undefined};
+        return product != null ? {status: true, productAlredyExists: true} : {status: true, product: undefined}
+      }
     } catch (error) {
       return { status: false, error: error };
     }
@@ -76,6 +69,7 @@ export default class Product {
       const product = await prisma.product.findUnique({
         where: {
           id: product_id,
+          excludedStatus: false
         },
       });
 
@@ -92,6 +86,7 @@ export default class Product {
         where:{
           AND:{
             category_id: category_id,
+            excludedStatus: false
           }
         },select:{
           id:true,
@@ -116,17 +111,24 @@ export default class Product {
       const product = await prisma.product.update({
         data:{
           name: productObject.name,
-          category_id: productObject.category_id,
           price: productObject.price,
+          costPrice: productObject.costPrice,
+          minimunQuantity: productObject.minimunQuantity,
+          observation: productObject.observation,
+          category_id: productObject.category_id,
         },
         where:{
-          id: productObject.id
+          id: productObject.id,
+          excludedStatus: false
         },
         select:{
           id: true,
           name: true,
+          price: true,
+          costPrice: true,
+          minimunQuantity: true,
+          observation: true,
           category_id: true,
-          price: true
         }
       });
 
@@ -142,10 +144,14 @@ export default class Product {
           product_id: product_id
         }
       })
-      await prisma.product.delete({
+      // substitui o delete por atualização no status de exclusão.
+      await prisma.product.update({
         where: {
           id: product_id,
         },
+        data:{
+          excludedStatus: true
+        }
       });
       return { status: true };
     } catch (error) {
@@ -158,6 +164,7 @@ export default class Product {
         where: {
           AND: {
             name: name,
+            excludedStatus: false
           },
         },
       });

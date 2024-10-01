@@ -30,35 +30,45 @@ export default class ProductController {
   static async create(request, response) {
     try {
       const productValidation = z.object({
-        name: z.string().trim().min(3).max(20),
-        category: z.number().positive().optional(),
+        name: z.string().trim().min(2).max(20),
         price: z.number().positive(),
-        supplier: z.string().trim().min(36).max(36).optional(),
-        quantity: z.number().positive(),
+        costPrice: z.number().positive(),
+        minimunQuantity: z.number().positive(),
+        observation: z.string().max(30).optional(),
+        category_id: z.number().positive()
       });
-      const { name, category, price, quantity, supplier } =
+      const { name, price, costPrice , minimunQuantity, observation, category_id} =
         productValidation.parse(request.body);
 
       const product = {
         name,
-        category,
         price,
-        quantity,
-        supplier,
+        costPrice,
+        minimunQuantity,
+        observation,
+        category_id
       };
+
       const productCreated = await Product.create(product);
 
       if (productCreated.status) {
-        response.status(201).send(
-          JSON.stringify({
-            name: productCreated.product_name,
-            batch: productCreated.batch_product
-          })
-        );
+        if(productCreated.productAlredyExists){
+          response.status(400).send(
+            JSON.stringify({
+                message: "Product alredy exists"
+            })
+          )
+        }else{
+          response.status(201).send(
+            JSON.stringify({
+              name: productCreated.product_name,
+            })
+          );
+        }
       } else {
         response.status(500).send(
           JSON.stringify({
-            error: productCreated.error,
+            error: productCreated.error.issues,
           })
         );
       };
@@ -71,6 +81,7 @@ export default class ProductController {
       );
     };
   };
+
   static async findById(request, response) {
     try {
       const product_id = z.object({
@@ -139,16 +150,22 @@ export default class ProductController {
       const productValidation = z.object({
         id: z.number().positive(),
         name: z.string().trim().min(3).max(20),
-        category_id: z.number().positive().optional(),
         price: z.number().positive(),
+        costPrice: z.number().positive(),
+        minimunQuantity: z.number().positive(),
+        observation: z.string().trim().max(30),
+        category_id: z.number().positive().optional(),
       });
 
-      const { id, name, price, category_id} = productValidation.parse(request.body);
+      const { id, name, price, costPrice, minimunQuantity, observation, category_id} = productValidation.parse(request.body);
 
       const product = {
         id,
         name,
         price,
+        costPrice,
+        minimunQuantity,
+        observation,
         category_id
       }
 

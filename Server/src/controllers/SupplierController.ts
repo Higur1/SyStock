@@ -1,6 +1,5 @@
 import { z } from "zod";
 import Supplier from "../models/Supplier";
-import { error } from "console";
 
 export default class SupplierController {
   static async findAll(request, response) {
@@ -94,7 +93,7 @@ export default class SupplierController {
         }
         response.status(404).send(
           JSON.stringify({
-            error: "fornecedor não existe",
+            error: "supplier don't exists",
           })
         );
       } else {
@@ -132,7 +131,7 @@ export default class SupplierController {
         }
         response.status(404).send(
           JSON.stringify({
-            error: "fornecedor não existe",
+            error: "supplier don't exists",
           })
         );
       } else {
@@ -238,7 +237,7 @@ export default class SupplierController {
       if (supplierDeleted.error.meta.cause.includes("not exist")) {
         response.status(404).send(
           JSON.stringify({
-            error: "fornecedor não existe",
+            error: "supplier don't exists",
           })
         );
       }

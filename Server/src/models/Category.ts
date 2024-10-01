@@ -3,7 +3,12 @@ import { prisma } from "../config/prisma";
 export default class Category {
   static async findAll() {
     try {
-      const listOfCategory = await prisma.category.findMany({});
+      const listOfCategory = await prisma.category.findMany({
+        select:{
+          id: true,
+          name: true,
+        }
+      });
       return listOfCategory != undefined
         ? { status: true, listOfCategory: listOfCategory }
         : { status: true, listOfCategory: {} };
@@ -16,6 +21,7 @@ export default class Category {
       const category = await prisma.category.create({
         data: {
           name: name,
+          excludedStatus: false
         },
       });
 
@@ -25,7 +31,6 @@ export default class Category {
             category: {
               category_id: category.id,
               category_name: category.name,
-              category_company_id: category.company_id,
             },
           }
         : { status: true, category: {} };
@@ -38,6 +43,7 @@ export default class Category {
       const category = await prisma.category.findFirst({
         where: {
           id: id,
+          excludedStatus: false
         },
       });
       return category != undefined
@@ -52,9 +58,14 @@ export default class Category {
       const categories = await prisma.category.findMany({
         where: {
           name: {
-            startsWith: category_name,
+            startsWith: category_name
           },
+          excludedStatus: false
         },
+        select:{
+          id: true,
+          name: true,
+        }
       });
       return categories != undefined
         ? { status: true, categories: categories }
@@ -68,10 +79,15 @@ export default class Category {
       const categoryUpdated = await prisma.category.update({
         where: {
           id: category_id,
+          excludedStatus: false
         },
         data: {
           name: category_name,
         },
+        select:{
+          id: true,
+          name: true,
+        }
       });
       return categoryUpdated != undefined
         ? { status: true, category: categoryUpdated }
@@ -82,10 +98,13 @@ export default class Category {
   }
   static async delete(category_id) {
     try {
-      const categoryDeleted = await prisma.category.delete({
+      const categoryDeleted = await prisma.category.update({
         where: {
           id: category_id,
         },
+        data:{
+          excludedStatus: true
+        }
       });
       return categoryDeleted != undefined
         ? { status: true, category: categoryDeleted }
@@ -99,6 +118,7 @@ export default class Category {
       const category = await prisma.category.findFirst({
         where: {
           name: category_name,
+          excludedStatus: false
         },
       });
       return category != undefined

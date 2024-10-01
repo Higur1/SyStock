@@ -3,22 +3,49 @@ import { prisma } from "../config/prisma";
 export default class Batch{
     static async findAll(){
         try {
-            const batchs = await prisma.batch.findMany({});
+            const batchs = await prisma.batch.findMany({
+                where:{
+                    deletionStatus: false
+                }
+            });
             return {status: true, batchs:batchs};
         } catch (error) {
             return {status: false, error:error};
         };
     };
+    static async create(BatchObject){
+        try {
+            const batch = await prisma.batch.create({
+                data:{
+                    expirationDate: BatchObject.expirationDate,
+                    quantity: BatchObject.quantity,
+                    deletionStatus: false,
+                    product_id: BatchObject.product_id,
+                    eValidationSattus:
+                }
+            })
+        } catch (error) {
+            
+        }
+    }
     static async findByProduct(product_id){
         try {
             const batch = await prisma.batch.findMany({
-                where:{
-                    AND:{
-                        product_id:product_id
+                include:{
+                    product_id_fk: {
+                        select:{
+                            excludedStatus: false
+                        }
                     }
                 },
+                where:{
+                    AND:{
+                        product_id:product_id,
+                    },
+                
+                },
                 orderBy:{
-                    createAt: "asc"
+                    
                 }
             });
             return {status: true, batch:batch};
@@ -46,11 +73,17 @@ export default class Batch{
     static async findBatch(ObjectBatch){
         try {
             const batch = await prisma.batch.findFirst({
+                include:{
+                    product_id_fk: {
+                        select:{
+                            excludedStatus: false
+                        }
+                    }
+                },
                 where:{
                     AND:{
                         product_id: ObjectBatch.product_id,
-                        supplier_id: ObjectBatch.supplier_id
-                    }
+                    }, 
                 }
             });
             return {status: true, batch: batch};

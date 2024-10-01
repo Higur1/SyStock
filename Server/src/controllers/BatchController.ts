@@ -4,9 +4,7 @@ import Batch from "../models/Batch";
 export default class BatchController {
   static async findAll(request, response) {
     try {
-
       const batchs = await Batch.findAll();
-
       if (batchs.status) {
         response.status(200).send(
           JSON.stringify({
@@ -30,6 +28,26 @@ export default class BatchController {
   }
   /*Resolver*/ static async findBatch(request, response) {
     try {
+      const batchValidation = z.object({
+        id: z.number().positive()
+      })
+      const { id } = batchValidation.parse(request.body);
+
+      const batch = await Batch.findBatch(id);
+
+      if(batch.status){
+        response.status(200).send(
+          JSON.stringify({
+            batch: batch
+          })
+        )
+      }else{
+        response.status(500).send(
+          JSON.stringify({
+            error: batch.error.message,
+          })
+        );
+      }
     } catch (error) {
       response.status(400).send(
         JSON.stringify({

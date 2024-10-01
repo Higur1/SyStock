@@ -111,7 +111,6 @@ export default class CategoryController {
       });
 
       const { name } = category_name.parse(request.params);
-
       const findCategory = await Category.findByName(name);
 
       if (findCategory.status) {

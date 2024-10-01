@@ -10,6 +10,9 @@ export default class User {
           email: true,
           login: true,
         },
+        where:{
+          excludedStatus: false
+        }
       });
       return listUsers.length > 0
         ? { status: true, listUsers }
@@ -33,6 +36,7 @@ export default class User {
             password: hash_password,
             email: email,
             user_type: user_type_id,
+            excludedStatus: false
           },
         });
         return {
@@ -89,7 +93,7 @@ export default class User {
           id: true,
           name: true,
           email: true,
-          user_type_id: true,
+          user_type: true
         },
       });
       return user != undefined
@@ -109,7 +113,7 @@ export default class User {
           id: true,
           name: true,
           email: true,
-          user_type_id: true,
+          user_type: true,
         },
       });
       return user != undefined
@@ -137,13 +141,13 @@ export default class User {
     try {
       const listOfUsers = await prisma.user.findMany({
         where: {
-          user_type_id: user_type,
+          user_type: user_type,
         },
         select: {
           id: true,
           name: true,
           email: true,
-          user_type_id: true,
+          user_type: true,
         },
       });
       return listOfUsers != null
@@ -161,7 +165,7 @@ export default class User {
         },
         data: {
           name: name,
-          user_type_id: type_id,
+          user_type: type_id,
         },
       });
       return result != null
@@ -170,7 +174,7 @@ export default class User {
             userUpdated: {
               id: result.id,
               name: result.name,
-              login: result.user_login,
+              login: result.login,
               created: result.createdAt,
             },
           }

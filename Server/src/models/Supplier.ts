@@ -10,6 +10,9 @@ export default class Supplier {
           email: true,
           phone: true,
         },
+        where:{
+          excludedStatus: false
+        }
       });
       return supplierResult != undefined
         ? { status: true, suppliers: supplierResult }
@@ -25,6 +28,7 @@ export default class Supplier {
           name: supplierObject.name,
           email: supplierObject.email,
           phone: supplierObject.phone,
+          excludedStatus: false
         },
       });
       return supplierResult != undefined
@@ -42,6 +46,7 @@ export default class Supplier {
       const supplierResult = await prisma.supplier.findUnique({
         where: {
           id: supplier_id,
+          excludedStatus: false
         },
         select: {
           id: true,
@@ -64,6 +69,7 @@ export default class Supplier {
           name: {
             startsWith: supplier_name,
           },
+          excludedStatus: false
         },
         select: {
           id: true,
@@ -89,6 +95,7 @@ export default class Supplier {
         },
         where: {
           id: supplierObject.id,
+          excludedStatus: false
         },
       });
       return { supplier: supplier };
@@ -102,6 +109,7 @@ export default class Supplier {
       const validSupplier = await prisma.supplier.findFirst({
         where: {
           id: supplierObject.id,
+          excludedStatus: false
         },
       });
       message += validSupplier == null ? "O fornecedor não existe" : "";
@@ -149,10 +157,13 @@ export default class Supplier {
   }
   static async delete(supplier_id) {
     try {
-      await prisma.supplier.delete({
+      await prisma.supplier.update({
         where: {
           id: supplier_id,
         },
+        data:{
+          excludedStatus: true
+        }
       });
       return { status: true };
     } catch (error) {
