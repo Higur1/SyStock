@@ -13,7 +13,7 @@ export default class Batch{
             return {status: false, error:error};
         };
     };
-    static async create(BatchObject){
+    /*static async create(BatchObject){
         try {
             const batch = await prisma.batch.create({
                 data:{
@@ -21,13 +21,13 @@ export default class Batch{
                     quantity: BatchObject.quantity,
                     deletionStatus: false,
                     product_id: BatchObject.product_id,
-                    eValidationSattus:
+                    eValidationSattus: 
                 }
             })
         } catch (error) {
             
         }
-    }
+    }*/
     static async findByProduct(product_id){
         try {
             const batch = await prisma.batch.findMany({

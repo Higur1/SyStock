@@ -61,7 +61,7 @@ export default class ProductController {
         }else{
           response.status(201).send(
             JSON.stringify({
-              name: productCreated.product_name,
+              product: productCreated,
             })
           );
         }

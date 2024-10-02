@@ -9,6 +9,9 @@ export const transport = nodemailer.createTransport({
     auth:{
         user: process.env.EMAIL,
         pass: process.env.PASSWORD
+    },
+    tls: {
+        rejectUnauthorized: false
     }
 });
 
@@ -20,8 +23,10 @@ export function sendEmail(email, token, instance){
         text:"",
         html: templateHtml(token, instance)
     }).then(result =>{
+        console.log(result)
         return result;
     }).catch(error =>{
+        console.log(error)
         return error;
     })
 }

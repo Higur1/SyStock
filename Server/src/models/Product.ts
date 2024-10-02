@@ -14,9 +14,9 @@ export default class Product {
           totalQuantityInStock: true,
           category_id: true,
         },
-        where:{
-          excludedStatus: false
-        }
+        where: {
+          excludedStatus: false,
+        },
       });
 
       return products != null
@@ -25,18 +25,17 @@ export default class Product {
     } catch (error) {
       return { status: false, error: error };
     }
-  };
+  }
   static async create(productObject) {
     try {
-    
-      let product_template = {name: "", id: 0};
+      let product_template = { name: "", id: 0 };
 
       const verifyProductExists = await Product.verifyDuplicateName(
-        productObject.name,
+        productObject.name
       );
-      if(!verifyProductExists.exists){
-        const product = await prisma.product.create({
-          data:{
+      if (!verifyProductExists.exists) {
+        const productResult = await prisma.product.create({
+          data: {
             name: productObject.name,
             price: productObject.price,
             costPrice: productObject.costPrice,
@@ -44,32 +43,46 @@ export default class Product {
             observation: productObject.observation,
             totalQuantityInStock: 0,
             category_id: productObject.category_id,
-            excludedStatus: false
-          }
+            excludedStatus: false,
+          },
+          select:{
+            id: true,
+            name: true,
+            price: true,
+            costPrice: true,
+            minimunQuantity: true,
+            observation: true,
+            totalQuantityInStock: true,
+            category_id: true
+          },
         });
-        product_template.id = product.id;
-        product_template.name = product.name;
-        return product != null ? {status: true, product_name: product_template.name} : {status: true, product: undefined};
-      }else{
+        product_template.id = productResult.id;
+        product_template.name = productResult.name;
+        return productResult != null
+          ? { status: true, product: productResult }
+          : { status: true, product: undefined };
+      } else {
         const product = await prisma.product.findFirst({
-          where:{
+          where: {
             name: productObject.name,
             category_id: productObject.category_id,
-          }
+          },
         });
 
-        return product != null ? {status: true, productAlredyExists: true} : {status: true, product: undefined}
+        return product != null
+          ? { status: true, productAlredyExists: true }
+          : { status: true, product: undefined };
       }
     } catch (error) {
       return { status: false, error: error };
     }
-  };
+  }
   static async findById(product_id) {
     try {
       const product = await prisma.product.findUnique({
         where: {
           id: product_id,
-          excludedStatus: false
+          excludedStatus: false,
         },
       });
 
@@ -79,37 +92,40 @@ export default class Product {
     } catch (error) {
       return { status: false, error: error };
     }
-  };
-  static async findByCategory(category_id){
+  }
+  static async findByCategory(category_id) {
     try {
       const productsByCategory = await prisma.product.findMany({
-        where:{
-          AND:{
+        where: {
+          AND: {
             category_id: category_id,
-            excludedStatus: false
-          }
-        },select:{
-          id:true,
+            excludedStatus: false,
+          },
+        },
+        select: {
+          id: true,
           name: true,
           category_id: true,
-          Batch:{
-            select:{
-              quantity: true
-            }
+          Batch: {
+            select: {
+              quantity: true,
+            },
           },
-          price: true
-        }
+          price: true,
+        },
       });
 
-      return productsByCategory != null ? {status: true, products: productsByCategory} : {status: true, products: undefined};
+      return productsByCategory != null
+        ? { status: true, products: productsByCategory }
+        : { status: true, products: undefined };
     } catch (error) {
       return { status: false, error: error };
     }
-  };
+  }
   static async update(productObject) {
     try {
       const product = await prisma.product.update({
-        data:{
+        data: {
           name: productObject.name,
           price: productObject.price,
           costPrice: productObject.costPrice,
@@ -117,11 +133,11 @@ export default class Product {
           observation: productObject.observation,
           category_id: productObject.category_id,
         },
-        where:{
+        where: {
           id: productObject.id,
-          excludedStatus: false
+          excludedStatus: false,
         },
-        select:{
+        select: {
           id: true,
           name: true,
           price: true,
@@ -129,42 +145,44 @@ export default class Product {
           minimunQuantity: true,
           observation: true,
           category_id: true,
-        }
+        },
       });
 
-      return product != null ? {status: true, product: product} : {status: true, product: undefined};
+      return product != null
+        ? { status: true, product: product }
+        : { status: true, product: undefined };
     } catch (error) {
       return { status: false, error: error };
     }
-  };
+  }
   static async delete(product_id) {
     try {
       await prisma.batch.deleteMany({
-        where:{
-          product_id: product_id
-        }
-      })
+        where: {
+          product_id: product_id,
+        },
+      });
       // substitui o delete por atualização no status de exclusão.
       await prisma.product.update({
         where: {
           id: product_id,
         },
-        data:{
-          excludedStatus: true
-        }
+        data: {
+          excludedStatus: true,
+        },
       });
       return { status: true };
     } catch (error) {
       return { status: false, error: error };
     }
-  };
+  }
   static async verifyDuplicateName(name) {
     try {
       const product = await prisma.product.findFirst({
         where: {
           AND: {
             name: name,
-            excludedStatus: false
+            excludedStatus: false,
           },
         },
       });
@@ -174,5 +192,5 @@ export default class Product {
     } catch (error) {
       return { status: false, error: error };
     }
-  };
-};
+  }
+}

@@ -3,6 +3,7 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "../functions/nodemailer";
+import { Console } from "console";
 
 export default class LoginController {
   static async auth(request, response) {
