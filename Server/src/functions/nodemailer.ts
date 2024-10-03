@@ -23,10 +23,8 @@ export function sendEmail(email, token, instance){
         text:"",
         html: templateHtml(token, instance)
     }).then(result =>{
-        console.log(result)
         return result;
     }).catch(error =>{
-        console.log(error)
         return error;
     })
 }

@@ -18,14 +18,16 @@ resetId();
 /*Delete */ await prisma.$transaction([
   prisma.token_Recovery.deleteMany(),
   prisma.user.deleteMany(),
+  prisma.eTypeUser.deleteMany(),
   //prisma.user_Type.deleteMany(),
-  prisma.batch.deleteMany(),
-  prisma.product.deleteMany(),
+//  prisma.batch.deleteMany(),
+//  prisma.product.deleteMany(),
   //prisma.category.delete({ where: {id:1}}),
-  prisma.supplier.deleteMany(),
-  prisma.category.deleteMany(),
+//  prisma.supplier.deleteMany(),
+//  prisma.category.deleteMany(),
 ]);
 
+await Promise.all([
   /*Create type of users */
   prisma.eTypeUser.create({
     data: {
@@ -51,25 +53,28 @@ resetId();
       password: bcrypt.hashSync("Admin HGB", salt),
       excludedStatus: false,
     },
-  }),
+  })
 
   /*Create generic category*/
-  prisma.category.create({
+/*  prisma.category.create({
     data: {
       id: 1,
       name: "Generic",
       excludedStatus: false
     },
-  }),
+  }),*/
 
   /*Create generic supplier*/
-  prisma.supplier.create({
+/*  prisma.supplier.create({
     data: {
       id: 1,
       name: "Generic",
       email: "GenericEmail@gmail.com",
       excludedStatus: false,
-      phone: "145789551",
+      phone: "14578955198",
 
     },
   });
+*/
+])
+  

@@ -10,9 +10,9 @@ export default class User {
           email: true,
           login: true,
         },
-        where:{
-          excludedStatus: false
-        }
+        where: {
+          excludedStatus: false,
+        },
       });
       return listUsers.length > 0
         ? { status: true, listUsers }
@@ -21,13 +21,35 @@ export default class User {
       return { status: false, error: error };
     }
   }
-  static async create(name, user_login, hash_password, email, user_type_id) {
+  static async findAllUserFuncionarioType() {
+    try {
+      const listUsers = await prisma.user.findMany({
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          login: true,
+        },
+        where: {
+          excludedStatus: false,
+          user_type: 2,
+        },
+      });
+      return listUsers.length > 0
+        ? { status: true, listUsers }
+        : { status: true, listUsers: {} };
+    } catch (error) {
+      return { status: false, error: error };
+    }
+  }
+  static async createFuncionario(name, user_login, hash_password, email, user_type_id) {
     try {
       const pre_User = await prisma.pre_User.findFirst({
         where: {
           AND: [{ name: name }, { email: email }],
         },
       });
+     // console.log(hash_password)
       if (pre_User != undefined) {
         const user = await prisma.user.create({
           data: {
@@ -35,8 +57,8 @@ export default class User {
             login: user_login,
             password: hash_password,
             email: email,
-            user_type: user_type_id,
-            excludedStatus: false
+            excludedStatus: false,
+            user_type:user_type_id
           },
         });
         return {
@@ -54,6 +76,7 @@ export default class User {
         };
       }
     } catch (error) {
+      //console.log(error);
       return { status: false, error: error };
     }
   }
@@ -93,7 +116,7 @@ export default class User {
           id: true,
           name: true,
           email: true,
-          user_type: true
+          user_type: true,
         },
       });
       return user != undefined
@@ -183,7 +206,7 @@ export default class User {
       return { status: false, error: error };
     }
   }
-  static async delete(id) {
+  static async deleteFuncionario(id) {
     try {
       await prisma.user.delete({
         where: { id: id },
@@ -211,13 +234,13 @@ export default class User {
   static async tokenCreate(user: any) {
     try {
       const result = await prisma.token_Recovery.create({
-        data:{
+        data: {
           user_id: user.id,
-          status: true
+          status: true,
         },
       });
       return result != null
-        ? { status: true, result: result.token}
+        ? { status: true, result: result.token }
         : { status: true, result: undefined };
     } catch (error) {
       return { status: false, error: error };
@@ -227,7 +250,7 @@ export default class User {
     try {
       const tokenIsValid = await prisma.token_Recovery.findUnique({
         where: {
-          token: token
+          token: token,
         },
       });
       const teste = await prisma.token_Recovery.findMany();
@@ -254,7 +277,7 @@ export default class User {
       return { status: false, error: error };
     }
   }
-  static async updatePassword(id, token, password,) {
+  static async updatePassword(id, token, password) {
     try {
       await prisma.user.update({
         where: {
@@ -265,16 +288,20 @@ export default class User {
         },
       });
       await prisma.token_Recovery.update({
-        where:{
-          token: token
+        where: {
+          token: token,
         },
-        data:{
-          status: false
-        }
+        data: {
+          status: false,
+        },
       });
       return { status: true };
     } catch (error) {
       return { status: false, error: error };
     }
+  }
+  static async isFuncionario(id) {
+      const user = await prisma.user.findFirst({ where: { id: id } });
+      return user?.user_type == 2 ? {is:true} : {is:false};
   }
 }

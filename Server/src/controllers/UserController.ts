@@ -33,85 +33,32 @@ export default class UserController {
         );
     }
   }
-  static async create(request, response) {
+  static async listOfFuncionarioUsers(request, response) {
     try {
-      const user = z.object({
-        name: z
-          .string()
-          .trim()
-          .min(5, "Name required minimum 5 character(s)")
-          .max(20, "Name required Maximum 20 character(s)"),
-        user_login: z
-          .string()
-          .trim()
-          .min(5, "user_login required minimum 5 character(s)")
-          .trim()
-          .max(10, "user_login required maximum 10 character(s)")
-          .trim(),
-        user_password: z
-          .string()
-          .trim()
-          .min(5, "user_password required minimum 5 character(s)")
-          .max(10, "user_password required maximum 10 character(s)"),
-        email: z.string().email("Valid e-mail required").trim(),
-        user_type_id: z.number().gt(0),
-      });
-      const { name, user_login, user_password, email, user_type_id } =
-        user.parse(request.body);
+      const listOfFuncionarioUsers = await User.findAllUserFuncionarioType();
 
-      //verifica se existe o usuario já existe antes de cadastra-lo
-      const userExists = await User.findUser(email, user_login);
+      if (listOfFuncionarioUsers.status) {
+        const _links = generatorHATEOAS("");
 
-      //verifica se existe um preusuario para o usuario que será cadastrado
-
-      const hash_password = cryptPassword(user_password);
-
-      if (userExists.status && userExists.user == undefined) {
-        const user_create = await User.create(
-          name,
-          user_login,
-          hash_password,
-          email,
-          user_type_id
-        );
-        if (user_create.status) {
-          response.status(201).send(user_create.user);
-        }
-        if (user_create.error == "preuser não existe") {
-          response.status(409).send(
-            JSON.stringify({
-              message: "preuser don't exists",
-            })
+        response
+          .status(200)
+          .send(
+            JSON.stringify({ users: listOfFuncionarioUsers.listUsers, _links })
           );
-        }
+      } else {
         response.status(500).send(
           JSON.stringify({
-            error: user_create.error,
-          })
-        );
-        /*const user_create = await User.create(
-              name,
-              user_login,
-              hash_password,
-              email,
-              user_type_id,
-            ).then((user) => {
-              response.status(201).send(user.user);
-            });*/
-      } else {
-        response.status(409).send(
-          JSON.stringify({
-            message: "o email inserido já pertence a um usuário",
-            error: userExists.error,
+            message: "An error has occured",
+            error: listOfFuncionarioUsers.error,
           })
         );
       }
     } catch (error) {
-      response.status(400).send(
-        JSON.stringify({
-          error: error.issues[0].message,
-        })
-      );
+      response
+        .status(400)
+        .send(
+          JSON.stringify({ message: "An error has occurred", error: error })
+        );
     }
   }
   static async findUserByName(request, response) {
@@ -198,6 +145,90 @@ export default class UserController {
       );
     }
   }
+  static async createFuncionario(request, response) {
+    try {
+      const funcionario = z.object({
+        name: z
+          .string()
+          .trim()
+          .min(5, "Name required minimum 5 character(s)")
+          .max(20, "Name required Maximum 20 character(s)"),
+        login: z
+          .string()
+          .trim()
+          .min(5, "user_login required minimum 5 character(s)")
+          .trim()
+          .max(10, "user_login required maximum 10 character(s)")
+          .trim(),
+        user_password: z
+          .string()
+          .trim()
+          .min(5, "user_password required minimum 5 character(s)")
+          .max(10, "user_password required maximum 10 character(s)"),
+        email: z.string().email("Valid e-mail required").trim(),
+        user_type_id: z.number().gt(0),
+      });
+      const { name, login, user_password, email, user_type_id } = funcionario.parse(request.body);
+
+      //verifica se os dados do funcionario já existem em algum usuario do sistema já existe antes de cadastra-lo
+      const userExists = await User.findUser(email, login);
+
+      //verifica se existe um preusuario para o usuario que será cadastrado
+
+      const hash_password = cryptPassword(user_password);
+
+      if (userExists.status && userExists.user == undefined) {
+        console.log("aq");
+        const user_create = await User.createFuncionario(
+          name,
+          login,
+          hash_password,
+          email, 
+          user_type_id
+        );
+        if (user_create.status) {
+          response.status(201).send(user_create.user);
+        }
+        if (user_create.error == "preuser não existe") {
+          response.status(409).send(
+            JSON.stringify({
+              message: "preuser don't exists",
+            })
+          );
+        }
+        console.log("500 codigo");
+        response.status(500).send(
+          JSON.stringify({
+            error: user_create.error,
+          })
+        );
+        /*const user_create = await User.create(
+              name,
+              user_login,
+              hash_password,
+              email,
+              user_type_id,
+            ).then((user) => {
+              response.status(201).send(user.user);
+            });*/
+      } else {
+        response.status(409).send(
+          JSON.stringify({
+            message: "o email inserido já pertence a um usuário",
+            error: userExists.error,
+          })
+        );
+      }
+    } catch (error) {
+
+      response.status(400).send(
+        JSON.stringify({
+          //error: error.issues[0].message,
+          error: error
+        })
+      );
+    }
+  }
   static async edit(request, response) {
     try {
       const user = z.object({
@@ -223,7 +254,7 @@ export default class UserController {
               message: "Name already exists",
             })
           );
-        } else if (userFind.user?.user_type_id == 1) {
+        } else if (userFind.user?.user_type == 1) {
           await User.update(id, name, 1).then((userResult) => {
             response.status(200).send(
               JSON.stringify({
@@ -265,7 +296,7 @@ export default class UserController {
       );
     }
   }
-  static async remove(request, response) {
+  static async removeFuncionario(request, response) {
     try {
       const user = z.object({
         id: z.number().min(1, "id required minimum 1 character(s)"),
@@ -275,9 +306,10 @@ export default class UserController {
       const userId = await User.findUserById(id);
       if (userId.status) {
         if (userId.user != undefined) {
+          //          if()
           if (userId.user.id != 1) {
             await User.tokenDelete(userId.user.id);
-            await User.delete(userId.user.id);
+            await User.deleteFuncionario(userId.user.id);
             response.status(200);
           } else {
             response.status(401).send(
@@ -287,7 +319,9 @@ export default class UserController {
             );
           }
         } else {
-          response.status(404).send(JSON.stringify({ message: "Not Found" }));
+          response
+            .status(404)
+            .send(JSON.stringify({ message: "Usuário não existe" }));
         }
       } else {
         response.status(500).send(
@@ -431,5 +465,5 @@ function cryptPassword(password) {
   const hash = bcrypt.hashSync(password, salt);
   return hash;
 }
-function genericError(code) { }
-export { UserController };
+function genericError(code) {}
+export { UserController, cryptPassword };

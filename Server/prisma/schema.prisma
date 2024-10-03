@@ -15,35 +15,35 @@ datasource db {
 }
 
 model eTypeUser {
-  id   Int    @id
+  id   Int    @id @default(autoincrement())
   type String
 
   User User[]
 }
 
 model eValitadionStatus {
-  id   Int    @id
+  id   Int    @id @default(autoincrement())
   type String
 
   Batch Batch[]
 }
 
 model eSalesStatus {
-  id   Int    @id
+  id   Int    @id @default(autoincrement())
   type String
 
   Sales Sales[]
 }
 
 model ePaymentMethod {
-  id   Int    @id
+  id   Int    @id @default(autoincrement())
   type String
 
   Sales Sales[]
 }
 
 model eTypeAction {
-  id   Int    @id
+  id   Int    @id @default(autoincrement())
   type String
 }
 
