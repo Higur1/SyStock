@@ -166,9 +166,10 @@ export default class UserController {
           .min(5, "user_password required minimum 5 character(s)")
           .max(10, "user_password required maximum 10 character(s)"),
         email: z.string().email("Valid e-mail required").trim(),
-        user_type_id: z.number().gt(0),
       });
-      const { name, login, user_password, email, user_type_id } = funcionario.parse(request.body);
+      const { name, login, user_password, email } = funcionario.parse(
+        request.body
+      );
 
       //verifica se os dados do funcionario já existem em algum usuario do sistema já existe antes de cadastra-lo
       const userExists = await User.findUser(email, login);
@@ -178,13 +179,11 @@ export default class UserController {
       const hash_password = cryptPassword(user_password);
 
       if (userExists.status && userExists.user == undefined) {
-        console.log("aq");
         const user_create = await User.createFuncionario(
           name,
           login,
           hash_password,
-          email, 
-          user_type_id
+          email
         );
         if (user_create.status) {
           response.status(201).send(user_create.user);
@@ -196,7 +195,6 @@ export default class UserController {
             })
           );
         }
-        console.log("500 codigo");
         response.status(500).send(
           JSON.stringify({
             error: user_create.error,
@@ -220,11 +218,10 @@ export default class UserController {
         );
       }
     } catch (error) {
-
       response.status(400).send(
         JSON.stringify({
           //error: error.issues[0].message,
-          error: error
+          error: error,
         })
       );
     }

@@ -42,14 +42,13 @@ export default class User {
       return { status: false, error: error };
     }
   }
-  static async createFuncionario(name, user_login, hash_password, email, user_type_id) {
+  static async createFuncionario(name, user_login, hash_password, email) {
     try {
       const pre_User = await prisma.pre_User.findFirst({
         where: {
           AND: [{ name: name }, { email: email }],
         },
       });
-     // console.log(hash_password)
       if (pre_User != undefined) {
         const user = await prisma.user.create({
           data: {
@@ -58,7 +57,7 @@ export default class User {
             password: hash_password,
             email: email,
             excludedStatus: false,
-            user_type:user_type_id
+            user_type: 2,
           },
         });
         return {
@@ -76,7 +75,6 @@ export default class User {
         };
       }
     } catch (error) {
-      //console.log(error);
       return { status: false, error: error };
     }
   }
@@ -301,7 +299,7 @@ export default class User {
     }
   }
   static async isFuncionario(id) {
-      const user = await prisma.user.findFirst({ where: { id: id } });
-      return user?.user_type == 2 ? {is:true} : {is:false};
+    const user = await prisma.user.findFirst({ where: { id: id } });
+    return user?.user_type == 2 ? { is: true } : { is: false };
   }
 }
