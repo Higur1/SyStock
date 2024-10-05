@@ -21,9 +21,9 @@ export default class User {
       return { status: false, error: error };
     }
   }
-  static async findAllUserFuncionarioType() {
+  static async findAllFuncionarios() {
     try {
-      const listUsers = await prisma.user.findMany({
+      const listOfFuncionarios = await prisma.user.findMany({
         select: {
           id: true,
           name: true,
@@ -35,9 +35,9 @@ export default class User {
           user_type: 2,
         },
       });
-      return listUsers.length > 0
-        ? { status: true, listUsers }
-        : { status: true, listUsers: {} };
+      return listOfFuncionarios.length > 0
+        ? { status: true, listOfFuncionarios }
+        : { status: true, listOfFuncionarios: {} };
     } catch (error) {
       return { status: false, error: error };
     }
@@ -83,7 +83,7 @@ export default class User {
       const user = await prisma.user.findFirst({ where: { email } });
       return user != null
         ? { status: true, user: user }
-        : { status: true, user: {} };
+        : { status: true, user: undefined };
     } catch (error) {
       return { status: false, error: error };
     }
@@ -204,6 +204,27 @@ export default class User {
       return { status: false, error: error };
     }
   }
+  static async updateEmail(id, email) {
+    try {
+      const result = await prisma.user.update({
+        where: {
+          id: id,
+        },
+        data: {
+          email: email,
+        },
+      });
+      console.log("1");
+      return result != null
+        ? {
+            status: true,
+          }
+        : { status: false };
+    } catch (error) {
+      console.log(error);
+      return { status: false, error: error };
+    }
+  }
   static async deleteFuncionario(id) {
     try {
       await prisma.user.delete({
@@ -275,7 +296,22 @@ export default class User {
       return { status: false, error: error };
     }
   }
-  static async updatePassword(id, token, password) {
+  static async updatePassword_editUser(id, password) {
+    try {
+      await prisma.user.update({
+        where: {
+          id: id,
+        },
+        data: {
+          password: password,
+        },
+      });
+      return { status: true };
+    } catch (error) {
+      return { status: false, error: error };
+    }
+  }
+  static async updatePassword_resetPassword(id, token, password) {
     try {
       await prisma.user.update({
         where: {

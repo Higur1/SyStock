@@ -19,9 +19,9 @@ async function user_routes(app: FastifyInstance) {
     UserController.listOfUsers
   );
   app.get(
-    "/usersOfFuncionarioType",
+    "/findAllFuncionarios",
     { preHandler: auth_middleware },
-    UserController.listOfFuncionarioUsers
+    UserController.findAllFuncionarios
   );
   app.post("/user", UserController.createFuncionario);
   app.get(
@@ -35,10 +35,12 @@ async function user_routes(app: FastifyInstance) {
     UserController.findUserByTypeId
   );
   app.put("/user", { preHandler: auth_middleware }, UserController.edit);
+  app.patch("/user/editEmail", UserController.editEmail);
+  app.patch("/user/editPassword", UserController.editPassword);
   app.delete(
     "/funcionario",
     { preHandler: auth_middleware },
-    UserController.removeFuncionario
+    UserController.deletaFuncionario
   );
   app.put("/reset/password", UserController.resetPassword);
 }

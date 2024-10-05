@@ -33,23 +33,24 @@ export default class UserController {
         );
     }
   }
-  static async listOfFuncionarioUsers(request, response) {
+  static async findAllFuncionarios(request, response) {
     try {
-      const listOfFuncionarioUsers = await User.findAllUserFuncionarioType();
+      const listOfFuncionarios = await User.findAllFuncionarios();
 
-      if (listOfFuncionarioUsers.status) {
+      if (listOfFuncionarios.status) {
         const _links = generatorHATEOAS("");
 
-        response
-          .status(200)
-          .send(
-            JSON.stringify({ users: listOfFuncionarioUsers.listUsers, _links })
-          );
+        response.status(200).send(
+          JSON.stringify({
+            users: listOfFuncionarios.listOfFuncionarios,
+            _links,
+          })
+        );
       } else {
         response.status(500).send(
           JSON.stringify({
             message: "An error has occured",
-            error: listOfFuncionarioUsers.error,
+            error: listOfFuncionarios.error,
           })
         );
       }
@@ -293,17 +294,116 @@ export default class UserController {
       );
     }
   }
-  static async removeFuncionario(request, response) {
+  static async editEmail(request, response) {
+    try {
+      const dataUser = z.object({
+        id: z.number().min(1, "id required minimum 1 character(s)"),
+        novoEmail: z.string().email("Valid e-mail required").trim(),
+      });
+
+      const { id, novoEmail } = dataUser.parse(request.body);
+      const userFind = await User.findUserById(id);
+      if (userFind.status) {
+        if (userFind.user != undefined) {
+          const emailFind = await User.findEmail(novoEmail);
+          if (emailFind.status && emailFind.user == undefined) {
+            console.log(emailFind.user);
+            if (emailFind.user == undefined) {
+              await User.updateEmail(id, novoEmail).then((userResult) => {
+                response.status(200).send(JSON.stringify({}));
+              });
+            }
+          }
+          response.status(400).send(
+            JSON.stringify({
+              error: "Email já utilizado",
+            })
+          );
+        }
+        response.status(404).send(
+          JSON.stringify({
+            error: "Usuário não existe",
+          })
+        );
+      }
+      response.status(500).send(
+        JSON.stringify({
+          error: userFind.error,
+        })
+      );
+    } catch (error) {
+      response.status(400).send(
+        JSON.stringify({
+          error: error.issues[0].message,
+        })
+      );
+    }
+  }
+  static async editPassword(request, response) {
+    try {
+      const dataUser = z.object({
+        id: z.number().min(1, "id required minimum 1 character(s)"),
+        novaPassword: z
+          .string()
+          .trim()
+          .min(5, "user_password required minimum 5 character(s)")
+          .max(10, "user_password required maximum 10 character(s)"),
+      });
+
+      const { id, novaPassword } = dataUser.parse(request.body);
+
+      const userFind = await User.findUserById(id);
+
+      if (userFind.status) {
+        if (userFind.user != undefined) {
+          
+          const hash_password = cryptPassword(novaPassword);
+
+          await User.updatePassword_editUser(id, hash_password).then(
+            (userResult) => {
+              response.status(200).send(JSON.stringify({}));
+            }
+          );
+        }
+        response.status(404).send(
+          JSON.stringify({
+            error: "Usuário não existe",
+          })
+        );
+      }
+      response.status(500).send(
+        JSON.stringify({
+          error: userFind.error,
+        })
+      );
+    } catch (error) {
+      response.status(400).send(
+        JSON.stringify({
+          error: error.issues[0].message,
+        })
+      );
+    }
+  }
+  static async deletaFuncionario(request, response) {
     try {
       const user = z.object({
         id: z.number().min(1, "id required minimum 1 character(s)"),
       });
       const { id } = user.parse(request.body);
 
+      /*      const isFuncionario = await User.isFuncionario(id);
+
+      if (!isFuncionario.is) {
+        response.status(400).send(
+          JSON.stringify({
+            message: "Funcionário não existe",
+          })
+        );
+      }
+*/
       const userId = await User.findUserById(id);
       if (userId.status) {
         if (userId.user != undefined) {
-          //          if()
           if (userId.user.id != 1) {
             await User.tokenDelete(userId.user.id);
             await User.deleteFuncionario(userId.user.id);
@@ -357,7 +457,7 @@ export default class UserController {
       if (isValidToken.status) {
         if (isValidToken.isValid) {
           if (isValidToken.status) {
-            const result = await User.updatePassword(
+            const result = await User.updatePassword_resetPassword(
               isValidToken.token?.user_id,
               isValidToken.token?.id,
               user_password
