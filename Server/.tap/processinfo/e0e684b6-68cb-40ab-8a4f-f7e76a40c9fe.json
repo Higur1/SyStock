@@ -1,0 +1,29 @@
+{
+  "date": "2024-10-08T03:09:18.258Z",
+  "argv": [
+    "C:\\Program Files\\nodejs\\node.exe",
+    "C:\\Users\\T-GAMER\\Desktop\\PROJETOS\\TCC\\SyStock\\Server\\test\\app.teste.ts"
+  ],
+  "execArgv": [
+    "--loader=file:///C:/Users/T-GAMER/Desktop/PROJETOS/TCC/SyStock/Server/node_modules/@isaacs/ts-node-temp-fork-for-pr-2009/esm.mjs",
+    "--loader=file:///C:/Users/T-GAMER/Desktop/PROJETOS/TCC/SyStock/Server/node_modules/@tapjs/mock/dist/esm/legacy-loader.mjs",
+    "--no-warnings",
+    "--enable-source-maps",
+    "--loader=file:///C:/Users/T-GAMER/Desktop/PROJETOS/TCC/SyStock/Server/node_modules/@tapjs/processinfo/dist/esm/loader-legacy.mjs"
+  ],
+  "NODE_OPTIONS": "",
+  "cwd": "C:\\Users\\T-GAMER\\Desktop\\PROJETOS\\TCC\\SyStock\\Server",
+  "pid": 20740,
+  "ppid": 5392,
+  "parent": null,
+  "uuid": "e0e684b6-68cb-40ab-8a4f-f7e76a40c9fe",
+  "files": [
+    "C:\\Users\\T-GAMER\\Desktop\\PROJETOS\\TCC\\SyStock\\Server\\test\\app.teste.ts"
+  ],
+  "sources": {},
+  "root": "e0e684b6-68cb-40ab-8a4f-f7e76a40c9fe",
+  "externalID": "test/app.teste.ts",
+  "code": 1,
+  "signal": null,
+  "runtime": 269.6821
+}
