@@ -1,4 +1,5 @@
 import { prisma } from "../config/prisma";
+import ProductEntity from "../entities/Product";
 
 export default class Product {
   static async findAll() {
@@ -24,28 +25,25 @@ export default class Product {
         : { status: false, products: {} };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
-  static async create(productObject) {
+    };
+  };
+  static async create(productData: ProductEntity) {
     try {
-      let product_template = { name: "", id: 0 };
-
-      const verifyProductExists = await Product.verifyDuplicateName(
-        productObject.name
-      );
+      const verifyProductExists = await Product.findByName(productData);
+      console.log(verifyProductExists)
       if (!verifyProductExists.exists) {
         const productResult = await prisma.product.create({
           data: {
-            name: productObject.name,
-            price: productObject.price,
-            costPrice: productObject.costPrice,
-            minimunQuantity: productObject.minimunQuantity,
-            observation: productObject.observation,
+            name: productData.name,
+            price: productData.price,
+            costPrice: productData.costPrice,
+            minimunQuantity: productData.minimunQuantity,
+            observation: productData.observation,
             totalQuantityInStock: 0,
-            category_id: productObject.category_id,
+            category_id: productData.category_id,
             excludedStatus: false,
           },
-          select:{
+          select: {
             id: true,
             name: true,
             price: true,
@@ -55,33 +53,22 @@ export default class Product {
             totalQuantityInStock: true,
             category_id: true
           },
-        });
-        product_template.id = productResult.id;
-        product_template.name = productResult.name;
+        })
         return productResult != null
           ? { status: true, product: productResult }
           : { status: true, product: undefined };
       } else {
-        const product = await prisma.product.findFirst({
-          where: {
-            name: productObject.name,
-            category_id: productObject.category_id,
-          },
-        });
-
-        return product != null
-          ? { status: true, productAlredyExists: true }
-          : { status: true, product: undefined };
-      }
+        return { status: true, message: "Product alredy exists" };
+      };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
-  static async findById(product_id) {
+    };
+  };
+  static async findById(productData: ProductEntity) {
     try {
       const product = await prisma.product.findUnique({
         where: {
-          id: product_id,
+          id: productData.id,
           excludedStatus: false,
         },
       });
@@ -91,14 +78,14 @@ export default class Product {
         : { status: true, product: null };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
-  static async findByCategory(category_id) {
+    };
+  };
+  static async findByCategory(productData: ProductEntity) {
     try {
       const productsByCategory = await prisma.product.findMany({
         where: {
           AND: {
-            category_id: category_id,
+            category_id: productData.category_id,
             excludedStatus: false,
           },
         },
@@ -120,21 +107,33 @@ export default class Product {
         : { status: true, products: undefined };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
-  static async update(productObject) {
+    };
+  };
+  static async findByName(productData: ProductEntity) {
+    try {
+      const productResult = await prisma.product.findFirst({
+        where: {
+          name: productData.name
+        }
+      });
+      return productResult != null ? { status: true, exists: true, product: productResult } : { status: true, exists: false }
+    } catch (error) {
+      return { status: false, error: error };
+    };
+  };
+  static async update(productData: ProductEntity) {
     try {
       const product = await prisma.product.update({
         data: {
-          name: productObject.name,
-          price: productObject.price,
-          costPrice: productObject.costPrice,
-          minimunQuantity: productObject.minimunQuantity,
-          observation: productObject.observation,
-          category_id: productObject.category_id,
+          name: productData.name,
+          price: productData.price,
+          costPrice: productData.costPrice,
+          minimunQuantity: productData.minimunQuantity,
+          observation: productData.observation,
+          category_id: productData.category_id,
         },
         where: {
-          id: productObject.id,
+          id: productData.id,
           excludedStatus: false,
         },
         select: {
@@ -153,19 +152,19 @@ export default class Product {
         : { status: true, product: undefined };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
-  static async delete(product_id) {
+    };
+  };
+  static async delete(productData: ProductEntity) {
     try {
       await prisma.batch.deleteMany({
         where: {
-          product_id: product_id,
+          product_id: productData.id,
         },
       });
       // substitui o delete por atualização no status de exclusão.
       await prisma.product.update({
         where: {
-          id: product_id,
+          id: productData.id,
         },
         data: {
           excludedStatus: true,
@@ -174,23 +173,15 @@ export default class Product {
       return { status: true };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
-  static async verifyDuplicateName(name) {
+    };
+  };
+  static async deleteAll() {
     try {
-      const product = await prisma.product.findFirst({
-        where: {
-          AND: {
-            name: name,
-            excludedStatus: false,
-          },
-        },
-      });
-      return product != null
-        ? { status: true, exists: true, product: product }
-        : { status: true, exists: false };
+      await prisma.product.deleteMany();
+
+      return { status: true };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
-}
+    };
+  };
+};

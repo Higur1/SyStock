@@ -1,10 +1,11 @@
 import { prisma } from "../config/prisma";
+import CategoryEntity from "../entities/Category";
 
 export default class Category {
   static async findAll() {
     try {
       const listOfCategory = await prisma.category.findMany({
-        select:{
+        select: {
           id: true,
           name: true,
         }
@@ -15,34 +16,35 @@ export default class Category {
     } catch (error) {
       return { status: false, error: error };
     }
-  }
-  static async create(name) {
+  };
+  static async create(categoryData: CategoryEntity) {
     try {
-      const category = await prisma.category.create({
+
+      const categoryResult = await prisma.category.create({
         data: {
-          name: name,
+          name: categoryData.name,
           excludedStatus: false
         },
       });
 
-      return category != undefined
+      return categoryResult != undefined
         ? {
-            status: true,
-            category: {
-              category_id: category.id,
-              category_name: category.name,
-            },
-          }
-        : { status: true, category: {} };
+          status: true,
+          category: {
+            category_id: categoryResult.id,
+            category_name: categoryResult.name,
+          },
+        }
+        : { status: true,  message: "category alredy exists"  };
     } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async findById(id) {
+      return { status: false, error: error};
+    };
+  };
+  static async findById(categoryData: CategoryEntity) {
     try {
       const category = await prisma.category.findFirst({
         where: {
-          id: id,
+          id: categoryData.id,
           excludedStatus: false
         },
       });
@@ -51,18 +53,18 @@ export default class Category {
         : { status: true, category: {} };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
-  static async findByName(category_name) {
+    };
+  };
+  static async findByName(categoryData: CategoryEntity) {
     try {
       const categories = await prisma.category.findMany({
         where: {
           name: {
-            startsWith: category_name
+            startsWith: categoryData.name
           },
           excludedStatus: false
         },
-        select:{
+        select: {
           id: true,
           name: true,
         }
@@ -72,19 +74,19 @@ export default class Category {
         : { status: true, categories: {} };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
-  static async update(category_id, category_name) {
+    };
+  };
+  static async update(categoryData: CategoryEntity) {
     try {
       const categoryUpdated = await prisma.category.update({
         where: {
-          id: category_id,
+          id: categoryData.id,
           excludedStatus: false
         },
         data: {
-          name: category_name,
+          name: categoryData.name,
         },
-        select:{
+        select: {
           id: true,
           name: true,
         }
@@ -94,15 +96,15 @@ export default class Category {
         : { status: true, category: undefined };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
-  static async delete(category_id) {
+    };
+  };
+  static async delete(categoryData: CategoryEntity) {
     try {
       const categoryDeleted = await prisma.category.update({
         where: {
-          id: category_id,
+          id: categoryData.id,
         },
-        data:{
+        data: {
           excludedStatus: true
         }
       });
@@ -112,20 +114,5 @@ export default class Category {
     } catch (error) {
       return { status: false, error: error };
     }
-  }
-  static async verifyDuplicateName(category_name) {
-    try {
-      const category = await prisma.category.findFirst({
-        where: {
-          name: category_name,
-          excludedStatus: false
-        },
-      });
-      return category != undefined
-        ? { status: true, category: category }
-        : { status: true, category: undefined };
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-}
+  };
+};

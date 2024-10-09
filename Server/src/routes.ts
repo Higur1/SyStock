@@ -58,7 +58,7 @@ async function preuser_routes(app: FastifyInstance) {
 async function category_routes(app: FastifyInstance) {
   app.post(
     "/category",
-    { preHandler: auth_middleware },
+    /*{ preHandler: auth_middleware },*/
     CategoryController.create
   );
   app.get(

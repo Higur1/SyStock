@@ -26,7 +26,7 @@ export default class BatchController {
       );
     }
   }
-  /*Resolver*/ static async findBatch(request, response) {
+  static async findBatch(request, response) {
     try {
       const batchValidation = z.object({
         id: z.number().positive()

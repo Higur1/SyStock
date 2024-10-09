@@ -1,3 +1,4 @@
+import preUser from "../entities/PreUser"
 import { prisma } from "../config/prisma";
 
 export default class PreUser {
@@ -15,41 +16,58 @@ export default class PreUser {
         : { status: true, listPreUsers: {} };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
-  static async create(name, email) {
+    };
+  };
+  static async create(user: preUser) {
     try {
-      const preuser = await prisma.pre_User.create({
-        data: {
-          name,
-          email,
-        },
-      });
-      return {
-        status: true,
-        preuser: {
-          id: preuser.id,
-          name: preuser.name,
-          email: preuser.email,
-        },
+      const preUserResult = await PreUser.findPreUser(user);
+      console.log(preUserResult)
+      if (preUserResult.preuser == undefined) {
+        const preuser = await prisma.pre_User.create({
+          data: {
+            name: user.name,
+            email: user.email
+          },
+        });
+        return {
+          status: true,
+          preuser: {
+            id: preuser.id,
+            name: preuser.name,
+            email: preuser.email,
+          },
+        };
+      } else {
+        return { status: true, message: "PreUser alredy exists" }
       };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
-  static async findPreUser(email) {
+    };
+  };
+  static async findPreUser(preUserData: preUser) {
     try {
       const preuser = await prisma.pre_User.findFirst({
         where: {
-          email: email,
-        },
+          AND:{
+            email: preUserData.email,
+            name: preUserData.name
+          }
+        }
       });
 
       return preuser != null
         ? { status: true, preuser: preuser }
-        : { status: true, user: undefined };
+        : { status: true, preuser: undefined };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
-}
+    };
+  };
+  static async delete() {
+    try {
+      await prisma.pre_User.deleteMany({});
+      return { status: true }
+    } catch (error) {
+      return { status: false, error: error };
+    };
+  };
+};

@@ -112,7 +112,7 @@ model Fill {
 
 model Category {
   id   Int    @id @default(autoincrement())
-  name String
+  name String @unique
   createdAt      DateTime @default(now())  
   updatedAt      DateTime @updatedAt
   excludedStatus Boolean
@@ -149,15 +149,15 @@ model Batch {
   expirationDate     DateTime 
   quantity           Int
   deletionStatus     Boolean
-  dateTimeEmptyStock DateTime
+  dateTimeEmptyStock DateTime?
   product_id         Int
-  eValidationSattus  Int
+  eValidationStatus  Int
   createdAt            DateTime @default(now())  
   updatedAt            DateTime @updatedAt
 
   Batch_Fill Batch_Fill[]
 
-  eValidationStatus_fk eValitadionStatus @relation(fields: [eValidationSattus], references: [id])
+  eValidationStatus_fk eValitadionStatus @relation(fields: [eValidationStatus], references: [id])
   product_id_fk        Product           @relation(fields: [product_id], references: [id])
 
   @@map("batch")

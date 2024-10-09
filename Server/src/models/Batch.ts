@@ -1,62 +1,82 @@
+import { existsSync } from "fs";
 import { prisma } from "../config/prisma";
+import BatchEntity from "../entities/Batch";
 
-export default class Batch{
-    static async findAll(){
+export default class Batch {
+    static async findAll() {
         try {
             const batchs = await prisma.batch.findMany({
-                where:{
+                where: {
                     deletionStatus: false
                 }
             });
-            return {status: true, batchs:batchs};
+            return { status: true, batchs: batchs };
         } catch (error) {
-            return {status: false, error:error};
+            return { status: false, error: error };
         };
     };
-    /*static async create(BatchObject){
+    static async create(batchData: BatchEntity) {
         try {
-            const batch = await prisma.batch.create({
-                data:{
-                    expirationDate: BatchObject.expirationDate,
-                    quantity: BatchObject.quantity,
-                    deletionStatus: false,
-                    product_id: BatchObject.product_id,
-                    eValidationSattus: 
-                }
-            })
+            const verifyBatchExistst = await Batch.verifyBatchAlredyExists(batchData);
+
+            if (verifyBatchExistst.exists) {
+                await prisma.batch.update({
+                    where: {
+                        id: verifyBatchExistst.batch_id
+                    },
+                    data: {
+                        quantity: {
+                            increment: batchData.quantity
+                        }
+                    }
+                });
+                return { status: true, message: "Update quantity" }
+            }
+            else {
+                const batchResult = await prisma.batch.create({
+                    data: {
+                        expirationDate: batchData.expirantionDate,
+                        quantity: batchData.quantity,
+                        deletionStatus: false,
+                        product_id: batchData.product_id,
+                        eValidationStatus: 1,
+                    }
+                });
+                return { status: true, batch: batchResult }
+            };
         } catch (error) {
-            
-        }
-    }*/
-    static async findByProduct(product_id){
+            return { status: false, error: error }
+        };
+    };
+    static async findByProduct(batchData: BatchEntity) {
         try {
             const batch = await prisma.batch.findMany({
-                include:{
+                include: {
                     product_id_fk: {
-                        select:{
+                        select: {
                             excludedStatus: false
                         }
                     }
                 },
-                where:{
-                    AND:{
-                        product_id:product_id,
+                where: {
+                    AND: {
+                        product_id: batchData.product_id,
                     },
-                
+
                 },
-                orderBy:{
-                    
+                orderBy: {
+
                 }
             });
-            return {status: true, batch:batch};
+            return { status: true, batch: batch };
         } catch (error) {
-            return {status: false, error:error};
+            return { status: false, error: error };
         };
     };
-    static async findBySupplier(supplier_id){
+    static async findBySupplier(supplier_id) {
         try {
             const batch = await prisma.$queryRaw
-            `
+                `
                 SELECT b.id as batch_id, p.name as product_name, s.name as supplier_name, b.quantity as product_quantity
                 FROM product p 
                 INNER JOIN batch b 
@@ -65,59 +85,75 @@ export default class Batch{
                 ON b.supplier_id = s.id
                 WHERE b.supplier_id = ${supplier_id}
             `;
-            return {status: true, batch: batch};
+            return { status: true, batch: batch };
         } catch (error) {
-            return {status: false, error:error};
+            return { status: false, error: error };
         };
     };
-    static async findBatch(ObjectBatch){
+    //Arrumar
+    static async findBatch(batchData: BatchEntity) {
         try {
             const batch = await prisma.batch.findFirst({
-                include:{
+                include: {
                     product_id_fk: {
-                        select:{
+                        select: {
                             excludedStatus: false
                         }
                     }
                 },
-                where:{
-                    AND:{
-                        product_id: ObjectBatch.product_id,
-                    }, 
+                where: {
+                    AND: {
+                        product_id: batchData.product_id,
+                    },
                 }
             });
-            return {status: true, batch: batch};
+            return { status: true, batch: batch };
         } catch (error) {
-            return {status: false, error:error};
+            return { status: false, error: error };
         };
     };
-    static async update(ObjectBatch){
+    static async update(batchData: BatchEntity) {
         try {
-            const findBatch = await this.findBatch(ObjectBatch); 
+            const findBatch = await this.findBatch(batchData);
             const batchUpdated = await prisma.batch.update({
-                data:{
-                    quantity: ObjectBatch.quantity
+                data: {
+                    quantity: batchData.quantity
                 },
-                where:{
+                where: {
                     id: findBatch.batch?.id
                 }
             });
-            return {status: true, batch: batchUpdated};
+            return { status: true, batch: batchUpdated };
         } catch (error) {
-            return {status: false, error:error};
+            return { status: false, error: error };
         };
     };
-    static async delete(ObjectBatch){
+    static async delete(batchData: BatchEntity) {
         try {
-            const findBatch = await this.findBatch(ObjectBatch);
-            await prisma.batch.delete({
+            const batchResult = await prisma.batch.delete({
                 where:{
-                    id: findBatch.batch?.id
+                    id: batchData.id
                 }
             });
-            return {status: true};
+            return { status: true };
         } catch (error) {
-            return {status: false, error:error};
+            return { status: false, error: error };
+        };
+    };
+    static async verifyBatchAlredyExists(batch: BatchEntity) {
+        try {
+            const batchResult = await prisma.batch.findFirst({
+                where: {
+                    AND: {
+                        product_id: batch.product_id,
+                        expirationDate: batch.expirantionDate
+                    }
+                }
+            });
+            return batch != null ? { status: true, exists: true, batch_id: batchResult!.id } :
+                { status: true, exists: false };
+        } catch (error) {
+            return { status: false, error: error };
         };
     };
 };
