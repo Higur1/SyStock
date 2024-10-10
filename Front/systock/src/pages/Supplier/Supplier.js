@@ -13,10 +13,10 @@ import BatchListDialog from "./dialogs/BatchListDialog";
 
 export default function Supplier() {
 
-  const { 
-    suppliers, 
-    openSnackBar, autoHideSnackBar, 
-    severitySnackBar, snackMessageSnackBar, 
+  const {
+    suppliers,
+    openSnackBar, autoHideSnackBar,
+    severitySnackBar, snackMessageSnackBar,
     handleCloseSnackBar,
     createSupplier, updateSupplier, handleDeleteSupplier,
     handleChangeSelectedPhone
@@ -32,22 +32,22 @@ export default function Supplier() {
     sup: null
   });
   const [deleteSupplier, setDeleteSupplier] = useState(false);
-  const [openLocationDialog, setOpenLocationDialog] = useState({open: false, index: null});
-  const [openBatchDialog, setOpenBatchDialog] = useState({open: false, index: null});
+  const [openLocationDialog, setOpenLocationDialog] = useState({ open: false, index: null });
+  const [openBatchDialog, setOpenBatchDialog] = useState({ open: false, index: null });
 
   useEffect(() => {
-    if(!openCreateEditSupplier.open || !deleteSupplier || !openLocationDialog.open) {
+    if (!openCreateEditSupplier.open || !deleteSupplier || !openLocationDialog.open) {
       handleCloseMenu();
     }
 
   }, [openCreateEditSupplier.open, deleteSupplier, openLocationDialog.open]);
 
   function handleBatchList(index) {
-    setOpenBatchDialog({open: true, index});
+    setOpenBatchDialog({ open: true, index });
   }
 
   function handleCloseBatchList() {
-    setOpenBatchDialog({open: false, index: null});
+    setOpenBatchDialog({ open: false, index: null });
   }
 
   function handleMenuOptions(e, index) {
@@ -79,9 +79,9 @@ export default function Supplier() {
       sup: null
     });
   }
-  
+
   return (
-    <>
+    <div style={{width: "100%", height: "100vh", overflow: 'hidden'}}>
       <Container>
         <HeaderContainer>
           <Button
@@ -92,48 +92,53 @@ export default function Supplier() {
             Adicionar Fornecedor
           </Button>
         </HeaderContainer>
-        <TableContainer>
-          <TableRow style={{background: '#DCDCDC', borderRadius: '8px 8px 0px 0px'}}>
-            {/* <TableData width={"32%"} minWidth={'200px'}>{"Nome"}</TableData> */}
-            <TableData style={{flex: 1, minWidth: '10%', maxWidth: 'calc(100% - (75% + 40px + 96px))'}}>{"Nome"}</TableData>
-            <TableData style={{flexBasis: '25%', maxWidth: '25%', minWidth: '25%'}}>{"E-mail"}</TableData>
-            <TableData style={{flexBasis: '20%', maxWidth: '20%', minWidth: '20%'}}>{"Telefone"}</TableData>
-            <TableData style={{flex: 1, justifyContent: 'flex-end'}} />
-          </TableRow>
-          {Boolean(suppliers.length) && suppliers.map((sup, index) => (
-            <TableRow key={index} style={{
-              borderRadius: index === suppliers.length - 1 ? '0px 0px 8px 8px' : '0px',
-              borderBottom: index === suppliers.length - 1 ? '0px' : '1px solid #d3D3D3',
-              background: index & 2 === 0 ? "#ebebeb" : "#F5f5f5"
-            }}>
-              <TableData style={{flex: 1, minWidth: '10%', maxWidth: 'calc(100% - (75% + 40px + 96px))'}}><ToolTipAndEllipsis item={sup.name} /></TableData>
-              <TableData style={{flexBasis: '25%', maxWidth: '25%', minWidth: '25%'}}><ToolTipAndEllipsis item={sup.email} /></TableData>
-              <TableData style={{flexBasis: '20%', maxWidth: '20%', minWidth: '20%', gap: 8}}><ToolTipAndEllipsis item={sup.phone} /></TableData>
-              <TableData style={{flex: 1, justifyContent: 'flex-end'}}>
-                <IconButton onClick={(e) => handleMenuOptions(e, index)}>
-                  <MoreVertIcon fontSize='small'/>
-                </IconButton>
-              </TableData>
-            </TableRow> 
-          ))}
-        </TableContainer>
+        <div style={{ height: "100%", overflow: 'hidden' }}>
+          <TableContainer>
+            <TableRow style={{ background: '#DCDCDC', borderRadius: '8px 8px 0px 0px' }}>
+              {/* <TableData width={"32%"} minWidth={'200px'}>{"Nome"}</TableData> */}
+              <TableData style={{ flex: 1, minWidth: '10%', maxWidth: 'calc(100% - (75% + 40px + 96px))' }}>{"Nome"}</TableData>
+              <TableData style={{ flexBasis: '25%', maxWidth: '25%', minWidth: '25%' }}>{"E-mail"}</TableData>
+              <TableData style={{ flexBasis: '20%', maxWidth: '20%', minWidth: '20%' }}>{"Telefone"}</TableData>
+              <TableData style={{ flex: 1, justifyContent: 'flex-end' }} />
+            </TableRow>
+            <div className="customScroll">
+              {Boolean(suppliers.length) && suppliers.map((sup, index) => (
+                <TableRow key={index} style={{
+                  borderRadius: index === suppliers.length - 1 ? '0px 0px 8px 8px' : '0px',
+                  borderBottom: index === suppliers.length - 1 ? '0px' : '1px solid #d3D3D3',
+                  background: index & 2 === 0 ? "#ebebeb" : "#F5f5f5"
+                }}>
+                  <TableData style={{ flex: 1, minWidth: '10%', maxWidth: 'calc(100% - (75% + 40px + 96px))' }}><ToolTipAndEllipsis item={sup.name} /></TableData>
+                  <TableData style={{ flexBasis: '25%', maxWidth: '25%', minWidth: '25%' }}><ToolTipAndEllipsis item={sup.email} /></TableData>
+                  <TableData style={{ flexBasis: '20%', maxWidth: '20%', minWidth: '20%', gap: 8 }}><ToolTipAndEllipsis item={sup.phone} /></TableData>
+                  <TableData style={{ flex: 1, justifyContent: 'flex-end' }}>
+                    <IconButton onClick={(e) => handleMenuOptions(e, index)}>
+                      <MoreVertIcon fontSize='small' />
+                    </IconButton>
+                  </TableData>
+                </TableRow>
+              ))}
+            </div>
+
+          </TableContainer>
+        </div>
       </Container>
 
-      
+
       {menuOption.open && (
         <Menu
           anchorEl={menuOption.anchor}
           open
           onClose={handleCloseMenu}
         >
-          <MenuItem style={{borderRadius: '16px 16px 0px 0px'}} onClick={handleOpenCreateEditDialog}>{"Editar Fornecedor"}</MenuItem>
-          <MenuItem onClick={() => setDeleteSupplier(true)} style={{borderBottom: '0px', borderRadius: '0px 0px 16px 16px'}} >{"Apagar Fornecedor"}</MenuItem>
+          <MenuItem style={{ borderRadius: '16px 16px 0px 0px' }} onClick={handleOpenCreateEditDialog}>{"Editar Fornecedor"}</MenuItem>
+          <MenuItem onClick={() => setDeleteSupplier(true)} style={{ borderBottom: '0px', borderRadius: '0px 0px 16px 16px' }} >{"Apagar Fornecedor"}</MenuItem>
         </Menu>
       )}
 
-      {openCreateEditSupplier.open && <CreateSupplierDialog 
+      {openCreateEditSupplier.open && <CreateSupplierDialog
         handleCreate={(sup) => {
-          if(openCreateEditSupplier.sup) {
+          if (openCreateEditSupplier.sup) {
             updateSupplier(sup);
             handleCloseCreateEditDialog();
           } else {
@@ -145,7 +150,7 @@ export default function Supplier() {
           handleCloseCreateEditDialog();
         }}
         open
-        
+
         supplierObj={openCreateEditSupplier.sup}
       />}
 
@@ -167,7 +172,7 @@ export default function Supplier() {
       )}
 
       {openSnackBar && (
-        <CustomizedSnackbars 
+        <CustomizedSnackbars
           open={openSnackBar}
           autoHide={autoHideSnackBar}
           handleClose={handleCloseSnackBar}
@@ -179,7 +184,7 @@ export default function Supplier() {
       {openLocationDialog.open && (
         <LocationDialog
           address={suppliers[openLocationDialog.index].Address[0]}
-          handleClose={() => setOpenLocationDialog({open: false, index: null})}
+          handleClose={() => setOpenLocationDialog({ open: false, index: null })}
         />
       )}
 
@@ -189,7 +194,7 @@ export default function Supplier() {
           id={suppliers[openBatchDialog.index].id}
         />
       )}
-    </>
+    </div>
   )
 }
 

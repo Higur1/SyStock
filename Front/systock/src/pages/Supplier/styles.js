@@ -1,12 +1,13 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template: 48px 1fr / 1fr;
   gap: 32px;
   width: 100%;
   height: 100%;
   padding: 16px;
+  overflow: hidden;
 `
 
 export const HeaderContainer = styled.div`

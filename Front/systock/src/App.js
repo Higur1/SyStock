@@ -44,6 +44,7 @@ function App() {
         return initialNavigation();
       } else {
         setIsLoggedIn(false);
+        if(window.location.pathname.indexOf("/reset/password/") !== -1) return;
         return navigate('login');
       }
     }
