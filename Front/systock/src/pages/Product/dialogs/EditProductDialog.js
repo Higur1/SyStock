@@ -1,9 +1,11 @@
 import { Backdrop, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputAdornment, InputLabel, MenuItem, Select, Slide, TextField } from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import PropTypes from 'prop-types';
 import { CurrencyInput } from "react-currency-mask";
 import styled from "styled-components";
 import { performFetch } from "../../../apiBase";
+import { DEBUG_LOCAL, MainContext } from "../../../App";
+import { ENTITIES} from "../../../utils/debug-local-helper";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
@@ -22,40 +24,36 @@ const Container = styled.div`
   padding-top: 16px;
 `
 
-const CurrencyInputCustom = () => {
-  return (
-    <CurrencyInput
-    />
-  );
-};
-
 export default function EditProductDialog(props) {
   const { handleEdit, handleClose, error, open, product } = props;
 
   const { id } = product;
   const [name, setName] = useState("");
-  const [ncmsh, setNcmsh] = useState(product.ncmSh || "");
   const [description, setDescription] = useState(product.description || "");
-  const [price, setPrice] = useState(product.price || 0);
-  const [categoryID, setCategoryID] = useState(product.category_id || "");
-  const [supplierID, setSupplierID] = useState(1);
+  const [priceBuy, setPriceBuy] = useState(product.priceBuy || 0);
+  const [priceSell, setPriceSell] = useState(product.priceSell || 0);
   const [categories, setCategories] = useState([])
   const [hasError, setHasError] = useState(false);
-  const [hasErrorPrice, setHasErrorPrice] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [suppliers, setSuppliers] = useState([]);
+  const [category, setCategory] = useState(product.category || null);
   const isMount = useRef();
   const currencyRegex = /^[0-9]+(\.[0-9]{1,2})?$/;
+
+  const { getData } = useContext(MainContext);
 
   useEffect(() => {
     if(isMount.current) return;
     
     isMount.current = true;
     getCategories();
-    getSupplier();
   }, []);
 
   async function getCategories() {
+    if(DEBUG_LOCAL) {
+      const categArr = getData(ENTITIES.CATEGORIES);
+
+      return setTimeout(() => setCategories(categArr), 350);
+    }
     try {
       const categories = await performFetch("/categories", {method: 'GET'});
       setCategories(categories);
@@ -64,22 +62,22 @@ export default function EditProductDialog(props) {
     }
   }
 
-  async function getSupplier() {
-    try {
-      const suppliers = await performFetch("/suppliers", {method: 'GET'});
-      setSuppliers(suppliers);
-    } catch (error) {
-      console.log(error.message);
-    }
-  }
-
-  const handlePriceChange = e => {
+  const handlePriceBuyChange = e => {
     let value = e.target.value;
     
     if(!currencyRegex.test(value)) {
-      setHasErrorPrice(true);
+      // setHasErrorPrice(true);
     }
-    setPrice(e.target.value);
+    setPriceBuy(e.target.value);
+  }
+
+  const handlePriceSellChange = e => {
+    let value = e.target.value;
+    
+    if(!currencyRegex.test(value)) {
+      // setHasErrorPrice(true);
+    }
+    setPriceSell(e.target.value);
   }
   
   return (
@@ -93,35 +91,38 @@ export default function EditProductDialog(props) {
         <DialogTitle><Title>{"Editar Produto"}</Title></DialogTitle>
         <DialogContent>
           <Container>
-          {/* <TextField
-              required
-              label="Nome do Produto"
-              value={name}
-              onChange={(e) => setName(e.target.value.slice(0,50))}
-              disabled={isLoading}
-            /> */}
             <TextField
               required
               label="NCM/SH"
-              value={ncmsh}
-              onChange={(e) => setNcmsh(e.target.value.slice(0,8))}
+              value={product.refCode}
+              disabled
+            />
+            <TextField
+              label="Nome"
+              value={name}
+              onChange={(e) => setName(e.target.value.slice(0,255))}
               disabled={isLoading}
             />
             <TextField
-              label="Descrição"
-              value={description}
-              onChange={(e) => setDescription(e.target.value.slice(0,255))}
-              disabled={isLoading}
-            />
-            <TextField
-              label="Preço"
-              value={price}
-              onChange={handlePriceChange}
+              label="Preço de Compra"
+              value={priceBuy}
+              onChange={handlePriceBuyChange}
               placeholder={"ex: 100.00"}
               name="numberformat"
               id="formatted-numberformat-input"
               disabled={isLoading}
-              error={hasErrorPrice}
+              InputProps={{
+                startAdornment: <InputAdornment position="start">R$</InputAdornment>
+              }}
+            />
+            <TextField
+              label="Preço de Venda"
+              value={priceSell}
+              onChange={handlePriceSellChange}
+              placeholder={"ex: 100.00"}
+              name="numberformat"
+              id="formatted-numberformat-input"
+              disabled={isLoading}
               InputProps={{
                 startAdornment: <InputAdornment position="start">R$</InputAdornment>
               }}
@@ -129,8 +130,8 @@ export default function EditProductDialog(props) {
             <FormControl>
               <InputLabel id="test-select-label">Categoria do Produto</InputLabel>
               <Select
-                value={categoryID}
-                onChange={(e) => setCategoryID(e.target.value)}
+                value={category}
+                onChange={(e, target) => setCategory(target)}
                 labelId="test-select-label"
                 label="Categoria"
                 disabled={isLoading}
@@ -144,55 +145,43 @@ export default function EditProductDialog(props) {
                 )}
               </Select>
             </FormControl>
-            {/* <FormControl>
-              <InputLabel id="test-select-label">Supplier</InputLabel>
-              <Select
-                value={supplierID}
-                onChange={(e) => setSupplierID(e.target.value)}
-                labelId="test-select-label"
-                label="Supplier"
-                disabled={isLoading}
-                defaultValue={1}
-              >
-                <MenuItem value='1'>
-                  <em>None</em>
-                </MenuItem>
-                {suppliers.map((cat, index) => (
-                  <MenuItem value={cat.id} key={index}>{cat.name}</MenuItem>
-                )
-                )}
-              </Select>
-            </FormControl> */}
-            <div style={{color: 'red', display:'flex', flexDirection: 'column'}}>
-              {hasErrorPrice && <>{"Vírgulas não são necessárias, apenas pontos."}</>}
-              {hasError && <>{"Preencha os campos obrigatórios!"}</>}
-              {error !== null && <>{error.message}</>}
-            </div>
+            <TextField
+              label="Observação"
+              value={description}
+              onChange={(e) => setDescription(e.target.value.slice(0,255))}
+              disabled={isLoading}
+            />
           </Container>
 
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancelar</Button>
           <Button onClick={() => {
-            if(ncmsh === '' || description === '' ||
-              price === 0 || categoryID === '') {
+            if(product.ncmSh === '' || description === '' ||
+              priceBuy === 0 || priceSell === 0 || categories === null) {
               setHasError(true);
               return;
             }
 
-            if(!currencyRegex.test(price)) {
-              setHasErrorPrice(true);
+            if(!currencyRegex.test(priceBuy)) {
+              // setHasErrorPrice(true);
+              return;
+            }
+
+            if(!currencyRegex.test(priceSell)) {
+              // setHasErrorPrice(true);
               return;
             }
 
             setIsLoading(true);
-            const priceString = parseFloat(price);
+            const strpriceSell = parseFloat(priceSell);
+            const strpriceBuy = parseFloat(priceBuy);
             const product = {
+              ...product,
               id,
-              ncmSh: ncmsh,
               description,
-              price: priceString,
-              category_id: categoryID,
+              priceBuy: strpriceBuy,
+              priceSell: strpriceSell,
               // supplier_id: supplierID
             };
 

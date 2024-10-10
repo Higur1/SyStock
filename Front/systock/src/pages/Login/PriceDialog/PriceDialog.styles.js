@@ -7,13 +7,14 @@ export const Container = styled('div')({
   alignItems: 'center',
   color: 'black',
   gap: 16,
-  justifyContent: 'center'
+  justifyContent: 'space-between'
 });
 
 export const Card = styled('div')({
   height: '100%',
   maxHeight: 324,
-  minWidth: 200,
+  maxWidth: '24%',
+  width: '24%',
   display: 'flex',
   flexDirection:'column',
   background: 'linear-gradient(135deg, #87CEFA 0%, #0a2fb6 175%)',

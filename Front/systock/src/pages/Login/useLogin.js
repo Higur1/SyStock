@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { performFetch, performFetchNoResult } from "../../apiBase";
+import { ENTITIES } from "../../utils/debug-local-helper";
+import { DEBUG_LOCAL, MainContext } from "../../App";
 
 export const useLogin = () => {
 
@@ -20,6 +22,8 @@ export const useLogin = () => {
     autoHide: 5000,
     handleClose: null
   });
+
+  const { getData } = useContext(MainContext);
 
   const onChangeUser = (event) => {
     setError({...error, user: ''});
@@ -51,6 +55,22 @@ export const useLogin = () => {
   async function onLogin () {
     setLoading(true);
 
+    if(DEBUG_LOCAL) {
+      const accounts = getData(ENTITIES.ACCOUNTS);
+
+      const i = accounts.findIndex(obj => obj.user === user && obj.password === password);
+      if(i !== -1) {
+        window.localStorage.setItem('tokenLogin', "connectLocal");
+        window.location.pathname = 'home';
+      } else {
+        setError({
+          ...error, user: 'Usuário ou senha incorretos!' 
+        });
+      }
+
+      return setLoading(false);
+    }
+
     try {
       const result = await performFetch("/auth", {
         method: "POST", 
@@ -58,7 +78,7 @@ export const useLogin = () => {
       });
       console.log(result);
       window.localStorage.setItem('tokenLogin', result.token);
-      window.location.pathname = 'dashboard';
+      window.location.pathname = 'home';
     } catch {
       setError({
         ...error, user: 'Usuário ou senha incorretos!' 

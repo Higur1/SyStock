@@ -1,7 +1,8 @@
 /* eslint-disable no-debugger */
-import { useEffect, useRef, useState } from "react";
-import { deepCopy } from "../utils/utils";
+import { useContext, useEffect, useRef, useState } from "react";
 import { performFetch, performFetchNoResult } from "../apiBase";
+import { DEBUG_LOCAL, MainContext } from "../App";
+import { ENTITIES } from "../utils/debug-local-helper";
 
 export default function useUsers() {
 
@@ -12,6 +13,8 @@ export default function useUsers() {
   const [autoHideSnackBar, setAutoHideSnackBar] = useState(3000);
   const [severitySnackBar, setSeveritySnackBar] = useState("info");
   const [snackMessageSnackBar, setSnackMessageSnackBar] = useState("");
+
+  const { updateData, getData } = useContext(MainContext);
 
   function handleOpenSnackBar(severity, message="Unexpected Error Occurred", autoHide=3000) {
     setSnackMessageSnackBar(message);
@@ -34,6 +37,10 @@ export default function useUsers() {
   }, []);
 
   async function getUsers() {
+    if(DEBUG_LOCAL) {
+      const users = getData(ENTITIES.ACCOUNTS);
+      return setUsers(users);
+    }
     try {
       const users = await performFetch("/users", {method: 'GET'});
       setUsers(users);
@@ -43,6 +50,12 @@ export default function useUsers() {
   }
 
   async function createUser(obj) {
+    if(DEBUG_LOCAL) {
+      const nextUsers = [...users, obj];
+      setUsers(nextUsers);
+      return updateData(ENTITIES.ACCOUNTS, nextUsers);
+    }
+
     try {
       const newItem = await performFetch("/users/new", {method: 'POST', body: JSON.stringify(obj)});
       if(typeof newItem === 'string') {
@@ -60,6 +73,11 @@ export default function useUsers() {
   }
 
   async function updateUser(sup) {
+    if(DEBUG_LOCAL) {
+      const nextUsers = users.map(user => (user.id === sup.id ? sup : user));
+      setUsers(nextUsers);
+      return updateData(ENTITIES.ACCOUNTS, nextUsers);
+    }
     try {
       const newItem = await performFetch("/users/update", {method: 'PUT', body: JSON.stringify(sup)});
       

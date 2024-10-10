@@ -1,164 +1,127 @@
-import React, { useState } from "react";
-import useProduct from "../../hooks/useProduct"
-import { Container, HeaderContainer, MenuOption, TableContainer, TableData, TableRow, Menu } from "./styles";
-import { Button, ClickAwayListener, Dialog, DialogActions, DialogTitle, IconButton } from "@mui/material";
+import React, { useContext, useState } from "react";
+import { Container } from "./styles";
+import { Box, Button, Chip, ClickAwayListener, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl, FormControlLabel, IconButton, InputLabel, MenuItem, OutlinedInput, Paper, Radio, RadioGroup, Select, Tab, Tabs } from "@mui/material";
 import ToolTipAndEllipsis from "../../components/dialogs/ComponentUtils/ToolTipAndEllipsis";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CreateProductDialog from "./dialogs/CreateProductDialog";
 import CustomizedSnackbars from "../../components/CustomizedSnackBar";
 import EditProductDialog from "./dialogs/EditProductDialog";
+import CircularLoading from "../../components/common/CircularLoading";
+import AddSupply from "./dialogs/AddSupply";
+import { formatDate } from "../../utils/utils";
+import ProductList from "./tabs/productList";
+import { ProductContext } from "./ProductPage";
+import DeleteProductDialog from "./dialogs/DeleteProductDialog";
+import ViewSupplies from "./tabs/ViewSupplies";
+import ViewProducts from "./dialogs/ViewProducts";
+import ChangeQuantityProduct from "./tabs/ChangeQuantityProductDialog";
+
+
+export const TABS = {
+  PRODUCTS_LIST: "PRODUCTS_LIST",
+  CREATE_PRODUCT: "CREATE_PRODUCT",
+  DECREASE_QUANTITY: "DECREASE_QUANTITY",
+  VIEW_SUPPLIES: "VIEW_SUPPLIES",
+  ADD_SUPPLY: "ADD_SUPPLY"
+}
+
+
+const TYPES_DIALOG = {
+  NONE: 0,
+  EDIT_PRODUCT: 3,
+  DELETE_PRODUCT: 4,
+  VIEW_SUPPLIES: 5,
+  VIEW_PRODUCTS: 6
+}
+
+const tabsList = [
+  { type: TABS.PRODUCTS_LIST, label: "Lista de Produtos" },
+  { type: TABS.CREATE_PRODUCT, label: "Criar Produto" },
+  { type: TABS.DECREASE_QUANTITY, label: "Diminuir Quantidade" },
+  { type: TABS.VIEW_SUPPLIES, label: "Visualizar Abastecimentos" },
+  { type: TABS.ADD_SUPPLY, label: "Adicionar Abastecimento" }
+];
 
 export default function Product() {
 
-  const { products, createProduct, errorInsert,
-    handleCloseSnackBar, openSnackBar, autoHideSnackBar, snackMessageSnackBar, severitySnackBar,
-    updateProduct, handleDeleteProduct
-  } = useProduct();
-  const [menuOption, setMenuOption] = useState(false);
-  const [idMenu, setIdMenu] = useState(null);
-  const [idEditProduct, setIdEditProduct] = useState(null);
-  const [openCreateProduct, setOpenCreateProduct] = useState(false);
-  const [openEditProduct, setOpenEditProduct] = useState(false);
-  const [deleteProduct, setDeleteProduct] = useState(false);
+  const { productsFiltered, createProduct, errorInsert, updateProduct } = useContext(ProductContext);
 
-  function handleMenuOptions(id) {
-    setMenuOption(true);
-    setIdMenu(id);
+  const [dialog, setDialog] = useState({ type: TYPES_DIALOG.NONE });
+  const [tab, setTab] = useState(TABS.PRODUCTS_LIST);
+
+  function handleEditProductDialog(index) {
+    setDialog({ type: TYPES_DIALOG.EDIT_PRODUCT, index });
   }
 
-  function handleCloseMenu() {
-    setMenuOption(false);
-    setIdMenu(null);
+  function handleDeleteProductDialog(index) {
+    setDialog({ type: TYPES_DIALOG.DELETE_PRODUCT, index });
+  }
+
+  function closeDialog() {
+    setDialog({ type: TYPES_DIALOG.NONE });
+  }
+
+  const handleChange = (event, newValue) => {
+    setTab(newValue);
+  };
+
+  function handleViewProducts(supply) {
+    setDialog({ type: TYPES_DIALOG.VIEW_PRODUCTS, supply});
   }
 
   return (
     <>
       <Container>
-        <HeaderContainer>
-          {/* <Autocomplete
-            multiple
-            id="combo-box-category"
-            options={categories.map(cat => cat.label)}
-            freeSolo
-            renderTags={(value, getTagProps) =>
-              value.map((option, index) => (
-                <Chip
-                  variant="outlined"
-                  label={option}
-                  {...getTagProps({ index })}
-                />
-              ))
-            }
-            value={selectedCategories}
-            onChange={(event, newValue) => handleSelectedOptions(newValue)}
-            sx={{ width: '100%', margin: 0 }}
-            renderInput={(params) => <TextField {...params} label="Categoria" />}
-          /> */}
-          <Button
-            variant="contained"
-            style={{ minWidth: '236px' }}
-            onClick={() => setOpenCreateProduct(true)}
-          >
-            Adicionar Produto
-          </Button>
-        </HeaderContainer>
-        <TableContainer>
-          <TableRow style={{background: '#DCDCDC', borderRadius: '8px 8px 0px 0px'}}>
-            {/* <TableData width={"32%"} minWidth={'200px'}>{"Nome"}</TableData> */}
-            <TableData style={{flex: 1}}>{"Descrição"}</TableData>
-            <TableData style={{justifyContent: 'center', width: 150, maxWidth: 150}}>{"ncmSh"}</TableData>
-            <TableData style={{justifyContent: 'center', width: 150, maxWidth: 150}}>{"Preço"}</TableData>
-            <TableData style={{justifyContent: 'center', width: 150, maxWidth: 150}}>{"Categoria"}</TableData>
-            {/* <TableData width={"7%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{"Supplier"}</TableData> */}
-            <TableData style={{justifyContent: 'center', width: 40}}/>
-          </TableRow>
-          <div className="customScroll">
-            {products.map((prod, index) => (
-              <TableRow key={index} style={{
-                borderRadius: index === products.length - 1 ? '0px 0px 8px 8px' : '0px',
-                borderBottom: index === products.length - 1 ? '0px' : '1px solid #d3D3D3',
-                background: index & 2 === 0 ? "#ebebeb" : "#F5f5f5"
-              }}>
-                {/* <TableData width={"32%"} minWidth={'200px'}>{prod.name}</TableData> */}
-                <TableData style={{flex: 1}}>
-                  <ToolTipAndEllipsis item={prod.description} />
-                </TableData>
-                <TableData style={{justifyContent: 'center', width: 150, maxWidth: 150}}>{prod.ncmSh}</TableData>
-                <TableData style={{justifyContent: 'center', width: 150, maxWidth: 150}}>{prod.price}</TableData>
-                <TableData style={{justifyContent: 'center', width: 150, maxWidth: 150}}>{prod.category_id}</TableData>
-                {/* <TableData width={"7%"} style={{justifyContent: 'center'}}minWidth={'60px'}>{prod.supplier_id}</TableData> */}
-                <TableData style={{justifyContent: 'center', width: 40}}>
-                  <IconButton onClick={() => handleMenuOptions(index)}>
-                    <MoreVertIcon fontSize='small'/>
-                    {menuOption && idMenu === index && (
-                      <ClickAwayListener onClickAway={handleCloseMenu}>
-                        <Menu>
-                          <MenuOption style={{borderRadius: '16px 16px 0px 0px'}}>{"Visualizar Produto"}</MenuOption>
-                          <MenuOption onClick={() => {
-                            setOpenEditProduct(true);
-                            setIdEditProduct(index);
-                            }}>{"Editar Produto"}</MenuOption>
-                          <MenuOption onClick={() => setDeleteProduct(true)} style={{borderBottom: '0px', borderRadius: '0px 0px 16px 16px'}} >{"Apagar Produto"}</MenuOption>
-                        </Menu>
-                      </ClickAwayListener>
-                    
-                  )}
-                  </IconButton>
-                  </TableData>
-              </TableRow> 
-            ))}
-          </div>
-        </TableContainer>
-      </Container>
+        <div style={{ display: 'flex', flexDirection: 'column', width: "100%", gridArea: "tab" }}>
+          <Tabs onChange={handleChange} value={tab}>
+            {tabsList.map((tab, i) => (<Tab label={tab.label} value={tab.type} key={i} />))}
+          </Tabs>
+          <Divider />
+        </div>
 
-      {openCreateProduct && <CreateProductDialog 
-        handleCreate={(prod) => {
-          createProduct(prod);
-          setOpenCreateProduct(false);
-        }}
-        handleClose={() => setOpenCreateProduct(false)}
-        error={errorInsert}
-        open={openCreateProduct}
-      />}
+        <div style={{ gridArea: "tabcontent", overflow: 'hidden' }}>
+          {tab === TABS.PRODUCTS_LIST && (
+            <ProductList
+              handleEditProductDialog={handleEditProductDialog}
+              handleDeleteProductDialog={handleDeleteProductDialog}
+            />
+          )}
 
-      {openEditProduct && <EditProductDialog 
+          {tab === TABS.CREATE_PRODUCT && (
+            <CreateProductDialog
+              handleCreate={(prod) => {
+                createProduct(prod);
+                closeDialog();
+              }}
+              handleClose={closeDialog}
+              error={errorInsert}
+              open
+            />
+          )}
+
+          {tab === TABS.ADD_SUPPLY && (<AddSupply />)}
+
+          {tab === TABS.DECREASE_QUANTITY && (<ChangeQuantityProduct />)}
+
+          {tab === TABS.VIEW_SUPPLIES && (<ViewSupplies handleViewProducts={handleViewProducts}/>)}
+        </div>
+      </Container >
+
+      {(dialog.type === TYPES_DIALOG.EDIT_PRODUCT) && <EditProductDialog
         handleEdit={(prod) => {
           updateProduct(prod);
-          setOpenEditProduct(false);
+          closeDialog();
         }}
-        handleClose={() => setOpenEditProduct(false)}
+        handleClose={closeDialog}
         error={errorInsert}
-        open={openEditProduct}
-        product={products[idEditProduct]}
-    
-      />}
+        open
+        product={productsFiltered[dialog.index]}
+      />
+      }
 
-      {deleteProduct && (
-        <Dialog
-          open={deleteProduct}
-          maxWidth="md"
-          fullWidth
-        >
-          <DialogTitle>{"Deseja  mesmo apagar essa categoria?"}</DialogTitle>
-          <DialogActions>
-            <Button onClick={() => setDeleteProduct(false)}>Cancelar</Button>
-            <Button onClick={() => {
-              handleDeleteProduct({ product_id: products.find((p, i) => i === idMenu).id });
-              setDeleteProduct(false);
-            }}>Confirmar</Button>
-          </DialogActions>
-        </Dialog>
-      )}
-      
-      {openSnackBar && (
-        <CustomizedSnackbars 
-          open={openSnackBar}
-          autoHide={autoHideSnackBar}
-          handleClose={handleCloseSnackBar}
-          severity={severitySnackBar}
-          snackMessage={snackMessageSnackBar}
-        />
-      )}
+      {dialog.type === TYPES_DIALOG.DELETE_PRODUCT && (<DeleteProductDialog closeDialog={closeDialog} index={dialog.index} />)}
+
+      {dialog.type === TYPES_DIALOG.VIEW_PRODUCTS && (<ViewProducts supply={dialog.supply} onClose={closeDialog} />)}
     </>
   )
 }

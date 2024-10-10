@@ -32,7 +32,7 @@ export default function Category() {
   } = useCategory();
 
   if(categories.length === 0) return;
-
+  console.log(categories)
   return (
     <>
       <Container>
@@ -81,7 +81,6 @@ export default function Category() {
                   <MoreVertIcon fontSize='small' />
                   {menuOption && idMenu === cat.id && (
                     <Menu>
-                      <MenuOption style={{borderRadius: '16px 16px 0px 0px'}}>{"Visualizar Categoria"}</MenuOption>
                       <MenuOption onClick={() => setEditCategory(true)}>{"Editar Categoria"}</MenuOption>
                       <MenuOption style={{borderBottom: '0px', borderRadius: '0px 0px 16px 16px'}} onClick={() => setDeleteCategory(true)}>{"Apagar Categoria"}</MenuOption>
                     </Menu>

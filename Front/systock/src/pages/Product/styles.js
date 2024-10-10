@@ -1,11 +1,24 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
+  display: grid;
+  grid-template:
+    "tab" 48px
+    "tabcontent" 1fr
+    / 1fr;
+  gap: 16px;
+  width: 100%;
+  height: 100vh;
+  padding: 16px;
+`
+
+export const ContainerProductsList = styled.div`
+  display: grid;
+  grid-template: 24px 60px 1px 1fr /1fr;
+  gap: 16px;
   width: 100%;
   height: 100%;
+  overflow: hidden;
 `
 
 export const HeaderContainer = styled.div`
@@ -17,12 +30,12 @@ export const HeaderContainer = styled.div`
 
 export const TableContainer = styled("div")({
   display: 'flex',
-  width: '100%',
   flexDirection: 'column',
   borderRadius: '8px',
   background: "#ebebeb",
   border: '1px solid #d3D3D3',
-  maxHeight: "calc(100% - 68.5px)"
+  height: "100%",
+  width: "100%"
 });
 
 export const TableRow = styled("div")({
@@ -37,6 +50,7 @@ export const TableRow = styled("div")({
 });
 
 export const TableData = styled("div")(() => ({
+  textAlign: 'center',
   display: 'flex',
   alignItems: 'center',
   height: '48px',

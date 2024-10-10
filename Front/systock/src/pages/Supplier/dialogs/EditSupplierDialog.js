@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from "react";
 import PropTypes from 'prop-types';
 import { CurrencyInput } from "react-currency-mask";
 import styled from "styled-components";
-import { performFetch } from "../../../apiBase";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;

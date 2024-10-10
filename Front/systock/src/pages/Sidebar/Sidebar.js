@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Option, Container, CustomArrow } from './styles.js';
+import { Option, Container } from './styles.js';
 import CategoryIcon from '@mui/icons-material/Category';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import Estoque from '../../images/stock.png';
@@ -18,46 +18,52 @@ export default function Sidebar({logOff}) {
 
   const [options, setOptions] = useState([
     {
-      type: 'dashboard', 
-      label: 'Dashboard', 
+      type: 'home', 
+      label: 'Página Inicial', 
       child: [],
-      openCollapse: false
-    },
-    {
-      type: 'categories', 
-      label: 'Categoria', 
-      child: [],
+      selected: window.location.pathname.indexOf('home') !== -1,
       openCollapse: false
     },
     {
       type: 'products', 
       label: 'Produto', 
       child: [],
+      selected: window.location.pathname.indexOf('products') !== -1,
+      openCollapse: false
+    },
+    {
+      type: 'categories', 
+      label: 'Categoria', 
+      child: [],
+      selected: window.location.pathname.indexOf('categories') !== -1,
       openCollapse: false
     },
     {
       type: 'suppliers', 
       label: 'Fornecedor', 
       child: [],
+      selected: window.location.pathname.indexOf('suppliers') !== -1,
       openCollapse: false
     },
     {
-      type: 'stock', 
-      label: 'Estoque', 
+      type: 'history', 
+      label: 'Históricos', 
       child: [],
+      selected: window.location.pathname.indexOf('history') !== -1,
+      openCollapse: false
+    },
+    {
+      type: 'sellRegisters', 
+      label: 'Registros de venda', 
+      child: [],
+      selected: window.location.pathname.indexOf('sellRegisters') !== -1,
       openCollapse: false
     },
     {
       type: 'settings', 
       label: 'Configurações', 
-      child: [
-        {
-          type: 'users', 
-          label: 'Usuários', 
-          child: [],
-          openCollapse: false
-        }
-      ],
+      child: [],
+      selected: window.location.pathname.indexOf('settings') !== -1,
       openCollapse: false
     },
   ]);
@@ -75,7 +81,7 @@ export default function Sidebar({logOff}) {
 
           return (
           <React.Fragment key={index}>
-            <Option>
+            <Option selected={`${window.location.pathname.indexOf(option.type) !== -1}`}>
               <IconCustom type={option.type} />
               <Link to={option.type}>{option.label}</Link>
               {option.child.length !== 0 ? (
@@ -86,10 +92,12 @@ export default function Sidebar({logOff}) {
             </Option>
             <Collapse in={option.openCollapse}>
               {option.child.map((optionChild, i) => (
-                <Option key={option.type + i}>
-                  <IconCustom type={option.type} />
-                  <Link to={optionChild.type} style={{paddingLeft: 32}}>{optionChild.label}</Link>
-                </Option>
+                <Link key={option.type + i} to={optionChild.type} style={{paddingLeft: 32}}>
+                  <Option selected={`${option.selected}`}>
+                    <IconCustom type={option.type} />
+                    {optionChild.label}
+                  </Option>
+                </Link>
               ))}
             </Collapse>
           </React.Fragment>
@@ -98,7 +106,7 @@ export default function Sidebar({logOff}) {
         })}
       </div>
       
-      <Option onClick={logOff}>
+      <Option onClick={logOff} selected={`false`}>
         <IconCustom type={"logOut"} />
         <p>{"Sair da Conta"}</p>
       </Option>

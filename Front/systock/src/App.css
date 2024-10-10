@@ -10,7 +10,8 @@ a, a:visited, a:hover, a:active {
 }
 
 .customScroll {
-  overflow-y: scroll
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .customScroll::-webkit-scrollbar {
