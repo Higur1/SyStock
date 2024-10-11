@@ -1,9 +1,10 @@
 import { z } from "zod";
+import CategoryService from "../service/CategoryService";
 import Category from "../models/Category";
 export default class CategoryController {
   static async listOfCategory(request, response) {
     try {
-      const lisOfCategories = await Category.findAll();
+      const lisOfCategories = await CategoryService.findAll();
 
       if (lisOfCategories.status) {
         response.status(200).send(
@@ -33,15 +34,16 @@ export default class CategoryController {
       });
       const { name } = category_name.parse(request.body);
 
-      const categoryAlreadyExists = await Category.verifyDuplicateName(name);
+      const category = new Category({ name });
+      const categoryAlreadyExists = await CategoryService.findByName(category);
 
       if (
         categoryAlreadyExists.status &&
-        categoryAlreadyExists.category == undefined
+        categoryAlreadyExists.categories == undefined
       ) {
-        const categoryCreated = await Category.create(name);
+        const categoryCreated = await CategoryService.create(category);
 
-        if (categoryCreated.status) {
+        if (categoryCreated.status && !categoryCreated.message) {
           response.status(201).send(
             JSON.stringify({
               category: {
@@ -80,12 +82,21 @@ export default class CategoryController {
       });
       const { id } = category_id.parse(request.params);
 
-      const findCategory = await Category.findById(Number(id));
+      const category = new Category({ name: "" });
+      category.id = Number(id);
+      const findCategory = await CategoryService.findById(category);
 
       if (findCategory.status) {
-        response.status(200).send(
+        if (findCategory.category != undefined) {
+          response.status(200).send(
+            JSON.stringify({
+              category: findCategory.category,
+            })
+          );
+        }
+        response.status(404).send(
           JSON.stringify({
-            category: findCategory.category,
+            error: "Categoria não existe",
           })
         );
       } else {
@@ -111,12 +122,20 @@ export default class CategoryController {
       });
 
       const { name } = category_name.parse(request.params);
-      const findCategory = await Category.findByName(name);
+      const category = new Category({ name });
+      const findCategory = await CategoryService.findByName(category);
 
       if (findCategory.status) {
-        response.status(200).send(
+        if (findCategory.categories != undefined) {
+          response.status(200).send(
+            JSON.stringify({
+              category: findCategory.categories,
+            })
+          );
+        }
+        response.status(404).send(
           JSON.stringify({
-            categories: findCategory.categories,
+            error: "Categoria não existe",
           })
         );
       } else {
@@ -137,37 +156,51 @@ export default class CategoryController {
   }
   static async edit(request, response) {
     try {
-      const category = z.object({
+      const categoryNewData = z.object({
         id: z.number().gt(0),
         name: z.string().trim().min(3).max(15),
       });
-      const { id, name } = category.parse(request.body);
+      const { id, name } = categoryNewData.parse(request.body);
 
-      const categoryAlredyExists = await Category.verifyDuplicateName(name);
+      const category = new Category({ name });
+      category.id = id;
+      const nameCategoryAlredyExists = await CategoryService.findByName(
+        category
+      );
 
-      if (
-        categoryAlredyExists.status &&
-        categoryAlredyExists.category == undefined
-      ) {
-        const categoryUpdated = await Category.update(id, name);
-
-        if (categoryUpdated.status) {
-          response.status(200).send(
+      if (nameCategoryAlredyExists.status) {
+        if (nameCategoryAlredyExists.categories != undefined) {
+          response.status(409).send(
             JSON.stringify({
-              category: categoryUpdated.category,
+              error: "name of Category alredy exists",
             })
           );
-        } else {
+        }
+      }
+
+      const idCategoryAlredyExists = await CategoryService.findById(category);
+
+      if (idCategoryAlredyExists.status) {
+        if (idCategoryAlredyExists.category == undefined) {
           response.status(404).send(
             JSON.stringify({
               message: "Category not found",
             })
           );
         }
-      } else {
-        response.status(409).send(
+      }
+      const categoryUpdated = await CategoryService.update(category);
+
+      if (categoryUpdated.status) {
+        response.status(200).send(
           JSON.stringify({
-            error: "Category alredy exists",
+            category: categoryUpdated.category,
+          })
+        );
+      } else {
+        response.status(500).send(
+          JSON.stringify({
+            error: categoryUpdated.error,
           })
         );
       }
@@ -182,13 +215,14 @@ export default class CategoryController {
   }
   static async remove(request, response) {
     try {
-      const category = z.object({
+      const categoryData = z.object({
         id: z.number().gt(0),
       });
 
-      const { id } = category.parse(request.body);
-
-      const categoryRemoved = await Category.delete(id);
+      const { id } = categoryData.parse(request.body);
+      const category = new Category({ name: "" });
+      category.id = Number(id);
+      const categoryRemoved = await CategoryService.delete(category);
 
       if (categoryRemoved.status && categoryRemoved.category != undefined) {
         response.status(200);

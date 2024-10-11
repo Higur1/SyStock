@@ -1,5 +1,5 @@
-import category from "../models/Category"
-import Category from "../entities/Category";
+import category from "../service/Category"
+import Category from "../models/Category";
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "@jest/globals";
 
 describe("Create category model", () => {

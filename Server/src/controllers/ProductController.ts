@@ -1,4 +1,4 @@
-import Product from "../models/Product";
+import Product from "../service/ProductService";
 import { z } from "zod";
 
 export default class ProductController {

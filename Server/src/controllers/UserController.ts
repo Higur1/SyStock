@@ -1,15 +1,17 @@
-import User from "../models/User";
-import PreUser from "../models/PreUser";
+import UserService from "../service/UserService";
+import PreUser from "../service/PreUserService";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import User from "../models/User";
+import { error } from "console";
 
 dotenv.config();
 
 export default class UserController {
   static async listOfUsers(request, response) {
     try {
-      const listOfUsers = await User.findAll();
+      const listOfUsers = await UserService.findAll();
 
       if (listOfUsers.status) {
         const _links = generatorHATEOAS("");
@@ -35,7 +37,7 @@ export default class UserController {
   }
   static async findAllFuncionarios(request, response) {
     try {
-      const listOfFuncionarios = await User.findAllFuncionarios();
+      const listOfFuncionarios = await UserService.findAllFuncionarios();
 
       if (listOfFuncionarios.status) {
         const _links = generatorHATEOAS("");
@@ -74,7 +76,7 @@ export default class UserController {
       const { name } = user.parse(request.params);
       const token = request.headers.authorization;
 
-      const userList = await User.findNameStartWith(name);
+      const userList = await UserService.findNameStartWith(name);
       if (userList.status) {
         if (userList.user != undefined) {
           response.status(200).send(
@@ -115,7 +117,7 @@ export default class UserController {
           .max(1, "type_id required maximum 1 character(s)"),
       });
       const { type_id } = user.parse(request.params);
-      const listOfUsers = await User.findUserByTypeId(Number(type_id));
+      const listOfUsers = await UserService.findUserByTypeId(Number(type_id));
 
       if (listOfUsers.status) {
         if (listOfUsers.listOfUsers != undefined) {
@@ -148,7 +150,7 @@ export default class UserController {
   }
   static async createFuncionario(request, response) {
     try {
-      const funcionario = z.object({
+      const funcionarioData = z.object({
         name: z
           .string()
           .trim()
@@ -168,24 +170,27 @@ export default class UserController {
           .max(10, "user_password required maximum 10 character(s)"),
         email: z.string().email("Valid e-mail required").trim(),
       });
-      const { name, login, user_password, email } = funcionario.parse(
+      const { name, login, user_password, email } = funcionarioData.parse(
         request.body
       );
 
       //verifica se os dados do funcionario já existem em algum usuario do sistema já existe antes de cadastra-lo
-      const userExists = await User.findUser(email, login);
+      const userExists = await UserService.findUser(email, login);
 
       //verifica se existe um preusuario para o usuario que será cadastrado
 
       const hash_password = cryptPassword(user_password);
 
       if (userExists.status && userExists.user == undefined) {
-        const user_create = await User.createFuncionario(
+        const funcionario = new User({
           name,
           login,
-          hash_password,
-          email
-        );
+          password: hash_password,
+          email,
+          excludedStatus: false,
+        });
+
+        const user_create = await UserService.createEmployee(funcionario);
         if (user_create.status) {
           response.status(201).send(user_create.user);
         }
@@ -229,55 +234,49 @@ export default class UserController {
   }
   static async edit(request, response) {
     try {
-      const user = z.object({
+      const userData = z.object({
         id: z.number().min(1, "id required minimum 1 character(s)"),
         name: z
           .string()
           .trim()
           .min(3, "Name required minimum 3 character(s)")
           .max(20, "Name required maximum 20 character(s)"),
-        user_type_id: z
+        /*        user_type_id: z
           .number()
           .min(1, "type_id required minimum 1 character(s)")
-          .max(3),
+          .max(3),*/
       });
-      const { id, name, user_type_id } = user.parse(request.body);
-      const userFind = await User.findUserById(id);
-      const userNameExists = await User.findName(name);
+      const { id, name } = userData.parse(request.body);
+      const userFind = await UserService.findUserById(id);
+      const userNameExists = await UserService.findName(name);
+
+      if (userNameExists.exists) {
+        response.status(200).send(
+          JSON.stringify({
+            message: "Name already exists",
+          })
+        );
+      }
 
       if (userFind.status) {
-        if (userNameExists.exists) {
-          response.status(200).send(
-            JSON.stringify({
-              message: "Name already exists",
-            })
-          );
-        } else if (userFind.user?.user_type == 1) {
-          await User.update(id, name, 1).then((userResult) => {
+        if (userFind.user != undefined) {
+          userFind.user.name = name;
+          await UserService.update(userFind.user).then((userResult) => {
             response.status(200).send(
               JSON.stringify({
                 user: {
                   id: userResult.userUpdated?.id,
                   name: userResult.userUpdated?.name,
-                  login: userResult.userUpdated?.login,
-                  created: userResult.userUpdated?.created,
                 },
               })
             );
           });
         } else {
-          await User.update(id, name, user_type_id).then((userResult) => {
-            response.status(200).send(
-              JSON.stringify({
-                user: {
-                  id: userResult.userUpdated?.id,
-                  name: userResult.userUpdated?.name,
-                  login: userResult.userUpdated?.login,
-                  created: userResult.userUpdated?.created,
-                },
-              })
-            );
-          });
+          response.status(404).send(
+            JSON.stringify({
+              error: "usuário não existe",
+            })
+          );
         }
       } else {
         response.status(500).send(
@@ -302,23 +301,29 @@ export default class UserController {
       });
 
       const { id, novoEmail } = dataUser.parse(request.body);
-      const userFind = await User.findUserById(id);
+      const userFind = await UserService.findUserById(id);
       if (userFind.status) {
         if (userFind.user != undefined) {
-          const emailFind = await User.findEmail(novoEmail);
-          if (emailFind.status && emailFind.user == undefined) {
-            console.log(emailFind.user);
-            if (emailFind.user == undefined) {
-              await User.updateEmail(id, novoEmail).then((userResult) => {
-                response.status(200).send(JSON.stringify({}));
-              });
-            }
+          const emailFind = await UserService.findEmail(userFind.user);
+          if (emailFind.user != undefined) {
+            response.status(400).send(
+              JSON.stringify({
+                error: "email já utilizado",
+              })
+            );
           }
-          response.status(400).send(
-            JSON.stringify({
-              error: "Email já utilizado",
-            })
-          );
+
+          userFind.user.email = novoEmail;
+          await UserService.updateEmail(userFind.user).then((userResult) => {
+            response.status(200).send(
+              JSON.stringify({
+                user: {
+                  id: userResult.result?.id,
+                  email: userResult.result?.email,
+                },
+              })
+            );
+          });
         }
         response.status(404).send(
           JSON.stringify({
@@ -352,14 +357,13 @@ export default class UserController {
 
       const { id, novaPassword } = dataUser.parse(request.body);
 
-      const userFind = await User.findUserById(id);
+      const userFind = await UserService.findUserById(id);
 
       if (userFind.status) {
         if (userFind.user != undefined) {
-          
           const hash_password = cryptPassword(novaPassword);
 
-          await User.updatePassword_editUser(id, hash_password).then(
+          await UserService.updatePassword_editUser(id, hash_password).then(
             (userResult) => {
               response.status(200).send(JSON.stringify({}));
             }
@@ -401,12 +405,12 @@ export default class UserController {
         );
       }
 */
-      const userId = await User.findUserById(id);
+      const userId = await UserService.findUserById(id);
       if (userId.status) {
         if (userId.user != undefined) {
           if (userId.user.id != 1) {
-            await User.tokenDelete(userId.user.id);
-            await User.deleteFuncionario(userId.user.id);
+            await UserService.tokenDelete(userId.user);
+            await UserService.deleteFuncionario(userId.user);
             response.status(200);
           } else {
             response.status(401).send(
@@ -452,12 +456,12 @@ export default class UserController {
 
       const { user_password, token } = passwordReset.parse(request.body);
 
-      const isValidToken = await User.tokenValited(token);
+      const isValidToken = await UserService.tokenValited(token);
 
       if (isValidToken.status) {
         if (isValidToken.isValid) {
           if (isValidToken.status) {
-            const result = await User.updatePassword_resetPassword(
+            const result = await UserService.updatePassword_resetPassword(
               isValidToken.token?.user_id,
               isValidToken.token?.id,
               user_password

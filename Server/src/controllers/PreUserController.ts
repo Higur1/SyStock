@@ -1,5 +1,5 @@
 import { error } from "console";
-import PreUser from "../models/PreUser";
+import PreUser from "../service/PreUserService";
 import { z } from "zod";
 import dotenv from "dotenv";
 

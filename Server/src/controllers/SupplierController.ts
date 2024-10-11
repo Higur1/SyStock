@@ -1,5 +1,5 @@
 import { z } from "zod";
-import Supplier from "../models/Supplier";
+import Supplier from "../service/SupplierService";
 
 export default class SupplierController {
   static async findAll(request, response) {
@@ -39,6 +39,7 @@ export default class SupplierController {
         name: name,
         email: email,
         phone: phone,
+        excludedStatus: false
       };
 
       const supplierValidated = await Supplier.validatedSupplierData(supplier);

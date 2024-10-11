@@ -1,5 +1,5 @@
 import { z } from "zod";
-import Batch from "../models/Batch";
+import Batch from "../service/BatchService";
 
 export default class BatchController {
   static async findAll(request, response) {
