@@ -1,5 +1,3 @@
-import Category from "./Category";
-
 /**
  * Represents a Product with various attributes.
  */

@@ -1,8 +1,8 @@
 /* eslint-disable no-debugger */
 import { useContext, useEffect, useRef, useState } from "react";
-import { performFetch, performFetchNoResult } from "../apiBase";
 import { DEBUG_LOCAL, MainContext } from "../App";
 import { ENTITIES } from "../utils/debug-local-helper";
+import UsersActions from "../Service/Users/UsersActions";
 
 export default function useUsers() {
 
@@ -42,7 +42,7 @@ export default function useUsers() {
       return setUsers(users);
     }
     try {
-      const users = await performFetch("/users", {method: 'GET'});
+      const users = await UsersActions.getAll();
       setUsers(users);
     } catch (error) {
       console.log(error.message);
@@ -57,7 +57,7 @@ export default function useUsers() {
     }
 
     try {
-      const newItem = await performFetch("/users/new", {method: 'POST', body: JSON.stringify(obj)});
+      const newItem = await UsersActions.create(obj);
       if(typeof newItem === 'string') {
         handleOpenSnackBar("error", newItem, 3500);
         return;
@@ -79,7 +79,7 @@ export default function useUsers() {
       return updateData(ENTITIES.ACCOUNTS, nextUsers);
     }
     try {
-      const newItem = await performFetch("/users/update", {method: 'PUT', body: JSON.stringify(sup)});
+      const newItem = await UsersActions.update(sup);
       
       if(typeof newItem === 'string') {
         handleOpenSnackBar("error", newItem, 3500);
@@ -101,16 +101,15 @@ export default function useUsers() {
    * @param {*} id 
    */
   async function handleDeleteUser(id) {
-    const url = "/users/delete";
+    try {
+      await UsersActions.delete(id);
 
-    performFetchNoResult(url, {method: 'DELETE', body: JSON.stringify(id)})
-    .then(() => {
       const usersList = users.filter(cat => cat.id !== id.id);
       setUsers(usersList);
       handleOpenSnackBar("success", "Usuário apagado com sucesso!!", 3500)
-    })
-    .catch(e => handleOpenSnackBar("error", e.message, 3500))
-    ;
+    } catch (e) {
+      handleOpenSnackBar("error", e.message, 3500);
+    }
   }
 
   return {

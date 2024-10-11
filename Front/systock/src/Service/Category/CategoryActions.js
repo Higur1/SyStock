@@ -19,7 +19,7 @@ export default class CategoryActions {
       });
   }
 
-  static async post(cat = new Category({})) {
+  static async create(cat = new Category({})) {
     const Client = new HTTPClient("/category");
 
     return Client.post(this.mapper.toServer(cat)).then(this.mapper.toInterface);
@@ -31,7 +31,7 @@ export default class CategoryActions {
     return Client.get().then(response => this.mapper.toInterface(response.category));
   }
 
-  static async put(cat = new Category({})) {
+  static async update(cat = new Category({})) {
     const Client = new HTTPClient("/category");
 
     return Client.put(this.mapper.toServerPut(cat))

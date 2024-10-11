@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 
 import { IMaskInput } from "react-imask";
 import InputCustom from "./InputCustom";
-import { useEffect } from "react";
 
 const TextMaskCustom  = React.forwardRef(function TextMaskCustom(props, ref) {
   const { onChange, ...other } = props;

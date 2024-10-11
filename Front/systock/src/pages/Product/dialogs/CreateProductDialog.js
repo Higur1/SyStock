@@ -3,9 +3,9 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import PropTypes from 'prop-types';
 import { CurrencyInput } from "react-currency-mask";
 import styled from "styled-components";
-import { performFetch } from "../../../apiBase";
 import { DEBUG_LOCAL, MainContext } from "../../../App";
 import { ENTITIES } from "../../../utils/debug-local-helper";
+import CategoryActions from "../../../Service/Category/CategoryActions";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
@@ -55,7 +55,7 @@ export default function CreateProductDialog(props) {
       return setTimeout(() => setCategories(categArr), 350);
     }
     try {
-      const categories = await performFetch("/categories", { method: 'GET' });
+      const categories = await CategoryActions.getAll();
       setCategories(categories);
     } catch (error) {
       console.log(error.message);

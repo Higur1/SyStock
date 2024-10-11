@@ -1,5 +1,5 @@
 import { Autocomplete, Button, Chip, Dialog, DialogActions, DialogTitle, IconButton, TextField } from '@mui/material'
-import React, { useState } from 'react'
+import React from 'react'
 import { Container, HeaderContainer, Menu, MenuOption, TableContainer, TableData, TableRow } from './styles'
 import useCategory from '../../hooks/useCategory';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -24,8 +24,8 @@ export default function Category() {
     handleCloseSnackBar,
 
     openCreateCategory, setOpenCreateCategory,
-    menuOption, setMenuOptions,
-    idMenu, setIdMenu,
+    menuOption,
+    idMenu,
     editCategory, setEditCategory,
     deleteCategory, setDeleteCategory,
     handleMenuOptions

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Container, HeaderContainer, Menu, MenuOption, TableContainer, TableData, TableRow } from './Users.styles';
-import { Autocomplete, Button, Chip, IconButton, TextField } from '@mui/material';
+import { Button, IconButton } from '@mui/material';
 
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CustomizedSnackbars from '../../components/CustomizedSnackBar';
@@ -12,8 +12,7 @@ const Users = () => {
     users, 
     openSnackBar, autoHideSnackBar, 
     severitySnackBar, snackMessageSnackBar, 
-    handleCloseSnackBar,
-    createUser, updateUser, handleDeleteUser
+    handleCloseSnackBar
   } = useUsers;
 
   const [openCreateUser, setOpenCreateUser] = useState(false);

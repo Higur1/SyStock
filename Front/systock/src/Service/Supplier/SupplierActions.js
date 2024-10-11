@@ -6,7 +6,7 @@ import SupplierMappers from "./Mappers/SupplierMappers";
 export default class SupplierActions {
   static mapper = new SupplierMappers();
 
-  async getAll() {
+  static async getAll() {
     const Client = new HTTPClient("/suppliers");
 
     return Client.get()
@@ -19,26 +19,26 @@ export default class SupplierActions {
       });
   }
 
-  async post(supp = new Supplier({})) {
+  static async create(supp = new Supplier({})) {
     const Client = new HTTPClient("/supplier");
 
     return Client.post(this.mapper.toServer(supp)).then(response => this.mapper.toInterface(response.supplier));
   }
 
-  async getById(id) {
+  static async getById(id) {
     const Client = new HTTPClient(`/supplier/${id}`);
 
     return Client.get().then(response => this.mapper.toInterface(response.supplier));
   }
 
-  async put(sup = new Supplier({})) {
+  static async update(sup = new Supplier({})) {
     const Client = new HTTPClient("/supplier");
 
     return Client.put(this.mapper.toServer(sup))
       .then(response => this.mapper.toInterface(response.supplier));
   }
 
-  async delete(id) {
+  static async delete(id) {
     const Client = new HTTPClient("/supplier");
 
     return Client.delete({id});

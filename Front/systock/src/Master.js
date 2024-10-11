@@ -15,7 +15,7 @@ import SupportPage from './pages/Support/SupportPage'
 export default function Master() {
   return (
     <MainContext.Consumer>
-      {({ isLoggedIn, actions }) => {
+      {({ isLoggedIn }) => {
 
         return (
           <div style={{ padding: "0px", flex: isLoggedIn ? 0 : 1, position: 'relative' }}>

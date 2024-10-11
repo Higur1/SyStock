@@ -3,8 +3,8 @@ import { FormContainer, Main, ResetPasswordContainer, TextContainer } from './Re
 import InputCustom from '../../../components/common/InputCustom/InputCustom';
 import { CircularProgress, InputAdornment } from '@mui/material';
 import { Key, Visibility, VisibilityOff } from '@mui/icons-material';
-import { performFetchNoResult } from '../../../apiBase';
 import ButtonCustom from '../../../components/common/ButtonCustom/ButtonCustom';
+import UsersActions from '../../../Service/Users/UsersActions';
 
 const ResetPassword = () => {
 
@@ -29,10 +29,7 @@ const ResetPassword = () => {
     } 
 
     try {
-      const response = await performFetchNoResult("/reset/password", {
-        method: "POST", 
-        body: JSON.stringify({token, user_password: password})
-      });
+      const response = await UsersActions.resetPassword({token, user_password: password});
 
       console.log(response);
 

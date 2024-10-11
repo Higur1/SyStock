@@ -1,10 +1,9 @@
 /* eslint-disable no-debugger */
 import { useContext, useEffect, useRef, useState } from "react";
 import { deepCopy } from "../utils/utils";
-import { performFetch, performFetchNoResult } from "../apiBase";
 import { DEBUG_LOCAL, MainContext } from "../App";
-import { products } from "../utils/data";
 import { ENTITIES } from "../utils/debug-local-helper";
+import CategoryActions from "../Service/Category/CategoryActions";
 
 export default function useCategory() {
 
@@ -57,7 +56,7 @@ export default function useCategory() {
       return setTimeout(() => setCategories(categArr), 350);
     }
     try {
-      const { categories } = await performFetch("/categories", {method: 'GET'});
+      const categories = await CategoryActions.getAll();
       setCategories(categories);
     } catch (error) {
       console.log(error.message);
@@ -107,11 +106,7 @@ export default function useCategory() {
     if(DEBUG_LOCAL) return insertCategory(obj);     
 
     try {
-      const newItem = await performFetch("/category", {method: 'POST', body: JSON.stringify(obj)});
-      if(typeof newItem === 'string') {
-        handleOpenSnackBar("error", newItem, null);
-        return;
-      }
+      const newItem = await CategoryActions.create(obj);
 
       insertCategory(newItem);
       setOpenCreateCategory(false);
@@ -127,8 +122,7 @@ export default function useCategory() {
   async function handleUpdateCategory(category) {
     if(DEBUG_LOCAL) return insertCategory(category);     
     try {
-      const newItem = await performFetch("/category", {method: 'PUT', body: JSON.stringify(category)});
-      
+      const newItem = await CategoryActions.update(category);
       if(typeof newItem === 'string') {
         handleOpenSnackBar("error", newItem, 3500);
         return;
@@ -152,17 +146,15 @@ export default function useCategory() {
       setCategories(updatedCategories);
       return updateData(ENTITIES.CATEGORIES, updatedCategories);
     }
-    const url = "/category";
 
-    performFetchNoResult(url, {method: 'DELETE', body: JSON.stringify(id)})
-    .then(() => {
+    try {
+      await CategoryActions.delete(id);
+
       const updatedCategories = categories.filter(cat => cat.id !== id.id);
       setCategories(updatedCategories);
-      
-    handleOpenSnackBar("success", "Categoria apagada com sucesso!!", 3500);
-    })
-    .catch(e => handleOpenSnackBar("error", e.message, 3500))
-    ;
+    } catch (e) {
+      handleOpenSnackBar("error", e.message, 3500);
+    }
   }
 
   return {

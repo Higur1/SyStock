@@ -22,7 +22,7 @@ export default class ProductActions {
       });
   }
 
-  static async post(supp = new Product({})) {
+  static async create(supp = new Product({})) {
     const Client = new HTTPClient("/product");
 
     try {
@@ -51,7 +51,7 @@ export default class ProductActions {
     }
   }
 
-  static async put(sup = new Product({})) {
+  static async update(sup = new Product({})) {
     const Client = new HTTPClient("/product");
     try {
       const nextProduct = Client.put(this.mapper.toServer(sup, "PUT")).then(response => response.product);

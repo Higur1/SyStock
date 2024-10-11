@@ -73,3 +73,59 @@ export default class Batch extends Product {
     this.supplier = supplier;
   }
 }
+
+export class Batch2 {
+  /**
+   * Creates an instance of Batch.
+   * @param {Object} options - The options for the Batch instance.
+   * @param {Number} [options.id= 0] - The id of this batch.
+   * @param {Product} [options.product=new Product()] - The product associated with this batch.
+   * @param {Date|null} [options.expiry=null] - The expiry date of the batch, or null if not applicable.
+   * @param {Boolean} [options.deleteStatus=false] - The deleteStatus;
+   * @param {Number} [options.validateStatus=0] - The validateStatus;
+   */
+  constructor({ id = 0, expiry = null, deleteStatus = false, product = new Product(), validateStatus = 0 } = {}) {
+    /**
+     * The buying price of the batch.
+     * @type {Number}
+     */
+    this.id = id;
+
+    /**
+     * The expiry date of the batch.
+     * @type {Date|null}
+     */
+    this.expiry = expiry;
+
+    /**
+     * delete Status.
+     * @type {Boolean}
+     */
+    this.deleteStatus = deleteStatus;
+
+    /**
+     * product related.
+     * @type {Product|null}
+     */
+    this.product = product;
+
+    /**
+     * valdiate Status.
+     * @type {Number}
+     */
+    this.validateStatus = validateStatus;
+  }
+
+  expiryToString() {
+    if(this.expiry === null) return "";
+
+    const date = new Date(this.expiry);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+
+    const formatDate = `${day}/${month}/${year}`;
+
+    return formatDate;
+  }
+}

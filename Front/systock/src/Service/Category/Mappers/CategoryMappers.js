@@ -1,4 +1,3 @@
-import Account from "../../../classes/Account";
 import Category from "../../../classes/Category";
 
 export default class CategoryMappers {

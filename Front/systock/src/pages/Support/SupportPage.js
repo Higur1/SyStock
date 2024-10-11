@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogContent, DialogTitle, Divider, Fab, IconButton, Paper } from '@mui/material'
+import { Button, Dialog, DialogContent, DialogTitle, Divider, Fab, IconButton } from '@mui/material'
 import React, { useState } from 'react'
 import styled from 'styled-components';
 import Logo from '../../components/common/Logo';

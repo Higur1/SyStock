@@ -1,7 +1,6 @@
-import { Backdrop, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputAdornment, InputLabel, MenuItem, Select, Slide, TextField } from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
+import { Backdrop, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Slide, TextField } from "@mui/material";
+import React, { useState } from "react";
 import PropTypes from 'prop-types';
-import { CurrencyInput } from "react-currency-mask";
 import styled from "styled-components";
 
 const Transition = React.forwardRef(function Transition(props, ref) {

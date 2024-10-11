@@ -1,8 +1,8 @@
 /* eslint-disable no-debugger */
 import { useContext, useEffect, useRef, useState } from "react";
-import { performFetch, performFetchNoResult } from "../apiBase";
 import { DEBUG_LOCAL, MainContext } from "../App";
 import { ENTITIES } from "../utils/debug-local-helper";
+import SupplierActions from "../Service/Supplier/SupplierActions";
 
 export default function useSupplier() {
 
@@ -93,7 +93,7 @@ export default function useSupplier() {
       return setSuppliers(suppliers);
     }
     try {
-      const obj = await performFetch("/suppliers", {method: 'GET'});
+      const obj = await SupplierActions.getAll();
       const suppliers = obj.suppliers;
       setSuppliers(suppliers.map(sup => {
         const Phone = sup.Phone.map((phone, index) => ({...phone, isSelected: index === 0}));
@@ -118,7 +118,7 @@ export default function useSupplier() {
     const sup = convertSupplierDialogToBody(obj);
 
     try {
-      const newItem = await performFetch("/supplier", {method: 'POST', body: JSON.stringify(sup)});
+      const newItem = await SupplierActions.create(sup);
       if(typeof newItem === 'string') {
         handleOpenSnackBar("error", newItem, 3500);
         return;
@@ -150,7 +150,7 @@ export default function useSupplier() {
     const sup = convertSupplierDialogToBody(obj);
 
     try {
-      const newItem = await performFetch("/supplier", {method: 'PUT', body: JSON.stringify(sup)});
+      const newItem = await SupplierActions.update(sup);
       
       if(typeof newItem === 'string') {
         handleOpenSnackBar("error", newItem, 3500);
@@ -179,15 +179,14 @@ export default function useSupplier() {
       setSuppliers(nextSuppliers);
       return updateData(ENTITIES.SUPPLIERS);
     }
-    const url = "/supplier";
 
-    performFetchNoResult(url, {method: 'DELETE', body: JSON.stringify(id)})
-    .then(() => {
+    try {
+      await SupplierActions.delete(id);
       setSuppliers(prevState => prevState.filter(cat => cat.id !== id.id));
-      handleOpenSnackBar("success", "Fornecedor apagado com sucesso!!", 3500)
-    })
-    .catch(e => handleOpenSnackBar("error", e.message, 3500))
-    ;
+      handleOpenSnackBar("success", "Fornecedor apagado com sucesso!!", 3500);
+    } catch (e) {
+      handleOpenSnackBar("error", e.message, 3500);
+    }
   }
 
   function handleChangeSelectedPhone(value, index) {

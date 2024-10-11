@@ -31,7 +31,7 @@ export default class BatchActions {
     return Client.get().then(response => this.mapper.toInterface(response.batch));
   }
 
-  static async put(batch = new Batch({})) {
+  static async update(batch = new Batch({})) {
     const Client = new HTTPClient("/batch");
 
     return Client.put(this.mapper.toServer(batch))

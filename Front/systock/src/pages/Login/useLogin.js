@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
-import { performFetch, performFetchNoResult } from "../../apiBase";
 import { ENTITIES } from "../../utils/debug-local-helper";
 import { DEBUG_LOCAL, MainContext } from "../../App";
+import UsersActions from "../../Service/Users/UsersActions";
 
 export const useLogin = () => {
 
@@ -72,12 +72,8 @@ export const useLogin = () => {
     }
 
     try {
-      const result = await performFetch("/auth", {
-        method: "POST", 
-        body: JSON.stringify({user_login: user, user_password: password})
-      });
-      console.log(result);
-      window.localStorage.setItem('tokenLogin', result.token);
+      const token = await UsersActions.login({user_login: user, user_password: password});
+      window.localStorage.setItem('tokenLogin', token);
       window.location.pathname = 'home';
     } catch {
       setError({
@@ -94,10 +90,7 @@ export const useLogin = () => {
       setError({...error, email: ''});
 
       try {
-        const response = await performFetchNoResult("/recovery", {
-          method: "POST", 
-          body: JSON.stringify({email, instance})
-        });
+        const response = await UsersActions.recovery({email, instance});
         console.log('onReset', response.ok);
 
         if(!response.ok) {

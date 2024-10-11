@@ -32,7 +32,8 @@ export default class HTTPClient {
       method,
       headers: {
         ...contentJSON,
-        ...headers
+        "Authorization" : `Bearer ${window.localStorage.getItem('tokenLogin')}`,
+        ...headers,
       }
     };
 
@@ -43,7 +44,15 @@ export default class HTTPClient {
 
       if (!response.ok) throw new Error(`Erro: ${response.statusText}`);
 
+      const contentType = response.headers.get("Content-Type");
+    
+    if (!contentType) {
+      return null;
+    } else if (contentType.includes("application/json")) {
       return await response.json();
+    } else {
+      return await response.text();
+    }
     } catch (error) {
       console.error("Error:", error);
       throw error;

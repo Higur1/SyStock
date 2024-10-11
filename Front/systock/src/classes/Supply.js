@@ -1,5 +1,3 @@
-import Batch from "./Batch";
-import Supplier from "./Supplier";
 
 /**
  * Represents a Supply with batches and a description.

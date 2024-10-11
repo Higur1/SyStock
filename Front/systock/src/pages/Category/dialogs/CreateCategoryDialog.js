@@ -1,5 +1,5 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, Slide, TextField } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Slide, TextField } from "@mui/material";
+import React, { useState } from "react";
 import styled from "styled-components";
 import PropTypes from 'prop-types';
 
@@ -21,7 +21,7 @@ const Container = styled.div`
 `
 
 export default function CreateCategoryDialog(props) {
-  const { open, handleClose, createCategory, handleCloseSnackBar } = props;
+  const { open, handleClose, createCategory } = props;
 
   const [categoryLabel, setCategoryLabel] = useState('');
   const [hasError, setHasError] = useState(false);

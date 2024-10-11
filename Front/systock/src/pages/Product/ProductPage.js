@@ -4,8 +4,8 @@ import { DEBUG_LOCAL, MainContext } from '../../App';
 import { FILTER_TYPES } from './tabs/productList';
 import { convertMsToDay, extraDateToString } from '../../utils/utils';
 import { ENTITIES } from '../../utils/debug-local-helper';
-import { performFetch, performFetchNoResult } from '../../apiBase';
 import { SuperArray } from '../../utils/arrayFunctions';
+import ProductActions from '../../Service/Product/ProductActions';
 
 export const ProductContext = createContext();
 
@@ -153,7 +153,7 @@ export default function ProductPage() {
       return setProductsBase(products);
     }
     try {
-      const products = await performFetch("/products", { method: 'GET' });
+      const products = await ProductActions.getAll();
       setFilteredProducts(products);
       setProductsBase(products);
     } catch (error) {
@@ -170,8 +170,7 @@ export default function ProductPage() {
       return updateData(ENTITIES.PRODUCTS, nextProducts);
     }
     try {
-      const prod = await performFetch("/products/new", { method: 'POST', body: JSON.stringify(product) });
-
+      const prod = await ProductActions.create(product);
 
       const productss = [...productsBase, prod]
       setFilteredProducts(productss);
@@ -191,8 +190,8 @@ export default function ProductPage() {
     }
 
     try {
-      await performFetchNoResult("/products/update", { method: 'PUT', body: JSON.stringify(product) });
-      const newProducts = productsBase.map(p => (p.refCode === product.refCode ? { ...product } : { ...p }));
+      const nextProduct = await ProductActions.update(product);
+      const newProducts = productsBase.map(p => (p.refCode === nextProduct.refCode ? nextProduct : { ...p }));
 
       setProductsBase(newProducts);
       setFilteredProducts(newProducts);
@@ -215,15 +214,14 @@ export default function ProductPage() {
       return updateData(ENTITIES.PRODUCTS, nextProducts);
     }
 
-    const url = "/products/delete";
-
-    performFetchNoResult(url, { method: 'DELETE', body: JSON.stringify(obj.id) })
-      .then(() => {
-        const updatedProducts = productsBase.filter(cat => cat.id !== obj.id);
-        setFilteredProducts(updatedProducts);
-        setProductsBase(updatedProducts);
-      })
-      .catch(e => handleOpenSnackBar("error", e.message, 3500));
+    try {
+      await ProductActions.delete(obj.id);
+      const updatedProducts = productsBase.filter(cat => cat.id !== obj.id);
+      setFilteredProducts(updatedProducts);
+      setProductsBase(updatedProducts);
+    } catch (e) {
+      handleOpenSnackBar("error", e.message, 3500);
+    }
   }
 
   function handleFilter(value) {

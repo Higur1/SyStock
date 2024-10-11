@@ -1,5 +1,3 @@
-import { generateID } from "../utils/utils";
-
 /**
  * Represents a Category with an ID and a name.
  */

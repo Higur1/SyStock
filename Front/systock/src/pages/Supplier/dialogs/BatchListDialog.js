@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { performFetch } from '../../../apiBase';
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import styled from 'styled-components';
 import VirtualizedTableCustom from '../../../components/VirtualizedTableCustom';
+import BatchActions from '../../../Service/Batch/BatchActions';
 
 const Title = styled('div')({
   fontSize: 24,
@@ -48,8 +48,7 @@ function BatchListDialog(props) {
 
   async function getBatchs() {
     try {
-      const obj = await performFetch(`/supplier/batchs/${id}`, {method: 'GET'});
-      const batchs = obj;
+      const batchs = await BatchActions.getAll();
       if(batchs.length === 0) return;
       setBatchs(batchs);
     } catch (error) {

@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import CategoryIcon from '@mui/icons-material/Category';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import SettingsIcon from '@mui/icons-material/Settings';
-import DashboardIcon from '@mui/icons-material/Dashboard';
 import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
 import HomeIcon from '@mui/icons-material/Home';
@@ -14,7 +13,7 @@ import Supply from '../../images/parcela.png';
 import { SvgIcon } from '@mui/material';
 import { LocalAtm, Visibility } from '@mui/icons-material';
 
-const IconCustom = ({ type, color = "#424242" }) => {
+const IconCustom = ({ type }) => {
 
   switch (type) {
     case 'home': {

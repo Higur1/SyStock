@@ -1,5 +1,3 @@
-import Batch from "../classes/Batch";
-import { products, suppliers } from "./data";
 
 export function deepCopy(object) {
   return JSON.parse(JSON.stringify(object));
