@@ -1,12 +1,12 @@
-import Category from "../../../classes/Category";
-import HTTPClient from "../../../utils/HTTPClient";
-import CategoryMappers from "./CategoryMappers";
+import Category from "../../classes/Category";
+import HTTPClient from "../../utils/HTTPClient";
+import CategoryMappers from "./Mappers/CategoryMappers";
 
 
 export default class CategoryActions {
-  mapper = new CategoryMappers();
+  static mapper = new CategoryMappers();
 
-  async getAll() {
+  static async getAll() {
     const Client = new HTTPClient("/categories");
 
     return Client.get()
@@ -19,26 +19,26 @@ export default class CategoryActions {
       });
   }
 
-  async post(cat = new Category({})) {
+  static async post(cat = new Category({})) {
     const Client = new HTTPClient("/category");
 
     return Client.post(this.mapper.toServer(cat)).then(this.mapper.toInterface);
   }
 
-  async getById(id) {
+  static async getById(id) {
     const Client = new HTTPClient(`/category/${id}`);
 
     return Client.get().then(response => this.mapper.toInterface(response.category));
   }
 
-  async put(cat = new Category({})) {
+  static async put(cat = new Category({})) {
     const Client = new HTTPClient("/category");
 
     return Client.put(this.mapper.toServerPut(cat))
       .then(response => this.mapper.toInterface(response.category));
   }
 
-  async delete(id) {
+  static async delete(id) {
     const Client = new HTTPClient("/funcionario");
 
     return Client.delete({id});

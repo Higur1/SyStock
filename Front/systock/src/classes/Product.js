@@ -14,8 +14,9 @@ export default class Product {
    * @param {number} [options.priceBaseBuy=0] - The base buying price of the product.
    * @param {number} [options.minimumQuantity=0] - The minimum quantity required for the product.
    * @param {string} [options.description=""] - The description of the product.
+   * @param {number} [options.totalQuantity=0] - Total Quantity in stock
    */
-  constructor({ name = "", refCode = "", category = null, priceBaseSell = 0, priceBaseBuy = 0, minimumQuantity = 0, description = "" } = {}) {
+  constructor({ name = "", refCode = "", category = null, priceBaseSell = 0, priceBaseBuy = 0, minimumQuantity = 0, description = "", totalQuantity = 0 } = {}) {
     /**
      * The name of the product.
      * @type {string}
@@ -57,5 +58,11 @@ export default class Product {
      * @type {string}
      */
     this.description = description;
+
+    /**
+     * Total QUantity
+     * @type {number}
+     */
+    this.totalQuantity = totalQuantity;
   }
 }

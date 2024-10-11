@@ -4,9 +4,9 @@ import HTTPClient from "../../utils/HTTPClient";
 import UsersMappers from "./Mappers/UsersMappers";
 
 export default class UsersActions {
-  mapper = new UsersMappers();
+  static mapper = new UsersMappers();
 
-  async getAll() {
+  static async getAll() {
     const ClientUsers = new HTTPClient("/users");
 
     return ClientUsers.get()
@@ -19,44 +19,44 @@ export default class UsersActions {
       });
   }
 
-  async post(user = new Account({})) {
+  static async post(user = new Account({})) {
     const ClientUser = new HTTPClient("/user");
 
     return ClientUser.post(this.mapper.toServer(user)).then(this.mapper.toInterface);
   }
 
-  async put(user = new Account({})) {
+  static async put(user = new Account({})) {
     const ClientUser = new HTTPClient("/user");
 
     return ClientUser.put(this.mapper.toServerPut(user))
       .then(response => this.mapper.toInterface(response.user));
   }
 
-  async putMail(user = new Account({})) {
+  static async putMail(user = new Account({})) {
     const Client = new HTTPClient("/user/editEmail");
 
     return Client.patch(this.mapper.toServerPutMail(user));
   }
 
-  async putPassword(user = new Account({})) {
+  static async putPassword(user = new Account({})) {
     const Client = new HTTPClient("/user/editPassword");
 
     return Client.patch(this.mapper.toServerPutMail(user));
   }
 
-  async delete(id) {
+  static async delete(id) {
     const Client = new HTTPClient("/funcionario");
 
     return Client.delete({id});
   }
 
-  async login(obj) {
+  static async login(obj) {
     const Client = new HTTPClient("/auth");
 
     return Client.post(obj);
   }
 
-  async recovery(obj) {
+  static async recovery(obj) {
     const Client = new HTTPClient("/recovery");
 
     return Client.post(obj);
