@@ -21,30 +21,11 @@ export default class UserService {
       return { status: false, error: error };
     };
   };
-  static async findAllFuncionarios() {
-    try {
-      const listOfFuncionarios = await prisma.user.findMany({
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          login: true,
-        },
-        where: {
-          excludedStatus: false,
-          user_type: 2,
-        },
-      });
-      return listOfFuncionarios.length > 0
-        ? { status: true, listOfFuncionarios }
-        : { status: true, listOfFuncionarios: {} };
-    } catch (error) {
-      return { status: false, error: error };
-    };
-  };
+
   static async createEmployee(userData: User) {
     try {
-      const verifyUserExists = await UserService.findUser(userData.email, userData.login);
+      const verifyUserExists = await UserService.findUser(userData);
+      
       if (verifyUserExists.user == undefined) {
         const pre_User = await prisma.pre_User.findFirst({
           where: {
@@ -94,11 +75,11 @@ export default class UserService {
       return { status: false, error: error };
     };
   };
-  static async findUser(email: string, login: string) {
+  static async findUser(userData: User) {
     try {
       const user = await prisma.user.findFirst({
         where: {
-          OR: [{ email: email }, { login: login }],
+          OR: [{ email: userData.email }, { login: userData.login }],
         },
       });
       return user != null
@@ -108,12 +89,12 @@ export default class UserService {
       return { status: false, error: error };
     };
   };
-  static async findNameStartWith(name: string) {
+  static async findNameStartWith(userData: User) {
     try {
       const user = await prisma.user.findFirst({
         where: {
           name: {
-            startsWith: name,
+            startsWith: userData.name,
           },
         },
         select: {
@@ -130,11 +111,11 @@ export default class UserService {
       return { status: false, error: error };
     };
   };
-  static async findName(name: string) {
+  static async findName(userData: User) {
     try {
       const user = await prisma.user.findFirst({
         where: {
-          name: name,
+          name: userData.name,
         },
         select: {
           id: true,
@@ -150,11 +131,11 @@ export default class UserService {
       return { status: false, error: error };
     };
   };
-  static async findUserById(id: number) {
+  static async findUserById(userData: User) {
     try {
       const user = await prisma.user.findFirst({
         where: {
-          id: id,
+          id: userData.id,
         },
       });
       return user != null
@@ -164,9 +145,9 @@ export default class UserService {
       return { status: false, error: error };
     };
   };
-  static async findUserByTypeId(id : number) {
+  static async findEmployees() {
     try {
-      const listOfUsers = await prisma.user.findMany({
+      const listOfEmployees = await prisma.user.findMany({
         where: {
           user_type: 2,
         },
@@ -177,9 +158,9 @@ export default class UserService {
           user_type: true,
         },
       });
-      return listOfUsers != null
-        ? { status: true, listOfUsers: listOfUsers }
-        : { status: true, listOfUsers: undefined };
+      return listOfEmployees != null
+        ? { status: true, listOfEmployees: listOfEmployees }
+        : { status: true, listOfEmployees: {}};
     } catch (error) {
       return { status: false, error: error };
     };

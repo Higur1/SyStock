@@ -48,24 +48,17 @@ export default class BatchService {
             return { status: false, error: error }
         };
     };
-    static async findByProduct(idProduct : number) {
+    static async findByProduct(batchData: Batch) {
         try {
             const batch = await prisma.batch.findMany({
-                include: {
-                    product_id_fk: {
-                        select: {
-                            excludedStatus: false
-                        }
-                    }
-                },
                 where: {
                     AND: {
-                        product_id: idProduct,
+                        product_id: batchData.product_id
                     },
-
                 },
-                orderBy: {
-
+                select:{
+                    expirationDate: true,
+                    quantity: true,
                 }
             });
             return { status: true, batch: batch };
@@ -73,38 +66,11 @@ export default class BatchService {
             return { status: false, error: error };
         };
     };
-    static async findBySupplier(supplier_id) {
-        try {
-            const batch = await prisma.$queryRaw
-                `
-                SELECT b.id as batch_id, p.name as product_name, s.name as supplier_name, b.quantity as product_quantity
-                FROM product p 
-                INNER JOIN batch b 
-                ON p.id = b.product_id
-                INNER JOIN supplier s
-                ON b.supplier_id = s.id
-                WHERE b.supplier_id = ${supplier_id}
-            `;
-            return { status: true, batch: batch };
-        } catch (error) {
-            return { status: false, error: error };
-        };
-    };
-    //Arrumar
     static async findBatch(batchData: Batch) {
         try {
             const batch = await prisma.batch.findFirst({
-                include: {
-                    product_id_fk: {
-                        select: {
-                            excludedStatus: false
-                        }
-                    }
-                },
                 where: {
-                    AND: {
-                        product_id: batchData.product_id,
-                    },
+                    id: batchData.id
                 }
             });
             return { status: true, batch: batch };

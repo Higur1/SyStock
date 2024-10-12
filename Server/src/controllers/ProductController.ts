@@ -1,10 +1,13 @@
-import Product from "../service/ProductService";
-import { z } from "zod";
+import productService from "../service/ProductService";
+import Product from "../models/Product";
+
+import { number, z } from "zod";
+import Decimal from "decimal.js";
 
 export default class ProductController {
   static async findAll(request, response) {
     try {
-      const products = await Product.findAll();
+      const products = await productService.findAll();
 
       if (products.status) {
         response.status(200).send(
@@ -31,8 +34,8 @@ export default class ProductController {
     try {
       const productValidation = z.object({
         name: z.string().trim().min(2).max(20),
-        price: z.number().positive(),
-        costPrice: z.number().positive(),
+        price: z.number().positive().refine((val) => val % 1 !==0),
+        costPrice: z.number().positive().refine((val) => val % 1 !==0),
         minimunQuantity: z.number().positive(),
         observation: z.string().max(30).optional(),
         category_id: z.number().positive()
@@ -40,19 +43,21 @@ export default class ProductController {
       const { name, price, costPrice , minimunQuantity, observation, category_id} =
         productValidation.parse(request.body);
 
-      const product = {
+      const productData: Product = {
         name,
-        price,
-        costPrice,
+        excludedStatus: false,
+        price: new Decimal(price),
+        costPrice: new Decimal(costPrice),
         minimunQuantity,
         observation,
+        totalQuantityInStock: 0,
         category_id
       };
 
-      const productCreated = await Product.create(product);
+      const productCreated = await productService.create(productData);
 
       if (productCreated.status) {
-        if(productCreated.productAlredyExists){
+        if(productCreated.message){
           response.status(400).send(
             JSON.stringify({
                 message: "Product alredy exists"
@@ -81,25 +86,34 @@ export default class ProductController {
       );
     };
   };
-
   static async findById(request, response) {
     try {
       const product_id = z.object({
-        id: z.string().trim().min(1),
+        id: z.string().min(1),
       });
       const { id } = product_id.parse(request.params);
-      const product = await Product.findById(Number(id));
+      const productData: Product = {
+        id: Number(id),
+        category_id: 0,
+        costPrice: new Decimal(0),
+        name: "",
+        price: new Decimal(0),
+        minimunQuantity: 0,
+        totalQuantityInStock: 0,
+        excludedStatus: false,
+      }
+      const productResult = await productService.findById(productData);
 
-      if (product.status) {
+      if (productResult.status) {
         response.status(200).send(
           JSON.stringify({
-            product: product.product,
+            product: productResult.product,
           })
         );
       } else {
         response.status(500).send(
           JSON.stringify({
-            error: product.error,
+            error: productResult.error,
           })
         );
       };
@@ -120,7 +134,17 @@ export default class ProductController {
 
       const { category_id } = category.parse(request.params);
 
-      const listProductsByCategory = await Product.findByCategory(Number(category_id));
+      const productData: Product = {
+        category_id: Number(category_id),
+        costPrice: new Decimal(0),
+        name: "",
+        price: new Decimal(0),
+        minimunQuantity: 0,
+        totalQuantityInStock: 0,
+        excludedStatus: false,
+      }
+
+      const listProductsByCategory = await productService.findByCategory(productData);
 
       if(listProductsByCategory.status){
         response.status(200).send(
@@ -154,25 +178,26 @@ export default class ProductController {
         costPrice: z.number().positive(),
         minimunQuantity: z.number().positive(),
         observation: z.string().trim().max(30),
-        category_id: z.number().positive().optional(),
+        category_id: z.number().positive(),
       });
 
       const { id, name, price, costPrice, minimunQuantity, observation, category_id} = productValidation.parse(request.body);
 
-      const product = {
-        id,
-        name,
-        price,
-        costPrice,
-        minimunQuantity,
-        observation,
-        category_id
+      const productData: Product = {
+        id: id,
+        name: name,
+        price: new Decimal(price),
+        costPrice: new Decimal(costPrice),
+        minimunQuantity: minimunQuantity,
+        observation: observation,
+        category_id: category_id,
+        excludedStatus: false,
       }
 
-      const verifyDuplicateName = await Product.verifyDuplicateName(name);
+      const verifyDuplicateName = await productService.findByName(productData);
    
-      if(!verifyDuplicateName.exists || verifyDuplicateName.product?.id == product.id){
-        const productUpdated = await Product.update(product);
+      if(!verifyDuplicateName.exists || verifyDuplicateName.product?.id == productData.id){
+        const productUpdated = await productService.update(productData);
 
         if(productUpdated.status){
           response.status(200).send(
@@ -188,7 +213,7 @@ export default class ProductController {
           );
         }
       }else{
-        response.status(409).send(
+        response.status(200).send(
           JSON.stringify({
             message: "could not update product, name already exists"
           })
@@ -209,7 +234,16 @@ export default class ProductController {
         id: z.number().positive(),
       });
       const { id } = product_id.parse(request.body);
-      const productDeleted = await Product.delete(id);
+      
+      const productData: Product = {
+        id: id,
+        category_id: 0,
+        costPrice: new Decimal(0),
+        name: "",
+        price: new Decimal(0),
+        minimunQuantity: 0,
+      }
+      const productDeleted = await productService.delete(productData);
 
       if (productDeleted.status) {
         response.status(200);

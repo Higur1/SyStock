@@ -3,7 +3,7 @@ interface IUser{
     login: string;
     password: string;
     email: string;
-    excludedStatus: boolean;
+    excludedStatus?: boolean;
 }
 class User{
     id?: number
@@ -11,7 +11,7 @@ class User{
     login: string
     password: string
     email: string
-    excludedStatus: boolean
+    excludedStatus?: boolean
 
     public constructor({
         name, 

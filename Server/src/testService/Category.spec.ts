@@ -1,4 +1,4 @@
-import category from "../service/Category"
+import category from "../service/CategoryService"
 import Category from "../models/Category";
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "@jest/globals";
 

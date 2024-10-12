@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeAll, afterAll } from "@jest/globals";
-import Product from "../entities/Product";
-import product from "../models/Product";
-import category from "../models/Category"
-import Category from "../entities/Category";
+import Product from "../models/Product";
+import product from "../service/ProductService";
+import category from "../service/CategoryService"
+import Category from "../models/Category";
 import Decimal from "decimal.js"
 
 describe("Create Product model", () => {

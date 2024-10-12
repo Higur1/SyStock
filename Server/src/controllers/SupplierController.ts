@@ -1,10 +1,11 @@
 import { z } from "zod";
-import Supplier from "../service/SupplierService";
+import supplierService from "../service/SupplierService";
+import Supplier from "../models/Supplier";
 
 export default class SupplierController {
   static async findAll(request, response) {
     try {
-      const suppliers = await Supplier.findAll();
+      const suppliers = await supplierService.findAll();
       if (suppliers.status) {
         response.status(200).send(
           JSON.stringify({
@@ -12,20 +13,20 @@ export default class SupplierController {
           })
         );
       } else {
-        response.status().send(
+        response.status(500).send(
           JSON.stringify({
             error: suppliers.error,
           })
         );
       }
     } catch (error) {
-      response.status(500).send(
+      response.status(400).send(
         JSON.stringify({
           error: error,
         })
       );
     }
-  }
+  };
   static async create(request, response) {
     try {
       const supplierValidation = z.object({
@@ -35,18 +36,18 @@ export default class SupplierController {
       });
 
       const { name, email, phone } = supplierValidation.parse(request.body);
-      const supplier = {
+      const supplierData = {
         name: name,
         email: email,
         phone: phone,
         excludedStatus: false
       };
 
-      const supplierValidated = await Supplier.validatedSupplierData(supplier);
+      const supplierValidated = await supplierService.validatedSupplierData(supplierData);
 
       if (supplierValidated.status) {
         if (supplierValidated.isValid) {
-          const supplierCreated = await Supplier.create(supplier);
+          const supplierCreated = await supplierService.create(supplierData);
           if (supplierCreated.supplier != null) {
             response.status(201).send(
               JSON.stringify({
@@ -60,7 +61,7 @@ export default class SupplierController {
             })
           );
         }
-        response.status(400).send(
+        response.status(200).send(
           JSON.stringify({
             error: supplierValidated.message,
           })
@@ -74,15 +75,20 @@ export default class SupplierController {
         })
       );
     }
-  }
+  };
   static async findById(request, response) {
     try {
       const supplierValidation = z.object({
         id: z.string().trim(),
       });
       const { id } = supplierValidation.parse(request.params);
-
-      const supplierFound = await Supplier.findById(Number(id));
+      const supplierData: Supplier = {
+        email: "",
+        phone: "",
+        name: "",
+        id: Number(id)
+      };
+      const supplierFound = await supplierService.findById(supplierData);
 
       if (supplierFound.status) {
         if (supplierFound.supplier != undefined) {
@@ -92,7 +98,7 @@ export default class SupplierController {
             })
           );
         }
-        response.status(404).send(
+        response.status(200).send(
           JSON.stringify({
             error: "supplier don't exists",
           })
@@ -112,15 +118,19 @@ export default class SupplierController {
         })
       );
     }
-  }
+  };
   static async findByName(request, response) {
     try {
       const supplierValidation = z.object({
         name: z.string().trim().min(3).max(51),
       });
       const { name } = supplierValidation.parse(request.params);
-
-      const supplierFound = await Supplier.findByName(name);
+      const supplierData: Supplier = {
+        email: "",
+        phone: "",
+        name: name,
+      };
+      const supplierFound = await supplierService.findByName(supplierData);
 
       if (supplierFound.status) {
         if (supplierFound.supplier != undefined) {
@@ -130,7 +140,7 @@ export default class SupplierController {
             })
           );
         }
-        response.status(404).send(
+        response.status(200).send(
           JSON.stringify({
             error: "supplier don't exists",
           })
@@ -150,7 +160,7 @@ export default class SupplierController {
         })
       );
     }
-  }
+  };
   static async update(request, response) {
     try {
       const supplierValidation = z.object({
@@ -161,68 +171,40 @@ export default class SupplierController {
       });
 
       const { id, name, email, phone } = supplierValidation.parse(request.body);
-      const supplier = {
+
+      const supplierData = {
         id: id,
         name: name,
         email: email,
         phone: phone,
       };
-      const supplierExists = await Supplier.validatedSupplierExists(supplier);
-      if (supplierExists.status) {
-        if (!supplierExists.exists) {
-          response.status(404).send(
-            JSON.stringify({
-              error: supplierExists.message,
-            })
-          );
-        }
 
-        const supplierValidated = await Supplier.validatedSupplierData(
-          supplier
-        );
+      const supplierExists = await supplierService.validatedSupplierExists(supplierData);
 
-        if (supplierValidated.status) {
-          if (supplierValidated.isValid) {
-            const supplierUpdated = await Supplier.updateSupplier(supplier);
-            if (supplierUpdated.supplier != null) {
-              response.status(200).send(
-                JSON.stringify({
-                  supplier: supplierUpdated.supplier,
-                })
-              );
-            }
-            response.status(500).send(
-              JSON.stringify({
-                supplier: supplierUpdated.error,
-              })
-            );
-          }
-          response.status(400).send(
-            JSON.stringify({
-              error: supplierValidated.message,
-            })
-          );
-        }
-        response.status(500).send(
-          JSON.stringify({
-            error: supplierValidated.error,
-          })
-        );
-      }
-      response.status(500).send(
-        JSON.stringify({
-          error: supplierExists.error,
-        })
-      );
+      if (!supplierExists.status) {
+        return response.status(200).send(JSON.stringify({
+          message: "Supplier not found"
+        }));
+      };
+
+      const supplierValidationInDataBase = await supplierService.validatedSupplierData(supplierData);
+
+      if (supplierValidationInDataBase.isValid) {
+        const supplierUpdated = await supplierService.update(supplierData);
+        return response.status(200).send(JSON.stringify({
+          supplier: supplierUpdated.supplier
+        }));
+      } else {
+        return response.status(200).send(JSON.stringify({
+          error: supplierValidationInDataBase.message
+        }));
+      };
     } catch (error) {
-      response.status(400).send(
-        JSON.stringify({
-          path: error.issues[0].path,
-          error: error.issues[0].message,
-        })
-      );
-    }
-  }
+      response.status(400).send(JSON.stringify({
+        error: error
+      }));
+    };
+  };
   static async delete(request, response) {
     try {
       const supplierValidation = z.object({
@@ -230,13 +212,20 @@ export default class SupplierController {
       });
       const { id } = supplierValidation.parse(request.body);
 
-      const supplierDeleted = await Supplier.delete(id);
+      const supplierData: Supplier = {
+        id: id,
+        email: "",
+        name: "",
+        phone: ""
+      }
+
+      const supplierDeleted = await supplierService.delete(supplierData);
 
       if (supplierDeleted.status) {
         response.status(200).send(JSON.stringify({}));
       }
       if (supplierDeleted.error.meta.cause.includes("not exist")) {
-        response.status(404).send(
+        response.status(200).send(
           JSON.stringify({
             error: "supplier don't exists",
           })
@@ -255,5 +244,5 @@ export default class SupplierController {
         })
       );
     }
-  }
-}
+  };
+};

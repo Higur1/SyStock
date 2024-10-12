@@ -1,5 +1,5 @@
-import { error } from "console";
-import PreUser from "../service/PreUserService";
+import PreUser from "../models/PreUser";
+import preUserService from "../service/PreUserService"
 import { z } from "zod";
 import dotenv from "dotenv";
 
@@ -7,7 +7,7 @@ dotenv.config();
 export default class PreUserController {
   static async listOfPreUsers(request, response) {
     try {
-      const listOfPreUsers = await PreUser.findAll();
+      const listOfPreUsers = await preUserService.findAll();
 
       if (listOfPreUsers.status) {
         response.status(200).send(
@@ -16,14 +16,14 @@ export default class PreUserController {
           })
         );
       } else {
-        response.status().send(
+        response.status(500).send(
           JSON.stringify({
             error: listOfPreUsers.error,
           })
         );
       }
     } catch (error) {
-      response.status(500).send(
+      response.status(400).send(
         JSON.stringify({
           error: error,
         })
@@ -32,7 +32,7 @@ export default class PreUserController {
   }
   static async create(request, response) {
     try {
-      const preUser = z.object({
+      const preUserValidation = z.object({
         name: z
           .string()
           .trim()
@@ -40,16 +40,20 @@ export default class PreUserController {
           .max(20, "Name required Maximum 20 character(s)"),
         email: z.string().email("Valid e-mail required").trim(),
       });
-      const { name, email } = preUser.parse(request.body);
+      const { name, email } = preUserValidation.parse(request.body);
 
-      const preuserExists = await PreUser.findPreUser(email);
+      const preUserData: PreUser = {
+        name: name,
+        email: email
+      };
 
+      const preuserExists = await preUserService.findPreUser(preUserData);
+     
       if (preuserExists.status && preuserExists.preuser == undefined) {
-        await PreUser.create(name, email).then((preUser) => {
-          response.status(201).send(preUser.preuser);
-        });
+          const preUserCreate = await preUserService.create(preUserData)
+          response.status(201).send(JSON.stringify({PreUser: preUserCreate.preuser}));
       } else {
-        response.status(409).send(
+        response.status(200).send(
           JSON.stringify({
             message:
               "an operation could not be performed email already exists",

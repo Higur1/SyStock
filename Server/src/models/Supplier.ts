@@ -2,15 +2,15 @@ interface ISupplier{
     name: string;
     phone: string;
     email: string;
-    excludedStatus: false;
+    excludedStatus?: false;
 };
 
 class Supplier{
-    id?: Number;
+    id?: number;
     name: string;
     phone: string;
     email: string;
-    excludedStatus: boolean;
+    excludedStatus?: boolean;
 
     private constructor({
         name, 

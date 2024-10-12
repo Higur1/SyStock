@@ -30,7 +30,7 @@ export default class ProductService {
   static async create(productData: Product) {
     try {
       const verifyProductExists = await ProductService.findByName(productData);
-      console.log(verifyProductExists)
+
       if (!verifyProductExists.exists) {
         const productResult = await prisma.product.create({
           data: {
@@ -38,7 +38,7 @@ export default class ProductService {
             price: productData.price,
             costPrice: productData.costPrice,
             minimunQuantity: productData.minimunQuantity,
-            observation: productData.observation,
+            observation: productData.observation ?? "",
             totalQuantityInStock: 0,
             category_id: productData.category_id,
             excludedStatus: false,

@@ -1,14 +1,15 @@
 import Decimal from "decimal.js"
 
 interface IProduct {
+    id?: number;
     name: string;
     price: Decimal;
     costPrice: Decimal;
     minimunQuantity: number;
-    observation: string;
-    totalQuantityInStock: number;
+    observation?: string;
+    totalQuantityInStock?: number;
     category_id: number;
-    excludedStatus: boolean;
+    excludedStatus?: boolean;
 }
 
 class Product {
@@ -17,10 +18,10 @@ class Product {
     price: Decimal
     costPrice: Decimal
     minimunQuantity: number
-    observation: string
-    totalQuantityInStock: number
+    observation?: string
+    totalQuantityInStock?: number
     category_id: number
-    excludedStatus: boolean
+    excludedStatus?: boolean
 
     private constructor({
         name,

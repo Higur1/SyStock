@@ -1,17 +1,15 @@
-import UserService from "../service/UserService";
-import PreUser from "../service/PreUserService";
+import userService from "../service/UserService";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import User from "../models/User";
-import { error } from "console";
 
 dotenv.config();
 
 export default class UserController {
   static async listOfUsers(request, response) {
     try {
-      const listOfUsers = await UserService.findAll();
+      const listOfUsers = await userService.findAll();
 
       if (listOfUsers.status) {
         const _links = generatorHATEOAS("");
@@ -35,16 +33,16 @@ export default class UserController {
         );
     }
   }
-  static async findAllFuncionarios(request, response) {
+  static async findAllEmployees(request, response) {
     try {
-      const listOfFuncionarios = await UserService.findAllFuncionarios();
+      const listOfEmployees = await userService.findEmployees();
 
-      if (listOfFuncionarios.status) {
+      if (listOfEmployees.status) {
         const _links = generatorHATEOAS("");
 
         response.status(200).send(
           JSON.stringify({
-            users: listOfFuncionarios.listOfFuncionarios,
+            users: listOfEmployees.listOfEmployees,
             _links,
           })
         );
@@ -52,7 +50,7 @@ export default class UserController {
         response.status(500).send(
           JSON.stringify({
             message: "An error has occured",
-            error: listOfFuncionarios.error,
+            error: listOfEmployees.error,
           })
         );
       }
@@ -66,17 +64,23 @@ export default class UserController {
   }
   static async findUserByName(request, response) {
     try {
-      const user = z.object({
+      const userValidation = z.object({
         name: z
           .string()
           .trim()
           .min(1, "Name required minimum 1 character(s)")
           .max(20, "Name required maximum 20 character(s)"),
       });
-      const { name } = user.parse(request.params);
-      const token = request.headers.authorization;
+      const { name } = userValidation.parse(request.params);
 
-      const userList = await UserService.findNameStartWith(name);
+      const userData: User = {
+        email: "",
+        login: "",
+        name: name,
+        password: "",
+      }
+
+      const userList = await userService.findNameStartWith(userData);
       if (userList.status) {
         if (userList.user != undefined) {
           response.status(200).send(
@@ -85,9 +89,9 @@ export default class UserController {
             })
           );
         } else {
-          response.status(404).send(
+          response.status(200).send(
             JSON.stringify({
-              message: "Not Found",
+              users: userList.user
             })
           );
         }
@@ -107,50 +111,9 @@ export default class UserController {
       );
     }
   }
-  static async findUserByTypeId(request, response) {
+  static async createEmployee(request, response) {
     try {
-      const user = z.object({
-        type_id: z
-          .string()
-          .trim()
-          .min(1, "type_id required minimum 1 character(s)")
-          .max(1, "type_id required maximum 1 character(s)"),
-      });
-      const { type_id } = user.parse(request.params);
-      const listOfUsers = await UserService.findUserByTypeId(Number(type_id));
-
-      if (listOfUsers.status) {
-        if (listOfUsers.listOfUsers != undefined) {
-          response.status(200).send(
-            JSON.stringify({
-              users: listOfUsers.listOfUsers,
-            })
-          );
-        } else {
-          response.status(404).send(
-            JSON.stringify({
-              message: "Not Found",
-            })
-          );
-        }
-      } else {
-        response.status(500).send(
-          JSON.stringify({
-            error: listOfUsers.error,
-          })
-        );
-      }
-    } catch (error) {
-      response.status(400).send(
-        JSON.stringify({
-          error: error.issues[0].message,
-        })
-      );
-    }
-  }
-  static async createFuncionario(request, response) {
-    try {
-      const funcionarioData = z.object({
+      const employeeValidation = z.object({
         name: z
           .string()
           .trim()
@@ -170,16 +133,21 @@ export default class UserController {
           .max(10, "user_password required maximum 10 character(s)"),
         email: z.string().email("Valid e-mail required").trim(),
       });
-      const { name, login, user_password, email } = funcionarioData.parse(
+      const { name, login, user_password, email } = employeeValidation.parse(
         request.body
       );
-
+      const userData: User = {
+        email: email,
+        login: login,
+        name: name,
+        password: user_password,
+      }
       //verifica se os dados do funcionario já existem em algum usuario do sistema já existe antes de cadastra-lo
-      const userExists = await UserService.findUser(email, login);
+      const userExists = await userService.findUser(userData);
 
       //verifica se existe um preusuario para o usuario que será cadastrado
 
-      const hash_password = cryptPassword(user_password);
+      const hash_password = cryptPassword(userData.password);
 
       if (userExists.status && userExists.user == undefined) {
         const funcionario = new User({
@@ -190,12 +158,12 @@ export default class UserController {
           excludedStatus: false,
         });
 
-        const user_create = await UserService.createEmployee(funcionario);
+        const user_create = await userService.createEmployee(funcionario);
         if (user_create.status) {
           response.status(201).send(user_create.user);
         }
-        if (user_create.error == "preuser não existe") {
-          response.status(409).send(
+        if (user_create.error == "preuser don't exists") {
+          response.status(200).send(
             JSON.stringify({
               message: "preuser don't exists",
             })
@@ -206,19 +174,10 @@ export default class UserController {
             error: user_create.error,
           })
         );
-        /*const user_create = await User.create(
-              name,
-              user_login,
-              hash_password,
-              email,
-              user_type_id,
-            ).then((user) => {
-              response.status(201).send(user.user);
-            });*/
       } else {
-        response.status(409).send(
+        response.status(200).send(
           JSON.stringify({
-            message: "o email inserido já pertence a um usuário",
+            message: "Email alredy used",
             error: userExists.error,
           })
         );
@@ -226,7 +185,6 @@ export default class UserController {
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
-          //error: error.issues[0].message,
           error: error,
         })
       );
@@ -234,21 +192,26 @@ export default class UserController {
   }
   static async edit(request, response) {
     try {
-      const userData = z.object({
+      const userValidation = z.object({
         id: z.number().min(1, "id required minimum 1 character(s)"),
         name: z
           .string()
           .trim()
           .min(3, "Name required minimum 3 character(s)")
           .max(20, "Name required maximum 20 character(s)"),
-        /*        user_type_id: z
-          .number()
-          .min(1, "type_id required minimum 1 character(s)")
-          .max(3),*/
       });
-      const { id, name } = userData.parse(request.body);
-      const userFind = await UserService.findUserById(id);
-      const userNameExists = await UserService.findName(name);
+
+      const { id, name } = userValidation.parse(request.body);
+      const userData: User = {
+        id: id,
+        email: "",
+        login: "",
+        name: name,
+        password: "",
+      }
+      const userFind = await userService.findUserById(userData);
+
+      const userNameExists = await userService.findName(userData);
 
       if (userNameExists.exists) {
         response.status(200).send(
@@ -261,7 +224,7 @@ export default class UserController {
       if (userFind.status) {
         if (userFind.user != undefined) {
           userFind.user.name = name;
-          await UserService.update(userFind.user).then((userResult) => {
+          await userService.update(userFind.user).then((userResult) => {
             response.status(200).send(
               JSON.stringify({
                 user: {
@@ -272,9 +235,9 @@ export default class UserController {
             );
           });
         } else {
-          response.status(404).send(
+          response.status(200).send(
             JSON.stringify({
-              error: "usuário não existe",
+              error: "User don't exists",
             })
           );
         }
@@ -301,20 +264,29 @@ export default class UserController {
       });
 
       const { id, novoEmail } = dataUser.parse(request.body);
-      const userFind = await UserService.findUserById(id);
+
+      const userData: User = {
+        id: id,
+        email: novoEmail,
+        login: "",
+        name: "",
+        password: "",
+      }
+
+      const userFind = await userService.findUserById(userData);
       if (userFind.status) {
         if (userFind.user != undefined) {
-          const emailFind = await UserService.findEmail(userFind.user);
+          const emailFind = await userService.findEmail(userFind.user);
           if (emailFind.user != undefined) {
-            response.status(400).send(
+            response.status(200).send(
               JSON.stringify({
-                error: "email já utilizado",
+                error: "email alredy used",
               })
             );
           }
 
           userFind.user.email = novoEmail;
-          await UserService.updateEmail(userFind.user).then((userResult) => {
+          await userService.updateEmail(userFind.user).then((userResult) => {
             response.status(200).send(
               JSON.stringify({
                 user: {
@@ -325,9 +297,9 @@ export default class UserController {
             );
           });
         }
-        response.status(404).send(
+        response.status(200).send(
           JSON.stringify({
-            error: "Usuário não existe",
+            error: "User don't exists",
           })
         );
       }
@@ -346,7 +318,7 @@ export default class UserController {
   }
   static async editPassword(request, response) {
     try {
-      const dataUser = z.object({
+      const userValidation = z.object({
         id: z.number().min(1, "id required minimum 1 character(s)"),
         novaPassword: z
           .string()
@@ -355,23 +327,28 @@ export default class UserController {
           .max(10, "user_password required maximum 10 character(s)"),
       });
 
-      const { id, novaPassword } = dataUser.parse(request.body);
+      const { id, novaPassword } = userValidation.parse(request.body);
 
-      const userFind = await UserService.findUserById(id);
+      const userData: User = {
+        id: id,
+        email: "",
+        login: "",
+        name: "",
+        password: novaPassword,
+      }
+      const userFind = await userService.findUserById(userData);
 
       if (userFind.status) {
         if (userFind.user != undefined) {
           const hash_password = cryptPassword(novaPassword);
 
-          await UserService.updatePassword_editUser(id, hash_password).then(
-            (userResult) => {
-              response.status(200).send(JSON.stringify({}));
-            }
+          await userService.updatePassword_editUser(id, hash_password).then(
+            response.status(200)
           );
         }
-        response.status(404).send(
+        response.status(200).send(
           JSON.stringify({
-            error: "Usuário não existe",
+            error: "User don't exists",
           })
         );
       }
@@ -388,32 +365,29 @@ export default class UserController {
       );
     }
   }
-  static async deletaFuncionario(request, response) {
+  static async deleteEmployee(request, response) {
     try {
       const user = z.object({
         id: z.number().min(1, "id required minimum 1 character(s)"),
       });
       const { id } = user.parse(request.body);
 
-      /*      const isFuncionario = await User.isFuncionario(id);
-
-      if (!isFuncionario.is) {
-        response.status(400).send(
-          JSON.stringify({
-            message: "Funcionário não existe",
-          })
-        );
+      const userData: User = {
+        id: id,
+        email: "",
+        login: "",
+        name: "",
+        password: "",
       }
-*/
-      const userId = await UserService.findUserById(id);
+      const userId = await userService.findUserById(userData);
       if (userId.status) {
         if (userId.user != undefined) {
           if (userId.user.id != 1) {
-            await UserService.tokenDelete(userId.user);
-            await UserService.deleteFuncionario(userId.user);
+            await userService.tokenDelete(userId.user);
+            await userService.deleteFuncionario(userId.user);
             response.status(200);
           } else {
-            response.status(401).send(
+            response.status(200).send(
               JSON.stringify({
                 message: "Is not possible to delete the admin user",
               })
@@ -421,8 +395,8 @@ export default class UserController {
           }
         } else {
           response
-            .status(404)
-            .send(JSON.stringify({ message: "Usuário não existe" }));
+            .status(200)
+            .send(JSON.stringify({ message: "User don't exists" }));
         }
       } else {
         response.status(500).send(
@@ -456,12 +430,12 @@ export default class UserController {
 
       const { user_password, token } = passwordReset.parse(request.body);
 
-      const isValidToken = await UserService.tokenValited(token);
+      const isValidToken = await userService.tokenValited(token);
 
       if (isValidToken.status) {
         if (isValidToken.isValid) {
           if (isValidToken.status) {
-            const result = await UserService.updatePassword_resetPassword(
+            const result = await userService.updatePassword_resetPassword(
               isValidToken.token?.user_id,
               isValidToken.token?.id,
               user_password
@@ -480,14 +454,14 @@ export default class UserController {
               );
             }
           } else {
-            response.status(401).send(
+            response.status(200).send(
               JSON.stringify({
                 message: "Token alredy used",
               })
             );
           }
         } else {
-          response.status(401).send(
+          response.status(200).send(
             JSON.stringify({
               message: "Token invalid",
             })
@@ -566,5 +540,5 @@ function cryptPassword(password) {
   const hash = bcrypt.hashSync(password, salt);
   return hash;
 }
-function genericError(code) {}
+
 export { UserController, cryptPassword };

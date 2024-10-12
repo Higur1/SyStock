@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeAll, afterAll, jest, beforeEach } from "@jest/globals";
-import Batch from "../entities/Batch";
-import batch from "../models/Batch";
-import category from "../models/Category";
-import product from "../models/Product";
-import Product from "../entities/Product";
+import Batch from "../models/Batch";
+import batch from "../service/BatchService";
+import category from "../service/CategoryService";
+import product from "../service/ProductService";
+import Product from "../models/Product";
 import Decimal from "decimal.js";
 
 

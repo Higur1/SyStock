@@ -1,25 +1,27 @@
 import { z } from "zod";
-import Batch from "../service/BatchService";
+import batchService from "../service/BatchService";
+import Batch from "../models/Batch";
 
 export default class BatchController {
   static async findAll(request, response) {
     try {
-      const batchs = await Batch.findAll();
-      if (batchs.status) {
+      const batchsResult = await batchService.findAll();
+
+      if (batchsResult.status) {
         response.status(200).send(
           JSON.stringify({
-            batchs: batchs.batchs,
+            batchs: batchsResult.batchs,
           })
         );
       } else {
         response.status(500).send(
           JSON.stringify({
-            error: batchs.error.message,
+            error: batchsResult.error.message,
           })
         );
       }
     } catch (error) {
-      response.status(500).send(
+      response.status(400).send(
         JSON.stringify({
           error: error,
         })
@@ -33,52 +35,26 @@ export default class BatchController {
       })
       const { id } = batchValidation.parse(request.body);
 
-      const batch = await Batch.findBatch(id);
+      const batchData: Batch = {
+        id: id,
+        eValidationStatus: 0,
+        expirantionDate: new Date(""),
+        product_id: 0,
+        quantity: 0,
+      }
 
-      if(batch.status){
+      const batchResult = await batchService.findBatch(batchData);
+
+      if (batchResult.status) {
         response.status(200).send(
           JSON.stringify({
-            batch: batch
+            batch: batchResult
           })
         )
-      }else{
-        response.status(500).send(
-          JSON.stringify({
-            error: batch.error.message,
-          })
-        );
-      }
-    } catch (error) {
-      response.status(400).send(
-        JSON.stringify({
-          path: error.issues[0].path,
-          error: error.issues[0].message,
-        })
-      );
-    }
-  }
-  static async findBatchBySupplier(request, response) {
-    try {
-      const supplierValidation = z.object({
-        supplier_id: z.string().trim().min(36).max(36),
-      });
-
-      const { supplier_id } = supplierValidation.parse(request.params);
-
-      const batch_supplier = await Batch.findBySupplier(
-        supplier_id
-      );
-
-      if (batch_supplier.status) {
-        response.status(200).send(
-          JSON.stringify({
-            batchs: batch_supplier.batch,
-          })
-        );
       } else {
         response.status(500).send(
           JSON.stringify({
-            error: batch_supplier.error.message,
+            error: batchResult.error.message,
           })
         );
       }
@@ -99,19 +75,25 @@ export default class BatchController {
 
       const { product_id } = productValidation.parse(request.params);
 
-      const batch_product = await Batch.findByProduct(Number(product_id));
+      const batchData: Batch = {
+        eValidationStatus: 0,
+        expirantionDate: new Date(""),
+        product_id: Number(product_id),
+        quantity: 0,
+      }
+      const batch_product = await batchService.findByProduct(batchData);
 
-      if(batch_product.status){
+      if (batch_product.status) {
         response.status(200).send(
-            JSON.stringify({
-                batch: batch_product.batch
-            })
+          JSON.stringify({
+            batch: batch_product.batch
+          })
         );
-      }else{
+      } else {
         response.status(500).send(
-            JSON.stringify({
-                error: batch_product.error.message
-            })
+          JSON.stringify({
+            error: batch_product.error.message
+          })
         );
       };
     } catch (error) {
@@ -125,35 +107,41 @@ export default class BatchController {
   };
   static async update(request, response) {
     try {
-        const batchValidation = z.object({
-            product_id:  z.string().trim().min(1),
-            supplier_id: z.string().trim().min(36).max(36),
-            quantity: z.number().positive()
-        });
+      const batchValidation = z.object({
+        id: z.number().positive(),
+        quantity: z.number().positive()
+      });
 
-        const { product_id, supplier_id , quantity } = batchValidation.parse(request.body);
+      const {  id, quantity } = batchValidation.parse(request.body);
 
-        const batch = {
-            product_id,
-            supplier_id,
-            quantity
-        };
+      const batchData: Batch = {
+       id: id,
+        quantity: quantity,
+        eValidationStatus: 0,
+        expirantionDate: new Date(""),
+        product_id: 0
+      };
+      const batchResult = await batchService.findBatch(batchData);
+      if(batchResult.batch == null){
+        return response.status(200).send(JSON.stringify({
+          message: "Batch not found"
+        }))
+      }
+      const batchUpdated = await batchService.update(batchData);
 
-        const batchUpdated = await Batch.update(batch);
-
-        if(batchUpdated.status){
-            response.status(200).send(
-                JSON.stringify({
-                    batch: batchUpdated.batch
-                })
-            );
-        }else{
-            response.status(500).send(
-                JSON.stringify({
-                    error: batchUpdated.error.message
-                })
-            );
-        };
+      if (batchUpdated.status) {
+        response.status(200).send(
+          JSON.stringify({
+            batch: batchUpdated.batch
+          })
+        );
+      } else {
+        response.status(500).send(
+          JSON.stringify({
+            error: batchUpdated.error.message
+          })
+        );
+      };
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
@@ -165,6 +153,7 @@ export default class BatchController {
   };
   static async delete(request, response) {
     try {
+      
     } catch (error) {
       response.status(400).send(
         JSON.stringify({

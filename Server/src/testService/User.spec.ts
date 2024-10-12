@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeAll, afterAll } from "@jest/globals";
-import User from "../entities/User";
-import user from "../models/User";
-import PreUser from "../entities/PreUser";
-import preUser from "../models/PreUser";
+import User from "../models/User";
+import user from "../service/UserService";
+import PreUser from "../models/PreUser";
+import preUser from "../service/PreUserService";
 
 describe("Create user model", () => {
 

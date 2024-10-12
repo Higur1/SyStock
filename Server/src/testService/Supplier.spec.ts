@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll } from "@jest/globals";
-import Supplier from "../entities/Supplier";
-import supplier from "../models/Supplier";
+import Supplier from "../models/Supplier";
+import supplier from "../service/SupplierService";
 
 describe("Create supplier model", () => {
 
