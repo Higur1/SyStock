@@ -25,7 +25,7 @@ export default class SupplierService {
   static async create(supplierData: Supplier) {
     try {
       const supplierVerify = await SupplierService.verifySupplierAlredyExists(supplierData);
-      console.log(supplierVerify)
+      
       if(!supplierVerify.exists){
         const supplierResult = await prisma.supplier.create({
           data: {
@@ -177,10 +177,14 @@ export default class SupplierService {
   };
   static async deleteAll() {
     try {
-      await prisma.supplier.deleteMany();
-      return { status: true }
+      await prisma.supplier.updateMany({
+        data: {
+          excludedStatus: true
+        }
+      });
+      return { status: true };
     } catch (error) {
-      return {status: false, error: error}
+      return { status: false, error: error };
     };
   };
   static async verifySupplierAlredyExists(supplierData: Supplier){
@@ -200,7 +204,6 @@ export default class SupplierService {
           ]
         }
       });
-
       return supplierResult != null ? {status: true, exists: true, supplier: supplierResult} : {status: true, exists: false}
     } catch (error) {
       return {status:false, error:error}

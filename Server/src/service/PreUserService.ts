@@ -21,7 +21,7 @@ export default class PreUserService {
   static async create(user: preUser) {
     try {
       const preUserResult = await PreUserService.findPreUser(user);
-      console.log(preUserResult)
+
       if (preUserResult.preuser == undefined) {
         const preuser = await prisma.pre_User.create({
           data: {
@@ -62,9 +62,21 @@ export default class PreUserService {
       return { status: false, error: error };
     };
   };
-  static async delete() {
+  static async deleteAll() {
     try {
       await prisma.pre_User.deleteMany({});
+      return { status: true }
+    } catch (error) {
+      return { status: false, error: error };
+    };
+  };
+  static async delete(preUser: preUser) {
+    try {
+      await prisma.pre_User.delete({
+        where :{
+          id: preUser.id
+        }
+      });
       return { status: true }
     } catch (error) {
       return { status: false, error: error };

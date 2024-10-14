@@ -42,4 +42,7 @@ describe("Create supplier model", () => {
   
           expect(createBatch).toHaveProperty("message");
     });
+    afterAll(async () => {
+        await supplier.deleteAll();
+    });
 });

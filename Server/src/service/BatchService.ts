@@ -39,7 +39,7 @@ export default class BatchService {
                         quantity: batchData.quantity,
                         deletionStatus: false,
                         product_id: batchData.product_id,
-                        eValidationStatus: 1,
+                        eValidationStatus: 3,
                     }
                 });
                 return { status: true, batch: batchResult }
@@ -112,11 +112,11 @@ export default class BatchService {
                 where: {
                     AND: {
                         product_id: batch.product_id,
-                        expirationDate: batch.expirantionDate
+                        expirationDate: batch.expirantionDate,
                     }
                 }
             });
-            return batch != null ? { status: true, exists: true, batch_id: batchResult!.id } :
+            return batchResult != undefined ? { status: true, exists: true, batch_id: batchResult!.id } :
                 { status: true, exists: false };
         } catch (error) {
             return { status: false, error: error };

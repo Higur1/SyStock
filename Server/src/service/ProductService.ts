@@ -1,4 +1,5 @@
 import { prisma } from "../config/prisma";
+import Batch from "../models/Batch";
 import Product from "../models/Product";
 
 export default class ProductService {
@@ -155,13 +156,20 @@ export default class ProductService {
     };
   };
   static async delete(productData: Product) {
+    console.log(productData)
     try {
-      await prisma.batch.deleteMany({
+      const productBatch = await prisma.batch.findFirst({
         where: {
-          product_id: productData.id,
-        },
-      });
-      // substitui o delete por atualização no status de exclusão.
+          product_id: productData.id
+        }, 
+        select: {
+          id: true
+        }
+      })
+      console.log(productBatch)
+      if(productBatch != null){
+        return { status: false, mensagem: "Não é possível deletar o produto! Produto possui quantidade em estoque!"}
+      }
       await prisma.product.update({
         where: {
           id: productData.id,
@@ -172,13 +180,17 @@ export default class ProductService {
       });
       return { status: true };
     } catch (error) {
+      console.log(error)
       return { status: false, error: error };
     };
   };
   static async deleteAll() {
     try {
-      await prisma.product.deleteMany();
-
+      await prisma.product.updateMany({
+        data: {
+          excludedStatus: true,
+        },
+      });
       return { status: true };
     } catch (error) {
       return { status: false, error: error };

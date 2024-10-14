@@ -58,6 +58,7 @@ describe("Create batch model", () => {
         };
 
         const createBatch = await batch.create(batchData);
+  
 
         await expect(createBatch).toHaveProperty("batch.id");
     });
@@ -74,4 +75,8 @@ describe("Create batch model", () => {
         const createBatch = await batch.create(batchData);
         await expect(createBatch).toHaveProperty("message");
     });
+
+    afterAll( async () =>{
+  //      await product.deleteAll();
+     });
 });

@@ -214,8 +214,20 @@ export default class UserService {
   };
   static async deleteFuncionario(userData: User) {
     try {
-      await prisma.user.delete({
+      await prisma.user.update({
         where: { id: userData.id },
+        data: { excludedStatus: true },
+      });
+      return { status: true };
+    } catch (error) {
+      return { status: false, error: error };
+    };
+  };
+  static async deleteAllEmployees() {
+    try {
+      await prisma.user.updateMany({
+        where: { user_type: 2 },
+        data: { excludedStatus: true },
       });
       return { status: true };
     } catch (error) {

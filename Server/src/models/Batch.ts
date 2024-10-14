@@ -9,10 +9,10 @@ interface IBatch {
 
 class Batch {
     id?: number
+    product_id: number
     expirantionDate: Date
     quantity: number
     deletationStatus?: false
-    product_id: number
     eValidationStatus: number
 
     private constructor({
