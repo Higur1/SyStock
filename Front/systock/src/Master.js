@@ -19,7 +19,7 @@ export default function Master() {
 
         return (
           <div style={{ padding: "0px", flex: isLoggedIn ? 0 : 1, position: 'relative' }}>
-            <SupportPage />
+            {isLoggedIn && <SupportPage />}
             <Routes>
               <Route path="login" element={
                 !isLoggedIn ? <Login /> : null

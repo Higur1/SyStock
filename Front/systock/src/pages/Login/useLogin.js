@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import { ENTITIES } from "../../utils/debug-local-helper";
 import { DEBUG_LOCAL, MainContext } from "../../App";
 import UsersActions from "../../Service/Users/UsersActions";
+import Account from "../../classes/Account";
 
 export const useLogin = () => {
 
@@ -22,6 +23,7 @@ export const useLogin = () => {
     autoHide: 5000,
     handleClose: null
   });
+  const [firstAccess, setFirstAccess] = useState({email: "", name: "", user: "", password: ""});
 
   const { getData } = useContext(MainContext);
 
@@ -114,6 +116,34 @@ export const useLogin = () => {
     }
   }
 
+  const onCreateFirstAccess = async () => {
+    const account = new Account({...firstAccess});
+
+    try {
+      const userCreated = await UsersActions.create(account);
+
+      if(!(userCreated instanceof Account)) return;
+
+      setSnackBar({
+        ...snackBar, 
+        open: true, 
+        severity: 'success', 
+        snackMessage: 'O usuário foi criado!',
+        autoHide: 3000,
+        handleClose: closeSnackBar
+      });
+    } catch (e) {
+      setSnackBar({
+        ...snackBar, 
+        open: true, 
+        severity: 'error', 
+        snackMessage: e,
+        autoHide: 3000,
+        handleClose: closeSnackBar
+      });
+    }
+  }
+
   const clearInfo = (screen) => {
     switch(screen) {
       case "login": {
@@ -135,12 +165,17 @@ export const useLogin = () => {
     });
   }
 
+  function handleChangeFirstAccess(type, value) {
+    setFirstAccess(prev => ({...prev, [type]: value}));
+  }
+
   return {
     user, onChangeUser,
     password, onChangePassword,
     error,
     email, onChangeEmail, 
     onLogin, onResetPassword, clearInfo,
-    loading, snackBar
+    loading, snackBar,
+    firstAccess, handleChangeFirstAccess, onCreateFirstAccess
   };
 }

@@ -24,7 +24,8 @@ const Login = () => {
     email, onChangeEmail,
     snackBar,
     onLogin, onResetPassword, clearInfo,
-    loading
+    firstAccess, handleChangeFirstAccess,
+    loading, onCreateFirstAccess
   } = useLogin();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -51,7 +52,7 @@ const Login = () => {
 
   return (
     <>
-      {(screen === "login" || screen === "forgotPassword") && (
+      {(screen === "login" || screen === "forgotPassword" || screen === "firstAccess") && (
         <Main>
           {screen === "login" && (
             <Container>
@@ -59,19 +60,13 @@ const Login = () => {
                 <>
                   <InfoContainer>
                     {"LOGO HERE"}
-                    {/* <ButtonCustom
-                      style={{
-                        padding: '4px 16px',
-                        bottom: 25,
-                        left: 20,
-                        position: 'absolute'
-                      }}
-                      onClick={handleOpenPrices}
+                    <ButtonCustom
+                      onClick={() => {}}
                       variant="outlined"
                       fullWidth={false}
                       color='primary'
-                      label={"Ver Preços"}
-                    /> */}
+                      label={"Primeiro Acesso"}
+                    />
                   </InfoContainer>
                   <FormContainer>
                     <Typography color="textPrimary" variant="h4">{"Conecte-se"}</Typography>
@@ -149,6 +144,62 @@ const Login = () => {
                   }} variant={"outlined"} 
                   />
                   <ButtonCustom fullWidth label={"Confirmar"} onClick={onResetPassword} variant={"contained"} disabled={error.email !== ''}/>
+                </DivGrid8>
+                
+              </FormContainer>
+            </ResetPasswordContainer>
+          )}
+
+          {screen === "firstAccess" && (
+            <ResetPasswordContainer>
+              <FormContainer style={{width: 370}}>
+                <TextContainer>
+                  {"Cadastro do Primeiro Acesso"}
+                </TextContainer>
+                <InputCustom
+                  label={"E-mail informado para o administrador"}
+                  onChange={e => handleChangeFirstAccess("email", e.target.value)}
+                  autoFocus
+                  fullWidth
+                  required
+                  color={"primary"}
+                  value={firstAccess.email}
+                />
+                <InputCustom
+                  label={"Nome informado para o administrador"}
+                  onChange={e => handleChangeFirstAccess("name", e.target.value)}
+                  autoFocus
+                  fullWidth
+                  required
+                  color={"primary"}
+                  value={firstAccess.name}
+                />
+                <InputCustom
+                  label={"Usuário"}
+                  onChange={e => handleChangeFirstAccess("user", e.target.value)}
+                  autoFocus
+                  fullWidth
+                  required
+                  color={"primary"}
+                  value={firstAccess.user}
+                />
+                <InputCustom
+                  label={"Senha"}
+                  onChange={e => handleChangeFirstAccess("password", e.target.value)}
+                  autoFocus
+                  fullWidth
+                  required
+                  type={"password"}
+                  color={"primary"}
+                  value={firstAccess.password}
+                />
+                <DivGrid8>
+                  <ButtonCustom label={"Voltar"} onClick={() => {
+                    handleScreen("login");
+                    clearInfo("login");
+                  }} variant={"outlined"} 
+                  />
+                  <ButtonCustom fullWidth label={"Confirmar"} onClick={onCreateFirstAccess} variant={"contained"} />
                 </DivGrid8>
                 
               </FormContainer>
