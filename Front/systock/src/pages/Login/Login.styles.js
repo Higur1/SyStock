@@ -37,6 +37,31 @@ export const ResetPasswordContainer = styled("div")({
   '-webkit-box-shadow': '0px 0px 8px 0px rgba(0,0,0,0.5)',
   '-moz-box-shadow': '0px 0px 8px 0px rgba(0,0,0,0.5)',
   boxShadow: '0px 0px 8px 0px rgba(0,0,0,0.5)'
+});
+
+export const FirstAccessContainer = styled("div")({
+  display: 'flex',
+  width: '700px',
+  minWidth: '700px',
+  borderRadius: '16px',
+  padding: 16,
+  minHeight: '450px',
+  height: '450px',
+  alignItems: 'center',
+  justifyContent: 'center',
+  background: '#FFF',
+  '-webkit-box-shadow': '0px 0px 8px 0px rgba(0,0,0,0.5)',
+  '-moz-box-shadow': '0px 0px 8px 0px rgba(0,0,0,0.5)',
+  boxShadow: '0px 0px 8px 0px rgba(0,0,0,0.5)'
+});
+
+export const FirstAccessFormContainer = styled("div")({
+  borderRadius: '0px 16px 16px 0px',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  gap: 16,
+  padding: '16px'
 })
 
 export const InfoContainer = styled("div")({

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types';
-import { Container, FormContainer, InfoContainer, Main, ResetPasswordContainer, TextContainer } from './Login.styles'
+import { Container, FirstAccessContainer, FirstAccessFormContainer, FormContainer, InfoContainer, Main, ResetPasswordContainer, TextContainer } from './Login.styles'
 import { Backdrop, CircularProgress, InputAdornment, Typography } from '@mui/material'
 import InputCustom from '../../components/common/InputCustom/InputCustom'
 import { useState } from 'react'
@@ -61,7 +61,7 @@ const Login = () => {
                   <InfoContainer>
                     {"LOGO HERE"}
                     <ButtonCustom
-                      onClick={() => {}}
+                      onClick={() => handleScreen("firstAccess")}
                       variant="outlined"
                       fullWidth={false}
                       color='primary'
@@ -151,8 +151,8 @@ const Login = () => {
           )}
 
           {screen === "firstAccess" && (
-            <ResetPasswordContainer>
-              <FormContainer style={{width: 370}}>
+            <FirstAccessContainer>
+              <FirstAccessFormContainer style={{width: 370}}>
                 <TextContainer>
                   {"Cadastro do Primeiro Acesso"}
                 </TextContainer>
@@ -202,8 +202,8 @@ const Login = () => {
                   <ButtonCustom fullWidth label={"Confirmar"} onClick={onCreateFirstAccess} variant={"contained"} />
                 </DivGrid8>
                 
-              </FormContainer>
-            </ResetPasswordContainer>
+              </FirstAccessFormContainer>
+            </FirstAccessContainer>
           )}
         </Main>
       )}

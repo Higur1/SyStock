@@ -6,6 +6,7 @@ import styled from "styled-components";
 import { DEBUG_LOCAL, MainContext } from "../../../App";
 import { ENTITIES } from "../../../utils/debug-local-helper";
 import CategoryActions from "../../../Service/Category/CategoryActions";
+import Product from "../../../classes/Product";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
@@ -29,7 +30,8 @@ export default function CreateProductDialog(props) {
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [price, setPrice] = useState(0);
+  const [priceSell, setPriceSell] = useState(0);
+  const [priceBuy, setPriceBuy] = useState(0);
   const [categoryID, setCategoryID] = useState("");
   const [categories, setCategories] = useState([])
   const [hasError, setHasError] = useState(false);
@@ -62,13 +64,35 @@ export default function CreateProductDialog(props) {
     }
   }
 
-  const handlePriceChange = e => {
+  const handlePriceChangeSell = e => {
     let value = e.target.value;
 
     if (!currencyRegex.test(value)) {
       setHasErrorPrice(true);
     }
-    setPrice(e.target.value);
+    setPriceSell(e.target.value);
+  }
+
+  const handlePriceChangeBuy = e => {
+    let value = e.target.value;
+
+    if (!currencyRegex.test(value)) {
+      setHasErrorPrice(true);
+    }
+    setPriceBuy(e.target.value);
+  }
+
+  function create() {
+    const prod = new Product({});
+
+    prod.name = name;
+    prod.priceBaseSell = priceSell;
+    prod.priceBaseBuy = priceBuy;
+    prod.minimumQuantity = minimumQuantity;
+    prod.description = description;
+    prod.category = categoryID ? categories.find(cat => cat.id === categoryID) : null;
+    
+    handleCreate(prod);
   }
 
   return (
@@ -83,8 +107,8 @@ export default function CreateProductDialog(props) {
         />
         <TextField
           label="Preço de Venda"
-          value={price}
-          onChange={handlePriceChange}
+          value={priceSell}
+          onChange={handlePriceChangeSell}
           placeholder={"ex: 100.00"}
           name="numberformat"
           id="formatted-numberformat-input"
@@ -96,8 +120,8 @@ export default function CreateProductDialog(props) {
         />
         <TextField
           label="Preço de Compra"
-          value={price}
-          onChange={handlePriceChange}
+          value={priceBuy}
+          onChange={handlePriceChangeBuy}
           placeholder={"ex: 100.00"}
           name="numberformat"
           id="formatted-numberformat-input"
@@ -167,26 +191,23 @@ export default function CreateProductDialog(props) {
         <Button variant={"contained"} onClick={handleClose}>Cancelar</Button>
         <Button variant={"contained"} onClick={() => {
           if (description === '' ||
-            price === 0 || categoryID === '') {
+            priceSell === 0 || priceBuy === 0 ||categoryID === '') {
             setHasError(true);
             return;
           }
 
-          if (!currencyRegex.test(price)) {
+          if (!currencyRegex.test(priceSell)) {
+            setHasErrorPrice(true);
+            return;
+          }
+          if (!currencyRegex.test(priceBuy)) {
             setHasErrorPrice(true);
             return;
           }
 
           setIsLoading(true);
-          const priceString = parseFloat(price);
-          const product = {
-            description,
-            price: priceString,
-            category_id: categoryID,
-            // supplier_id: supplierID
-          };
 
-          handleCreate(product);
+          create();
         }}>Adicionar</Button>
       </div>
     </div>
