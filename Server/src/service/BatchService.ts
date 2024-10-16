@@ -39,7 +39,7 @@ export default class BatchService {
                         quantity: batchData.quantity,
                         deletionStatus: false,
                         product_id: batchData.product_id,
-                        eValidationStatus: 3,
+                        eValidationStatus: batchData.eValidationStatus == undefined ? 0 : batchData.eValidationStatus,
                     }
                 });
                 return { status: true, batch: batchResult }

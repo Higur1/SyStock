@@ -114,7 +114,8 @@ export default class ProductService {
     try {
       const productResult = await prisma.product.findFirst({
         where: {
-          name: productData.name
+          name: productData.name,
+          excludedStatus: false
         }
       });
       return productResult != null ? { status: true, exists: true, product: productResult } : { status: true, exists: false }
@@ -156,20 +157,23 @@ export default class ProductService {
     };
   };
   static async delete(productData: Product) {
-    console.log(productData)
+
     try {
       const productBatch = await prisma.batch.findFirst({
         where: {
           product_id: productData.id
         }, 
         select: {
-          id: true
-        }
+          id: true,
+          quantity: true
+        },
       })
-      console.log(productBatch)
+
       if(productBatch != null){
+        
         return { status: false, mensagem: "Não é possível deletar o produto! Produto possui quantidade em estoque!"}
       }
+
       await prisma.product.update({
         where: {
           id: productData.id,

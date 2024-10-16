@@ -32,6 +32,14 @@ describe("Create category model", () => {
         await expect(createCategory).not.toHaveProperty("message");
     });
 
+    it("Should be able to delete a category", async () => {
+        const categoryData = {
+            name: UniqueName
+        };
+
+        const createCategory = await category.create(categoryData);
+        await expect(createCategory).not.toHaveProperty("message");
+    });
     afterAll(async () => {
         await category.delete(categoryId);
     });
