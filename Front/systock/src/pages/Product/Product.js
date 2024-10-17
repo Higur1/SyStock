@@ -91,11 +91,8 @@ export default function Product() {
             <CreateProductDialog
               handleCreate={(prod) => {
                 createProduct(prod);
-                closeDialog();
               }}
-              handleClose={closeDialog}
               error={errorInsert}
-              open
             />
           )}
 

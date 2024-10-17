@@ -25,7 +25,7 @@ const Container = styled.div`
   padding-top: 16px;
 `;
 export default function CreateProductDialog(props) {
-  const { handleCreate, handleClose, error, open } = props;
+  const { handleCreate, error } = props;
 
 
   const [name, setName] = useState("");
@@ -188,7 +188,6 @@ export default function CreateProductDialog(props) {
         </div>
       </Container>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 16 }}>
-        <Button variant={"contained"} onClick={handleClose}>Cancelar</Button>
         <Button variant={"contained"} onClick={() => {
           if (description === '' ||
             priceSell === 0 || priceBuy === 0 ||categoryID === '') {

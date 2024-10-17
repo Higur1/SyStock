@@ -23,7 +23,6 @@ const InputStyled = styled("input")({
 });
 
 export default function ChangeQuantityProduct(props) {
-  const { onClose } = props;
   const [product, setProduct] = useState(null);
   const [nextQuantity, setNextQuantity] = useState(0);
   const [currentQuantity, setCurrentQuantity] = useState(0);
@@ -103,7 +102,6 @@ export default function ChangeQuantityProduct(props) {
         />
       </div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 16 }}>
-        <Button variant={"contained"} onClick={onClose}>Cancelar</Button>
         <Button variant={"contained"} onClick={onConfirm} disabled={disableConfirm}>Confirmar</Button>
       </div>
     </div>
