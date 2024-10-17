@@ -28,6 +28,7 @@ export default function ChangeQuantityProduct(props) {
   const [currentQuantity, setCurrentQuantity] = useState(0);
   const [currentExpiryDate, setCurrentExpiryDate] = useState(null);
   const [expiryList, setExpiryList] = useState(null);
+  const [reason, setReason] = useState("");
 
   const { productsWithoutSupply, getProductTotalQuantity, getExpiryDatesByProduct } = useContext(ProductContext);
 
@@ -52,7 +53,6 @@ export default function ChangeQuantityProduct(props) {
     setExpiryList(getExpiryDatesByProduct(value.refCode));
     setCurrentExpiryDate(null);
   }
-  console.log({ product });
 
   const disableConfirm = product === null || nextQuantity === 0;
 
@@ -93,12 +93,22 @@ export default function ChangeQuantityProduct(props) {
           onChange={(event, newInputValue) => {
             handleChangeProduct(newInputValue);
           }}
+          disabled={expiryList === null}
           getOptionLabel={(option) => formatDate(option, false)}
           sx={{ flex: 1 }}
           renderInput={(params) => <TextField {...params} label="Data de Validade" />}
           placeholder='Selecione uma data de validate deste produto'
           ListboxProps={{ style: { zIndex: 100 } }}
           PopperComponent={props => <Popper {...props} style={{ ...props.style, zIndex: 100000 }} disablePortal={false} />}
+        />
+        <TextField
+          id="outlined-multiline-static"
+          label="Motivo"
+          multiline
+          value={reason}
+          onChange={e => setReason(e.target.value)}
+          rows={4}
+          variant="outlined"
         />
       </div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 16 }}>
