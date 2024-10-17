@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from "@jest/globals";
-import PreUser from "../entities/PreUser";
-import preUser from "../models/PreUser";
+import PreUser from "../models/PreUser";
+import preUser from "../service/PreUserService";
 
 describe("Create preUser model", () => {
     it("Should be able to create a new preUser", async () => {
@@ -21,9 +21,19 @@ describe("Create preUser model", () => {
         const createPreUser = await preUser.create(preUserData);
 
         expect(createPreUser).toHaveProperty("message");
-
      });
+    it("Should be able to delete a preUser", async () => {
+        const preUserData: PreUser = {
+            name: "Teste",
+            email: "Higor.hungria466@gmail.com"
+        };
+        
+        preUserData.id = (await preUser.findPreUser(preUserData)).preuser?.id;
+        const preUserExcluded = await preUser.delete(preUserData);
+
+        expect(preUserExcluded.status).toBe(true);
+    }),
      afterAll( async () =>{
-        await preUser.delete();
+        await preUser.deleteAll();
      });
 });

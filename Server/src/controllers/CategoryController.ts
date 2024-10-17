@@ -1,9 +1,10 @@
 import { z } from "zod";
+import CategoryService from "../service/CategoryService";
 import Category from "../models/Category";
 export default class CategoryController {
   static async listOfCategory(request, response) {
     try {
-      const lisOfCategories = await Category.findAll();
+      const lisOfCategories = await CategoryService.findAll();
 
       if (lisOfCategories.status) {
         response.status(200).send(
@@ -28,20 +29,23 @@ export default class CategoryController {
   }
   static async create(request, response) {
     try {
-      const category_name = z.object({
+      const categoryValidation = z.object({
         name: z.string().trim().min(3).max(15),
       });
-      const { name } = category_name.parse(request.body);
+      const { name } = categoryValidation.parse(request.body);
 
-      const categoryAlreadyExists = await Category.verifyDuplicateName(name);
+      const categoryData: Category = {
+        name: name
+      }
+      const categoryAlreadyExists = await CategoryService.findByName(categoryData);
 
       if (
         categoryAlreadyExists.status &&
-        categoryAlreadyExists.category == undefined
+        categoryAlreadyExists.categories == undefined
       ) {
-        const categoryCreated = await Category.create(name);
+        const categoryCreated = await CategoryService.create(categoryData);
 
-        if (categoryCreated.status) {
+        if (categoryCreated.status && !categoryCreated.message) {
           response.status(201).send(
             JSON.stringify({
               category: {
@@ -58,7 +62,7 @@ export default class CategoryController {
           );
         }
       } else {
-        response.status(409).send(
+        response.status(200).send(
           JSON.stringify({
             message: "Category already exists",
           })
@@ -80,12 +84,20 @@ export default class CategoryController {
       });
       const { id } = category_id.parse(request.params);
 
-      const findCategory = await Category.findById(Number(id));
+      const category: Category = { id: Number(id), name: "" };
+      const findCategory = await CategoryService.findById(category);
 
       if (findCategory.status) {
+        if (findCategory.category != undefined) {
+          response.status(200).send(
+            JSON.stringify({
+              category: findCategory.category,
+            })
+          );
+        }
         response.status(200).send(
           JSON.stringify({
-            category: findCategory.category,
+            error: "Category don't exists",
           })
         );
       } else {
@@ -111,12 +123,20 @@ export default class CategoryController {
       });
 
       const { name } = category_name.parse(request.params);
-      const findCategory = await Category.findByName(name);
+      const category: Category = { name };
+      const findCategory = await CategoryService.findByName(category);
 
       if (findCategory.status) {
+        if (findCategory.categories != undefined) {
+          response.status(200).send(
+            JSON.stringify({
+              category: findCategory.categories,
+            })
+          );
+        }
         response.status(200).send(
           JSON.stringify({
-            categories: findCategory.categories,
+            error: "Category don't exists",
           })
         );
       } else {
@@ -137,37 +157,54 @@ export default class CategoryController {
   }
   static async edit(request, response) {
     try {
-      const category = z.object({
+      const categoryNewData = z.object({
         id: z.number().gt(0),
         name: z.string().trim().min(3).max(15),
       });
-      const { id, name } = category.parse(request.body);
+      const { id, name } = categoryNewData.parse(request.body);
 
-      const categoryAlredyExists = await Category.verifyDuplicateName(name);
+      const category:Category = { 
+        id: id, 
+        name: name
+       };
+     
+      const nameCategoryAlredyExists = await CategoryService.findByName(
+        category
+      );
 
-      if (
-        categoryAlredyExists.status &&
-        categoryAlredyExists.category == undefined
-      ) {
-        const categoryUpdated = await Category.update(id, name);
-
-        if (categoryUpdated.status) {
+      if (nameCategoryAlredyExists.status) {
+        if (nameCategoryAlredyExists.categories != undefined) {
           response.status(200).send(
             JSON.stringify({
-              category: categoryUpdated.category,
+              error: "name of Category alredy exists",
             })
           );
-        } else {
-          response.status(404).send(
+        }
+      }
+
+      const idCategoryAlredyExists = await CategoryService.findById(category);
+
+      if (idCategoryAlredyExists.status) {
+        if (idCategoryAlredyExists.category == undefined) {
+          response.status(200).send(
             JSON.stringify({
               message: "Category not found",
             })
           );
         }
-      } else {
-        response.status(409).send(
+      }
+      const categoryUpdated = await CategoryService.update(category);
+
+      if (categoryUpdated.status) {
+        response.status(200).send(
           JSON.stringify({
-            error: "Category alredy exists",
+            category: categoryUpdated.category,
+          })
+        );
+      } else {
+        response.status(500).send(
+          JSON.stringify({
+            error: categoryUpdated.error,
           })
         );
       }
@@ -180,15 +217,15 @@ export default class CategoryController {
       );
     }
   }
-  static async remove(request, response) {
+  static async delete(request, response) {
     try {
-      const category = z.object({
+      const categoryData = z.object({
         id: z.number().gt(0),
       });
 
-      const { id } = category.parse(request.body);
-
-      const categoryRemoved = await Category.delete(id);
+      const { id } = categoryData.parse(request.body);
+      const category: Category = { id: id, name: "" };
+      const categoryRemoved = await CategoryService.delete(category);
 
       if (categoryRemoved.status && categoryRemoved.category != undefined) {
         response.status(200);
@@ -196,13 +233,13 @@ export default class CategoryController {
         categoryRemoved.status &&
         categoryRemoved.category == undefined
       ) {
-        response.status(404).send(
+        response.status(200).send(
           JSON.stringify({
             message: "Category not found",
           })
         );
       } else {
-        response.status(400).send(
+        response.status(200).send(
           JSON.stringify({
             message:
               "it is not possible to delete a category with registered products",

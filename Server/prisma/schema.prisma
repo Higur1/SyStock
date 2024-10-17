@@ -79,9 +79,9 @@ model Pre_User {
 
 model Supplier {
   id    Int    @id @default(autoincrement())
-  name  String @unique
-  phone String @unique
-  email String @unique
+  name  String 
+  phone String 
+  email String 
   createdAt            DateTime @default(now())  
   updatedAt            DateTime @updatedAt
   excludedStatus Boolean

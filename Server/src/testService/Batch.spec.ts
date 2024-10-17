@@ -1,10 +1,11 @@
 import { describe, it, expect, beforeAll, afterAll, jest, beforeEach } from "@jest/globals";
-import Batch from "../entities/Batch";
-import batch from "../models/Batch";
-import category from "../models/Category";
-import product from "../models/Product";
-import Product from "../entities/Product";
+import Batch from "../models/Batch";
+import batchService from "../service/BatchService";
+import category from "../service/CategoryService";
+import product from "../service/ProductService";
+import Product from "../models/Product";
 import Decimal from "decimal.js";
+import BatchService from "../service/BatchService";
 
 
 describe("Create batch model", () => {
@@ -57,7 +58,18 @@ describe("Create batch model", () => {
             deletationStatus: false
         };
 
-        const createBatch = await batch.create(batchData);
+        const createBatch = await BatchService.create(batchData);
+  
+
+        await expect(createBatch).toHaveProperty("batch.id");
+    });
+
+    it("Should be able to create a new batch with eValidationStatus 2", async () => {
+    
+        const batchData = new Batch({expirantionDate: new Date("2024-10-16"), quantity:1, product_id: product_id});
+
+        const createBatch = await BatchService.create(batchData);
+  
 
         await expect(createBatch).toHaveProperty("batch.id");
     });
@@ -71,7 +83,11 @@ describe("Create batch model", () => {
             deletationStatus: false
         };
 
-        const createBatch = await batch.create(batchData);
+        const createBatch = await BatchService.create(batchData);
         await expect(createBatch).toHaveProperty("message");
     });
+
+    afterAll( async () =>{
+  //      await product.deleteAll();
+     });
 });

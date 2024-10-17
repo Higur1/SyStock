@@ -53,6 +53,25 @@ await Promise.all([
       password: bcrypt.hashSync("Admin HGB", salt),
       excludedStatus: false,
     },
+  }),
+
+  prisma.eValitadionStatus.create({
+    data: {
+      id: 1,
+      type: "dataValidadeAtingida"
+    },
+  }),
+    prisma.eValitadionStatus.create({  
+    data: {
+      id: 2,
+      type: "dataValidadeProximaASerAtingida"
+    },
+  }),
+  prisma.eValitadionStatus.create({  
+    data: {
+      id: 3,
+      type: "dentroDaValidade"
+    },
   })
 
   /*Create generic category*/

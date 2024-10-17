@@ -1,5 +1,5 @@
-import category from "../models/Category"
-import Category from "../entities/Category";
+import category from "../service/CategoryService"
+import Category from "../models/Category";
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "@jest/globals";
 
 describe("Create category model", () => {
@@ -17,6 +17,7 @@ describe("Create category model", () => {
         };
 
         const createCategory = await category.create(categoryData);
+
         categoryId = createCategory.category!.category_id;
         await expect(createCategory).toHaveProperty("category.category_id");
 
@@ -31,6 +32,14 @@ describe("Create category model", () => {
         await expect(createCategory).not.toHaveProperty("message");
     });
 
+    it("Should be able to delete a category", async () => {
+        const categoryData = {
+            name: UniqueName
+        };
+
+        const createCategory = await category.create(categoryData);
+        await expect(createCategory).not.toHaveProperty("message");
+    });
     afterAll(async () => {
         await category.delete(categoryId);
     });

@@ -1,14 +1,14 @@
+import userService from "../service/UserService";
 import User from "../models/User";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "../functions/nodemailer";
-import { Console } from "console";
 
 export default class LoginController {
   static async auth(request, response) {
     try {
-      const user = z.object({
+      const userValidation = z.object({
         user_login: z
           .string()
           .trim()
@@ -20,9 +20,16 @@ export default class LoginController {
           .min(5, "user_password required minimum 5 character(s)")
           .max(10, "user_password required maximum 10 character(s)"),
       });
-      const { user_login, user_password } = user.parse(request.body);
+      const { user_login, user_password } = userValidation.parse(request.body);
 
-      const userVerify = await User.authUser(user_login);
+      const userData: User = {
+        email: "",
+        login: user_login,
+        name: "",
+        password: user_password,
+      }
+
+      const userVerify = await userService.authUser(userData);
       if (userVerify.status) {
         if (userVerify.user != undefined) {
           await bcrypt
@@ -50,9 +57,9 @@ export default class LoginController {
               }
             });
         } else {
-          response.status(404).send(
+          response.status(200).send(
             JSON.stringify({
-              message: "Usuário não existe",
+              message: "User don't exists",
             })
           );
         }
@@ -79,28 +86,35 @@ export default class LoginController {
       });
 
       const { email, instance } = recovery.parse(request.body);
-      const user = await User.findEmail(email);
+      const userData: User = {
+        email: email,
+        login: "",
+        name: "",
+        password: "",
+      }
+      
+      const userResult = await userService.findEmail(userData);
 
-      if (user.status) {
-        if (user.user != undefined) {
-          const tokenRecovery = await User.tokenCreate(user.user);
-          sendEmail(email, tokenRecovery.result, instance);
+      if (userResult.status) {
+        if (userResult.user != undefined) {
+          const tokenRecovery = await userService.tokenCreate(userResult.user);
+          sendEmail(email, tokenRecovery!.result, instance);
           response.status(200).send(
             JSON.stringify({
-              message: "E-mail sent",
+              message: "Email sent",
             })
           );
         } else {
-          response.status(404).send(
+          response.status(200).send(
             JSON.stringify({
-              message: "Not Found",
+              message: "Email not found",
             })
           );
         }
       } else {
         response.status(500).send(
           JSON.stringify({
-            error: user.error,
+            error: userResult.error,
           })
         );
       }
