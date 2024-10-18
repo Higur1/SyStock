@@ -12,16 +12,15 @@ class Supplier{
     email: string;
     excludedStatus?: boolean;
 
-    private constructor({
+    public constructor({
         name, 
         phone, 
         email, 
-        excludedStatus
     }: ISupplier){
         this.name = name,
         this.phone = phone;
         this.email = email;
-        this.excludedStatus = excludedStatus;
+        this.excludedStatus = false;
     };
 };
 

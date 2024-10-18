@@ -1,7 +1,7 @@
 interface IBatch {
     expirantionDate: Date;
     quantity: number;
-    deletationStatus?: false;
+    deletationStatus?: boolean;
     dateTimeEmptyStock?: Date;
     product_id: number;
     eValidationStatus?: number
@@ -12,7 +12,7 @@ class Batch {
     product_id: number
     expirantionDate: Date
     quantity: number
-    deletationStatus?: false
+    deletationStatus?: boolean
     eValidationStatus?: number
 
     public constructor({
@@ -25,6 +25,7 @@ class Batch {
             this.quantity = quantity;
         this.deletationStatus = deletationStatus;
         this.product_id = product_id;
+        this.expirantionDate.setDate(this.expirantionDate.getDate()+1)
         this.expirantionDate.setHours(-3);
         this.expirantionDate.setMinutes(0);
         this.expirantionDate.setSeconds(0);
@@ -34,7 +35,7 @@ class Batch {
         dateNow.setMinutes(0);
         dateNow.setSeconds(0);
         dateNow.setMilliseconds(0);
-        if (expirantionDate.toISOString() === dateNow.toISOString()) {
+        if ((expirantionDate.toISOString() === dateNow.toISOString()) || (dateNow.toISOString() > expirantionDate.toISOString())) {
             this.eValidationStatus = 1;
         }
         else {

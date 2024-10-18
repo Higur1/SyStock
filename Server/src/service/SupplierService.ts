@@ -12,48 +12,52 @@ export default class SupplierService {
           phone: true,
         },
         where: {
-          excludedStatus: false
-        }
+          excludedStatus: false,
+        },
       });
       return supplierResult != undefined
         ? { status: true, suppliers: supplierResult }
         : { status: true, suppliers: {} };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async create(supplierData: Supplier) {
     try {
-      const supplierVerify = await SupplierService.verifySupplierAlredyExists(supplierData);
-      
-      if(!supplierVerify.exists){
+      const supplierVerify = await SupplierService.verifySupplierAlredyExists(
+        supplierData
+      );
+
+      if (!supplierVerify.exists) {
+        supplierData.excludedStatus = false;
         const supplierResult = await prisma.supplier.create({
           data: {
             name: supplierData.name,
             email: supplierData.email,
             phone: supplierData.phone,
-            excludedStatus: false
+            excludedStatus: supplierData.excludedStatus,
           },
         });
         return supplierResult != undefined
-        ? {
-          status: true,
-          supplier: supplierResult,
-        }
-        : { status: true, supplier: {} };
-      }else{
-        return {status: true, message: "Supplier alredy exists"}
-      };
+          ? {
+              status: true,
+              supplier: supplierResult,
+            }
+          : { status: true, supplier: {} };
+      } else {
+        const validate = await this.validatedSupplierDataExists(supplierData);
+        return { status: false, message: validate.message };
+      }
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async findById(supplierData: Supplier) {
     try {
       const supplierResult = await prisma.supplier.findUnique({
         where: {
           id: supplierData.id,
-          excludedStatus: false
+          excludedStatus: false,
         },
         select: {
           id: true,
@@ -67,16 +71,30 @@ export default class SupplierService {
         : { status: true, supplier: undefined };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async findByName(supplierData: Supplier) {
+    try {
+      const supplierFinded = await prisma.supplier.findFirst({
+        where: {
+          name: supplierData.name,
+        },
+      });
+      return supplierFinded != undefined
+        ? { status: true, supplier: supplierFinded }
+        : { status: true, supplier: {} };
+    } catch (error) {
+      return { status: false, error: error };
+    }
+  }
+  static async findAllSuppliersThatNameStartsWith(supplierData: Supplier) {
     try {
       const supplierResult = await prisma.supplier.findMany({
         where: {
           name: {
             startsWith: supplierData.name,
           },
-          excludedStatus: false
+          excludedStatus: false,
         },
         select: {
           id: true,
@@ -90,8 +108,8 @@ export default class SupplierService {
         : { status: true, supplier: {} };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async update(supplierData: Supplier) {
     try {
       const supplier = await prisma.supplier.update({
@@ -102,31 +120,31 @@ export default class SupplierService {
         },
         where: {
           id: supplierData.id,
-          excludedStatus: false
+          excludedStatus: false,
         },
       });
       return { supplier: supplier };
     } catch (error) {
       return { error: error };
-    };
-  };
+    }
+  }
   static async validatedSupplierExists(supplierData: Supplier) {
     try {
       const validSupplier = await prisma.supplier.findFirst({
         where: {
           id: supplierData.id,
-          excludedStatus: false
+          excludedStatus: false,
         },
       });
 
       return validSupplier != null
         ? { status: true, exists: true }
-        : { status: true, exists: false};
+        : { status: true, exists: false };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
-  static async validatedSupplierData(supplierData: Supplier) {
+    }
+  }
+  static async validatedSupplierDataExists(supplierData: Supplier) {
     try {
       let message = "";
       const validNameSupplier = await prisma.supplier.findFirst({
@@ -158,8 +176,8 @@ export default class SupplierService {
         : { status: true, isValid: false, message: message };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async delete(supplierData: Supplier) {
     try {
       await prisma.supplier.update({
@@ -167,46 +185,49 @@ export default class SupplierService {
           id: supplierData.id,
         },
         data: {
-          excludedStatus: true
-        }
+          excludedStatus: true,
+        },
       });
       return { status: true };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async deleteAll() {
     try {
       await prisma.supplier.updateMany({
         data: {
-          excludedStatus: true
-        }
+          excludedStatus: true,
+        },
       });
       return { status: true };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
-  static async verifySupplierAlredyExists(supplierData: Supplier){
+    }
+  }
+  static async verifySupplierAlredyExists(supplierData: Supplier) {
     try {
       const supplierResult = await prisma.supplier.findFirst({
-        where:{
-          OR:[
+        where: {
+          OR: [
             {
-              name: supplierData.name
+              name: supplierData.name,
             },
             {
-              email: supplierData.email
+              email: supplierData.email,
             },
             {
-              phone: supplierData.phone
-            }
-          ]
-        }
+              phone: supplierData.phone,
+            },
+          ],
+        },
       });
-      return supplierResult != null ? {status: true, exists: true, supplier: supplierResult} : {status: true, exists: false}
+      supplierResult;
+      return supplierResult != null
+        ? { status: true, exists: true, supplier: supplierResult }
+        : { status: true, exists: false };
     } catch (error) {
-      return {status:false, error:error}
-    };
-  };
-};
+      return { status: false, error: error };
+    }
+  }
+}

@@ -95,14 +95,7 @@ describe("Create Product model", () => {
         };
         ProductData.id = ((await product.findByName(ProductData)).product?.id);
         
-        const batch : Batch = {
-            quantity: 1, 
-//            eValidationStatus: 3,
-            //expirantionDate: new Date("2024-12-30"),
-            expirantionDate: new Date("2024-12-30T05:00:00.000Z"),
-            product_id: ProductData.id == undefined ? 0 : ProductData.id, 
-            deletationStatus: false
-        };
+        const batch = new Batch ({expirantionDate: new Date("2024-12-30T05:00:00.000Z"), quantity:1, product_id: ProductData.id == undefined ? 0 : ProductData.id});
 
         const batchCreated = await batchService.create(batch);
 
@@ -110,7 +103,8 @@ describe("Create Product model", () => {
         const dateEqual = new Date("2024-12-30T05:00:00.000Z")
         console.log("primeiro teste: " + batch.expirantionDate.toISOString() + " é igual " + dateEqual.toISOString() + " " + (batch.expirantionDate.toISOString()===dateEqual.toISOString()))
         const dateMenor = new Date("2024-11-30")
-        console.log("segundo teste: " + batch.expirantionDate.toISOString() + " é igual " + dateMenor.toISOString() + " " + (batch.expirantionDate.toISOString()===dateMenor.toISOString()))
+        console.log("segundo test
+        e: " + batch.expirantionDate.toISOString() + " é igual " + dateMenor.toISOString() + " " + (batch.expirantionDate.toISOString()===dateMenor.toISOString()))
         const dateMaior = new Date("2024-12-31")
         console.log("terceiro teste: " + batch.expirantionDate.toISOString() + "é maior que " + dateMaior.toISOString() + " " + (batch.expirantionDate.toISOString() > dateMaior.toISOString()))
         console.log("quarto teste: " + dateMaior.toISOString() + " é maior que " + batch.expirantionDate.toISOString() + " " + (dateMaior.toISOString() > batch.expirantionDate.toISOString()))
