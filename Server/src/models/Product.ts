@@ -23,24 +23,22 @@ class Product {
     category_id: number
     excludedStatus?: boolean
 
-    private constructor({
+    public constructor({
         name,
         price,
         costPrice,
         minimunQuantity,
         observation,
-        totalQuantityInStock,
         category_id,
-        excludedStatus
     }: IProduct) {
         this.name = name;
         this.price = new Decimal(price);
         this.costPrice = new Decimal(costPrice);
         this.minimunQuantity = minimunQuantity;
         this.observation = observation;
-        this.totalQuantityInStock = totalQuantityInStock;
+        this.totalQuantityInStock = 0;
         this.category_id = category_id;
-        this.excludedStatus = excludedStatus
+        this.excludedStatus = false;
     }
 
 }

@@ -99,7 +99,6 @@ describe("Create user model", () => {
     });
 
     const createUser = await user.createEmployee(userData);
-
     expect(createUser.user?.excludedStatus).toBe(false);
   });
 

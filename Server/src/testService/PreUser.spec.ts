@@ -32,7 +32,7 @@ describe("Create preUser model", () => {
         
         preUserData.id = (await preUser.findPreUser(preUserData)).preuser?.id;
         const preUserExcluded = await preUser.delete(preUserData);
-
+        console.log(preUserExcluded)
         expect(preUserExcluded.status).toBe(true);
     }),
      afterAll( async () =>{

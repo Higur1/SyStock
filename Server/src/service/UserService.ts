@@ -39,9 +39,7 @@ export default class UserService {
               password: userData.password,
               email: userData.email,
               excludedStatus:
-                userData.excludedStatus == undefined
-                  ? false
-                  : userData.excludedStatus,
+                userData.excludedStatus = false,
               user_type: 2,
             },
           });

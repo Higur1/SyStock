@@ -3,103 +3,146 @@ import Product from "../models/Product";
 import Batch from "../models/Batch";
 import batchService from "../service/BatchService";
 import product from "../service/ProductService";
-import category from "../service/CategoryService"
+import category from "../service/CategoryService";
 import Category from "../models/Category";
-import Decimal from "decimal.js"
+import Decimal from "decimal.js";
 import { prisma } from "../config/prisma";
 import { string } from "zod";
 
 describe("Create Product model", () => {
+  let categoryId;
+  let UniqueName;
 
-    let categoryId;
-    let UniqueName;
+  beforeAll(async () => {
+    const genarateUniqueProductName = `Mock Product-${String(Date.now())}`;
+    UniqueName = genarateUniqueProductName;
 
-    beforeAll(async ()=>{
-        const genarateUniqueProductName = `Mock Product-${String(Date.now())}`;
-        UniqueName = genarateUniqueProductName;
+    const genarateUniqueCategoryName = `Mock CategoryProduct-${String(
+      Date.now()
+    )}`;
 
-        const genarateUniqueCategoryName = `Mock CategoryProduct-${String(Date.now())}`;
+    const categoryData: Category = {
+      name: genarateUniqueCategoryName,
+    };
 
-        const categoryData: Category = {
-            name: genarateUniqueCategoryName
-        };
-    
-        const categoryResult = await category.create(categoryData);
-  
-        categoryId = categoryResult.category!.category_id;
+    const categoryResult = await category.create(categoryData);
 
+    categoryId = categoryResult.category!.category_id;
+  });
+  it("Dado um produto X Quando há uma tentativa de criação com atributos válidos Então ele é criado com sucesso", async () => {
+    const ProductData = new Product({
+      name: UniqueName,
+      price: new Decimal(1500.0),
+      costPrice: new Decimal(1000.0),
+      minimunQuantity: 3,
+      observation: "De mesa",
+      category_id: categoryId,
     });
-    it("Should be able to create a new Product", async () => {
+    const createProduct = await product.create(ProductData);
 
-        const ProductData: Product = {
-            name: UniqueName,
-            price: new Decimal (1500.00),
-            costPrice: new Decimal (1000.00),
-            minimunQuantity: 3,
-            excludedStatus: false,
-            observation: "De mesa",
-            totalQuantityInStock: 0,
-            category_id: categoryId,
-        };
-        const createProduct = await product.create(ProductData);
+    await expect(createProduct).toHaveProperty("product.id");
+  });
 
-        await expect(createProduct).toHaveProperty("product.id");
+  it("Dado um novo produto X Quando criado com uma  categoria inexistente Então ocorre um erro com a seguinte mensagem: 'Categoria é inexistente'", async () => {
+    const genarateUniqueProductName = `Mock Product-${String(Date.now())}`;
+    let UniqueNameNew = genarateUniqueProductName;
+    const ProductData = new Product({
+      name: UniqueNameNew,
+      price: new Decimal(1500.0),
+      costPrice: new Decimal(1000.0),
+      minimunQuantity: 3,
+      observation: "De mesa",
+      category_id: 50000,
     });
-    it("Should not be able to create a new Product", async () => {
+    const createProduct = await product.create(ProductData);
 
-        const ProductData: Product = {
-            name: UniqueName,
-            price: new Decimal (1500.00),
-            costPrice: new Decimal (1000.00),
-            minimunQuantity: 3,
-            excludedStatus: false,
-            observation: "De mesa",
-            totalQuantityInStock: 0,
-            category_id: categoryId,
-        };
-        const createProduct = await product.create(ProductData);
+    await expect(createProduct.error).toBe("Categoria é inexistente");
+  });
 
-        await expect(createProduct).toHaveProperty("message");
+  it("Dado um produto X Quando criado no BD Então a quantidade em estoque deve ser 0 e o excludedStatus 'false'", async () => {
+    const genarateUniqueProductName = `Mock Product-${String(Date.now())}`;
+    let UniqueNameNew = genarateUniqueProductName;
+    const ProductData = new Product({
+      name: UniqueNameNew,
+      price: new Decimal(1500.0),
+      costPrice: new Decimal(1000.0),
+      minimunQuantity: 3,
+      observation: "De mesa",
+      category_id: categoryId,
     });
-    it("Should be able to delete a produto", async () => {
-        
-        const ProductData: Product = {
-            name: UniqueName,
-            price: new Decimal (1500.00),
-            costPrice: new Decimal (1000.00),
-            minimunQuantity: 3,
-            excludedStatus: false,
-            observation: "De mesa",
-            totalQuantityInStock: 0,
-            category_id: categoryId,
-        };
-        ProductData.id = ((await product.findByName(ProductData)).product?.id);
-        const productExcluded = await product.delete(ProductData);
+    const createProduct = await product.create(ProductData);
+    ProductData.id = createProduct.product?.id;
+    const verifyExcludedStatus = await product.getExcludedStatus(ProductData);
 
+    await expect(createProduct.product?.totalQuantityInStock).toBe(0);
+    await expect(verifyExcludedStatus.product?.excludedStatus).toBe(false);
+  });
 
-        expect(productExcluded.status).toBe(true);
-    }),
+  it("Dado um produto X não existente no BD Quando criado uma instancia do objeto dele Então a quantidade em estoque deve ser 0", async () => {
+    const ProductData = new Product({
+      name: UniqueName,
+      price: new Decimal(1500.0),
+      costPrice: new Decimal(1000.0),
+      minimunQuantity: 3,
+      observation: "De mesa",
+      category_id: categoryId,
+    });
 
+    await expect(ProductData.totalQuantityInStock).toBe(0);
+  });
+
+  it("Dado um produto X não criado Quando há uma tentativa de criação com um nome que já existe Então ele não é criado e a seguinte mensagem é exibida : 'Product alredy exists'", async () => {
+    const ProductData = new Product({
+      name: UniqueName,
+      price: new Decimal(1500.0),
+      costPrice: new Decimal(1000.0),
+      minimunQuantity: 3,
+      observation: "De mesa",
+      category_id: categoryId,
+    });
+    const createProduct = await product.create(ProductData);
+
+    await expect(createProduct.message).toBe("Product alredy exists");
+  });
+  it("Should be able to delete a produto", async () => {
+    const ProductData: Product = {
+      name: UniqueName,
+      price: new Decimal(1500.0),
+      costPrice: new Decimal(1000.0),
+      minimunQuantity: 3,
+      excludedStatus: false,
+      observation: "De mesa",
+      totalQuantityInStock: 0,
+      category_id: categoryId,
+    };
+    ProductData.id = (await product.findByName(ProductData)).product?.id;
+    const productExcluded = await product.delete(ProductData);
+
+    expect(productExcluded.status).toBe(true);
+  }),
     //pois o produto possui lotes
     it("Should not be able to delete a product", async () => {
+      const ProductData: Product = {
+        name: UniqueName,
+        price: new Decimal(1500.0),
+        costPrice: new Decimal(1000.0),
+        minimunQuantity: 3,
+        excludedStatus: false,
+        observation: "De mesa",
+        totalQuantityInStock: 0,
+        category_id: categoryId,
+      };
+      ProductData.id = (await product.findByName(ProductData)).product?.id;
 
-        const ProductData: Product = {
-            name: UniqueName,
-            price: new Decimal (1500.00),
-            costPrice: new Decimal (1000.00),
-            minimunQuantity: 3,
-            excludedStatus: false,
-            observation: "De mesa",
-            totalQuantityInStock: 0,
-            category_id: categoryId,
-        };
-        ProductData.id = ((await product.findByName(ProductData)).product?.id);
-        
-        const batch = new Batch ({expirantionDate: new Date("2024-12-30T05:00:00.000Z"), quantity:1, product_id: ProductData.id == undefined ? 0 : ProductData.id});
+      const batch = new Batch({
+        expirantionDate: new Date("2024-12-30T05:00:00.000Z"),
+        quantity: 1,
+        product_id: ProductData.id == undefined ? 0 : ProductData.id,
+      });
 
-        const batchCreated = await batchService.create(batch);
+      const batchCreated = await batchService.create(batch);
 
-        /*
+      /*
         const dateEqual = new Date("2024-12-30T05:00:00.000Z")
         console.log("primeiro teste: " + batch.expirantionDate.toISOString() + " é igual " + dateEqual.toISOString() + " " + (batch.expirantionDate.toISOString()===dateEqual.toISOString()))
         const dateMenor = new Date("2024-11-30")
@@ -148,12 +191,11 @@ describe("Create Product model", () => {
                 deletionStatus: false
             }
         });*/
-        const productExcluded = await product.delete(ProductData);
+      const productExcluded = await product.delete(ProductData);
 
-        expect(productExcluded).toHaveProperty("mensagem");
+      expect(productExcluded.error).toBe("Não é possível deletar o produto! Produto possui quantidade em estoque!");
     }),
     afterAll(async () => {
-        await product.deleteAll();
+      await product.deleteAll();
     });
 });
-

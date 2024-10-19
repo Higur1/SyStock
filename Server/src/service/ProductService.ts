@@ -1,6 +1,7 @@
 import { prisma } from "../config/prisma";
 import Batch from "../models/Batch";
 import Product from "../models/Product";
+import { Prisma } from "@prisma/client";
 
 export default class ProductService {
   static async findAll() {
@@ -26,8 +27,26 @@ export default class ProductService {
         : { status: false, products: {} };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
+  static async getExcludedStatus(productData: Product){
+    try {
+      const product = await prisma.product.findUnique({
+        where: {
+          id: productData.id,
+        },
+        select: {
+          excludedStatus: true
+        }
+      });
+
+      return product != null
+        ? { status: true, product: product }
+        : { status: true, product: null };
+    } catch (error) {
+      return { status: false, error: error };
+    }
+  }
   static async create(productData: Product) {
     try {
       const verifyProductExists = await ProductService.findByName(productData);
@@ -52,19 +71,24 @@ export default class ProductService {
             minimunQuantity: true,
             observation: true,
             totalQuantityInStock: true,
-            category_id: true
+            category_id: true,
           },
-        })
+        });
         return productResult != null
           ? { status: true, product: productResult }
           : { status: true, product: undefined };
       } else {
         return { status: true, message: "Product alredy exists" };
-      };
+      }
     } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === "P2003") {
+          return { status: false, error: "Categoria é inexistente" };
+        }
+      }
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async findById(productData: Product) {
     try {
       const product = await prisma.product.findUnique({
@@ -79,8 +103,8 @@ export default class ProductService {
         : { status: true, product: null };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async findByCategory(productData: Product) {
     try {
       const productsByCategory = await prisma.product.findMany({
@@ -108,21 +132,23 @@ export default class ProductService {
         : { status: true, products: undefined };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async findByName(productData: Product) {
     try {
       const productResult = await prisma.product.findFirst({
         where: {
           name: productData.name,
-          excludedStatus: false
-        }
+          excludedStatus: false,
+        },
       });
-      return productResult != null ? { status: true, exists: true, product: productResult } : { status: true, exists: false }
+      return productResult != null
+        ? { status: true, exists: true, product: productResult }
+        : { status: true, exists: false };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async update(productData: Product) {
     try {
       const product = await prisma.product.update({
@@ -154,24 +180,27 @@ export default class ProductService {
         : { status: true, product: undefined };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
-  static async delete(productData: Product) {
+    }
+  }
 
+  static async delete(productData: Product) {
     try {
       const productBatch = await prisma.batch.findFirst({
         where: {
-          product_id: productData.id
-        }, 
+          product_id: productData.id,
+        },
         select: {
           id: true,
-          quantity: true
+          quantity: true,
         },
-      })
+      });
 
-      if(productBatch != null){
-        
-        return { status: false, mensagem: "Não é possível deletar o produto! Produto possui quantidade em estoque!"}
+      if (productBatch != null) {
+        return {
+          status: false,
+          error:
+            "Não é possível deletar o produto! Produto possui quantidade em estoque!",
+        };
       }
 
       await prisma.product.update({
@@ -184,10 +213,11 @@ export default class ProductService {
       });
       return { status: true };
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return { status: false, error: error };
-    };
-  };
+    }
+  }
+
   static async deleteAll() {
     try {
       await prisma.product.updateMany({
@@ -198,6 +228,6 @@ export default class ProductService {
       return { status: true };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
-};
+    }
+  }
+}
