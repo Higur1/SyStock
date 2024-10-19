@@ -50,16 +50,15 @@ describe("Create batch model", () => {
 
     const productResult = await product.create(mockProduct);
     product_id = productResult.product?.id;
-
   });
 
   it("Should be able to create a new batch", async () => {
     const batchDatanew = new Batch({
-      expirantionDate: new Date('2024-10-02'),
+      expirantionDate: new Date("2024-10-02"),
       quantity: 1,
       product_id: product_id,
     });
-    console.log(batchDatanew.expirantionDate)
+    
     const createBatch = await BatchService.create(batchDatanew);
 
     await expect(createBatch).toHaveProperty("batch.id");
@@ -69,11 +68,11 @@ describe("Create batch model", () => {
     /*const doisDiasAMaisDoAtual = new Date();
     doisDiasAMaisDoAtual.setDate(doisDiasAMaisDoAtual.getDate() + 2);*/
     const batchData = new Batch({
-      expirantionDate: new Date('2024-10-18'),
+      expirantionDate: new Date("2024-10-18"),
       quantity: 1,
       product_id: product_id,
     });
-console.log(product_id)
+
     const createBatch = await BatchService.create(batchData);
 
     await expect(createBatch).toHaveProperty("batch.id");
@@ -83,7 +82,7 @@ console.log(product_id)
     /*const dezesseisDiasAMaisDoAtual = new Date();
     dezesseisDiasAMaisDoAtual.setDate(dezesseisDiasAMaisDoAtual.getDate() + 16);*/
     const batchData = new Batch({
-      expirantionDate: /*dezesseisDiasAMaisDoAtual*/new Date('2024-10-31'),
+      expirantionDate: /*dezesseisDiasAMaisDoAtual*/ new Date("2024-10-31"),
       quantity: 1,
       product_id: product_id,
     });
@@ -95,7 +94,7 @@ console.log(product_id)
 
   it("Should be able to create a new batch with quantity 0, but deletationstatus will be true", async () => {
     const batchData = new Batch({
-      expirantionDate: new Date('2024-10-20'),
+      expirantionDate: new Date("2024-10-20"),
       quantity: 0,
       product_id: product_id,
     });
@@ -105,7 +104,7 @@ console.log(product_id)
 
   it("Should be not able to create a new batch | add quantity in batch alredy exists", async () => {
     const batchData = new Batch({
-      expirantionDate: new Date('2024-10-18'),
+      expirantionDate: new Date("2024-10-18"),
       quantity: 9,
       product_id: product_id,
     });

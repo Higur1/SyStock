@@ -38,7 +38,10 @@ export default class UserService {
               login: userData.login,
               password: userData.password,
               email: userData.email,
-              excludedStatus: false,
+              excludedStatus:
+                userData.excludedStatus == undefined
+                  ? false
+                  : userData.excludedStatus,
               user_type: 2,
             },
           });
@@ -49,6 +52,7 @@ export default class UserService {
               name: userResult.name,
               user_login: userResult.login,
               email: userResult.email,
+              excludedStatus: userResult.excludedStatus,
             },
           };
         } else {

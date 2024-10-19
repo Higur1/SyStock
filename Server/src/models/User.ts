@@ -18,13 +18,12 @@ class User{
         login, 
         password, 
         email, 
-        excludedStatus = false
     }: IUser){
         this.name = name;
         this.login = login;
         this.password = password;
         this.email = email;
-        this.excludedStatus = excludedStatus;    
+        this.excludedStatus = false;    
     }
 }
 

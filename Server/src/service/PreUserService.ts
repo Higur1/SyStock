@@ -1,4 +1,4 @@
-import preUser from "../models/PreUser"
+import preUser from "../models/PreUser";
 import { prisma } from "../config/prisma";
 
 export default class PreUserService {
@@ -16,43 +16,44 @@ export default class PreUserService {
         : { status: true, listPreUsers: {} };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async create(user: preUser) {
     try {
-      const preUserResult = await PreUserService.findPreUser(user);
-
-      if (preUserResult.preuser == undefined) {
-        const preuser = await prisma.pre_User.create({
-          data: {
-            name: user.name,
-            email: user.email
-          },
-        });
-        return {
-          status: true,
-          preuser: {
-            id: preuser.id,
-            name: preuser.name,
-            email: preuser.email,
-          },
-        };
-      } else {
-        return { status: true, message: "PreUser alredy exists" }
+      const preuser = await prisma.pre_User.create({
+        data: {
+          name: user.name,
+          email: user.email,
+        },
+      });
+      return {
+        status: true,
+        preuser: {
+          id: preuser.id,
+          name: preuser.name,
+          email: preuser.email,
+        },
       };
     } catch (error) {
+      if (
+        error
+          .toString()
+          .includes("Unique constraint failed on the fields: (`email`)")
+      ) {
+        return { status: false, message: "PreUser alredy exists" };
+      }
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async findPreUser(preUserData: preUser) {
     try {
       const preuser = await prisma.pre_User.findFirst({
         where: {
-          AND:{
+          AND: {
             email: preUserData.email,
-            name: preUserData.name
-          }
-        }
+            name: preUserData.name,
+          },
+        },
       });
 
       return preuser != null
@@ -60,26 +61,26 @@ export default class PreUserService {
         : { status: true, preuser: undefined };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async deleteAll() {
     try {
       await prisma.pre_User.deleteMany({});
-      return { status: true }
+      return { status: true };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async delete(preUser: preUser) {
     try {
       await prisma.pre_User.delete({
-        where :{
-          id: preUser.id
-        }
+        where: {
+          id: preUser.id,
+        },
       });
-      return { status: true }
+      return { status: true };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
-};
+    }
+  }
+}
