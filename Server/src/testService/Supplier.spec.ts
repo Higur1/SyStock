@@ -16,7 +16,7 @@ describe("Create supplier model", () => {
     supplierEmail = genarateUniqueEmail;
     supplierPhone = genarateUniquePhone;
   });
-  it("Should be able to create a new Supplier with mockUnique", async () => {
+  it("Dado um fornecedor X Quando criado no BD Então resultado deve ser igual ao id do fornecedor", async () => {
     const supplierData: Supplier = {
       name: supplierName,
       email: supplierEmail,
@@ -29,7 +29,7 @@ describe("Create supplier model", () => {
     expect(createBatch).toHaveProperty("supplier.id");
   });
 
-  it("Should be verify if excludedStatus is false when a new Supplier is created", async () => {
+  it("Dado um fornecedor X Quando criado Então seu atributo excludedStatus deve ser igual a false", async () => {
     const supplierDataMock = new Supplier({
       name: "joao",
       email: "joao@gmail.com",
@@ -39,19 +39,7 @@ describe("Create supplier model", () => {
     expect(supplierDataMock.excludedStatus).toBe(false);
   });
 
-  it("Should be able to create a new Supplier with mock", async () => {
-    const supplierDataMock = new Supplier({
-      name: "joao",
-      email: "joao@gmail.com",
-      phone: "11974846202",
-    });
-
-    const supplierCreated = await supplier.create(supplierDataMock);
-
-    expect(supplierCreated).toHaveProperty("supplier.id");
-  });
-
-  it("Should be not able to create a new Supplier", async () => {
+  it("Dado um fornecedor X Quando há uma tentativa de cria-lo com dados unique já presentes em outros forncedores Então deve retornar uma mensagem informando que os dados já existem no BD", async () => {
     const supplierData: Supplier = {
       name: supplierName,
       email: supplierEmail,
@@ -63,7 +51,24 @@ describe("Create supplier model", () => {
 
     expect(createBatch).toHaveProperty("message");
   });
+
+  it("Dado um fornecedor X Quando deletado e é criado outro identico a ele Então resultado deve ser igual ao id do fornecedor", async () => {
+    const supplierData: Supplier = {
+      name: supplierName,
+      email: supplierEmail,
+      phone: supplierPhone,
+      excludedStatus: false,
+    };
+
+    supplierData.id = (await supplier.findByName(supplierName)).supplier?.id;
+    await supplier.delete(supplierData);
+
+    const createBatch = await supplier.create(supplierData);
+
+    expect(createBatch).toHaveProperty("supplier.id");
+  });
+
   afterAll(async () => {
-    //await supplier.deleteAll();
+    await supplier.deleteAll();
   });
 });

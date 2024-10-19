@@ -52,6 +52,26 @@ export default class SupplierService {
       return { status: false, error: error };
     }
   }
+  static async findSupplierForForeignKey(supplierData: Supplier) {
+    try {
+      const supplierResult = await prisma.supplier.findUnique({
+        where: {
+          id: supplierData.id,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+        },
+      });
+      return supplierResult != undefined
+        ? { status: true, supplier: supplierResult }
+        : { status: true, supplier: undefined };
+    } catch (error) {
+      return { status: false, error: error };
+    }
+  }
   static async findById(supplierData: Supplier) {
     try {
       const supplierResult = await prisma.supplier.findUnique({
@@ -78,11 +98,12 @@ export default class SupplierService {
       const supplierFinded = await prisma.supplier.findFirst({
         where: {
           name: supplierData.name,
+          excludedStatus: false
         },
       });
       return supplierFinded != undefined
-        ? { status: true, supplier: supplierFinded }
-        : { status: true, supplier: {} };
+        ? { status: true, exists:true, supplier: supplierFinded }
+        : { status: true, exists: false };
     } catch (error) {
       return { status: false, error: error };
     }
@@ -150,26 +171,29 @@ export default class SupplierService {
       const validNameSupplier = await prisma.supplier.findFirst({
         where: {
           name: supplierData.name,
+          excludedStatus: false
         },
       });
       const validEmailSupplier = await prisma.supplier.findFirst({
         where: {
           email: supplierData.email,
+          excludedStatus: false
         },
       });
       const validPhoneSupplier = await prisma.supplier.findFirst({
         where: {
           phone: supplierData.phone,
+          excludedStatus: false
         },
       });
       message +=
-        validNameSupplier == null ? "" : "nome já cadastrado no sistema | ";
+        validNameSupplier?.name == undefined ? "" : "nome já cadastrado no sistema | ";
 
       message +=
-        validEmailSupplier == null ? "" : "email já cadastrado no sistema | ";
+        validEmailSupplier?.email == undefined ? "" : "email já cadastrado no sistema | ";
 
       message +=
-        validPhoneSupplier == null ? "" : "phone já cadastrado no sistema";
+        validPhoneSupplier?.phone == undefined ? "" : "phone já cadastrado no sistema";
 
       return message.length == 0
         ? { status: true, isValid: true }
@@ -220,6 +244,11 @@ export default class SupplierService {
               phone: supplierData.phone,
             },
           ],
+          AND: [
+            {
+              excludedStatus: false
+            }
+          ]
         },
       });
       supplierResult;

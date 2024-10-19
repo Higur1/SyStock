@@ -20,7 +20,6 @@ describe("Create batch model", () => {
   let category_id;
   let uniqueProductName;
   let uniqueCategoryName;
-  let expirationDate;
 
   beforeAll(async () => {
     const genarateUniqueCategoryName = `Mock CategoryBatch-${String(
@@ -52,14 +51,11 @@ describe("Create batch model", () => {
     const productResult = await product.create(mockProduct);
     product_id = productResult.product?.id;
 
-    expirationDate = new Date();
-    expirationDate.setHours(-3);
   });
 
   it("Should be able to create a new batch", async () => {
-    console.log(expirationDate)
     const batchDatanew = new Batch({
-      expirantionDate: expirationDate,
+      expirantionDate: new Date('2024-10-02'),
       quantity: 1,
       product_id: product_id,
     });
@@ -73,11 +69,11 @@ describe("Create batch model", () => {
     /*const doisDiasAMaisDoAtual = new Date();
     doisDiasAMaisDoAtual.setDate(doisDiasAMaisDoAtual.getDate() + 2);*/
     const batchData = new Batch({
-      expirantionDate: /*doisDiasAMaisDoAtual*/new Date('2024-10-18'),
+      expirantionDate: new Date('2024-10-18'),
       quantity: 1,
       product_id: product_id,
     });
-
+console.log(product_id)
     const createBatch = await BatchService.create(batchData);
 
     await expect(createBatch).toHaveProperty("batch.id");

@@ -19,13 +19,12 @@ export default class UserService {
         : { status: true, listUsers: {} };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
 
   static async createEmployee(userData: User) {
     try {
-      const verifyUserExists = await UserService.findUser(userData);
-      
+      const verifyUserExists = await this.findUser(userData);
       if (verifyUserExists.user == undefined) {
         const pre_User = await prisma.pre_User.findFirst({
           where: {
@@ -57,29 +56,36 @@ export default class UserService {
             status: false,
             message: "preuser don't exists",
           };
-        };
+        }
       } else {
-        return { status: true, message: "User alredy exists" }
-      };
+        return { status: true, message: "User alredy exists" };
+      }
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async findEmail(userData: User) {
     try {
-      const user = await prisma.user.findFirst({ where: { email: userData.email } });
+      const user = await prisma.user.findFirst({
+        where: { email: userData.email, excludedStatus: false },
+      });
       return user != null
         ? { status: true, user: user }
         : { status: true, user: undefined };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async findUser(userData: User) {
     try {
       const user = await prisma.user.findFirst({
         where: {
           OR: [{ email: userData.email }, { login: userData.login }],
+          AND: [
+            {
+              excludedStatus: false,
+            },
+          ],
         },
       });
       return user != null
@@ -87,8 +93,8 @@ export default class UserService {
         : { status: true, user: undefined };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async findNameStartWith(userData: User) {
     try {
       const user = await prisma.user.findFirst({
@@ -96,6 +102,7 @@ export default class UserService {
           name: {
             startsWith: userData.name,
           },
+          excludedStatus: false,
         },
         select: {
           id: true,
@@ -109,13 +116,14 @@ export default class UserService {
         : { status: true, user: {} };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async findName(userData: User) {
     try {
       const user = await prisma.user.findFirst({
         where: {
           name: userData.name,
+          excludedStatus: false,
         },
         select: {
           id: true,
@@ -129,9 +137,9 @@ export default class UserService {
         : { status: true, exists: false };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
-  static async findUserById(userData: User) {
+    }
+  }
+  static async findUserForForeignKey(userData: User) {
     try {
       const user = await prisma.user.findFirst({
         where: {
@@ -143,13 +151,29 @@ export default class UserService {
         : { status: true, user: undefined };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
+  static async findUserById(userData: User) {
+    try {
+      const user = await prisma.user.findFirst({
+        where: {
+          id: userData.id,
+          excludedStatus: false,
+        },
+      });
+      return user != null
+        ? { status: true, user: user }
+        : { status: true, user: undefined };
+    } catch (error) {
+      return { status: false, error: error };
+    }
+  }
   static async findEmployees() {
     try {
       const listOfEmployees = await prisma.user.findMany({
         where: {
           user_type: 2,
+          excludedStatus: false,
         },
         select: {
           id: true,
@@ -160,11 +184,11 @@ export default class UserService {
       });
       return listOfEmployees != null
         ? { status: true, listOfEmployees: listOfEmployees }
-        : { status: true, listOfEmployees: {}};
+        : { status: true, listOfEmployees: {} };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async update(userData: User) {
     try {
       const result = await prisma.user.update({
@@ -177,19 +201,19 @@ export default class UserService {
       });
       return result != null
         ? {
-          status: true,
-          userUpdated: {
-            id: result.id,
-            name: result.name,
-            login: result.login,
-            created: result.createdAt,
-          },
-        }
+            status: true,
+            userUpdated: {
+              id: result.id,
+              name: result.name,
+              login: result.login,
+              created: result.createdAt,
+            },
+          }
         : { status: true, userUpdated: {} };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async updateEmail(userData: User) {
     try {
       const result = await prisma.user.update({
@@ -202,16 +226,17 @@ export default class UserService {
       });
       return result != null
         ? {
-          status: true, result: {
-            id : result.id,
-            email : result.email
-          },
-        }
+            status: true,
+            result: {
+              id: result.id,
+              email: result.email,
+            },
+          }
         : { status: false, result: undefined };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async deleteFuncionario(userData: User) {
     try {
       await prisma.user.update({
@@ -221,8 +246,8 @@ export default class UserService {
       return { status: true };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async deleteAllEmployees() {
     try {
       await prisma.user.updateMany({
@@ -232,8 +257,8 @@ export default class UserService {
       return { status: true };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async authUser(userData: User) {
     try {
       const user = await prisma.user.findFirst({
@@ -246,12 +271,12 @@ export default class UserService {
         : { status: true, user: undefined };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
 
   static async tokenCreate(userData: User) {
     try {
-      if(userData.id != undefined){
+      if (userData.id != undefined) {
         const result = await prisma.token_Recovery.create({
           data: {
             user_id: userData.id,
@@ -264,8 +289,8 @@ export default class UserService {
       }
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async tokenValited(token) {
     try {
       const tokenIsValid = await prisma.token_Recovery.findUnique({
@@ -277,14 +302,14 @@ export default class UserService {
       return tokenIsValid == undefined
         ? { status: true, isValid: false }
         : {
-          status: true,
-          isValid: true,
-          token: { id: tokenIsValid.token, user_id: tokenIsValid.user_id },
-        };
+            status: true,
+            isValid: true,
+            token: { id: tokenIsValid.token, user_id: tokenIsValid.user_id },
+          };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async tokenDelete(userData: User) {
     try {
       const result = await prisma.token_Recovery.deleteMany({
@@ -295,8 +320,8 @@ export default class UserService {
       return result.count > 0 ? { status: true } : { status: false };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async updatePassword_editUser(id, password) {
     try {
       await prisma.user.update({
@@ -310,8 +335,8 @@ export default class UserService {
       return { status: true };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async updatePassword_resetPassword(id, token, password) {
     try {
       await prisma.user.update({
@@ -333,10 +358,10 @@ export default class UserService {
       return { status: true };
     } catch (error) {
       return { status: false, error: error };
-    };
-  };
+    }
+  }
   static async isFuncionario(id) {
     const user = await prisma.user.findFirst({ where: { id: id } });
     return user?.user_type == 2 ? { is: true } : { is: false };
-  };
-};
+  }
+}
