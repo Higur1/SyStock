@@ -18,12 +18,11 @@ class Batch {
     public constructor({
         expirantionDate,
         quantity,
-        deletationStatus,
         product_id,
     }: IBatch) {
         this.expirantionDate = expirantionDate,
             this.quantity = quantity;
-        this.deletationStatus = deletationStatus;
+        this.deletationStatus = false;
         this.product_id = product_id;
         this.expirantionDate.setDate(this.expirantionDate.getDate()+1)
         this.expirantionDate.setHours(-3);

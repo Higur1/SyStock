@@ -51,7 +51,7 @@ export default class BatchService {
             eValidationStatus:
               batchData.eValidationStatus == undefined
                 ? 0
-                : batchData.eValidationStatus,
+                : batchData.eValidationStatus
           },
         });
         return { status: true, batch: batchResult };

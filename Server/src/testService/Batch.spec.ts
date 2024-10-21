@@ -14,6 +14,7 @@ import product from "../service/ProductService";
 import Product from "../models/Product";
 import Decimal from "decimal.js";
 import BatchService from "../service/BatchService";
+import { prisma } from "../config/prisma";
 
 describe("Create batch model", () => {
   let product_id;
@@ -60,13 +61,12 @@ describe("Create batch model", () => {
     });
     
     const createBatch = await BatchService.create(batchDatanew);
-
+    console.log(createBatch.batch)
     await expect(createBatch).toHaveProperty("batch.id");
   });
 
   it("Should be able to create a new batch with eValidationStatus 2", async () => {
-    /*const doisDiasAMaisDoAtual = new Date();
-    doisDiasAMaisDoAtual.setDate(doisDiasAMaisDoAtual.getDate() + 2);*/
+
     const batchData = new Batch({
       expirantionDate: new Date("2024-10-18"),
       quantity: 1,
@@ -77,12 +77,10 @@ describe("Create batch model", () => {
 
     await expect(createBatch).toHaveProperty("batch.id");
   });
-
+  
   it("Should be able to create a new batch with eValidationStatus 3", async () => {
-    /*const dezesseisDiasAMaisDoAtual = new Date();
-    dezesseisDiasAMaisDoAtual.setDate(dezesseisDiasAMaisDoAtual.getDate() + 16);*/
     const batchData = new Batch({
-      expirantionDate: /*dezesseisDiasAMaisDoAtual*/ new Date("2024-10-31"),
+      expirantionDate:  new Date("2024-10-31T10:05:00.000Z"),
       quantity: 1,
       product_id: product_id,
     });
@@ -90,6 +88,9 @@ describe("Create batch model", () => {
     const createBatch = await BatchService.create(batchData);
 
     await expect(createBatch).toHaveProperty("batch.id");
+    const idParaApagarBatch = ((await batchService.findBatch(batchData)).batch?.id)
+    console.log(idParaApagarBatch)
+    await prisma.batch.delete({where: {id: idParaApagarBatch}});
   });
 
   it("Should be able to create a new batch with quantity 0, but deletationstatus will be true", async () => {
@@ -100,6 +101,10 @@ describe("Create batch model", () => {
     });
     const createBatch = await BatchService.create(batchData);
     await expect(createBatch.batch?.deletionStatus).toBe(true);
+    //excluindo lote criado e ja testado
+    const idParaApagarBatch = ((await batchService.findBatch(batchData)).batch?.id)
+    console.log(idParaApagarBatch)
+    await prisma.batch.delete({where: {id: idParaApagarBatch}});
   });
 
   it("Should be not able to create a new batch | add quantity in batch alredy exists", async () => {
@@ -110,9 +115,30 @@ describe("Create batch model", () => {
     });
     const createBatch = await BatchService.create(batchData);
     await expect(createBatch).toHaveProperty("message");
+    const idParaApagarBatch = ((await batchService.findBatch(batchData)).batch?.id)
+    console.log(idParaApagarBatch)
+    await prisma.batch.delete({where: {id: idParaApagarBatch}});
   });
 
-  afterAll(async () => {
-    //      await product.deleteAll();
+  it("Should be able to delete a batch", async () => {
+    const batchDatanew = new Batch({
+      expirantionDate: new Date("2024-10-02"),
+      quantity: 1,
+      product_id: product_id,
+    });
+    batchDatanew.id = (await batchService.findBatch(batchDatanew)).batch?.id
+    console.log(batchDatanew)
+    const batchDeleted = await batchService.delete(batchDatanew) 
+
+    await expect(batchDeleted.status).toBe(true);
   });
+/*
+  afterAll(async () => {
+    const batchencontrado = await prisma.batch.findFirst({where: {product_id: product_id}});
+    console.log(batchencontrado)
+    const encontrado = await prisma.product.findUnique({where: {id: product_id}});
+    console.log(encontrado)
+    await prisma.product.delete({where: {id: product_id}});
+    await prisma.category.delete({where: {id: category_id}});
+  });*/
 });
