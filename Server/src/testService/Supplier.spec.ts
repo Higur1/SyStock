@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from "@jest/globals";
+import { describe, it, expect, beforeAll, afterAll } from "@jest/globals";
 import Supplier from "../models/Supplier";
 import supplier from "../service/SupplierService";
 
@@ -66,7 +66,7 @@ describe("Create supplier model", () => {
     const createBatch = await supplier.create(supplierData);
 
     expect(createBatch).toHaveProperty("supplier.id");
-  });
+  })
 
   afterAll(async () => {
     await supplier.deleteAll();

@@ -23,6 +23,7 @@ export default class CategoryService {
       const categoryResult = await prisma.category.create({
         data: {
           name: categoryData.name,
+          excludedStatus: false
         },
       });
 

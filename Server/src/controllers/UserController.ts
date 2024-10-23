@@ -142,13 +142,13 @@ export default class UserController {
         name: name,
         password: user_password,
       }
+
       //verifica se os dados do funcionario já existem em algum usuario do sistema já existe antes de cadastra-lo
       const userExists = await userService.findUser(userData);
 
       //verifica se existe um preusuario para o usuario que será cadastrado
 
       const hash_password = cryptPassword(userData.password);
-
       if (userExists.status && userExists.user == undefined) {
         const funcionario = new User({
           name,

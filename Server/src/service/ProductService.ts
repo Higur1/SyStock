@@ -1,6 +1,7 @@
 import { prisma } from "../config/prisma";
-import Batch from "../models/Batch";
 import Product from "../models/Product";
+import Batch from "../models/Batch";
+import batch from "../service/BatchService";
 import { Prisma } from "@prisma/client";
 
 export default class ProductService {
@@ -74,6 +75,13 @@ export default class ProductService {
             category_id: true,
           },
         });
+        const batchData:Batch = {
+          expirantionDate: new Date("2024-01-01T00:00:01.000"),
+          product_id: productResult.id,
+          quantity: 0
+        }
+        await batch.create(batchData);
+ 
         return productResult != null
           ? { status: true, product: productResult }
           : { status: true, product: undefined };

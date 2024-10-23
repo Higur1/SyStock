@@ -38,14 +38,10 @@ export default class CategoryController {
         name: name
       }
       const categoryAlreadyExists = await CategoryService.findByName(categoryData);
-
-      if (
-        categoryAlreadyExists.status &&
-        categoryAlreadyExists.categories == undefined
+      if (categoryAlreadyExists.status && categoryAlreadyExists.categories == 0
       ) {
         const categoryCreated = await CategoryService.create(categoryData);
-
-        if (categoryCreated.status && !categoryCreated.message) {
+        if (categoryCreated.status && !categoryCreated.error) {
           response.status(201).send(
             JSON.stringify({
               category: {

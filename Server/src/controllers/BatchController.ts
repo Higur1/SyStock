@@ -1,6 +1,7 @@
 import { z } from "zod";
 import batchService from "../service/BatchService";
 import Batch from "../models/Batch";
+import exp from "constants";
 
 export default class BatchController {
   static async findAll(request, response) {
@@ -65,8 +66,8 @@ export default class BatchController {
           error: error.issues[0].message,
         })
       );
-    }
-  }
+    };
+  };
   static async findBatchByProduct(request, response) {
     try {
       const productValidation = z.object({
@@ -105,43 +106,9 @@ export default class BatchController {
       );
     };
   };
-  static async update(request, response) {
+  static async delete(request, response) {
     try {
-      const batchValidation = z.object({
-        id: z.number().positive(),
-        quantity: z.number().positive()
-      });
 
-      const {  id, quantity } = batchValidation.parse(request.body);
-
-      const batchData: Batch = {
-       id: id,
-        quantity: quantity,
-        eValidationStatus: 0,
-        expirantionDate: new Date(""),
-        product_id: 0
-      };
-      const batchResult = await batchService.findBatch(batchData);
-      if(batchResult.batch == null){
-        return response.status(200).send(JSON.stringify({
-          message: "Batch not found"
-        }))
-      }
-      const batchUpdated = await batchService.update(batchData);
-
-      if (batchUpdated.status) {
-        response.status(200).send(
-          JSON.stringify({
-            batch: batchUpdated.batch
-          })
-        );
-      } else {
-        response.status(500).send(
-          JSON.stringify({
-            error: batchUpdated.error.message
-          })
-        );
-      };
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
@@ -151,9 +118,51 @@ export default class BatchController {
       );
     };
   };
-  static async delete(request, response) {
+  static async supply(request, response) {
     try {
-      
+      const baseData = ("2024-01-01T03:00:01.000Z");
+      const batchValidation = z.object({
+        product_id: z.number(),
+        expirationDate: z.string().transform((val)=> new Date(val)).default(baseData),
+        quantity: z.number(),
+        operation: z.number()
+      });
+      const {product_id, expirationDate, quantity, operation} = batchValidation.parse(request.body);
+
+      const batchData: Batch = {
+        product_id : product_id,
+        expirantionDate:expirationDate,
+        quantity: quantity
+      }
+      const batchIsValid = await batchService.searchForExpirationDate(batchData);
+
+      if(batchIsValid.find){
+        const batchSupply = await batchService.update(batchData, operation);
+        if(batchSupply.status){
+          response.status(200).JSON.stringify({
+            batch: batchSupply
+          })
+        }else{
+          response.status(500).send(
+            JSON.stringify({
+              error: batchSupply.error.message
+            })
+          );
+        }
+      }else{
+        const batchSupply = await batchService.create(batchData);
+        if(batchSupply.status){
+          response.status(201).JSON.stringify({
+            batch: batchSupply
+          });
+        }else{
+          response.status(500).send(
+            JSON.stringify({
+              error: batchSupply.error.message
+            })
+          );
+        }
+      }
     } catch (error) {
       response.status(400).send(
         JSON.stringify({

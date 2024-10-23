@@ -34,8 +34,8 @@ export default class ProductController {
     try {
       const productValidation = z.object({
         name: z.string().trim().min(2).max(20),
-        price: z.number().positive().refine((val) => val % 1 !==0),
-        costPrice: z.number().positive().refine((val) => val % 1 !==0),
+        price: z.number().positive(),
+        costPrice: z.number().positive(),
         minimunQuantity: z.number().positive(),
         observation: z.string().max(30).optional(),
         category_id: z.number().positive()
@@ -55,7 +55,6 @@ export default class ProductController {
       };
 
       const productCreated = await productService.create(productData);
-
       if (productCreated.status) {
         if(productCreated.message){
           response.status(400).send(
