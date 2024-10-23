@@ -70,4 +70,11 @@ export default class ProductActions {
 
     return Client.delete({id});
   }
+
+  static async addMultipleQuantityProducts(productsToAdd = []) {
+
+    const results = await Promise.all(productsToAdd.map(this.update));
+
+    return results;
+  }
 }

@@ -33,6 +33,11 @@ export default function ProductPage() {
     setLoading(false);
   }, [productsFiltered]);
 
+  async function loadProducts() {
+    setLoading(true);
+    getProducts();
+  }
+
   function setFilteredProducts(products = productsBase, filterBase = filter) {
 
     let nextProducts = [];
@@ -249,7 +254,8 @@ export default function ProductPage() {
         errorInsert, handleDeleteProduct,
         productsWithoutSupply, getProductTotalQuantity,
         getExpiryDatesByProduct,
-        loading
+        loading,
+        loadProducts
       }}
     >
       <Product />

@@ -6,9 +6,10 @@ import styled from 'styled-components';
 import SectionCollapser from '../../../components/common/SectionCollapser';
 import { TableContainer, TableData, TableRow } from '../styles';
 import Batch from '../../../classes/Batch';
-import { MainContext } from '../../../App';
+import { DEBUG_LOCAL, MainContext } from '../../../App';
 import { ENTITIES } from '../../../utils/debug-local-helper';
 import Supply from '../../../classes/Supply';
+import ProductActions from '../../../Service/Product/ProductActions';
 
 const TYPES = {
   MINUS: "MINUS",
@@ -44,7 +45,7 @@ function total(arr) {
 
 }
 
-export default function AddSupply(props) {
+export default function AddQuantity(props) {
   const { onClose } = props;
   const [extraProps, setExtraProps] = useState(initialConfigProduct);
   const [productsToAdd, setProductsToAdd] = useState([]);
@@ -109,21 +110,26 @@ export default function AddSupply(props) {
     setExtraProps(prevExtra => ({ ...prevExtra, priceBuy: product.priceBaseBuy, priceSell: product.priceBaseSell }));
   }
 
-  function handleCreateSupply() {
+  async function handleAddQuantity() {
     const nextSupplier = supplier ? suppliersBase.find(sup => sup.email === supplier.value) : null;
+    if (DEBUG_LOCAL) {
 
-    const batches = productsToAdd.map(prod => {
-      const supplier = nextSupplier ? nextSupplier : null;
+      const batches = productsToAdd.map(prod => {
+        const supplier = nextSupplier ? nextSupplier : null;
 
-      prod.setSupplier(supplier);
+        prod.setSupplier(supplier);
 
-      return prod;
-    });
+        return prod;
+      });
 
-    const currentSupplies = getData(ENTITIES.SUPPLY_LIST);
 
-    updateData(ENTITIES.SUPPLY_LIST, [...currentSupplies, new Supply({ batches, description, supplier: nextSupplier ? nextSupplier : null })]);
-    handleOpenSnackBar("success", "Abastecimento Criado", 5000);
+      const currentSupplies = getData(ENTITIES.SUPPLY_LIST);
+
+      updateData(ENTITIES.SUPPLY_LIST, [...currentSupplies, new Supply({ batches, description, supplier: nextSupplier ? nextSupplier : null })]);
+      handleOpenSnackBar("success", "Abastecimento Criado", 5000);
+    } else {
+      await ProductActions.addMultipleQuantityProducts(productsToAdd);
+    }
     onClose();
   }
 
@@ -282,7 +288,7 @@ export default function AddSupply(props) {
       </div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 16 }}>
         <Button variant="contained" onClick={onClose}>Cancelar</Button>
-        <Button variant="contained" onClick={handleCreateSupply}>Confirmar</Button>
+        <Button variant="contained" onClick={handleAddQuantity}>Confirmar</Button>
       </div>
     </div>
   );

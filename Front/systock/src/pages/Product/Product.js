@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Container } from "./styles";
 import { Box, Button, Chip, ClickAwayListener, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl, FormControlLabel, IconButton, InputLabel, MenuItem, OutlinedInput, Paper, Radio, RadioGroup, Select, Tab, Tabs } from "@mui/material";
 import ToolTipAndEllipsis from "../../components/dialogs/ComponentUtils/ToolTipAndEllipsis";
@@ -22,7 +22,7 @@ export const TABS = {
   CREATE_PRODUCT: "CREATE_PRODUCT",
   DECREASE_QUANTITY: "DECREASE_QUANTITY",
   VIEW_SUPPLIES: "VIEW_SUPPLIES",
-  ADD_SUPPLY: "ADD_SUPPLY"
+  ADD_QUANTITY: "ADD_QUANTITY"
 }
 
 
@@ -39,15 +39,20 @@ const tabsList = [
   { type: TABS.CREATE_PRODUCT, label: "Criar Produto" },
   { type: TABS.DECREASE_QUANTITY, label: "Diminuir Quantidade" },
   { type: TABS.VIEW_SUPPLIES, label: "Visualizar Abastecimentos" },
-  { type: TABS.ADD_SUPPLY, label: "Adicionar Abastecimento" }
+  { type: TABS.ADD_QUANTITY, label: "Adicionar Quantidade" }
 ];
 
 export default function Product() {
 
-  const { productsFiltered, createProduct, errorInsert, updateProduct } = useContext(ProductContext);
+  const { productsFiltered, createProduct, errorInsert, updateProduct, loadProducts } = useContext(ProductContext);
 
   const [dialog, setDialog] = useState({ type: TYPES_DIALOG.NONE });
   const [tab, setTab] = useState(TABS.PRODUCTS_LIST);
+
+  useEffect(() => {
+    if(tab !== TABS.PRODUCTS_LIST) return;
+    loadProducts();
+  }, [tab]);
 
   function handleEditProductDialog(index) {
     setDialog({ type: TYPES_DIALOG.EDIT_PRODUCT, index });
@@ -96,7 +101,7 @@ export default function Product() {
             />
           )}
 
-          {tab === TABS.ADD_SUPPLY && (<AddSupply />)}
+          {tab === TABS.ADD_QUANTITY && (<AddSupply onClose={() => handleChange(null, TABS.PRODUCTS_LIST)}/>)}
 
           {tab === TABS.DECREASE_QUANTITY && (<ChangeQuantityProduct />)}
 
