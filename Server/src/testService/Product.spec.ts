@@ -27,8 +27,9 @@ describe("Create Product model", () => {
     };
 
     const categoryResult = await category.create(categoryData);
-
+    console.log(categoryResult)
     categoryId = categoryResult.category!.category_id;
+    console.log(categoryId)
   });
   it("Dado um produto X Quando há uma tentativa de criação com atributos válidos Então ele é criado com sucesso", 
     async () => {
@@ -79,7 +80,9 @@ describe("Create Product model", () => {
     await expect(createProduct.product?.totalQuantityInStock).toBe(0);
     await expect(verifyExcludedStatus.product?.excludedStatus).toBe(false);
     const idParaApagar = (await product.findByName(ProductData)).product?.id
-    await prisma.product.delete({where: {id: idParaApagar}});
+    await prisma.product.update({where:{id: idParaApagar}, data:{category_id: undefined} })
+    const deleteProduct = await prisma.product.delete({where: {id: idParaApagar}});
+    console.log(deleteProduct)
   });
 
   it("Dado um produto X não existente no BD Quando criado uma instancia do objeto dele Então a quantidade em estoque deve ser 0", async () => {

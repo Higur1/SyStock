@@ -203,7 +203,7 @@ export default class ProductService {
         },
       });
 
-      if (productBatch != null) {
+      if (productBatch?.quantity == undefined ? 1 : productBatch?.quantity > 0) {
         return {
           status: false,
           error:

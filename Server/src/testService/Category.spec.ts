@@ -25,7 +25,7 @@ describe("Create category model", () => {
     };
 
     const createCategory = await category.create(categoryData);
-
+    console.log(createCategory)
     categoryId = createCategory.category!.category_id;
     await expect(createCategory).toHaveProperty("category.category_id");
   });

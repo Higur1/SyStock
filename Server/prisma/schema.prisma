@@ -129,7 +129,7 @@ model Product {
   minimunQuantity      Int
   observation          String
   totalQuantityInStock Int
-  category_id          Int
+  category_id          Int?
   createdAt            DateTime @default(now())  
   updatedAt            DateTime @updatedAt
   excludedStatus       Boolean
@@ -138,7 +138,7 @@ model Product {
   Batch                Batch[]
             
 
-  category_id_fk Category @relation(fields: [category_id], references: [id])
+  category_id_fk Category? @relation(fields: [category_id], references: [id])
 
   @@map("product")
 }
@@ -171,9 +171,11 @@ model Batch_Fill {
   subTotal  Decimal
   createdAt            DateTime @default(now())  
   updatedAt            DateTime @updatedAt
+  logFill_id Int
 
   batch_id_fk Batch @relation(fields: [batch_id], references: [id])
   fill_id_fk  Fill  @relation(fields: [fill_id], references: [id])
+  logFill_id_fk  logFill  @relation(fields: [logFill_id], references: [id])
 }
 
 model Sales {
@@ -227,24 +229,25 @@ model logSales {
 model logProduct {
   id           Int      @id @default(autoincrement())
   product_id   Int
-  product_name String
   quantity     Int
-  user_name    String
+  user_id    String
   dateTime     DateTime @default(now())
   eTypeAction  Int
+  motivo     String
 
   @@map("log_product")
 }
 
 model logFill {
   id            Int      @id @default(autoincrement())
+
   observation   String
   dateTime      DateTime @default(now())
-  user_name     String
-  supplier_name String
-  price         Decimal
+  user_id       Int
+  supplier_id   Int
+  Batch_Fill
   totalPrice    Decimal
-  subTotal      Decimal
+
 
   @@map("log_fill")
 }

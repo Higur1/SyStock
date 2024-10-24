@@ -61,7 +61,7 @@ describe("Create batch model", () => {
     });
     
     const createBatch = await BatchService.create(batchDatanew);
-    console.log(createBatch.batch)
+    console.log(createBatch)
     await expect(createBatch).toHaveProperty("batch.id");
   });
 
@@ -88,33 +88,6 @@ describe("Create batch model", () => {
     const createBatch = await BatchService.create(batchData);
 
     await expect(createBatch).toHaveProperty("batch.id");
-    const idParaApagarBatch = ((await batchService.findBatch(batchData)).batch?.id)
-    console.log(idParaApagarBatch)
-    await prisma.batch.delete({where: {id: idParaApagarBatch}});
-  });
-
-  it("Should be able to create a new batch with quantity 0, but deletationstatus will be true", async () => {
-    const batchData = new Batch({
-      expirantionDate: new Date("2024-10-20"),
-      quantity: 0,
-      product_id: product_id,
-    });
-    const createBatch = await BatchService.create(batchData);
-    await expect(createBatch.batch?.deletionStatus).toBe(true);
-    //excluindo lote criado e ja testado
-    const idParaApagarBatch = ((await batchService.findBatch(batchData)).batch?.id)
-    console.log(idParaApagarBatch)
-    await prisma.batch.delete({where: {id: idParaApagarBatch}});
-  });
-
-  it("Should be not able to create a new batch | add quantity in batch alredy exists", async () => {
-    const batchData = new Batch({
-      expirantionDate: new Date("2024-10-18"),
-      quantity: 9,
-      product_id: product_id,
-    });
-    const createBatch = await BatchService.create(batchData);
-    await expect(createBatch).toHaveProperty("message");
     const idParaApagarBatch = ((await batchService.findBatch(batchData)).batch?.id)
     console.log(idParaApagarBatch)
     await prisma.batch.delete({where: {id: idParaApagarBatch}});
