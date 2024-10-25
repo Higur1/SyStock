@@ -19,7 +19,6 @@ class Fill {
 
   public constructor({
     totalPrice,
-    dateTime,
     observation,
     supplier_id,
     user_id,
