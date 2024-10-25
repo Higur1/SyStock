@@ -163,7 +163,6 @@ model Batch {
 }
 
 model Batch_Fill {
-  id        Int     @id @default(autoincrement())
   batch_id  Int
   fill_id   Int
   quantity  Int
@@ -173,6 +172,8 @@ model Batch_Fill {
   updatedAt            DateTime @updatedAt
   logFill_id Int
 
+  @@id(name: "batch_Fill_id", [batch_id, fill_id])
+  
   batch_id_fk Batch @relation(fields: [batch_id], references: [id])
   fill_id_fk  Fill  @relation(fields: [fill_id], references: [id])
   logFill_id_fk  logFill  @relation(fields: [logFill_id], references: [id])
@@ -240,15 +241,13 @@ model logProduct {
 
 model logFill {
   id            Int      @id @default(autoincrement())
-
   observation   String
   dateTime      DateTime @default(now())
   user_id       Int
   supplier_id   Int
-  Batch_Fill
   totalPrice    Decimal
 
-
+  Batch_Fill Batch_Fill[]
   @@map("log_fill")
 }
 

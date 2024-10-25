@@ -32,12 +32,17 @@ export default class BatchService {
             expirationDate: batchData.expirantionDate,
             quantity: batchData.quantity,
             product_id: batchData.product_id,
-            eValidationStatus: 2
+            eValidationStatus: batchData.eValidationStatus == undefined ? 0 : batchData.eValidationStatus
+          }
+        })
+        await prisma.logFill.create({
+          data:{
+            dateTime
           }
         })
         return {status: true, batch: createBatch};
       }else{
-        return {status: true, error: "not possible create batch"};
+        return {status: true, error: "not possible create batch, batch exists"};
       };
     } catch (error) {
       return {status: false, error: error};
