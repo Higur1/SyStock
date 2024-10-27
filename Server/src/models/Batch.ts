@@ -1,10 +1,13 @@
+import Batch_Fill from "./Batch_Fill"; 
+
 interface IBatch {
     expirantionDate: Date;
     quantity: number;
     deletationStatus?: boolean;
     dateTimeEmptyStock?: Date;
     product_id: number;
-    eValidationStatus?: number
+    eValidationStatus?: number;
+    batchs_fills: Array<Batch_Fill>;
 }
 
 class Batch {
@@ -14,11 +17,13 @@ class Batch {
     quantity: number
     deletationStatus?: boolean
     eValidationStatus?: number
+    batchs_fills: Array<Batch_Fill>;
 
     public constructor({
         expirantionDate,
         quantity,
         product_id,
+        batchs_fills
     }: IBatch) {
         this.expirantionDate = expirantionDate,
             this.quantity = quantity;
@@ -48,6 +53,7 @@ class Batch {
                 this.eValidationStatus = 3;
             }
         }
+        this.batchs_fills = batchs_fills;
     }
 }
 export default Batch;

@@ -1,33 +1,19 @@
 import User from "./User";
-import Batch_Fill from "./Batch_Fill";
-import Supplier from "./Supplier";
-import Decimal from "decimal.js";
+import Fill from "./Fill";
 
 interface ILogFill {
-  totalPrice: Decimal;
-  quantity: number;
+  id?: number;
   user: User;
-  dateTime?: Date;
-  supplier?: Supplier;
-  observation: string;
-  batch_fill: Array<Batch_Fill>;
+  fill: Fill;
 }
 class LogFill {
   id?: number;
-  totalPrice: Decimal;
-  quantity: number;
   user: User;
-  dateTime?: Date;
-  supplier?: Supplier;
-  observation: string;
-  batch_fill: Array<Batch_Fill>;
+  fill: Fill;
 
-  public constructor({ totalPrice, quantity, user, observation, batch_fill }: ILogFill) {
-    this.totalPrice = totalPrice;
-    this.quantity = quantity;
+  public constructor({ user, fill }: ILogFill) {
     this.user = user;
-    this.observation = observation;
-    this.batch_fill = batch_fill;
+    this.fill = fill;
   }
 }
 

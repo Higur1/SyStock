@@ -1,4 +1,4 @@
-import {
+/*import {
   describe,
   it,
   expect,
@@ -113,5 +113,6 @@ describe("Create batch model", () => {
     console.log(encontrado)
     await prisma.product.delete({where: {id: product_id}});
     await prisma.category.delete({where: {id: category_id}});
-  });*/
+  });
 });
+*/

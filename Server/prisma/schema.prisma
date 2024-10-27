@@ -63,7 +63,8 @@ model User {
   Sales Sales[]
   Fill  Fill[]
   token_Recovery token_Recovery[]
-
+  logFills logFill[]
+  logProdutos logProduct[]
   @@map("user")
 }
 
@@ -100,8 +101,8 @@ model Fill {
   user_id     Int
   createdAt            DateTime @default(now())  
   updatedAt            DateTime @updatedAt
-  excludedStatus Boolean
-
+  
+  logFill    logFill[]
   Batch_Fill Batch_Fill[]
 
   supplier_id_fk Supplier @relation(fields: [supplier_id], references: [id])
@@ -133,13 +134,13 @@ model Product {
   createdAt            DateTime @default(now())  
   updatedAt            DateTime @updatedAt
   excludedStatus       Boolean
+  
 
   Product_Sales        Product_Sales[]
   Batch                Batch[]
-            
+  logProduto           logProduct[]          
 
   category_id_fk Category? @relation(fields: [category_id], references: [id])
-
   @@map("product")
 }
 
@@ -176,7 +177,6 @@ model Batch_Fill {
   
   batch_id_fk Batch @relation(fields: [batch_id], references: [id])
   fill_id_fk  Fill  @relation(fields: [fill_id], references: [id])
-  logFill_id_fk  logFill  @relation(fields: [logFill_id], references: [id])
 }
 
 model Sales {
@@ -229,25 +229,25 @@ model logSales {
 
 model logProduct {
   id           Int      @id @default(autoincrement())
-  product_id   Int
+  produto_id   Int 
   quantity     Int
-  user_id    String
+  user_id      Int 
   dateTime     DateTime @default(now())
   eTypeAction  Int
   motivo     String
 
+  product     Product? @relation(fields: [produto_id], references: [id])
+  user        User? @relation(fields: [user_id], references: [id])
   @@map("log_product")
 }
 
 model logFill {
   id            Int      @id @default(autoincrement())
-  observation   String
-  dateTime      DateTime @default(now())
+  fill_id       Int
   user_id       Int
-  supplier_id   Int
-  totalPrice    Decimal
 
-  Batch_Fill Batch_Fill[]
+  fill          Fill @relation(fields: [fill_id], references: [id])
+  user          User  @relation(fields: [user_id], references: [id])
   @@map("log_fill")
 }
 
