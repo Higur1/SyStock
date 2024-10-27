@@ -1,7 +1,7 @@
-import { error } from "console";
 import { prisma } from "../config/prisma";
 import Fill from "../models/Fill";
 import Supplier from "../models/Supplier";
+import User from "../models/User";
 
 export default class FillService {
   static async findAll() {
@@ -37,27 +37,51 @@ export default class FillService {
       return { status: false, error: error };
     }
   }
-  static async create(fill: Fill) {
-    try{
-        fill.dateTime = new Date();
-        fill.totalPrice = fill.calcTotalPrice(fill).totalPrice;
-        const fillResult = await prisma.fill.create({
+  static async create(fill: Fill, user: User) {
+    try {
+      fill.dateTime = new Date();
+      fill.totalPrice = fill.calcTotalPrice(fill).totalPrice;
+      const fillResult = await prisma.fill.create({
+        data: {
+          dateTime: fill.dateTime,
+          observation: fill.observation,
+          totalPrice: fill.totalPrice,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          supplier_id: fill.supplier_id,
+          user_id: fill.user_id,
+        },
+      });
+      if (fillResult != null) {
+        const logFillCreated = await prisma.logFill.create({
+          data: {
+            fill: {
+              connect: { id: fillResult.id },
+            },
+            user: {
+              connect: { id: fillResult.id },
+            },
+          },
+        });
+        const batchFillPromises = fill.batchs_fills.map(async (batch_fill) => {
+          return await prisma.batch_Fill.create({
             data: {
-              dateTime: fill.dateTime,
-              observation: fill.observation,
-              totalPrice: fill.totalPrice,
+              costPrice: batch_fill.costPrice,
+              quantity: batch_fill.quantity,
+              subTotal: batch_fill.subtotal,
               createdAt: new Date(),
-              updatedAt: new Date,
-              supplier_id: fill.supplier_id,
-              user_id: fill.user_id,
-            }
-        })
-        if(fillResult != null){
-            
-        }
-        return { status: true, fill: fill };
-    }catch(error){
-        return { status: false, error: error };
+              fill_id: batch_fill.fill.id == undefined ? 0 : batch_fill.fill.id,
+              batch_id:
+                batch_fill.batch.id == undefined ? 0 : batch_fill.batch.id,
+              updatedAt: new Date(),
+            },
+          });
+        });
+        await Promise.all(batchFillPromises);
+      }
+      return { status: true, fill: fillResult };
+    } catch (error) {
+      return { status: false, error: error };
     }
   }
   static async getHistoryFill() {}

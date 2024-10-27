@@ -3,6 +3,7 @@ import Product from "../models/Product";
 import Batch from "../models/Batch";
 import batch from "../service/BatchService";
 import { Prisma } from "@prisma/client";
+import User from "../models/User";
 
 export default class ProductService {
   static async findAll() {
@@ -30,15 +31,15 @@ export default class ProductService {
       return { status: false, error: error };
     }
   }
-  static async getExcludedStatus(productData: Product){
+  static async getExcludedStatus(productData: Product) {
     try {
       const product = await prisma.product.findUnique({
         where: {
           id: productData.id,
         },
         select: {
-          excludedStatus: true
-        }
+          excludedStatus: true,
+        },
       });
 
       return product != null
@@ -48,7 +49,7 @@ export default class ProductService {
       return { status: false, error: error };
     }
   }
-  static async create(productData: Product) {
+  static async create(productData: Product, user: User) {
     try {
       const verifyProductExists = await ProductService.findByName(productData);
 
@@ -75,13 +76,14 @@ export default class ProductService {
             category_id: true,
           },
         });
-        const batchData:Batch = {
+        const batchData: Batch = {
           expirantionDate: new Date("2024-01-01T00:00:01.000"),
           product_id: productResult.id,
-          quantity: 0
-        }
-        await batch.create(batchData);
- 
+          quantity: 0,
+          batchs_fills: [],
+        };
+        await batch.create(batchData, user);
+
         return productResult != null
           ? { status: true, product: productResult }
           : { status: true, product: undefined };
@@ -203,7 +205,9 @@ export default class ProductService {
         },
       });
 
-      if (productBatch?.quantity == undefined ? 1 : productBatch?.quantity > 0) {
+      if (
+        productBatch?.quantity == undefined ? 0 : productBatch?.quantity > 0
+      ) {
         return {
           status: false,
           error:

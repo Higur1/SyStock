@@ -2,7 +2,6 @@ import Decimal from "decimal.js";
 import Batch_Fill from "./Batch_Fill";
 
 interface IFill {
-  id?: number;
   totalPrice: Decimal;
   dateTime?: Date;
   supplier_id: number;

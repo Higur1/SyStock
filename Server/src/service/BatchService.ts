@@ -29,6 +29,7 @@ export default class BatchService {
         },
       });
       if (batchResult == null) {
+        console.log("entrou" + ``)
         const createBatch = await prisma.batch.create({
           data: {
             deletionStatus: false,
@@ -86,6 +87,7 @@ export default class BatchService {
         };
       }
     } catch (error) {
+      console.log(error)
       return { status: false, error: error };
     }
   }

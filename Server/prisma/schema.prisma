@@ -171,7 +171,6 @@ model Batch_Fill {
   subTotal  Decimal
   createdAt            DateTime @default(now())  
   updatedAt            DateTime @updatedAt
-  logFill_id Int
 
   @@id(name: "batch_Fill_id", [batch_id, fill_id])
   

@@ -8,7 +8,7 @@ interface IBatch_Fill {
     batch: Batch;
     quantity: number;
     costPrice: Decimal;
-    subtotal?: Decimal;
+    subtotal: Decimal;
     iLogFill?: ILogFill;
   }
   class Batch_Fill {
@@ -16,15 +16,15 @@ interface IBatch_Fill {
     batch: Batch;
     quantity: number;
     costPrice: Decimal;
-    subtotal?: Decimal;
+    subtotal: Decimal;
     iLogFill?: ILogFill;
   
-    public constructor({ fill, batch, quantity, costPrice }: IBatch_Fill) {
+    public constructor({ fill, batch, quantity, costPrice, subtotal }: IBatch_Fill) {
       this.fill = fill;
       this.batch = batch;
       this.quantity = quantity;
       this.costPrice = costPrice;
-      this.subtotal = Decimal.mul( this.costPrice, this.quantity); 
+      this.subtotal = subtotal; 
     }
   }
   

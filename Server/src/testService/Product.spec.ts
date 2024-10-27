@@ -4,15 +4,20 @@ import Batch from "../models/Batch";
 import batchService from "../service/BatchService";
 import product from "../service/ProductService";
 import category from "../service/CategoryService";
+import userService from "../service/UserService";
 import Category from "../models/Category";
 import Decimal from "decimal.js";
 import { prisma } from "../config/prisma";
 import { string } from "zod";
 import BatchService from "../service/BatchService";
+import User from "../models/User";
 
 describe("Create Product model", () => {
   let categoryId;
   let UniqueName;
+  let userEmail;
+  let userLogin;
+  let UserData;
 
   beforeAll(async () => {
     const genarateUniqueProductName = `Mock Product-${String(Date.now())}`;
@@ -27,12 +32,23 @@ describe("Create Product model", () => {
     };
 
     const categoryResult = await category.create(categoryData);
-    console.log(categoryResult)
+    console.log(categoryResult);
     categoryId = categoryResult.category!.category_id;
-    console.log(categoryId)
+    console.log(categoryId);
+
+    const genarateUniqueEmail = `Mock UserEmailInProduct-${String(Date.now())}`;
+    userEmail = genarateUniqueEmail;
+    const genarateUniqueLogin = `Mock UserLoginInProduct-${String(Date.now())}`;
+    userLogin = genarateUniqueLogin;
+
+    UserData = new User({
+      name: "userTestProduct",
+      login: userLogin,
+      password: "senha",
+      email: userEmail,
+    });
   });
-  it("Dado um produto X Quando há uma tentativa de criação com atributos válidos Então ele é criado com sucesso", 
-    async () => {
+  it("Dado um produto X Quando há uma tentativa de criação com atributos válidos Então ele cria produto e cria um lote generico", async () => {
     const ProductData = new Product({
       name: UniqueName,
       price: new Decimal(1500.0),
@@ -41,12 +57,21 @@ describe("Create Product model", () => {
       observation: "De mesa",
       category_id: categoryId,
     });
-    const createProduct = await product.create(ProductData);
-
+    const createUser = await userService.createEmployee(UserData);
+    UserData.id = createUser.user?.id;
+    console.log(UserData.id)
+    const createProduct = await product.create(ProductData, UserData);
     await expect(createProduct).toHaveProperty("product.id");
+
+    console.log(createProduct.product?.id)
+    const batchFinded= await prisma.batch.findFirst({
+      where: { product_id: createProduct.product?.id },
+    });
+    console.log(batchFinded)
+    await expect(batchFinded).not.toBe(null);
   });
 
-  it("Dado um novo produto X Quando criado com uma  categoria inexistente Então ocorre um erro com a seguinte mensagem: 'Categoria é inexistente'", async () => {
+  it("Dado um novo produto X Quando criado com uma  categoria inexistente Então ocorre um erro com a seguinte mensagem: 'Categoria é inexistente' e o bacth nao deve ser criado", async () => {
     const genarateUniqueProductName = `Mock Product-${String(Date.now())}`;
     let UniqueNameNew = genarateUniqueProductName;
     const ProductData = new Product({
@@ -57,9 +82,16 @@ describe("Create Product model", () => {
       observation: "De mesa",
       category_id: 50000,
     });
-    const createProduct = await product.create(ProductData);
+
+    const findedUser = await userService.findUser(UserData);
+    UserData.id = findedUser.user?.id;
+    const createProduct = await product.create(ProductData, UserData);
 
     await expect(createProduct.error).toBe("Categoria é inexistente");
+    const batchFinded = await prisma.batch.findFirst({
+      where: { product_id: createProduct.product?.id }
+    });
+    await expect(batchFinded).toBe(null);
   });
 
   it("Dado um produto X Quando criado no BD Então a quantidade em estoque deve ser 0 e o excludedStatus 'false'", async () => {
@@ -73,16 +105,23 @@ describe("Create Product model", () => {
       observation: "De mesa",
       category_id: categoryId,
     });
-    const createProduct = await product.create(ProductData);
+    const findedUser = await userService.findUser(UserData);
+    UserData.id = findedUser.user?.id;
+    const createProduct = await product.create(ProductData, UserData);
     ProductData.id = createProduct.product?.id;
     const verifyExcludedStatus = await product.getExcludedStatus(ProductData);
 
     await expect(createProduct.product?.totalQuantityInStock).toBe(0);
     await expect(verifyExcludedStatus.product?.excludedStatus).toBe(false);
-    const idParaApagar = (await product.findByName(ProductData)).product?.id
-    await prisma.product.update({where:{id: idParaApagar}, data:{category_id: undefined} })
-    const deleteProduct = await prisma.product.delete({where: {id: idParaApagar}});
-    console.log(deleteProduct)
+    const idParaApagar = (await product.findByName(ProductData)).product?.id;
+    await prisma.product.update({
+      where: { id: idParaApagar },
+      data: { category_id: undefined },
+    });
+    const deleteProduct = await prisma.product.delete({
+      where: { id: idParaApagar },
+    });
+    console.log(deleteProduct);
   });
 
   it("Dado um produto X não existente no BD Quando criado uma instancia do objeto dele Então a quantidade em estoque deve ser 0", async () => {
@@ -107,36 +146,43 @@ describe("Create Product model", () => {
       observation: "De mesa",
       category_id: categoryId,
     });
-    const createProduct = await product.create(ProductData);
+    
+    const findedUser = await userService.findUser(UserData);
+    UserData.id = findedUser.user?.id;
+    const createProduct = await product.create(ProductData, UserData);
 
     await expect(createProduct.message).toBe("Product alredy exists");
     /*const idParaApagar = (await product.findByName(ProductData)).product?.id
     await prisma.product.delete({where: {id: idParaApagar}});*/
   });
-//pois o produto possui lotes
+  //pois o produto possui lotes
 
-it("Should not be able to delete a product", async () => {
-  const ProductData: Product = {
-    name: UniqueName,
-    price: new Decimal(1500.0),
-    costPrice: new Decimal(1000.0),
-    minimunQuantity: 3,
-    excludedStatus: false,
-    observation: "De mesa",
-    totalQuantityInStock: 0,
-    category_id: categoryId,
-  };
-  ProductData.id = (await product.findByName(ProductData)).product?.id;
-  console.log(ProductData)
-  const batch = new Batch({
-    expirantionDate: new Date("2024-12-30T05:00:00.000Z"),
-    quantity: 1,
-    product_id: ProductData.id == undefined ? 0 : ProductData.id,
-  });
+  it("Should not be able to delete a product", async () => {
+    const ProductData: Product = {
+      name: UniqueName,
+      price: new Decimal(1500.0),
+      costPrice: new Decimal(1000.0),
+      minimunQuantity: 3,
+      excludedStatus: false,
+      observation: "De mesa",
+      totalQuantityInStock: 0,
+      category_id: categoryId,
+    };
+    const findedUser = await userService.findUser(UserData);
+    UserData.id = findedUser.user?.id;
 
-  const batchCreated = await batchService.create(batch);
+    ProductData.id = (await product.findByName(ProductData)).product?.id;
+    console.log(ProductData);
+    const batch = new Batch({
+      expirantionDate: new Date("2024-12-30T05:00:00.000Z"),
+      quantity: 1,
+      product_id: ProductData.id == undefined ? 0 : ProductData.id,
+      batchs_fills: []
+    });
 
-  /*
+    const batchCreated = await batchService.create(batch, UserData);
+
+    /*
     const dateEqual = new Date("2024-12-30T05:00:00.000Z")
     console.log("primeiro teste: " + batch.expirantionDate.toISOString() + " é igual " + dateEqual.toISOString() + " " + (batch.expirantionDate.toISOString()===dateEqual.toISOString()))
     const dateMenor = new Date("2024-11-30")
@@ -185,35 +231,36 @@ it("Should not be able to delete a product", async () => {
             deletionStatus: false
         }
     });*/
-    
-  const productExcluded = await product.delete(ProductData);
 
-  expect(productExcluded.error).toBe("Não é possível deletar o produto! Produto possui quantidade em estoque!");
-  //deletando batch do produto para poder deletar o produto no metodo abaixo (metodo com o nome Should be able to delete a produto')
-  const idParaApagarBatch = ((await batchService.findBatch(batch)).batch?.id)
-  console.log(idParaApagarBatch, batch)
-  await prisma.batch.delete({where: {id: idParaApagarBatch}});
-}),
-  it("Should be able to delete a produto", async () => {
-    const ProductData: Product = {
-      name: UniqueName,
-      price: new Decimal(1500.0),
-      costPrice: new Decimal(1000.0),
-      minimunQuantity: 3,
-      excludedStatus: false,
-      observation: "De mesa",
-      totalQuantityInStock: 0,
-      category_id: categoryId,
-    };
-    
-    ProductData.id = (await product.findByName(ProductData)).product?.id;
-    console.log(ProductData)
     const productExcluded = await product.delete(ProductData);
-    console.log(productExcluded)
-    expect(productExcluded.status).toBe(true);
+
+    expect(productExcluded.error).toBe(
+      "Não é possível deletar o produto! Produto possui quantidade em estoque!"
+    );
+    //deletando batch do produto para poder deletar o produto no metodo abaixo (metodo com o nome Should be able to delete a produto')
+    const idParaApagarBatch = (await batchService.findBatch(batch)).batch?.id;
+    console.log(idParaApagarBatch, batch);
+    await prisma.batch.delete({ where: { id: idParaApagarBatch } });
   }),
-    
+    it("Should be able to delete a produto", async () => {
+      const ProductData: Product = {
+        name: UniqueName,
+        price: new Decimal(1500.0),
+        costPrice: new Decimal(1000.0),
+        minimunQuantity: 3,
+        excludedStatus: false,
+        observation: "De mesa",
+        totalQuantityInStock: 0,
+        category_id: categoryId,
+      };
+
+      ProductData.id = (await product.findByName(ProductData)).product?.id;
+      console.log(ProductData);
+      const productExcluded = await product.delete(ProductData);
+      console.log(productExcluded);
+      expect(productExcluded.status).toBe(true);
+    }),
     afterAll(async () => {
-      await prisma.category.delete({where: {id: categoryId}});
+      await prisma.category.delete({ where: { id: categoryId } });
     });
 });
