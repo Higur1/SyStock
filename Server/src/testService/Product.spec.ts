@@ -11,6 +11,8 @@ import { prisma } from "../config/prisma";
 import { string } from "zod";
 import BatchService from "../service/BatchService";
 import User from "../models/User";
+import preUserService from "../service/PreUserService";
+import PreUser from "../models/PreUser";
 
 describe("Create Product model", () => {
   let categoryId;
@@ -18,6 +20,7 @@ describe("Create Product model", () => {
   let userEmail;
   let userLogin;
   let UserData;
+  let PreUserData;
 
   beforeAll(async () => {
     const genarateUniqueProductName = `Mock Product-${String(Date.now())}`;
@@ -41,6 +44,10 @@ describe("Create Product model", () => {
     const genarateUniqueLogin = `Mock UserLoginInProduct-${String(Date.now())}`;
     userLogin = genarateUniqueLogin;
 
+    PreUserData = new PreUser({
+      name: "userTestProduct",
+      email: userEmail,
+    });
     UserData = new User({
       name: "userTestProduct",
       login: userLogin,
@@ -57,7 +64,10 @@ describe("Create Product model", () => {
       observation: "De mesa",
       category_id: categoryId,
     });
+    console.log(UserData)
+    const createPreUser = await preUserService.create(PreUserData);
     const createUser = await userService.createEmployee(UserData);
+    console.log(createUser)
     UserData.id = createUser.user?.id;
     console.log(UserData.id)
     const createProduct = await product.create(ProductData, UserData);

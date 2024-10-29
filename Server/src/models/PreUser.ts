@@ -8,7 +8,7 @@ class PreUser{
     name: string;
     email: string;
 
-    private constructor({
+    public constructor({
         name, 
         email
     }: IPreUser){

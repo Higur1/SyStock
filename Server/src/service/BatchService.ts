@@ -29,17 +29,19 @@ export default class BatchService {
         },
       });
       if (batchResult == null) {
-        console.log("entrou" + ``)
+        console.log("entrou" + ``);
+        if (batchData.eValidationStatus == null) {
+          return { status: false, error: "Erro interno 'eValidationStatus don't exists'" };
+        }
+        console.log(batchData.product_id)
         const createBatch = await prisma.batch.create({
           data: {
+            
             deletionStatus: false,
             expirationDate: batchData.expirantionDate,
             quantity: batchData.quantity,
             product_id: batchData.product_id,
-            eValidationStatus:
-              batchData.eValidationStatus == undefined
-                ? 0
-                : batchData.eValidationStatus,
+            eValidationStatus: batchData.eValidationStatus,
           },
         });
         const product = await prisma.product.findFirst({
@@ -87,7 +89,7 @@ export default class BatchService {
         };
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return { status: false, error: error };
     }
   }
