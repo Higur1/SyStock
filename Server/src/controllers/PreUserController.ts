@@ -12,20 +12,20 @@ export default class PreUserController {
       if (listOfPreUsers.status) {
         response.status(200).send(
           JSON.stringify({
-            preusers: listOfPreUsers.listPreUsers,
+            Pre_users: listOfPreUsers.listPreUsers,
           })
         );
       } else {
         response.status(500).send(
           JSON.stringify({
-            error: listOfPreUsers.error,
+            Error: listOfPreUsers.error,
           })
         );
       }
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
-          error: error,
+          Error: error,
         })
       );
     }
@@ -51,13 +51,13 @@ export default class PreUserController {
      
       if (preuserExists.status && preuserExists.preuser == undefined) {
           const preUserCreate = await preUserService.create(preUserData)
-          response.status(201).send(JSON.stringify({PreUser: preUserCreate.preuser}));
+          response.status(201).send(JSON.stringify({Pre_User: preUserCreate.preuser}));
       } else {
-        response.status(200).send(
+        response.status(409).send(
           JSON.stringify({
-            message:
-              "an operation could not be performed email already exists",
-            error: preuserExists.error,
+            Message:
+              "An operation could not be performed. Email already used",
+            Error: preuserExists.error,
           })
         );
       }

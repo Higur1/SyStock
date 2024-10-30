@@ -43,6 +43,7 @@ export default class LoginController {
                   {
                     id: userVerify.user.id,
                     email: userVerify.user.email,
+                    user_type: userVerify.user.user_type
                   },
                   knowkey!,
                   { expiresIn: "24h" }
@@ -81,7 +82,7 @@ export default class LoginController {
   static async recovery(request, response) {
     try {
       const recovery = z.object({
-        email: z.string().trim().email("valid email required"),
+        email: z.string().trim().email("Valid email required"),
         instance: z.string(),
       });
 
@@ -93,11 +94,11 @@ export default class LoginController {
         password: "",
       }
       
-      const userResult = await userService.findEmail(userData);
+      const userResult = await userService.findByEmail(userData);
 
       if (userResult.status) {
         if (userResult.user != undefined) {
-          const tokenRecovery = await userService.tokenCreate(userResult.user);
+          const tokenRecovery = await userService.tokenCreate(userResult.user.id);
           sendEmail(email, tokenRecovery!.result, instance);
           response.status(200).send(
             JSON.stringify({

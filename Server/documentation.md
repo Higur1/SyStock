@@ -132,7 +132,7 @@ If successful, this response returns a list of registered pre-users.
 
 Response Example:
 {
-	"preusers": [
+	"Pre_users": [
 		{
 			"id": 1,
 			"email": "test@test.com",
@@ -184,7 +184,7 @@ Reasons: The email is already in use.
 Response Example:
 ```
 {
-    "Message": "Email already exists"
+    "Message": "An operation could not be performed. Email already used"
 }
 ```
 ##### Internal Error! 500
@@ -243,37 +243,6 @@ Response Example:
 }
 ```
 
-### GET /findAllEmployees Verificar
-#### Parameters
-No parameters
-#### Request example
-```
-{
-	
-}
-```
-#### Answers
-##### Internal Error! 500
-This response indicates a server error.
-Reasons: Possibly due to issues such as file problems, server downtime, or database issues.
-
-Response Example:
-```
-{
-    "Error": "An error has ocurred"
-}
-```
-##### Data error! 400
-This response indicates an error in the data sent with the request.
-Reasons: Such as incorrect data type or field size.
-
-Response Example:
-```
-{
-	"Error": "Expected string, received number"
-}
-```
-
 ### POST /user OK
 The route registers a new user in the system. This endpoint requires the submission of user details, including their name, login, password, and email. It is essential to register a pre-user before creating a regular user.
 #### Parameters
@@ -284,9 +253,9 @@ email: Email of the user to be registered in the system.
 #### Request Example
 ```
 {
-	"name": "test",
-    "login": "test",
-    "password": "test",
+	"name": "testtest",
+    "login": "testtest",
+    "password": "testtest",
     "email": "test@test.com"
 }
 ```
@@ -298,9 +267,9 @@ If successful, this response returns the created user.
 Response Example:
 {
 	"id": 1,
-	"name": "teste",
-	"user_login": "teste",
-	"email": "teste.teste@gmail.com"
+	"name": "testtest",
+	"login": "testtest",
+	"email": "test@test.com"
 }
 ##### Pre-user Not Found! 404
 This response indicates that no pre-user is registered with the provided data.
@@ -308,7 +277,7 @@ Reasons: It is necessary to register a pre-user first.
 
 Response Example:
 {
-    "Message": "preuser don't exists"
+    "Message": "Pre_user not found"
 }
 ##### Email Already in Use! 409
 This response indicates that the provided email is already registered to another user.
@@ -342,11 +311,12 @@ Response Example:
 ```
 
 ### GET /user/:name 
+The route returns a list of all users registered in the system who have the requested parameters in their name. This endpoint is used to fetch a list of users
 #### Parameters
 name: name of the user who will be searched
 #### Request example
 The ID is passed as a URL parameter, so no body is needed for the request.
-Example URL: /user/test
+Example URL: /user/ByName/:test
 #### Responses
 ##### Success! 200 
 If this response occurs, a list of users will be sent.
@@ -383,6 +353,17 @@ Response Example:
 	"Error": "Expected string, received number"
 }
 ```
+
+### GET /user/ById/:id
+The route returns a user registered in the system who has the requested parameters. This endpoint is used to search for a user by id
+#### Parameters
+id: id of the user who will be searched
+#### Request Example
+The ID is passed as a URL parameter, so no body is needed for the request.
+Example URL: /user/ById/:1
+#### Responses
+##### Success! 200
+
 
 ### PUT /user OK
 The route updates the information of an existing user in the system. You can modify the user's name by providing their unique identifier and the new name.

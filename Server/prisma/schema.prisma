@@ -55,7 +55,7 @@ model User {
   email     String   
   createdAt DateTime @default(now())
   updateAt  DateTime @updatedAt
-  user_type Int      @default(1)
+  user_type Int      @default(2)
   excludedStatus Boolean
 
   user_type_fk eTypeUser @relation(fields: [user_type], references: [id])
@@ -106,7 +106,7 @@ model Fill {
   Batch_Fill Batch_Fill[]
 
   supplier_id_fk Supplier @relation(fields: [supplier_id], references: [id])
-  user_id_fk     User     @relation(fields: [user_id], references: [id])
+  user_id_fill_fk     User     @relation(fields: [user_id], references: [id])
 
   @@map("fill")
 }
@@ -236,7 +236,7 @@ model logProduct {
   motivo     String
 
   product     Product? @relation(fields: [produto_id], references: [id])
-  user        User? @relation(fields: [user_id], references: [id])
+  user_id_product_fk        User? @relation(fields: [user_id], references: [id])
   @@map("log_product")
 }
 
@@ -246,7 +246,7 @@ model logFill {
   user_id       Int
 
   fill          Fill @relation(fields: [fill_id], references: [id])
-  user          User  @relation(fields: [user_id], references: [id])
+  user_id_fill_fk     User  @relation(fields: [user_id], references: [id])
   @@map("log_fill")
 }
 

@@ -3,11 +3,12 @@ import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import User from "../models/User";
+import { uptime } from "process";
 
 dotenv.config();
 
 export default class UserController {
-  static async listOfUsers(request, response) {
+  static async list(request, response) {
     try {
       const listOfUsers = await userService.findAll();
 
@@ -16,11 +17,11 @@ export default class UserController {
 
         response
           .status(200)
-          .send(JSON.stringify({ users: listOfUsers.listUsers, _links }));
+          .send(JSON.stringify({ Users: listOfUsers.listUsers, _links }));
       } else {
         response.status(500).send(
           JSON.stringify({
-            message: "An error has occured",
+            Message: "An error has occured",
             error: listOfUsers.error,
           })
         );
@@ -29,40 +30,11 @@ export default class UserController {
       response
         .status(400)
         .send(
-          JSON.stringify({ message: "An error has occurred", error: error })
+          JSON.stringify({ Message: "An error has occurred", error: error })
         );
     }
-  }
-  static async findAllEmployees(request, response) {
-    try {
-      const listOfEmployees = await userService.findEmployees();
-
-      if (listOfEmployees.status) {
-        const _links = generatorHATEOAS("");
-
-        response.status(200).send(
-          JSON.stringify({
-            users: listOfEmployees.listOfEmployees,
-            _links,
-          })
-        );
-      } else {
-        response.status(500).send(
-          JSON.stringify({
-            message: "An error has occured",
-            error: listOfEmployees.error,
-          })
-        );
-      }
-    } catch (error) {
-      response
-        .status(400)
-        .send(
-          JSON.stringify({ message: "An error has occurred", error: error })
-        );
-    }
-  }
-  static async findUserByName(request, response) {
+  };
+  static async findByName(request, response) {
     try {
       const userValidation = z.object({
         name: z
@@ -80,25 +52,25 @@ export default class UserController {
         password: "",
       }
 
-      const userList = await userService.findNameStartWith(userData);
+      const userList = await userService.findByNameStartWith(userData);
       if (userList.status) {
         if (userList.user != undefined) {
           response.status(200).send(
             JSON.stringify({
-              users: userList.user,
+              Users: userList.user,
             })
           );
         } else {
-          response.status(200).send(
+          response.status(404).send(
             JSON.stringify({
-              users: userList.user
+              Users: userList.user
             })
           );
         }
       } else {
         response.status(500).send(
           JSON.stringify({
-            message: "An error has occured",
+            Message: "An error has occured",
             error: userList.error,
           })
         );
@@ -106,14 +78,59 @@ export default class UserController {
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
-          error: error.issues[0].message,
+          Error: error.issues[0].message,
         })
       );
     }
   }
-  static async createEmployee(request, response) {
+  static async find(request, response) {
     try {
-      const employeeValidation = z.object({
+      const userValidation = z.object({
+        id: z.string().min(1)
+      });
+      const { id } = userValidation.parse(request.params);
+    
+      const userData: User = {
+        id: Number(id),
+        email: "",
+        login: "",
+        name: "",
+        password: "",
+      };
+      const userResult = await userService.find(userData);
+      if (userResult.status) {
+        if (userResult.user != undefined) {
+          response.status(200).send(
+            JSON.stringify({
+              User: userResult.user
+            })
+          )
+        } else {
+          response.status(404).send(
+            JSON.stringify({
+              Message: "User not found"
+            })
+          )
+        };
+      } else {
+        response.status(500).send(
+          JSON.stringify({
+            Message: "An error has occured",
+            Error: userResult.error,
+          })
+        );
+      };
+    } catch (error) {
+      response.status(400).send(
+        JSON.stringify({
+          Error: error,
+        })
+      );
+    };
+  }
+  static async create(request, response) {
+    try {
+      const userValidation = z.object({
         name: z
           .string()
           .trim()
@@ -133,55 +150,43 @@ export default class UserController {
           .max(10, "user_password required maximum 10 character(s)"),
         email: z.string().email("Valid e-mail required").trim(),
       });
-      const { name, login, password, email } = employeeValidation.parse(
+      const { name, login, password, email } = userValidation.parse(
         request.body
       );
+      const hash_password = cryptPassword(password);
+
       const userData: User = {
         email: email,
         login: login,
         name: name,
-        password: password,
+        password: hash_password,
       }
 
-      //verifica se os dados do funcionario já existem em algum usuario do sistema já existe antes de cadastra-lo
-      const userExists = await userService.findUser(userData);
-
-      //verifica se existe um preusuario para o usuario que será cadastrado
-
-      const hash_password = cryptPassword(userData.password);
-      if (userExists.status && userExists.user == undefined) {
-        const funcionario = new User({
-          name,
-          login,
-          password: hash_password,
-          email,
-          excludedStatus: false,
-        });
-
-        const user_create = await userService.createEmployee(funcionario);
-        if (user_create.status) {
-          response.status(201).send(user_create.user);
-        }
-        if (user_create.error == "preuser don't exists") {
-          response.status(200).send(
-            JSON.stringify({
-              message: "preuser don't exists",
-            })
-          );
-        }
+      const user_create = await userService.create(userData);
+      console.log(user_create)
+      if (user_create.pre_user_exists == false) {
+        response.status(404).send(
+          JSON.stringify({
+            message: "Pre_user not found",
+          })
+        );
+      };
+      if (user_create.user_alredy_exists) {
+        response.status(409).send(
+          JSON.stringify({
+            Message: "Email alredy used"
+          }));
+      };
+      if (user_create.status && user_create.user != undefined) {
+        response.status(201).send(user_create.user);
+      } else {
         response.status(500).send(
           JSON.stringify({
-            error: user_create.error,
-          })
-        );
-      } else {
-        response.status(200).send(
-          JSON.stringify({
-            message: "Email already used",
-            error: userExists.error,
+            Error: user_create.error,
           })
         );
       }
+
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
@@ -189,7 +194,7 @@ export default class UserController {
         })
       );
     }
-  }
+  };
   static async edit(request, response) {
     try {
       const userValidation = z.object({
@@ -209,42 +214,33 @@ export default class UserController {
         name: name,
         password: "",
       }
-      const userFind = await userService.findUserById(userData);
 
-      const userNameExists = await userService.findName(userData);
+      const updatedUser = await userService.update(userData);
 
-      if (userNameExists.exists) {
-        response.status(200).send(
+      if (updatedUser.user_name_already_exists) {
+        response.status(409).send(
           JSON.stringify({
-            message: "Name already exists",
+            Message: "Name already exists",
           })
         );
+      };
+      if (updatedUser.user_dont_exists) {
+        response.status(404).send(
+          JSON.stringify({
+            Message: "User not found"
+          })
+        )
       }
-
-      if (userFind.status) {
-        if (userFind.user != undefined) {
-          userFind.user.name = name;
-          await userService.update(userFind.user).then((userResult) => {
-            response.status(200).send(
-              JSON.stringify({
-                user: {
-                  id: userResult.userUpdated?.id,
-                  name: userResult.userUpdated?.name,
-                },
-              })
-            );
-          });
-        } else {
-          response.status(200).send(
-            JSON.stringify({
-              error: "User don't exists",
-            })
-          );
-        }
+      if (updatedUser.status && updatedUser.userUpdated) {
+        response.status(200).send(
+          JSON.stringify({
+            User: updatedUser.userUpdated
+          })
+        )
       } else {
         response.status(500).send(
           JSON.stringify({
-            error: userFind.error,
+            error: updatedUser.error,
           })
         );
       }
@@ -273,41 +269,35 @@ export default class UserController {
         password: "",
       }
 
-      const userFind = await userService.findUserById(userData);
-      if (userFind.status) {
-        if (userFind.user != undefined) {
-          const emailFind = await userService.findEmail(userFind.user);
-          if (emailFind.user != undefined) {
-            response.status(200).send(
-              JSON.stringify({
-                error: "email alredy used",
-              })
-            );
-          }
-
-          userFind.user.email = newEmail;
-          await userService.updateEmail(userFind.user).then((userResult) => {
-            response.status(200).send(
-              JSON.stringify({
-                user: {
-                  id: userResult.result?.id,
-                  email: userResult.result?.email,
-                },
-              })
-            );
-          });
-        }
-        response.status(200).send(
+      const userUpdated = await userService.update(userData);
+      if (userUpdated.user_email_already_exists) {
+        response.status(409).send(
           JSON.stringify({
-            error: "User don't exists",
+            Error: "Email already used",
           })
         );
+      };
+      if (userUpdated.status) {
+        if (userUpdated.userUpdated) {
+          response.status(200).send(
+            JSON.stringify({
+              User: userUpdated.userUpdated
+            })
+          )
+        } else {
+          response.status(404).send(
+            JSON.stringify({
+              Message: "User not found"
+            })
+          )
+        }
+      } else {
+        response.status(500).send(
+          JSON.stringify({
+            Error: userUpdated.error
+          })
+        )
       }
-      response.status(500).send(
-        JSON.stringify({
-          error: userFind.error,
-        })
-      );
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
@@ -336,7 +326,7 @@ export default class UserController {
         name: "",
         password: newPassword,
       }
-      const userFind = await userService.findUserById(userData);
+      const userFind = await userService.find(userData);
 
       if (userFind.status) {
         if (userFind.user != undefined) {
@@ -346,9 +336,9 @@ export default class UserController {
             response.status(200)
           );
         }
-        response.status(200).send(
+        response.status(404).send(
           JSON.stringify({
-            error: "User don't exists",
+            error: "User not found",
           })
         );
       }
@@ -365,7 +355,7 @@ export default class UserController {
       );
     }
   }
-  static async deleteEmployee(request, response) {
+  static async delete(request, response) {
     try {
       const user = z.object({
         id: z.number().min(1, "id required minimum 1 character(s)"),
@@ -379,29 +369,33 @@ export default class UserController {
         name: "",
         password: "",
       }
-      const userId = await userService.findUserById(userData);
-      if (userId.status) {
-        if (userId.user != undefined) {
-          if (userId.user.id != 1) {
-            await userService.tokenDelete(userId.user);
-            await userService.deleteFuncionario(userId.user);
-            response.status(200);
-          } else {
+      const userResult = await userService.find(userData);
+      if (userResult.status) {
+        if (userResult.user != undefined) {
+          if (userResult.user.id != 1) {
+            await userService.tokenDelete(userResult.user.id);
+            await userService.delete(userResult.user.id);
             response.status(200).send(
               JSON.stringify({
-                message: "Is not possible to delete the admin user",
+                Message: "User delete successfully"
+              })
+            )
+          } else {
+            response.status(400).send(
+              JSON.stringify({
+                Message: "Is not possible to delete the admin user",
               })
             );
           }
         } else {
           response
-            .status(200)
-            .send(JSON.stringify({ message: "User don't exists" }));
+            .status(404)
+            .send(JSON.stringify({ Message: "User not found" }));
         }
       } else {
         response.status(500).send(
           JSON.stringify({
-            error: userId.error,
+            error: userResult.error,
           })
         );
       }
@@ -413,7 +407,6 @@ export default class UserController {
       );
     }
   }
-
   static async resetPassword(request, response) {
     try {
       const passwordReset = z.object({

@@ -35,38 +35,20 @@ export default class PreUserService {
         },
       };
     } catch (error) {
-      if (
-        error
-          .toString()
-          .includes("Unique constraint failed on the fields: (`email`)")
-      ) {
-        return { status: false, message: "PreUser alredy exists" };
-      }
-      return { status: false, error: error };
+      return { status: false}
     }
   }
   static async findPreUser(preUserData: preUser) {
     try {
       const preuser = await prisma.pre_User.findFirst({
         where: {
-          AND: {
-            email: preUserData.email,
-            name: preUserData.name,
-          },
+          email: preUserData.email
         },
       });
 
       return preuser != null
         ? { status: true, preuser: preuser }
         : { status: true, preuser: undefined };
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async deleteAll() {
-    try {
-      await prisma.pre_User.deleteMany({});
-      return { status: true };
     } catch (error) {
       return { status: false, error: error };
     }
