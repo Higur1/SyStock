@@ -64,7 +64,7 @@ export default class PreUserController {
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
-          error: error.issues[0].message,
+          Error: error.issues[0].message,
         })
       );
     }

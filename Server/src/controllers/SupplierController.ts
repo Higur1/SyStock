@@ -43,7 +43,7 @@ export default class SupplierController {
         excludedStatus: false
       };
 
-      const supplierValidated = await supplierService.validatedSupplierData(supplierData);
+      const supplierValidated = await supplierService.validatedSupplierDataExists(supplierData);
 
       if (supplierValidated.status) {
         if (supplierValidated.isValid) {

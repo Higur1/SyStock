@@ -126,21 +126,21 @@ export default class UserController {
           .trim()
           .max(10, "user_login required maximum 10 character(s)")
           .trim(),
-        user_password: z
+        password: z
           .string()
           .trim()
           .min(5, "user_password required minimum 5 character(s)")
           .max(10, "user_password required maximum 10 character(s)"),
         email: z.string().email("Valid e-mail required").trim(),
       });
-      const { name, login, user_password, email } = employeeValidation.parse(
+      const { name, login, password, email } = employeeValidation.parse(
         request.body
       );
       const userData: User = {
         email: email,
         login: login,
         name: name,
-        password: user_password,
+        password: password,
       }
 
       //verifica se os dados do funcionario já existem em algum usuario do sistema já existe antes de cadastra-lo
@@ -177,7 +177,7 @@ export default class UserController {
       } else {
         response.status(200).send(
           JSON.stringify({
-            message: "Email alredy used",
+            message: "Email already used",
             error: userExists.error,
           })
         );
@@ -260,14 +260,14 @@ export default class UserController {
     try {
       const dataUser = z.object({
         id: z.number().min(1, "id required minimum 1 character(s)"),
-        novoEmail: z.string().email("Valid e-mail required").trim(),
+        newEmail: z.string().email("Valid e-mail required").trim(),
       });
 
-      const { id, novoEmail } = dataUser.parse(request.body);
+      const { id, newEmail } = dataUser.parse(request.body);
 
       const userData: User = {
         id: id,
-        email: novoEmail,
+        email: newEmail,
         login: "",
         name: "",
         password: "",
@@ -285,7 +285,7 @@ export default class UserController {
             );
           }
 
-          userFind.user.email = novoEmail;
+          userFind.user.email = newEmail;
           await userService.updateEmail(userFind.user).then((userResult) => {
             response.status(200).send(
               JSON.stringify({
@@ -320,27 +320,27 @@ export default class UserController {
     try {
       const userValidation = z.object({
         id: z.number().min(1, "id required minimum 1 character(s)"),
-        novaPassword: z
+        newPassword: z
           .string()
           .trim()
           .min(5, "user_password required minimum 5 character(s)")
           .max(10, "user_password required maximum 10 character(s)"),
       });
 
-      const { id, novaPassword } = userValidation.parse(request.body);
+      const { id, newPassword } = userValidation.parse(request.body);
 
       const userData: User = {
         id: id,
         email: "",
         login: "",
         name: "",
-        password: novaPassword,
+        password: newPassword,
       }
       const userFind = await userService.findUserById(userData);
 
       if (userFind.status) {
         if (userFind.user != undefined) {
-          const hash_password = cryptPassword(novaPassword);
+          const hash_password = cryptPassword(newPassword);
 
           await userService.updatePassword_editUser(id, hash_password).then(
             response.status(200)
@@ -456,7 +456,7 @@ export default class UserController {
           } else {
             response.status(200).send(
               JSON.stringify({
-                message: "Token alredy used",
+                message: "Token already used",
               })
             );
           }

@@ -14,13 +14,13 @@ const app = fastify();
 
 async function user_routes(app: FastifyInstance) {
   app.get("/users",{ preHandler: auth_middleware },UserController.listOfUsers);
-  app.get("/findAllFuncionarios",{ preHandler: auth_middleware },UserController.findAllEmployees);
+  app.get("/findAllEmployess",{ preHandler: auth_middleware },UserController.findAllEmployees);
   app.post("/user", UserController.createEmployee);
   app.get("/user/:name",{ preHandler: auth_middleware }, UserController.findUserByName);
   app.put("/user", { preHandler: auth_middleware }, UserController.edit);
   app.patch("/user/editEmail", UserController.editEmail);
   app.patch("/user/editPassword", UserController.editPassword);
-  app.delete("/funcionario",{ preHandler: auth_middleware },UserController.deleteEmployee);
+  app.delete("/user",{ preHandler: auth_middleware },UserController.deleteEmployee);
   app.put("/reset/password", UserController.resetPassword);
 };
 async function login_routes(app: FastifyInstance) {

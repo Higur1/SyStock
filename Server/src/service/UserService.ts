@@ -49,8 +49,7 @@ export default class UserService {
               id: userResult.id,
               name: userResult.name,
               user_login: userResult.login,
-              email: userResult.email,
-              excludedStatus: userResult.excludedStatus,
+              email: userResult.email
             },
           };
         } else {
