@@ -182,8 +182,8 @@ export default class UserService {
               id: userData.id,
             },
             data: {
-              name: userData?.name,
-              email: userData?.email
+              ...(userData.name && {name: userData.name}),
+              ...(userData.email && {email: userData.email})
             },
           });
           return result != null
@@ -249,7 +249,7 @@ export default class UserService {
         const result = await prisma.token_Recovery.create({
           data: {
             user_id: id,
-            status: true,
+            isActive: true,
           },
         });
         return result != null
@@ -267,13 +267,13 @@ export default class UserService {
           token: token,
         },
       });
-      const teste = await prisma.token_Recovery.findMany();
+  
       return tokenIsValid == undefined
         ? { status: true, isValid: false }
         : {
           status: true,
           isValid: true,
-          token: { id: tokenIsValid.token, user_id: tokenIsValid.user_id },
+          tokenIsValid,
         };
     } catch (error) {
       return { status: false, error: error };
@@ -321,7 +321,7 @@ export default class UserService {
           token: token,
         },
         data: {
-          status: false,
+          isActive: false,
         },
       });
       return { status: true };

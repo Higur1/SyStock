@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import User from "../models/User";
-import { uptime } from "process";
 
 dotenv.config();
 
@@ -203,15 +202,18 @@ export default class UserController {
           .string()
           .trim()
           .min(3, "Name required minimum 3 character(s)")
-          .max(20, "Name required maximum 20 character(s)"),
+          .max(20, "Name required maximum 20 character(s)")
+          .optional(),
+        email: z.string().email("Valid e-mail required").trim().optional()
       });
 
-      const { id, name } = userValidation.parse(request.body);
+      const { id, name, email } = userValidation.parse(request.body);
+
       const userData: User = {
         id: id,
-        email: "",
+        email: email ?? "",
         login: "",
-        name: name,
+        name: name ?? "",
         password: "",
       }
 
@@ -224,13 +226,20 @@ export default class UserController {
           })
         );
       };
+      if(updatedUser.user_email_already_exists){
+        response.status(409).send(
+          JSON.stringify({
+            Message: "User email alredy exists"
+          })
+        );
+      };
       if (updatedUser.user_dont_exists) {
         response.status(404).send(
           JSON.stringify({
             Message: "User not found"
           })
-        )
-      }
+        );
+      };
       if (updatedUser.status && updatedUser.userUpdated) {
         response.status(200).send(
           JSON.stringify({
@@ -243,65 +252,11 @@ export default class UserController {
             error: updatedUser.error,
           })
         );
-      }
-    } catch (error) {
-      response.status(400).send(
-        JSON.stringify({
-          error: error.issues[0].message,
-        })
-      );
-    }
-  }
-  static async editEmail(request, response) {
-    try {
-      const dataUser = z.object({
-        id: z.number().min(1, "id required minimum 1 character(s)"),
-        newEmail: z.string().email("Valid e-mail required").trim(),
-      });
-
-      const { id, newEmail } = dataUser.parse(request.body);
-
-      const userData: User = {
-        id: id,
-        email: newEmail,
-        login: "",
-        name: "",
-        password: "",
-      }
-
-      const userUpdated = await userService.update(userData);
-      if (userUpdated.user_email_already_exists) {
-        response.status(409).send(
-          JSON.stringify({
-            Error: "Email already used",
-          })
-        );
       };
-      if (userUpdated.status) {
-        if (userUpdated.userUpdated) {
-          response.status(200).send(
-            JSON.stringify({
-              User: userUpdated.userUpdated
-            })
-          )
-        } else {
-          response.status(404).send(
-            JSON.stringify({
-              Message: "User not found"
-            })
-          )
-        }
-      } else {
-        response.status(500).send(
-          JSON.stringify({
-            Error: userUpdated.error
-          })
-        )
-      }
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
-          error: error.issues[0].message,
+          error: error,
         })
       );
     }
@@ -357,48 +312,53 @@ export default class UserController {
   }
   static async delete(request, response) {
     try {
-      const user = z.object({
-        id: z.number().min(1, "id required minimum 1 character(s)"),
+      const userValidation = z.object({
+        id: z.string().min(1, "id required minimum 1 character(s)").trim(),
       });
-      const { id } = user.parse(request.body);
+      const { id } = userValidation.parse(request.params);
 
       const userData: User = {
-        id: id,
+        id: Number(id),
         email: "",
         login: "",
         name: "",
         password: "",
       }
+
       const userResult = await userService.find(userData);
-      if (userResult.status) {
-        if (userResult.user != undefined) {
-          if (userResult.user.id != 1) {
-            await userService.tokenDelete(userResult.user.id);
-            await userService.delete(userResult.user.id);
-            response.status(200).send(
-              JSON.stringify({
-                Message: "User delete successfully"
-              })
-            )
-          } else {
-            response.status(400).send(
-              JSON.stringify({
-                Message: "Is not possible to delete the admin user",
-              })
-            );
-          }
-        } else {
-          response
-            .status(404)
-            .send(JSON.stringify({ Message: "User not found" }));
-        }
-      } else {
-        response.status(500).send(
+
+      if(userResult.user == undefined){
+        response.status(404).send(
           JSON.stringify({
-            error: userResult.error,
+            Message: "User not found"
           })
         );
+      };
+      if(userResult.user?.user_type == 1){
+        response.status(400).send(
+          JSON.stringify({
+            Message: "Is not possible to delete the admin user",
+          })
+        );
+      };
+      if(!userResult.status){
+        response.status(500).send(
+          JSON.stringify({
+            Error: userResult.error
+          })
+        )
       }
+      if(userResult != undefined){
+        await userService.tokenDelete(userResult.user!.id);
+        await userService.delete(userResult.user!.id)
+
+        response.status(200).send(
+          JSON.stringify({
+            Message: "User delete successfully"
+          })
+        );
+      };
+
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
@@ -407,66 +367,59 @@ export default class UserController {
       );
     }
   }
-  static async resetPassword(request, response) {
+  static async resetPassword(request, response){
     try {
-      const passwordReset = z.object({
+      const passwordResetValidation = z.object({
         token: z
-          .string()
-          .trim()
-          .min(36, "token required minimum 36 character(s)")
-          .max(36, "token required maximum 36 character(s)"),
-        user_password: z
-          .string()
-          .min(5, "user_password required minimum 5 character(s)")
-          .max(10, "user_password required maximum 10 character(s)"),
+        .string()
+        .trim()
+        .min(36, "token required minimum 36 character(s)")
+        .max(36, "token required maximum 36 character(s)"),
+        password:  z
+        .string()
+        .min(5, "user_password required minimum 5 character(s)")
+        .max(10, "user_password required maximum 10 character(s)"),
       });
-
-      const { user_password, token } = passwordReset.parse(request.body);
-
+      const {token, password} = passwordResetValidation.parse(request.body);
       const isValidToken = await userService.tokenValited(token);
 
-      if (isValidToken.status) {
-        if (isValidToken.isValid) {
-          if (isValidToken.status) {
-            const result = await userService.updatePassword_resetPassword(
-              isValidToken.token?.user_id,
-              isValidToken.token?.id,
-              user_password
-            );
-            if (result.status) {
-              response.status(200).send(
-                JSON.stringify({
-                  message: "password updated",
-                })
-              );
-            } else {
-              response.status(500).send(
-                JSON.stringify({
-                  error: result.error,
-                })
-              );
-            }
-          } else {
-            response.status(200).send(
-              JSON.stringify({
-                message: "Token already used",
-              })
-            );
-          }
-        } else {
-          response.status(200).send(
-            JSON.stringify({
-              message: "Token invalid",
-            })
-          );
-        }
-      } else {
-        response.status(500).send(
+      if(!isValidToken.isValid){
+        response.status(401).send(
           JSON.stringify({
-            error: isValidToken.error,
+              Message: "Token invalid"
           })
         );
-      }
+      };
+      if(!isValidToken.status){
+        response.status(500).send(
+          JSON.stringify({
+            Error: isValidToken.error
+          })
+        );
+      };
+      if(!isValidToken.tokenIsValid?.isActive){
+        response.status(409).send(
+          JSON.stringify({
+            Error: "Token already used"
+          })
+        );
+      }else{
+        const hashPassword = await cryptPassword(password);
+        const resultUpdatePassword = await userService.updatePassword_resetPassword(isValidToken.tokenIsValid.user_id, isValidToken.tokenIsValid.token, hashPassword) 
+        if(resultUpdatePassword.status){
+          response.status(200).send(
+            JSON.stringify({
+              Message: "Password updated successfully"
+            })
+          );
+        }else{
+          response.status(404).send(
+            JSON.stringify({
+              Message: "User not found"
+            })
+          );
+        };
+      };
     } catch (error) {
       response.status(400).send(
         JSON.stringify({

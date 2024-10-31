@@ -20,7 +20,7 @@ export default class CategoryService {
   }
   static async create(categoryData: Category) {
     try {
-      const categoryResult = await prisma.category.create({
+      const categoria = await prisma.category.create({
         data: {
           name: categoryData.name,
         },
@@ -28,17 +28,9 @@ export default class CategoryService {
 
       return {
         status: true,
-        category: {
-          category_id: categoryResult.id,
-          category_name: categoryResult.name,
-        },
+        categoria
       };
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === "P2002") {
-          return { status: false, error: "Já existe categoria com esse nome" };
-        }
-      }
       return { status: false, error: error };
     }
   }
@@ -50,8 +42,8 @@ export default class CategoryService {
         },
       });
       return category != undefined
-        ? { status: true, category: category }
-        : { status: true, category: {} };
+        ? { status: true, exists: true, category: category }
+        : { status: true, exists: false, category: {} };
     } catch (error) {
       return { status: false, error: error };
     }
@@ -70,19 +62,17 @@ export default class CategoryService {
         },
       });
       return categories != undefined
-        ? { status: true, categories: categories }
-        : { status: true, categories: {} };
+        ? { status: true, exists: true, categories: categories }
+        : { status: true, exists: false, categories: {} };
     } catch (error) {
       return { status: false, error: error };
     }
   }
   static async findByName(categoryData: Category) {
     try {
-      const categories = await prisma.category.findMany({
+      const categories = await prisma.category.findFirst({
         where: {
-          name: {
-            startsWith: categoryData.name,
-          },
+          name: categoryData.name
         },
         select: {
           id: true,
@@ -90,8 +80,8 @@ export default class CategoryService {
         },
       });
       return categories != undefined
-        ? { status: true, categories: categories }
-        : { status: true, categories: {} };
+        ? { status: true, exists: true, categories: categories }
+        : { status: true, exists: false, categories: {} };
     } catch (error) {
       return { status: false, error: error };
     }
@@ -130,13 +120,11 @@ export default class CategoryService {
         },
       });
       return categoryDeleted != undefined
-        ? { status: true, category: categoryDeleted }
-        : { status: true, category: {} };
+        ? { status: true, exists: true, category: categoryDeleted }
+        : { status: true, exists: false, category: {} };
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === "P2025") {
-          return { status: false, error: "Não existe Categoria com o ID informado" };
-        }
+      if(error.code == "P2025"){
+        return {status: false, categoryHaveProducts: true}
       }
       return { status: false, error: error };
     }

@@ -115,12 +115,12 @@ export default class ProductService {
       return { status: false, error: error };
     }
   }
-  static async findByCategory(productData: Product) {
+  static async findByCategory(category_id: number) {
     try {
       const productsByCategory = await prisma.product.findMany({
         where: {
           AND: {
-            category_id: productData.category_id,
+            category_id: category_id,
             excludedStatus: false,
           },
         },
@@ -138,8 +138,8 @@ export default class ProductService {
       });
 
       return productsByCategory != null
-        ? { status: true, products: productsByCategory }
-        : { status: true, products: undefined };
+        ? { status: true, exists: true, products: productsByCategory }
+        : { status: true, exists: false, products: undefined };
     } catch (error) {
       return { status: false, error: error };
     }
@@ -192,7 +192,6 @@ export default class ProductService {
       return { status: false, error: error };
     }
   }
-
   static async delete(productData: Product) {
     try {
       const productBatch = await prisma.batch.findFirst({
@@ -229,7 +228,6 @@ export default class ProductService {
       return { status: false, error: error };
     }
   }
-
   static async deleteAll() {
     try {
       await prisma.product.updateMany({

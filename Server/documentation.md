@@ -1,8 +1,8 @@
 # API documentation
 
-## Endpoints Login OK
+## Endpoints Login
 
-### POST /auth OK
+### POST /auth 
 The route authenticates users in the system. By providing a valid login and password, the user receives a JWT token that allows access to other protected API routes.
 #### Parameters
 user_login: Registered user login in the system
@@ -66,7 +66,7 @@ Response Example:
 }
 ```
 
-### POST /recovery OK
+### POST /recovery 
 The route initiates the password recovery process by sending an email with instructions to reset the password. The request requires the registered email and the server instance's IP address handling the request.
 #### Parameters
 email: Email registered in the system.
@@ -121,8 +121,8 @@ Response Example:
 ```
 
 
-## Endpoints Pre-User OK
-### GET /preusers OK
+## Endpoints Pre-User 
+### GET /preusers 
 The route retrieves a list of registered pre-users in the system. This endpoint does not require any parameters.
 #### Parameters
 No parameters is required.
@@ -151,7 +151,7 @@ Response Example:
 }
 ```
 
-### POST /preuser OK
+### POST /preuser 
 The route allows for the registration of a new pre-user in the system by providing their name and email. This endpoint is used to create a new pre-user entry.
 #### Parameters
 name: Name of the new user to be registered in the system.
@@ -209,8 +209,8 @@ Response Example:
 ```
 
 
-## Endpoints User VERIFICAR
-### GET /users OK
+## Endpoints User 
+### GET /users 
 The route retrieves a list of all registered users in the system. This endpoint is used for fetching user data without requiring any parameters.
 #### Parameters
 No parameters is required.
@@ -243,7 +243,7 @@ Response Example:
 }
 ```
 
-### POST /user OK
+### POST /user 
 The route registers a new user in the system. This endpoint requires the submission of user details, including their name, login, password, and email. It is essential to register a pre-user before creating a regular user.
 #### Parameters
 name: Name of the user to be registered in the system.
@@ -316,7 +316,7 @@ The route returns a list of all users registered in the system who have the requ
 name: name of the user who will be searched
 #### Request example
 The ID is passed as a URL parameter, so no body is needed for the request.
-Example URL: /user/ByName/:test
+Example URL: /user/ByName/test
 #### Responses
 ##### Success! 200 
 If this response occurs, a list of users will be sent.
@@ -363,9 +363,51 @@ The ID is passed as a URL parameter, so no body is needed for the request.
 Example URL: /user/ById/:1
 #### Responses
 ##### Success! 200
+If this response occurs, a list of users will be sent.
 
+Response Example:
+```
+{
+    users:[
+        {
+            id: 1,
+            "name": "test",
+            "email": "test@test.com",
+        }
+    ]
+}
+```
+##### User not found! 404
+If this response occurs, user not found or not exists.
 
-### PUT /user OK
+Response Example:
+```
+{
+    "Message": "User not found"
+}
+```
+##### Internal Error! 500
+This response indicates a server error.
+Reasons: Possibly due to issues such as file problems, server downtime, or database issues.
+
+Response Example:
+```
+{
+    "Error": "An error has ocurred"
+}
+```
+##### Data error! 400
+This response indicates an error in the data sent with the request.
+Reasons: Such as incorrect data type or field size.
+
+Response Example:
+```
+{
+	"Error": "Expected string, received number"
+}
+```
+
+### PATCH /user 
 The route updates the information of an existing user in the system. You can modify the user's name by providing their unique identifier and the new name.
 #### Parameters
 id: Unique identifier of the user.
@@ -375,6 +417,19 @@ name: New name to update for the user.
 {
 	"id": 1,
     "name": "test"
+}
+```
+```
+{
+    "id": 1,
+    "email": "test@test.com"
+}
+```
+```
+{
+    "id": 1,
+    "name": "test",
+    "email": "test@test.com"
 }
 ```
 #### Reponses
@@ -399,6 +454,16 @@ Response Example:
 ```
 {
     "Message": "Name already exists",
+}
+```
+##### User email already exists! 409
+This response indicates that the user name could not be updated.
+Reason:  Email is already in use.
+
+Response Example:
+```
+{
+    "Message": "Email already exists",
 }
 ```
 ##### User Not Found! 404
@@ -432,71 +497,9 @@ Response Example:
 }
 ```
 
-### PATCH /user/editEmail OK
-The route allows you to update the email address of an existing user in the system. You must provide the user's unique identifier and the new email address you want to assign.
-#### Parameters
-id: Unique identifier of the user.
-newEmail: New email to update for the user.
-#### Request Example
-```
-{
-	"id": 1,
-    "newEmail": "test@test.com"
-}
-```
-#### Responses
-##### Success! 200 
-If successful, this response returns the updated user information.
 
-Response Example:
-```
-{
-    "id": 1,
-    "email": "test"
-}
-```
-##### Email Already in Use! 409
-This response indicates that the email could not be updated.
-Reason: Email is already associated with another user.
 
-Response Example:
-```
-{
-    "Message": "Email already in use"
-}
-```
-##### User Not Found! 404
-This response indicates that the user with the specified ID does not exist.
-Reason: User don't exits
-
-Response Example:
-```
-{
-     "Message": "User not found"
-}
-```
-##### Internal Error! 500
-This response indicates a server error.
-Reasons: Possibly due to issues such as file problems, server downtime, or database issues.
-
-Response Example:
-```
-{
-    "Error": "An error has ocurred"
-}
-```
-##### Data error! 400
-This response indicates an error in the data sent with the request.
-Reasons: Such as incorrect data type or field size.
-
-Response Example:
-```
-{
-	"Error": "Expected string, received number"
-}
-```
-
-### PATCH /user/editPassword OK
+### PATCH /user/editPassword 
 The route allows you to update the password of an existing user in the system. You must provide the user's unique identifier and the new password you want to set.
 #### Parameters
 id: Unique identifier of the user.
@@ -549,16 +552,13 @@ Response Example:
 }
 ```
 
-### DELETE /user OK
+### DELETE /user 
 The route allows you to remove a user from the system by their unique identifier. This action is restricted for administrator users, who cannot be deleted.
 #### Parameters
 id: Unique identifier of the user.
 #### Request Example
-```
-{
-	"id": 1
-}
-```
+The ID is passed as a URL parameter, so no body is needed for the request.
+Example URL: /user/1
 #### Responses
 ##### Success! 200
 If successful, this response confirms that the user has been deleted from the system.
@@ -611,7 +611,7 @@ Response Example:
 }
 ```
 
-### PUT /reset/password OK
+### PUT /reset/password 
 The route allows users to reset their passwords using a unique token generated during the password recovery process. The new password will be set if the provided token is valid and has not been used.
 #### Parameters
 token: A unique token generated for password reset.
@@ -668,7 +668,7 @@ Response Example:
 }
 ```
 
-## Endpoints Category OK
+## Endpoints Category 
 ### POST /category OK
 The route allows users to create a new category in the system by providing a unique name for the category.
 #### Parameters
@@ -720,7 +720,7 @@ Response Example:
 }
 ```
 
-### GET /categories OK
+### GET /categories 
 The route retrieves a list of all categories registered in the system.
 #### Parameters
 No parameters is required.
@@ -750,7 +750,7 @@ Response Example:
 }
 ```
 
-### GET /category/:id OK
+### GET /category/:id 
 This endpoint retrieves a specific category by its unique identifier.
 #### Parameters
 id: The unique identifier of the category.
@@ -801,7 +801,7 @@ Response Example:
 }
 ```
 
-### GET /category/name/:name OK
+### GET /category/name/:name 
 This endpoint retrieves a specific category by its name.
 #### Parameters
 name: The name of the category.
@@ -852,7 +852,7 @@ Response Example:
 }
 ```
 
-### PUT /category OK
+### PUT /category 
 This endpoint allows users to update an existing category.
 #### Parameters
 id: The unique identifier of the category to be updated.

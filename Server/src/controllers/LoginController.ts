@@ -36,7 +36,7 @@ export default class LoginController {
             .compare(user_password, userVerify.user.password)
             .then(async (checkPassword) => {
               if (!checkPassword) {
-                return response.status(401).send({ message: "login ou senha incorretos" });
+                return response.status(401).send({ Message: "Incorrect login or password" });
               } else {
                 const knowkey = process.env.JWTSecret;
                 const token = jwt.sign(
@@ -58,23 +58,23 @@ export default class LoginController {
               }
             });
         } else {
-          response.status(200).send(
+          response.status(404).send(
             JSON.stringify({
-              message: "User don't exists",
+              message: "User not found",
             })
           );
         }
       } else {
         response.status(500).send(
           JSON.stringify({
-            error: userVerify.error,
+            Error: userVerify.error,
           })
         );
       }
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
-          error: error.issues[0].message,
+          Error: error.issues[0].message,
         })
       );
     }
@@ -102,27 +102,27 @@ export default class LoginController {
           sendEmail(email, tokenRecovery!.result, instance);
           response.status(200).send(
             JSON.stringify({
-              message: "Email sent",
+              Message: "Email sent",
             })
           );
         } else {
-          response.status(200).send(
+          response.status(404).send(
             JSON.stringify({
-              message: "Email not found",
+              Message: "Email not found",
             })
           );
         }
       } else {
         response.status(500).send(
           JSON.stringify({
-            error: userResult.error,
+            Error: userResult.error,
           })
         );
       }
     } catch (error) {
       response.status(400).send(
         JSON.stringify({
-          error: error.issues[0].message,
+          Error: error.issues[0].message,
         })
       );
     }

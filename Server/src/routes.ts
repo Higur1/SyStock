@@ -17,10 +17,9 @@ async function user_routes(app: FastifyInstance) {
   app.post("/user", UserController.create);
   app.get("/user/ByName/:name",{ preHandler: auth_middleware }, UserController.findByName);
   app.get("/user/ById/:id", {preHandler: auth_middleware}, UserController.find);
-  app.put("/user", { preHandler: auth_middleware }, UserController.edit);
-  app.patch("/user/editEmail", UserController.editEmail);
+  app.patch("/user", { preHandler: auth_middleware }, UserController.edit);
   app.patch("/user/editPassword", UserController.editPassword);
-  app.delete("/user",{ preHandler: auth_middleware },UserController.delete);
+  app.delete("/user/:id",{ preHandler: auth_middleware },UserController.delete);
   app.put("/reset/password", UserController.resetPassword);
 };
 async function login_routes(app: FastifyInstance) {
@@ -32,12 +31,12 @@ async function preuser_routes(app: FastifyInstance) {
   app.post("/preuser", PreUserController.create);
 };
 async function category_routes(app: FastifyInstance) {
-  app.post("/category",/*{ preHandler: auth_middleware },*/CategoryController.create);
-  app.get("/categories",{ preHandler: auth_middleware },CategoryController.listOfCategory);
+  app.post("/category",{ preHandler: auth_middleware }, CategoryController.create);
+  app.get("/categories",{ preHandler: auth_middleware },CategoryController.list);
   app.get("/category/:id",{ preHandler: auth_middleware },CategoryController.findById);
   app.get("/category/name/:name",{ preHandler: auth_middleware },CategoryController.findByName);
   app.put("/category",{ preHandler: auth_middleware },CategoryController.edit);
-  app.delete("/category",{ preHandler: auth_middleware },CategoryController.delete);
+  app.delete("/category/:id",{ preHandler: auth_middleware },CategoryController.delete);
 };
 async function supplier_routes(app: FastifyInstance) {
   app.get("/suppliers",/*{ preHandler: auth_middleware },*/ SupplierController.findAll);

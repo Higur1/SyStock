@@ -253,7 +253,7 @@ model logFill {
 model token_Recovery {
   token         String   @id @default(uuid())
   user_id       Int
-  status        Boolean 
+  isActive      Boolean @default(true)
   createdAt     DateTime @default(now())  
   updatedAt     DateTime @updatedAt
 
