@@ -16,8 +16,8 @@ export default class PreUserService {
         : { status: true, listPreUsers: {} };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
+    };
+  };
   static async create(user: preUser) {
     try {
       const preuser = await prisma.pre_User.create({
@@ -36,13 +36,15 @@ export default class PreUserService {
       };
     } catch (error) {
       return { status: false}
-    }
-  }
+    };
+  };
   static async findPreUser(preUserData: preUser) {
     try {
       const preuser = await prisma.pre_User.findFirst({
         where: {
-          email: preUserData.email
+          AND:[
+            {email: preUserData.email}, {name: preUserData.name}
+          ]
         },
       });
 
@@ -51,8 +53,8 @@ export default class PreUserService {
         : { status: true, exists: false, preuser: undefined };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
+    };
+  };
   static async delete(preUser: preUser) {
     try {
       await prisma.pre_User.delete({
@@ -63,7 +65,7 @@ export default class PreUserService {
       return { status: true };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
-}
+    };
+  };
+};
 

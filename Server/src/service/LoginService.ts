@@ -36,7 +36,7 @@ export default class LoginService {
     static async recovery(userData: IUser, instance) {
         try {
             const findEmail = await UserModel.findByEmail(userData);
-
+ 
             if(!findEmail.exists){
                 throw new Error("Email not found");
             };

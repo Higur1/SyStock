@@ -1,5 +1,6 @@
 import { prisma } from "../config/prisma";
 import IUser from "../interface/IUser";
+
 export default class UserService {
   static async findAll() {
     try {
@@ -19,7 +20,7 @@ export default class UserService {
         : { status: true, listUsers: {} };
     } catch (error) {
       return { status: false, error: error };
-    }
+    };
   };
   static async create(userData: IUser) {
     try {
@@ -45,10 +46,11 @@ export default class UserService {
       };
     } catch (error) {
       return { status: false, error: error };
-    }
+    };
   };
   static async find(userData: IUser) {
     try {
+      console.log(userData)
       const user = await prisma.user.findFirst({
         where: {
           AND: [
@@ -74,7 +76,7 @@ export default class UserService {
         : { status: true, user: undefined };
     } catch (error) {
       return { status: false, error: error };
-    }
+    };
   };
   static async findByEmail(userData: IUser) {
     try {
@@ -97,7 +99,7 @@ export default class UserService {
         : { status: true, exists: false, user: undefined };
     } catch (error) {
       return { status: false, error: error };
-    }
+    };
   };
   static async findByName(userData: IUser) {
     try {
@@ -120,7 +122,7 @@ export default class UserService {
         : { status: true, exists: false, user: undefined };
     } catch (error) {
       return { status: false, error: error };
-    }
+    };
   };
   static async findByNameStartWith(userData: IUser) {
     try {
@@ -147,7 +149,7 @@ export default class UserService {
         : { status: true, user: {} };
     } catch (error) {
       return { status: false, error: error };
-    }
+    };
   };
   static async update(userData: IUser) {
     try {
@@ -173,8 +175,7 @@ export default class UserService {
         : { status: true, user: undefined };
     } catch (error) {
       return { status: false, error: error };
-    }
-
+    };
   };
   static async delete(userData: IUser) {
     try {
@@ -185,7 +186,7 @@ export default class UserService {
       return { status: true };
     } catch (error) {
       return { status: false, error: error };
-    }
+    };
   };
   static async deleteAllEmployees() {
     try {
@@ -196,7 +197,7 @@ export default class UserService {
       return { status: true };
     } catch (error) {
       return { status: false, error: error };
-    }
+    };
   };
   static async authUser(userData: IUser) {
     try {
@@ -210,7 +211,7 @@ export default class UserService {
         : { status: true, user: undefined };
     } catch (error) {
       return { status: false, error: error };
-    }
+    };
   };
   static async tokenCreate(id: number) {
     try {
@@ -226,7 +227,7 @@ export default class UserService {
 
     } catch (error) {
       return { status: false, error: error };
-    }
+    };
   };
   static async tokenValited(token) {
     try {
@@ -245,7 +246,7 @@ export default class UserService {
         };
     } catch (error) {
       return { status: false, error: error };
-    }
+    };
   };
   static async tokenDelete(id: number) {
     try {
@@ -257,7 +258,7 @@ export default class UserService {
       return result.count > 0 ? { status: true } : { status: false };
     } catch (error) {
       return { status: false, error: error };
-    }
+    };
   };
   static async updatePassword_editUser(userData: IUser) {
     try {
@@ -272,7 +273,7 @@ export default class UserService {
       return { status: true };
     } catch (error) {
       return { status: false, error: error };
-    }
+    };
   };
   static async updatePassword_resetPassword(id, token, password) {
     try {
@@ -295,6 +296,6 @@ export default class UserService {
       return { status: true };
     } catch (error) {
       return { status: false, error: error };
-    }
+    };
   };
-}
+};

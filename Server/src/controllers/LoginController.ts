@@ -26,21 +26,21 @@ export default class LoginController {
         password: user_password,
       };
 
-      const token = LoginService.auth(userData);
-
+      const token = await LoginService.auth(userData);
+ 
       response.status(200).send(JSON.stringify({
         token: token
       }));
     } catch (error) {
       if (error.message === "User not found") {
         response.status(404).send(JSON.stringify({
-          Error: error.message
-        }))
+          Message: error.message
+        }));
       };
       if (error.message === "Incorrect login or password") {
         response.status(401).send(JSON.stringify({
-          Error: error.message
-        }))
+          Message: error.message
+        }));
       };
       if (error.message === "Internal Server Error") {
         response.status(500).send(JSON.stringify({
@@ -50,8 +50,8 @@ export default class LoginController {
       response.status(400).send(JSON.stringify({
         Error: error.issues[0].message,
       }));
-    }
-  }
+    };
+  };
   static async recovery(request, response) {
     try {
       const recovery = z.object({
@@ -74,7 +74,7 @@ export default class LoginController {
     } catch (error) {
       if (error.message === "Email not found") {
         response.status(404).send(JSON.stringify({
-          Error: error.message
+          Message: error.message
         }));
       };
       if (error.message === "Internal Server Error") {
@@ -85,6 +85,6 @@ export default class LoginController {
       response.status(400).send(JSON.stringify({
         Error: error.issues[0].message,
       }));
-    }
-  }
-}
+    };
+  };
+};

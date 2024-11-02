@@ -16,6 +16,7 @@ async function user_routes(app: FastifyInstance) {
   app.get("/users",{ preHandler: auth_middleware },UserController.list);
   app.post("/user", UserController.create);
   app.get("/user/findByName/:name",{ preHandler: auth_middleware }, UserController.findByName);
+  app.get("/user/listByName/:name", {preHandler: auth_middleware}, UserController.findByNameList);
   app.get("/user/findById/:id", {preHandler: auth_middleware}, UserController.find);
   app.patch("/user", { preHandler: auth_middleware }, UserController.edit);
   app.patch("/user/editPassword", UserController.editPassword);
@@ -44,7 +45,7 @@ async function supplier_routes(app: FastifyInstance) {
   app.get("/supplier/:id", { preHandler: auth_middleware }, SupplierController.find);
   app.get("/supplier/findByName/:name",{ preHandler: auth_middleware }, SupplierController.findByName);
   app.put("/supplier", { preHandler: auth_middleware }, SupplierController.update);
-  app.delete("/supplier", { preHandler: auth_middleware }, SupplierController.delete);
+  app.delete("/supplier/:id", { preHandler: auth_middleware }, SupplierController.delete);
 };
 async function product_routes(app: FastifyInstance) {
   app.get("/products",{ preHandler: auth_middleware }, ProductController.findAll);
@@ -53,13 +54,13 @@ async function product_routes(app: FastifyInstance) {
   app.get("/product/findByName/:name", {preHandler: auth_middleware}, ProductController.findByName);
   app.get("/product/category/:category_id",{ preHandler: auth_middleware },ProductController.findByCategory);
   app.put("/product",{ preHandler: auth_middleware },ProductController.update);
-  app.delete("/product",{ preHandler: auth_middleware },ProductController.delete);
+  app.delete("/product/:id",{ preHandler: auth_middleware },ProductController.delete);
 };
 async function batch_routes(app: FastifyInstance) {
-  //app.get("/batchs", { preHandler: auth_middleware }, BatchController.findAll);
-  //app.get("/batch/product/:product_id",{ preHandler: auth_middleware },BatchController.findBatchByProduct);
-  //app.post("/batch", { preHandler: auth_middleware }, BatchController.supply);
-  //app.delete("/batch", { preHandler: auth_middleware }, BatchController.delete);
+  app.get("/batchs", { preHandler: auth_middleware }, BatchController.findAll);
+  app.get("/batch/product/:product_id",{ preHandler: auth_middleware },BatchController.findByProduct);
+  app.post("/batch", { preHandler: auth_middleware }, BatchController.supply);
+  app.delete("/batch/:id", { preHandler: auth_middleware }, BatchController.delete);
 };
 export {
   user_routes,

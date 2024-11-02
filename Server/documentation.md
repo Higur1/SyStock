@@ -232,6 +232,18 @@ Response Example:
     ]
 }
 ```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
+}
+```
 ##### Internal Error! 500
 This response indicates a server error.
 Reasons: Possibly due to issues such as file problems, server downtime, or database issues.
@@ -265,20 +277,36 @@ email: Email of the user to be registered in the system.
 If successful, this response returns the created user.
 
 Response Example:
+```
 {
 	"id": 1,
 	"name": "testtest",
 	"login": "testtest",
 	"email": "test@test.com"
 }
+```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
+}
+```
 ##### Pre-user Not Found! 404
 This response indicates that no pre-user is registered with the provided data.
 Reasons: It is necessary to register a pre-user first.
 
 Response Example:
+```
 {
     "Message": "Pre_user not found"
 }
+```
 ##### Email Already in Use! 409
 This response indicates that the provided email is already registered to another user.
 Reasons: Other user have already used email.
@@ -310,13 +338,13 @@ Response Example:
 }
 ```
 
-### GET /user/:name 
-The route returns a list of all users registered in the system who have the requested parameters in their name. This endpoint is used to fetch a list of users
+### GET /user/findByName/:name 
+The route return a user registered in the system who have the requested parameters. This endpoint is used return the user.
 #### Parameters
 name: name of the user who will be searched
 #### Request example
 The ID is passed as a URL parameter, so no body is needed for the request.
-Example URL: /user/ByName/test
+Example URL: /user/findByName/test
 #### Responses
 ##### Success! 200 
 If this response occurs, a list of users will be sent.
@@ -324,13 +352,34 @@ If this response occurs, a list of users will be sent.
 Response Example:
 ```
 {
-    users:[
+    User:[
         {
             id: 1,
             "name": "test",
             "email": "test@test.com",
         }
     ]
+}
+```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
+}
+```
+##### User not found! 404
+If this response occurs, user not found or not exists.
+
+Response Example:
+```
+{
+    "Message": "User not found"
 }
 ```
 ##### Internal Error! 500
@@ -354,7 +403,62 @@ Response Example:
 }
 ```
 
-### GET /user/ById/:id
+### GET /user/listByName/:name
+The route returns a list of users registered in the system who have the requested parameters. This endpoint is used to return a list of user.
+#### Parameters
+name: name of the user who will be searched
+#### Request example
+The ID is passed as a URL parameter, so no body is needed for the request.
+Example URL: /user/findByName/test
+#### Responses
+##### Success! 200 
+If this response occurs, a list of users will be sent.
+
+Response Example:
+```
+{
+    Users:[
+        {
+            id: 1,
+            "name": "test",
+            "email": "test@test.com",
+        }
+    ]
+}
+```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
+}
+```
+##### Internal Error! 500
+This response indicates a server error.
+Reasons: Possibly due to issues such as file problems, server downtime, or database issues.
+
+Response Example:
+```
+{
+    "Error": "An error has ocurred"
+}
+```
+##### Data error! 400
+This response indicates an error in the data sent with the request.
+Reasons: Such as incorrect data type or field size.
+
+Response Example:
+```
+{
+	"Error": "Expected string, received number"
+}
+```
+### GET /user/findById/:id
 The route returns a user registered in the system who has the requested parameters. This endpoint is used to search for a user by id
 #### Parameters
 id: id of the user who will be searched
@@ -377,6 +481,18 @@ Response Example:
     ]
 }
 ```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
+}
+```
 ##### User not found! 404
 If this response occurs, user not found or not exists.
 
@@ -384,6 +500,16 @@ Response Example:
 ```
 {
     "Message": "User not found"
+}
+```
+##### Bad Request convert! 400
+If this response occurs, expected a number and received a string.
+Reasons: Parameter is not a number
+
+Response Example:
+```
+{
+	"Message": "Expected a number and received a string"
 }
 ```
 ##### Internal Error! 500
@@ -446,6 +572,18 @@ Response Example:
     }
 }
 ```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
+}
+```
 ##### Name Already Exists! 409
 This response indicates that the user name could not be updated.
 Reason:  Name is already in use.
@@ -497,8 +635,6 @@ Response Example:
 }
 ```
 
-
-
 ### PATCH /user/editPassword 
 The route allows you to update the password of an existing user in the system. You must provide the user's unique identifier and the new password you want to set.
 #### Parameters
@@ -519,6 +655,18 @@ Response Example:
 ```
 {
     "Message": "Password updated successfully"
+}
+```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
 }
 ```
 ##### User Not Found! 404
@@ -552,7 +700,7 @@ Response Example:
 }
 ```
 
-### DELETE /user 
+### DELETE /user/:id 
 The route allows you to remove a user from the system by their unique identifier. This action is restricted for administrator users, who cannot be deleted.
 #### Parameters
 id: Unique identifier of the user.
@@ -569,7 +717,18 @@ Response Example:
     "Message": "User deleted successfully"
 }
 ```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
 
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
+}
+```
 ##### Cannot Delete Admin User! 403
 This response indicates that it is not possible to delete the administrator user from the system.
 Reason: The admin user cannot be deleted.
@@ -635,6 +794,18 @@ Response Example:
 ```
 {
     "message": "Token alredy used"
+}
+```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
 }
 ```
 ##### Invalid token! 400

@@ -10,7 +10,7 @@ export default class PreUserService{
         } catch (error) {
             throw new Error("An error has occurred");
         };
-    }
+    };
     static async create(pre_user: IPreUser){
         try {
             const verifyPreUserEmail = await PreUserModel.findPreUser(pre_user);
@@ -19,10 +19,10 @@ export default class PreUserService{
                 throw new Error("An operation could not be performed. Email already used");
             };
             const createResult = await PreUserModel.create(pre_user);
-
+ 
             return createResult;
         } catch (error) {
             throw error;
-        }
-    }
-}
+        };
+    };
+};

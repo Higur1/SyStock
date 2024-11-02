@@ -6,7 +6,7 @@ export default class PreUserController {
     static async list(request, response) {
         try {
             const list = await PreUserService.list();
-
+ 
             response.status(200).send(JSON.stringify({
                 Pre_Users: list
             }));
@@ -19,8 +19,8 @@ export default class PreUserController {
             response.status(400).send(JSON.stringify({
                 Error: error.issues[0].message,
             }));
-        }
-    }
+        };
+    };
     static async create(request, response) {
         try {
             const preUserValidation = z.object({
@@ -48,7 +48,7 @@ export default class PreUserController {
                 response.status(409).send(JSON.stringify({
                     Error: error.message
                 }));
-            }
+            };
             if (error.message === "Internal Server Error") {
                 response.status(500).send(JSON.stringify({
                     Error: error.message
@@ -57,6 +57,6 @@ export default class PreUserController {
             response.status(400).send(JSON.stringify({
                 Error: error.issues[0].message,
             }));
-        }
-    }
-}
+        };
+    };
+};

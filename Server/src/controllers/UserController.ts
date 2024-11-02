@@ -1,6 +1,7 @@
 import { z } from "zod";
 import IUser from "../interface/IUser";
 import UserService from "../service/UserService";
+import convert from "../functions/convertToNumber";
 
 export default class UserController {
     static async list(request, response) {
@@ -14,22 +15,23 @@ export default class UserController {
             if (error.message === "Internal Server Error") {
                 response.status(500).send(JSON.stringify({
                     Error: error.message
-                }))
-            }
+                }));
+            };
             response.status(400).send(JSON.stringify({
                 Error: error.issues[0].message
             }));
-        }
-    }
+        };
+    };
     static async find(request, response) {
         try {
             const userValidation = z.object({
                 id: z.string().min(1)
             });
             const { id } = userValidation.parse(request.params);
-
+            const convertID = convert(id);
+           
             const userData: IUser = {
-                id: Number(id),
+                id: convertID,
                 email: "",
                 login: "",
                 name: "",
@@ -37,27 +39,31 @@ export default class UserController {
             };
 
             const findResult = await UserService.find(userData);
-
+            
             response.status(200).send(JSON.stringify({
                 User: findResult.user
             }));
         } catch (error) {
+            if (error.message == "Expected a number and received a string") {
+                response.status(400).send(JSON.stringify({
+                    Message: error.message
+                }));
+            };
             if (error.message == "User not found") {
                 response.status(404).send(JSON.stringify({
                     Message: error.message
-                }))
-            }
+                }));
+            };
             if (error.message === "Internal Server Error") {
                 response.status(500).send(JSON.stringify({
                     Error: error.message
-                }))
-            }
+                }));
+            };
             response.status(400).send(JSON.stringify({
                 Error: error.issues[0].message
             }));
-        }
-
-    }
+        };
+    };
     static async findByNameList(request, response) {
         try {
             const userValidation = z.object({
@@ -85,13 +91,13 @@ export default class UserController {
             if (error.message === "Internal Server Error") {
                 response.status(500).send(JSON.stringify({
                     Error: error.message
-                }))
-            }
+                }));
+            };
             response.status(400).send(JSON.stringify({
                 Error: error.issues[0].message
             }));
-        }
-    }
+        };
+    };
     static async findByName(request, response) {
         try {
             const userValidation = z.object({
@@ -119,18 +125,18 @@ export default class UserController {
             if (error.message == "User not found") {
                 response.status(404).send(JSON.stringify({
                     Message: error.message
-                }))
-            }
+                }));
+            };
             if (error.message === "Internal Server Error") {
                 response.status(500).send(JSON.stringify({
                     Error: error.message
-                }))
-            }
+                }));
+            };
             response.status(400).send(JSON.stringify({
                 Error: error.issues[0].message
             }));
-        }
-    }
+        };
+    };
     static async create(request, response) {
         try {
             const userValidation = z.object({
@@ -172,23 +178,23 @@ export default class UserController {
             if (error.message === "Pre_user not found") {
                 response.status(404).send(JSON.stringify({
                     Message: error.message
-                }))
-            }
-            if (error.message === "Email alredy used") {
-                response.status(509).send(JSON.stringify({
+                }));
+            };
+            if (error.message === "Email already used") {
+                response.status(409).send(JSON.stringify({
                     Message: error.message
-                }))
-            }
+                }));
+            };
             if (error.message === "Internal Server Error") {
                 response.status(500).send(JSON.stringify({
                     Error: error.message
-                }))
-            }
+                }));
+            };
             response.status(400).send(JSON.stringify({
                 Error: error.issues[0].message
             }));
-        }
-    }
+        };
+    };
     static async edit(request, response) {
         try {
             const userValidation = z.object({
@@ -220,28 +226,28 @@ export default class UserController {
             if (error.message === "Name already exists") {
                 response.status(409).send(JSON.stringify({
                     Message: error.message
-                }))
-            }
+                }));
+            };
             if (error.message === "Email already exists") {
                 response.status(409).send(JSON.stringify({
                     Message: error.message
-                }))
-            }
+                }));
+            };
             if (error.message === "User not found") {
                 response.status(404).send(JSON.stringify({
                     Message: error.message
-                }))
-            }
+                }));
+            };
             if (error.message === "Internal Server Error") {
                 response.status(500).send(JSON.stringify({
                     Error: error.message
-                }))
-            }
+                }));
+            };
             response.status(400).send(JSON.stringify({
                 Error: error.issues[0].message
             }));
-        }
-    }
+        };
+    };
     static async editPassword(request, response) {
         try {
             const userValidation = z.object({
@@ -281,8 +287,8 @@ export default class UserController {
             response.status(400).send(JSON.stringify({
                 Error: error.issues[0].message
             }));
-        }
-    }
+        };
+    };
     static async delete(request, response) {
         try {
             const userValidation = z.object({
@@ -308,12 +314,12 @@ export default class UserController {
                 response.status(404).send(JSON.stringify({
                     Message: error.message
                 }));
-            }
+            };
             if (error.message === "It is not possible to delete the admin user") {
                 response.status(403).send(JSON.stringify({
                     Message: error.message
                 }));
-            }
+            };
             if (error.message === "Internal Server Error") {
                 response.status(500).send(JSON.stringify({
                     Error: error.message
@@ -322,8 +328,8 @@ export default class UserController {
             response.status(400).send(JSON.stringify({
                 Error: error.issues[0].message
             }));
-        }
-    }
+        };
+    };
     static async resetPassword(request, response) {
         try {
             const passwordResetValidation = z.object({
@@ -355,8 +361,8 @@ export default class UserController {
                     Message: error.message
                 }));
             };
-            if (error.message === "Invalid Token") {
-                response.status(400).send(JSON.stringify({
+            if (error.message === "Invalid token") {
+                response.status(409).send(JSON.stringify({
                     Message: error.message
                 }));
             };
@@ -368,6 +374,6 @@ export default class UserController {
             response.status(400).send(JSON.stringify({
                 Error: error.issues[0].message
             }));
-        }
-    }
-}
+        };
+    };
+};
