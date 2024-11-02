@@ -1,262 +1,109 @@
-import { prisma } from "../config/prisma";
-import Supplier from "../models/Supplier";
+import ISupplier from "../interface/ISupplier";
+import SupplierModel from "../models/SupplierModel";
 
 export default class SupplierService {
-  static async findAll() {
-    try {
-      const supplierResult = await prisma.supplier.findMany({
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          phone: true,
-        },
-        where: {
-          excludedStatus: false,
-        },
-      });
-      return supplierResult != undefined
-        ? { status: true, suppliers: supplierResult }
-        : { status: true, suppliers: {} };
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async create(supplierData: Supplier) {
-    try {
-      const supplierVerify = await SupplierService.verifySupplierAlredyExists(
-        supplierData
-      );
+    static async findAll() {
+        try {
+            const list = await SupplierModel.findAll();
 
-      if (!supplierVerify.exists) {
-        supplierData.excludedStatus = false;
-        const supplierResult = await prisma.supplier.create({
-          data: {
-            name: supplierData.name,
-            email: supplierData.email,
-            phone: supplierData.phone,
-            excludedStatus: supplierData.excludedStatus,
-          },
-        });
-        return supplierResult != undefined
-          ? {
-              status: true,
-              supplier: supplierResult,
+            return list;
+        } catch (error) {
+            throw error;
+        }
+    }
+    static async create(suppliderData: ISupplier) {
+        try {
+            const validatedSupplierDataExists = await validatedSupplierData(suppliderData);
+            if (validatedSupplierDataExists.length > 0) {
+                return new Error(validatedSupplierDataExists)
             }
-          : { status: true, supplier: {} };
-      } else {
-        const validate = await this.validatedSupplierDataExists(supplierData);
-        return { status: false, message: validate.message };
-      }
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async findSupplierForForeignKey(supplierData: Supplier) {
-    try {
-      const supplierResult = await prisma.supplier.findUnique({
-        where: {
-          id: supplierData.id,
-        },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          phone: true,
-        },
-      });
-      return supplierResult != undefined
-        ? { status: true, supplier: supplierResult }
-        : { status: true, supplier: undefined };
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async findById(supplierData: Supplier) {
-    try {
-      const supplierResult = await prisma.supplier.findUnique({
-        where: {
-          id: supplierData.id,
-          excludedStatus: false,
-        },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          phone: true,
-        },
-      });
-      return supplierResult != undefined
-        ? { status: true, supplier: supplierResult }
-        : { status: true, supplier: undefined };
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async findByName(supplierData: Supplier) {
-    try {
-      const supplierFinded = await prisma.supplier.findFirst({
-        where: {
-          name: supplierData.name,
-          excludedStatus: false
-        },
-      });
-      return supplierFinded != undefined
-        ? { status: true, exists:true, supplier: supplierFinded }
-        : { status: true, exists: false };
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async findAllSuppliersThatNameStartsWith(supplierData: Supplier) {
-    try {
-      const supplierResult = await prisma.supplier.findMany({
-        where: {
-          name: {
-            startsWith: supplierData.name,
-          },
-          excludedStatus: false,
-        },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          phone: true,
-        },
-      });
-      return supplierResult != undefined
-        ? { status: true, supplier: supplierResult }
-        : { status: true, supplier: {} };
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async update(supplierData: Supplier) {
-    try {
-      const supplier = await prisma.supplier.update({
-        data: {
-          name: supplierData.name,
-          email: supplierData.email,
-          phone: supplierData.phone,
-        },
-        where: {
-          id: supplierData.id,
-          excludedStatus: false,
-        },
-      });
-      return { supplier: supplier };
-    } catch (error) {
-      return { error: error };
-    }
-  }
-  static async validatedSupplierExists(supplierData: Supplier) {
-    try {
-      const validSupplier = await prisma.supplier.findFirst({
-        where: {
-          id: supplierData.id,
-          excludedStatus: false,
-        },
-      });
 
-      return validSupplier != null
-        ? { status: true, exists: true }
-        : { status: true, exists: false };
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async validatedSupplierDataExists(supplierData: Supplier) {
-    try {
-      let message = "";
-      const validNameSupplier = await prisma.supplier.findFirst({
-        where: {
-          name: supplierData.name,
-          excludedStatus: false
-        },
-      });
-      const validEmailSupplier = await prisma.supplier.findFirst({
-        where: {
-          email: supplierData.email,
-          excludedStatus: false
-        },
-      });
-      const validPhoneSupplier = await prisma.supplier.findFirst({
-        where: {
-          phone: supplierData.phone,
-          excludedStatus: false
-        },
-      });
-      message +=
-        validNameSupplier?.name == undefined ? "" : "nome já cadastrado no sistema | ";
+            const createResult = await SupplierModel.create(suppliderData);
 
-      message +=
-        validEmailSupplier?.email == undefined ? "" : "email já cadastrado no sistema | ";
+            return createResult.supplier;
+        } catch (error) {
+            throw error;
+        }
+    }
+    static async find(suppliderData: ISupplier) {
+        try {
+            const findResult = await SupplierModel.find(suppliderData);
 
-      message +=
-        validPhoneSupplier?.phone == undefined ? "" : "phone já cadastrado no sistema";
+            if (findResult.supplier == undefined) {
+                throw new Error("Supplier not found");
+            };
 
-      return message.length == 0
-        ? { status: true, isValid: true }
-        : { status: true, isValid: false, message: message };
-    } catch (error) {
-      return { status: false, error: error };
+            return findResult;
+        } catch (error) {
+            throw error;
+        }
     }
-  }
-  static async delete(supplierData: Supplier) {
-    try {
-      await prisma.supplier.update({
-        where: {
-          id: supplierData.id,
-        },
-        data: {
-          excludedStatus: true,
-        },
-      });
-      return { status: true };
-    } catch (error) {
-      return { status: false, error: error };
+    static async findByName(suppliderData: ISupplier) {
+        try {
+            const findResult = await SupplierModel.findByName(suppliderData);
+
+            if (!findResult.exists) {
+                throw new Error("Supplider not found");
+            };
+
+            return findResult;
+        } catch (error) {
+            throw error;
+        }
     }
-  }
-  static async deleteAll() {
-    try {
-      await prisma.supplier.updateMany({
-        data: {
-          excludedStatus: true,
-        },
-      });
-      return { status: true };
-    } catch (error) {
-      return { status: false, error: error };
+    static async findNameStartWith(suppliderData: ISupplier) {
+        try {
+            const listName = await SupplierModel.findNameStartsWith(suppliderData);
+
+            return listName;
+        } catch (error) {
+            throw error;
+        }
     }
-  }
-  static async verifySupplierAlredyExists(supplierData: Supplier) {
-    try {
-      const supplierResult = await prisma.supplier.findFirst({
-        where: {
-          OR: [
-            {
-              name: supplierData.name,
-            },
-            {
-              email: supplierData.email,
-            },
-            {
-              phone: supplierData.phone,
-            },
-          ],
-          AND: [
-            {
-              excludedStatus: false
+    static async update(suppliderData: ISupplier) {
+        try {
+            const validatedSupplierDataExists = await validatedSupplierData(suppliderData);
+
+            if (validatedSupplierDataExists.length > 0) {
+                throw new Error(validatedSupplierDataExists);
             }
-          ]
-        },
-      });
-      supplierResult;
-      return supplierResult != null
-        ? { status: true, exists: true, supplier: supplierResult }
-        : { status: true, exists: false };
-    } catch (error) {
-      return { status: false, error: error };
+            const findSupplider = await SupplierModel.find(suppliderData);
+            if (findSupplider.supplier == undefined) {
+                throw new Error("Supplier not found")
+            }
+            const updatedResult = await SupplierModel.update(suppliderData);
+
+            return updatedResult;
+        } catch (error) {
+            throw error;
+        }
     }
-  }
+    static async delete(suppliderData: ISupplier) {
+        try {
+            const findSupplier = await SupplierModel.find(suppliderData);
+
+            if (findSupplier.supplier == undefined) {
+                throw new Error("Supplier not found")
+            }
+
+            const supplierRemove = await SupplierModel.delete(suppliderData);
+
+            return supplierRemove;
+        } catch (error) {
+            throw error;
+        }
+    }
+}
+async function validatedSupplierData(suppliderData: ISupplier) {
+    let message = "";
+    const validatedName = await SupplierModel.findByName(suppliderData);
+    message += validatedName.supplier?.name == undefined ? "" : "Name already exists";
+
+    const validatedEmail = await SupplierModel.findByEmail(suppliderData);
+    message += validatedEmail.supplier?.email == undefined ? "" : "Email already exists";
+
+    const validatedPhone = await SupplierModel.findByPhone(suppliderData);
+    message += validatedPhone.supplier?.phone == undefined ? "" : "Phone already exists";
+
+    return message;
 }

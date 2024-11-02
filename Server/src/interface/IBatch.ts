@@ -1,30 +1,30 @@
-import Batch_Fill from "./Batch_Fill"; 
+import Batch_Fill from "./IBatchFill"; 
 
-interface IBatch {
+interface InterfaceBatch {
     expirantionDate: Date;
     quantity: number;
     deletationStatus?: boolean;
     dateTimeEmptyStock?: Date;
     product_id: number;
     eValidationStatus?: number;
-    batchs_fills: Array<Batch_Fill>;
+    batchs_fills?: Array<Batch_Fill>;
 }
 
-class Batch {
+class IBatch {
     id?: number
     product_id: number
     expirantionDate: Date
     quantity: number
     deletationStatus?: boolean
     eValidationStatus?: number
-    batchs_fills: Array<Batch_Fill>;
+    batchs_fills?: Array<Batch_Fill>;
 
     public constructor({
         expirantionDate,
         quantity,
         product_id,
         batchs_fills
-    }: IBatch) {
+    }: InterfaceBatch) {
         this.expirantionDate = expirantionDate,
             this.quantity = quantity;
         this.deletationStatus = false;
@@ -56,4 +56,4 @@ class Batch {
         this.batchs_fills = batchs_fills;
     }
 }
-export default Batch;
+export default IBatch;

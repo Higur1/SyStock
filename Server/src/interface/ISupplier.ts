@@ -1,11 +1,11 @@
-interface ISupplier{
+interface InterfaceSupplier{
     name: string;
     phone: string;
     email: string;
     excludedStatus?: false;
 };
 
-class Supplier{
+class ISupplier{
     id?: number;
     name: string;
     phone: string;
@@ -16,7 +16,7 @@ class Supplier{
         name, 
         phone, 
         email, 
-    }: ISupplier){
+    }: InterfaceSupplier){
         this.name = name,
         this.phone = phone;
         this.email = email;
@@ -24,5 +24,5 @@ class Supplier{
     };
 };
 
-export default Supplier;
+export default ISupplier;
 

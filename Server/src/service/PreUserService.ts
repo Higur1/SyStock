@@ -1,68 +1,28 @@
-import preUser from "../models/PreUser";
-import { prisma } from "../config/prisma";
+import IPreUser from "../interface/IPreUser";
+import PreUserModel from "../models/PreUserModel";
 
-export default class PreUserService {
-  static async findAll() {
-    try {
-      const listPreUsers = await prisma.pre_User.findMany({
-        select: {
-          id: true,
-          email: true,
-          name: true,
-        },
-      });
-      return listPreUsers.length > 0
-        ? { status: true, listPreUsers }
-        : { status: true, listPreUsers: {} };
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async create(user: preUser) {
-    try {
-      const preuser = await prisma.pre_User.create({
-        data: {
-          name: user.name,
-          email: user.email,
-        },
-      });
-      return {
-        status: true,
-        preuser: {
-          id: preuser.id,
-          name: preuser.name,
-          email: preuser.email,
-        },
-      };
-    } catch (error) {
-      return { status: false}
-    }
-  }
-  static async findPreUser(preUserData: preUser) {
-    try {
-      const preuser = await prisma.pre_User.findFirst({
-        where: {
-          email: preUserData.email
-        },
-      });
+export default class PreUserService{
+    static async list(){
+        try {
+            const list = await PreUserModel.findAll();
 
-      return preuser != null
-        ? { status: true, preuser: preuser }
-        : { status: true, preuser: undefined };
-    } catch (error) {
-      return { status: false, error: error };
+            return list;
+        } catch (error) {
+            throw new Error("An error has occurred");
+        };
     }
-  }
-  static async delete(preUser: preUser) {
-    try {
-      await prisma.pre_User.delete({
-        where: {
-          id: preUser.id,
-        },
-      });
-      return { status: true };
-    } catch (error) {
-      return { status: false, error: error };
+    static async create(pre_user: IPreUser){
+        try {
+            const verifyPreUserEmail = await PreUserModel.findPreUser(pre_user);
+       
+            if(verifyPreUserEmail.exists){
+                throw new Error("An operation could not be performed. Email already used");
+            };
+            const createResult = await PreUserModel.create(pre_user);
+
+            return createResult;
+        } catch (error) {
+            throw error;
+        }
     }
-  }
 }

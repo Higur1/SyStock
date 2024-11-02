@@ -1,7 +1,7 @@
 import Decimal from "decimal.js";
-import Batch_Fill from "./Batch_Fill";
+import Batch_Fill from "./IBatchFill";
 
-interface IFill {
+interface InterfaceFill {
   totalPrice: Decimal;
   dateTime?: Date;
   supplier_id: number;
@@ -10,7 +10,7 @@ interface IFill {
   batchs_fills: Array<Batch_Fill>;
 }
 
-class Fill {
+class IFill {
   id?: number;
   totalPrice?: Decimal;
   dateTime?: Date;
@@ -25,7 +25,7 @@ class Fill {
     supplier_id,
     user_id,
     batchs_fills,
-  }: IFill) {
+  }: InterfaceFill) {
     this.totalPrice = new Decimal(totalPrice);
     this.dateTime = new Date();
     this.observation = observation;
@@ -45,7 +45,7 @@ class Fill {
     });
     this.totalPrice = acumula;
   }
-  public calcTotalPrice(fill: Fill) {
+  public calcTotalPrice(fill: IFill) {
     let acumula: Decimal;
     acumula = new Decimal(0);
     this.batchs_fills.forEach((element) => {
@@ -59,4 +59,4 @@ class Fill {
   }
 }
 
-export default Fill;
+export default IFill;

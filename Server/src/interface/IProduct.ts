@@ -1,6 +1,6 @@
 import Decimal from "decimal.js";
 
-interface IProduct {
+interface InterfaceProduct {
   id?: number;
   name: string;
   price: Decimal;
@@ -12,7 +12,7 @@ interface IProduct {
   excludedStatus?: boolean;
 }
 
-class Product {
+class IProduct {
   id?: number;
   name: string;
   price: Decimal;
@@ -30,7 +30,7 @@ class Product {
     minimunQuantity,
     observation,
     category_id
-  }: IProduct) {
+  }: InterfaceProduct) {
     this.name = name;
     this.price = new Decimal(price);
     this.costPrice = new Decimal(costPrice);
@@ -42,4 +42,4 @@ class Product {
   }
 }
 
-export default Product;
+export default IProduct;

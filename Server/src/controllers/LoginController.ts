@@ -1,10 +1,6 @@
-import userService from "../service/UserService";
-import User from "../models/User";
-import { z } from "zod";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import { sendEmail } from "../functions/nodemailer";
-
+import IUser from "../interface/IUser";
+import LoginService from "../service/LoginService";
+import z from "zod"
 export default class LoginController {
   static async auth(request, response) {
     try {
@@ -20,63 +16,40 @@ export default class LoginController {
           .min(5, "user_password required minimum 5 character(s)")
           .max(10, "user_password required maximum 10 character(s)"),
       });
+
       const { user_login, user_password } = userValidation.parse(request.body);
 
-      const userData: User = {
+      const userData: IUser = {
         email: "",
         login: user_login,
         name: "",
         password: user_password,
-      }
+      };
 
-      const userVerify = await userService.authUser(userData);
-      if (userVerify.status) {
-        if (userVerify.user != undefined) {
-          await bcrypt
-            .compare(user_password, userVerify.user.password)
-            .then(async (checkPassword) => {
-              if (!checkPassword) {
-                return response.status(401).send({ Message: "Incorrect login or password" });
-              } else {
-                const knowkey = process.env.JWTSecret;
-                const token = jwt.sign(
-                  {
-                    id: userVerify.user.id,
-                    email: userVerify.user.email,
-                    user_type: userVerify.user.user_type
-                  },
-                  knowkey!,
-                  { expiresIn: "24h" }
-                );
-               // const _links = generatorHATEOAS(userVerify.user);
-                response.status(200).send(
-                  JSON.stringify({
-                    token: token,
-                  //  _links,
-                  })
-                );
-              }
-            });
-        } else {
-          response.status(404).send(
-            JSON.stringify({
-              message: "User not found",
-            })
-          );
-        }
-      } else {
-        response.status(500).send(
-          JSON.stringify({
-            Error: userVerify.error,
-          })
-        );
-      }
+      const token = LoginService.auth(userData);
+
+      response.status(200).send(JSON.stringify({
+        token: token
+      }));
     } catch (error) {
-      response.status(400).send(
-        JSON.stringify({
-          Error: error.issues[0].message,
-        })
-      );
+      if (error.message === "User not found") {
+        response.status(404).send(JSON.stringify({
+          Error: error.message
+        }))
+      };
+      if (error.message === "Incorrect login or password") {
+        response.status(401).send(JSON.stringify({
+          Error: error.message
+        }))
+      };
+      if (error.message === "Internal Server Error") {
+        response.status(500).send(JSON.stringify({
+          Error: error.message
+        }));
+      };
+      response.status(400).send(JSON.stringify({
+        Error: error.issues[0].message,
+      }));
     }
   }
   static async recovery(request, response) {
@@ -87,44 +60,31 @@ export default class LoginController {
       });
 
       const { email, instance } = recovery.parse(request.body);
-      const userData: User = {
+      const userData: IUser = {
         email: email,
         login: "",
         name: "",
         password: "",
-      }
-      
-      const userResult = await userService.findByEmail(userData);
+      };
+      await LoginService.recovery(userData, instance);
 
-      if (userResult.status) {
-        if (userResult.user != undefined) {
-          const tokenRecovery = await userService.tokenCreate(userResult.user.id);
-          sendEmail(email, tokenRecovery!.result, instance);
-          response.status(200).send(
-            JSON.stringify({
-              Message: "Email sent",
-            })
-          );
-        } else {
-          response.status(404).send(
-            JSON.stringify({
-              Message: "Email not found",
-            })
-          );
-        }
-      } else {
-        response.status(500).send(
-          JSON.stringify({
-            Error: userResult.error,
-          })
-        );
-      }
+      response.status(200).send(JSON.stringify({
+        Message: "Email sent"
+      }));
     } catch (error) {
-      response.status(400).send(
-        JSON.stringify({
-          Error: error.issues[0].message,
-        })
-      );
+      if (error.message === "Email not found") {
+        response.status(404).send(JSON.stringify({
+          Error: error.message
+        }));
+      };
+      if (error.message === "Internal Server Error") {
+        response.status(500).send(JSON.stringify({
+          Error: error.message
+        }));
+      };
+      response.status(400).send(JSON.stringify({
+        Error: error.issues[0].message,
+      }));
     }
   }
 }

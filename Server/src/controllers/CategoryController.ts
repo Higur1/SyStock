@@ -1,33 +1,28 @@
 import { z } from "zod";
 import CategoryService from "../service/CategoryService";
-import Category from "../models/Category";
-import ProductService from "../service/ProductService";
+import ICategory from "../interface/ICategory";
+
 export default class CategoryController {
   static async list(request, response) {
     try {
+
       const lisOfCategories = await CategoryService.findAll();
 
-      if (lisOfCategories.status) {
-        response.status(200).send(
-          JSON.stringify({
-            Categories: lisOfCategories.listOfCategory,
-          })
-        );
-      } else {
-        response.status(500).send(
-          JSON.stringify({
-            Error: lisOfCategories.error,
-          })
-        );
-      }
+      response.status(200).send(JSON.stringify({
+        Categories: lisOfCategories.listOfCategory,
+      }));
+
     } catch (error) {
-      response.status(400).send(
-        JSON.stringify({
-          Error: error,
-        })
-      );
-    }
-  }
+      if (error.message === "Internal Server Error") {
+        response.status(500).send(JSON.stringify({
+          Error: error.message
+        }));
+      };
+      response.status(400).send(JSON.stringify({
+        Error: error.issues[0].message,
+      }));
+    };
+  };
   static async create(request, response) {
     try {
       const categoryValidation = z.object({
@@ -35,43 +30,32 @@ export default class CategoryController {
       });
       const { name } = categoryValidation.parse(request.body);
 
-      const categoryData: Category = {
+      const categoryData: ICategory = {
+        id: 0,
         name: name
-      }
-      const categoryAlreadyExists = await CategoryService.findByName(categoryData);
-      console.log(categoryAlreadyExists)
-      if (categoryAlreadyExists.exists) {
-        response.status(409).send(
-          JSON.stringify({
-            Message: "Category already exists"
-          })
-        );
-      } else {
-        const categoryCreatedResult = await CategoryService.create(categoryData);
+      };
+      const createCategory = await CategoryService.create(categoryData);
 
-        if (categoryCreatedResult.status) {
-          response.status(201).send(
-            JSON.stringify({
-              Category: categoryCreatedResult.categoria
-            })
-          )
-        } else {
-          response.status(500).send(
-            JSON.stringify({
-              Error: categoryCreatedResult.error,
-            })
-          )
-        }
-      }
+      response.status(200).send(JSON.stringify({
+        Category: createCategory.categoria
+      }));
+
     } catch (error) {
-      response.status(400).send(
-        JSON.stringify({
-          path: error.issues[0].path,
-          error: error.issues[0].message,
-        })
-      );
-    }
-  }
+      if (error.message == "Category Already exists") {
+        response.status(409).send(JSON.stringify({
+          Message: error.message
+        }));
+      };
+      if (error.message === "Internal Server Error") {
+        response.status(500).send(JSON.stringify({
+          Error: error.message
+        }));
+      };
+      response.status(400).send(JSON.stringify({
+        Error: error.issues[0].message,
+      }));
+    };
+  };
   static async findById(request, response) {
     try {
       const category_id = z.object({
@@ -79,38 +63,29 @@ export default class CategoryController {
       });
       const { id } = category_id.parse(request.params);
 
-      const category: Category = { id: Number(id), name: "" };
-      const findCategory = await CategoryService.findById(category);
-    
-      if(!findCategory.status){
-        response.status(500).send(
-          JSON.stringify({
-            Error: findCategory.error
-          })
-        );
-      };
-      if(!findCategory.exists){
-        response.status(404).send(
-          JSON.stringify({
-            Message: "Category not found"
-          })
-        );
-      }else{
-        response.status(200).send(
-          JSON.stringify({
-            Category: findCategory.category
-          })
-        );
-      };
+      const category: ICategory = { id: Number(id), name: "" };
+
+      const findCategory = await CategoryService.find(category);
+
+      response.status(200).send(JSON.stringify({
+        Category: findCategory.category
+      }));
     } catch (error) {
-      response.status(400).send(
-        JSON.stringify({
-          path: error.issues[0].path,
-          error: error.issues[0].message,
-        })
-      );
-    }
-  }
+      if (error.message === "Category not found") {
+        response.status(404).send(JSON.stringify({
+          Message: error.message
+        }));
+      }
+      if (error.message === "Internal Server Error") {
+        response.status(500).send(JSON.stringify({
+          Error: error.message
+        }))
+      }
+      response.status(400).send(JSON.stringify({
+        Error: error.issues[0].message,
+      }));
+    };
+  };
   static async findByName(request, response) {
     try {
       const category_name = z.object({
@@ -118,36 +93,28 @@ export default class CategoryController {
       });
 
       const { name } = category_name.parse(request.params);
-      const category: Category = { name };
-      const findCategory = await CategoryService.findByTextsThatStartsWithName(category);
+      const categoryData: ICategory = { id: 0, name };
 
-      if(!findCategory.status){
-        response.status(500).send(
-          JSON.stringify({
-            Error: findCategory.error
-          })
-        );
-      };
-      if(!findCategory.exists){
-        response.status(404).send(
-          JSON.stringify({
-            Message: "Category doesn't exist"
-          })
-        );
-      }else{
-        response.status(200).send(
-          JSON.stringify({
-            Category: findCategory.categories
-          })
-        );
-      };
+      const findCategory = await CategoryService.findByName(categoryData);
+
+      response.status(200).send(JSON.stringify({
+        Categories: findCategory.categories
+      }));
+
     } catch (error) {
-      response.status(400).send(
-        JSON.stringify({
-          path: error.issues[0].path,
-          error: error.issues[0].message,
-        })
-      );
+      if (error.message === "Internal Server Error") {
+        response.status(500).send(JSON.stringify({
+          Error: error.message
+        }));
+      }
+      if (error.message === "Category not found") {
+        response.status(409).send(JSON.stringify({
+          Error: error.message
+        }));
+      }
+      response.status(400).send(JSON.stringify({
+        Error: error.issues[0].message,
+      }));
     };
   };
   static async edit(request, response) {
@@ -158,103 +125,72 @@ export default class CategoryController {
       });
       const { id, name } = categoryNewData.parse(request.body);
 
-      const category: Category = {
+      const category: ICategory = {
         id: id,
         name: name
       };
 
-      const nameCategoryAlredyExists = await CategoryService.findByName(
-        category
-      );
+      const categoryUpdated = await CategoryService.edit(category);
 
-      if(nameCategoryAlredyExists.exists){
-        response.status(409).send(
-          JSON.stringify({
-            Message: "Name of category alredy exists"
-          })
-        );
-      };
-
-      const idCategoryAlredyExists = await CategoryService.findById(category);
-
-      if(!idCategoryAlredyExists.status){
-        response.status(500).send(
-          JSON.stringify({
-            Error: idCategoryAlredyExists.error
-          })
-        );
-      };
-
-      if(!idCategoryAlredyExists.exists){
-        response.status(404).send(
-          JSON.stringify({
-            Message: "Category doesn't found"
-          })
-        );
-      }else{
-        const categoryUpdated = await CategoryService.update(category);
-
-        if (!categoryUpdated.status){
-          response.status(500).send(
-            JSON.stringify({
-              Error: categoryUpdated.error
-            })
-          );
-        }
-        response.status(200).send(
-          JSON.stringify({
-            Category: categoryUpdated.category
-          })
-        );
-      };
+      response.status(200).send(JSON.stringify({
+        Message: "Category updated successfully",
+        Category: categoryUpdated.category
+      }));
+       
     } catch (error) {
-      response.status(400).send(
-        JSON.stringify({
-          path: error.issues[0].path,
-          error: error.issues[0].message,
-        })
-      );
-    }
-  }
+      if(error.message === "Internal Server Error"){
+        response.status(500).send(JSON.stringify({
+          Error: error.message,
+        }));
+      }
+      if(error.message === "Name of category already exists"){
+        response.status(409).send(JSON.stringify({
+          Message: error.message,
+        }));
+      }
+      if(error.message === "Category doesn't found"){
+        response.status(404).send(JSON.stringify({
+          Message: error.message,
+        }));
+      }
+      response.status(400).send(JSON.stringify({
+        error: error.issues[0].message,
+      }));
+    };
+  };
   static async delete(request, response) {
     try {
-      const categoryData = z.object({
+      const categoryValidation = z.object({
         id: z.string().trim().min(1),
       });
 
-      const { id } = categoryData.parse(request.params);
-      const category: Category = { id: Number(id), name: "" };
+      const { id } = categoryValidation.parse(request.params);
+      const categoryData: ICategory = { id: Number(id), name: "" };
 
-      const categoryRemoved = await CategoryService.delete(category);
+      await CategoryService.delete(categoryData);
 
-      if(!categoryRemoved.status){
-        response.status(404).send(
-          JSON.stringify({
-            Message: "Category doesn't found"
-          })
-        );
-      };
-
-      const verifyProductExistsInCategory = await ProductService.findByCategory(Number(id));
-      console.log(verifyProductExistsInCategory)
-      if(verifyProductExistsInCategory.exists){
-        response.status(409).send(
-          JSON.stringify({
-            Message: "it is not possible to delete a category with registered products"
-          })
-        );
-      };
-      response.status(200).send(
-        JSON.stringify({
-          Message: "Category deleted successfully"
-        })
-      );
+      response.status(200).send(JSON.stringify({
+        Message: "Category deleted successfully"
+      }));
     } catch (error) {
-      response.status(400).send(
-        JSON.stringify({
-          error: error,
-        })
-      );
+      if(error.message === "Category doesn't found"){
+        response.status(404).send(JSON.stringify({
+          Message: error.message,
+        }));
+      }
+      if(error.message === "Internal Server Error"){
+        response.status(500).send(JSON.stringify({
+          Error: error.message,
+        }));
+      }
+      if(error.message === "it is not possible to delete a category with registered products"){
+        response.status(409).send(JSON.stringify({
+          Error: error.message,
+        }));
+      }
+      response.status(400).send(JSON.stringify({
+        error: error,
+      }));
     };
   };
 };

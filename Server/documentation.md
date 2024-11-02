@@ -977,8 +977,8 @@ Response Example:
 }
 ```
 
-## Endpoints Supplier OK
-### GET /suppliers OK
+## Endpoints Supplier 
+### GET /suppliers 
 This endpoint retrieves a list of all suppliers.
 #### Parameters
 No parameters is required.
@@ -1010,7 +1010,7 @@ Response Example:
 }
 ```
 
-### POST /supplier OK
+### POST /supplier 
 The route registers a new supplier in the system.
 #### Parameters
 name: Name of the supplier to be registered.
@@ -1044,7 +1044,7 @@ Reasons:  Phone or email already used.
 Response Example:
 ```
 {
-    "Message": "phone or email already used"
+    "Message": "Name, Phone or email already exists"
 }
 ```
 ##### Internal Error! 500
@@ -1068,7 +1068,7 @@ Response Example:
 }
 ```
 
-### GET /supplier/:id OK
+### GET /supplier/:id 
 This endpoint retrieves a supplier by their unique identifier.
 #### Parameters
 id: Unique identifier of the supplier.(passed as a URL parameter).
@@ -1119,7 +1119,7 @@ Response Example:
 }
 ```
 
-### GET /supplier/findByName/:name OK
+### GET /supplier/findByName/:name 
 This endpoint retrieves a supplier by their name.
 #### Parameters
 name: Name of the requested supplier (passed as a URL parameter).
@@ -1170,7 +1170,7 @@ Response Example:
 }
 ```
 
-### PUT /supplier OK
+### PUT /supplier 
 This endpoint updates the information for an existing supplier.
 #### Parameters
 id: Unique identifier of the supplier to be updated.
@@ -1216,7 +1216,7 @@ Reasons: Phone or email already in use.
 Reponse Example:
 ```
 {
-    "Message": "Phone or email already in use"
+    "Message": "Name, Phone or Email already exists"
 }
 ```
 ##### Internal Error! 500
@@ -1240,7 +1240,7 @@ Response Example:
 }
 ```
 
-### DELETE /supplier OK
+### DELETE /supplier 
 This endpoint deletes an existing supplier based on the provided unique identifier.
 #### Parameters
 id: Unique identifier of the supplier to be deleted.

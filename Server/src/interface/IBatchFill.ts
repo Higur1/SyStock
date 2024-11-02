@@ -1,9 +1,9 @@
 import Decimal from "decimal.js";
-import Fill from "./Fill";
-import Batch from "./Batch";
-import ILogFill from "./LogFill";
+import Fill from "./IFill";
+import Batch from "./IBatch";
+import ILogFill from "./ILogFill";
 
-interface IBatch_Fill {
+interface InterfaceBatch_Fill {
     fill: Fill;
     batch: Batch;
     quantity: number;
@@ -11,7 +11,7 @@ interface IBatch_Fill {
     subtotal: Decimal;
     iLogFill?: ILogFill;
   }
-  class Batch_Fill {
+  class IBatch_Fill {
     fill: Fill;
     batch: Batch;
     quantity: number;
@@ -19,7 +19,7 @@ interface IBatch_Fill {
     subtotal: Decimal;
     iLogFill?: ILogFill;
   
-    public constructor({ fill, batch, quantity, costPrice, subtotal }: IBatch_Fill) {
+    public constructor({ fill, batch, quantity, costPrice, subtotal }: InterfaceBatch_Fill) {
       this.fill = fill;
       this.batch = batch;
       this.quantity = quantity;
@@ -28,5 +28,5 @@ interface IBatch_Fill {
     }
   }
   
-  export default Batch_Fill;
+  export default IBatch_Fill;
   

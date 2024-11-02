@@ -1,243 +1,120 @@
-import { prisma } from "../config/prisma";
-import Product from "../models/Product";
-import Batch from "../models/Batch";
-import batch from "../service/BatchService";
-import { Prisma } from "@prisma/client";
-import User from "../models/User";
+import IProduct from "../interface/IProduct";
+import ProducModel from "../models/ProductModel";
+import CategoryModel from "../models/CategoryModel";
+import ICategory from "../interface/ICategory";
 
-export default class ProductService {
-  static async findAll() {
-    try {
-      const products = await prisma.product.findMany({
-        select: {
-          id: true,
-          name: true,
-          price: true,
-          costPrice: true,
-          minimunQuantity: true,
-          observation: true,
-          totalQuantityInStock: true,
-          category_id: true,
-        },
-        where: {
-          excludedStatus: false,
-        },
-      });
+export default class ProducService{
+    static async findAll(){
+        try {
+            const list = await ProducModel.findAll();
 
-      return products != null
-        ? { status: true, products: products }
-        : { status: false, products: {} };
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async getExcludedStatus(productData: Product) {
-    try {
-      const product = await prisma.product.findUnique({
-        where: {
-          id: productData.id,
-        },
-        select: {
-          excludedStatus: true,
-        },
-      });
-
-      return product != null
-        ? { status: true, product: product }
-        : { status: true, product: null };
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async create(productData: Product, user: User) {
-    try {
-      const verifyProductExists = await ProductService.findByName(productData);
-
-      if (!verifyProductExists.exists) {
-        const productResult = await prisma.product.create({
-          data: {
-            name: productData.name,
-            price: productData.price,
-            costPrice: productData.costPrice,
-            minimunQuantity: productData.minimunQuantity,
-            observation: productData.observation ?? "",
-            totalQuantityInStock: 0,
-            category_id: productData.category_id,
-            excludedStatus: false,
-          },
-          select: {
-            id: true,
-            name: true,
-            price: true,
-            costPrice: true,
-            minimunQuantity: true,
-            observation: true,
-            totalQuantityInStock: true,
-            category_id: true,
-          },
-        });
-        const batchData: Batch = {
-          expirantionDate: new Date("2024-01-01T00:00:01.000"),
-          product_id: productResult.id,
-          quantity: 0,
-          batchs_fills: [],
-        };
-        await batch.create(batchData, user);
-
-        return productResult != null
-          ? { status: true, product: productResult }
-          : { status: true, product: undefined };
-      } else {
-        return { status: true, message: "Product alredy exists" };
-      }
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === "P2003") {
-          return { status: false, error: "Categoria é inexistente" };
+            return list;
+        } catch (error) {
+            throw error;
         }
-      }
-      return { status: false, error: error };
     }
-  }
-  static async findById(productData: Product) {
-    try {
-      const product = await prisma.product.findUnique({
-        where: {
-          id: productData.id,
-          excludedStatus: false,
-        },
-      });
+    static async create(productData: IProduct){
+        try {
+            let category_id_replace = 0
+            if(productData.category_id != 0){
+                category_id_replace = productData.category_id
+            };
+            const categoryData: ICategory = {
+                id: category_id_replace,
+                name: ""
+            }
+            const findCategory = await CategoryModel.find(categoryData);
 
-      return product != null
-        ? { status: true, product: product }
-        : { status: true, product: null };
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async findByCategory(category_id: number) {
-    try {
-      const productsByCategory = await prisma.product.findMany({
-        where: {
-          AND: {
-            category_id: category_id,
-            excludedStatus: false,
-          },
-        },
-        select: {
-          id: true,
-          name: true,
-          category_id: true,
-          Batch: {
-            select: {
-              quantity: true,
-            },
-          },
-          price: true,
-        },
-      });
+            if(!findCategory.exists){
+                throw new Error("Category doesn't found")
+            }
 
-      return productsByCategory != null
-        ? { status: true, exists: true, products: productsByCategory }
-        : { status: true, exists: false, products: undefined };
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async findByName(productData: Product) {
-    try {
-      const productResult = await prisma.product.findFirst({
-        where: {
-          name: productData.name,
-          excludedStatus: false,
-        },
-      });
-      return productResult != null
-        ? { status: true, exists: true, product: productResult }
-        : { status: true, exists: false };
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async update(productData: Product) {
-    try {
-      const product = await prisma.product.update({
-        data: {
-          name: productData.name,
-          price: productData.price,
-          costPrice: productData.costPrice,
-          minimunQuantity: productData.minimunQuantity,
-          observation: productData.observation,
-          category_id: productData.category_id,
-        },
-        where: {
-          id: productData.id,
-          excludedStatus: false,
-        },
-        select: {
-          id: true,
-          name: true,
-          price: true,
-          costPrice: true,
-          minimunQuantity: true,
-          observation: true,
-          category_id: true,
-        },
-      });
+            const verifyNameDuplicate = await ProducModel.findByName(productData);
 
-      return product != null
-        ? { status: true, product: product }
-        : { status: true, product: undefined };
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async delete(productData: Product) {
-    try {
-      const productBatch = await prisma.batch.findFirst({
-        where: {
-          product_id: productData.id,
-        },
-        select: {
-          id: true,
-          quantity: true,
-        },
-      });
+            if(verifyNameDuplicate.exists){
+                throw new Error("Name already exists")
+            }
 
-      if (
-        productBatch?.quantity == undefined ? 0 : productBatch?.quantity > 0
-      ) {
-        return {
-          status: false,
-          error:
-            "Não é possível deletar o produto! Produto possui quantidade em estoque!",
-        };
-      }
+            const createResult = await ProducModel.create(productData);
+        
+            return createResult;
+        } catch (error) {
+            throw error;
+        }
+    }
+    static async find(productData: IProduct){
+        try {
+            const findResult = await ProducModel.find(productData);
 
-      await prisma.product.update({
-        where: {
-          id: productData.id,
-        },
-        data: {
-          excludedStatus: true,
-        },
-      });
-      return { status: true };
-    } catch (error) {
-      console.log(error);
-      return { status: false, error: error };
+            if(findResult.product == undefined){
+                throw new Error("Product not found")
+            }
+            return findResult;
+        } catch (error) {
+            throw error;
+        }
     }
-  }
-  static async deleteAll() {
-    try {
-      await prisma.product.updateMany({
-        data: {
-          excludedStatus: true,
-        },
-      });
-      return { status: true };
-    } catch (error) {
-      return { status: false, error: error };
+    static async findByCategory(productData: IProduct){
+        try {
+            const categoryData: ICategory = {
+                name: "",
+                id: productData.category_id
+            }
+            const findCategory = await CategoryModel.find(categoryData);
+            if(!findCategory.exists){
+                throw new Error("Category doesn't found");
+            };
+
+            const findResult = await ProducModel.findByCategory(productData.category_id);
+
+            return findResult;
+        } catch (error) {
+            throw error;
+        }
     }
-  }
+    static async findByName(productData: IProduct){
+        try {
+            const findResult = await ProducModel.findByName(productData);
+
+            if(!findResult.exists){ 
+                throw new Error("Product not found");
+            };
+
+            return findResult;
+        } catch (error) {
+            throw error;
+        }
+    }
+    static async update(productData: IProduct){
+        try {
+            const categoryData: ICategory = {
+                name: "",
+                id: productData.category_id
+            };
+            const verifyCategoryExists = await CategoryModel.find(categoryData)
+            if(!verifyCategoryExists.exists){
+                throw new Error("Category not found");
+            };
+            const verifyDuplicateName = await ProducModel.findByName(productData);
+            
+            if(verifyDuplicateName.exists){
+                throw new Error("Could not update product, name already exists");
+            };
+
+            const updatedResult = await ProducModel.update(productData);
+
+            return updatedResult;
+        } catch (error) {
+            throw error;
+        }
+    }
+    //criar dps do batch
+    static async delete(productData: IProduct){
+        try {
+            
+        } catch (error) {
+            throw error;
+        }
+    }
+    static async deleteAll(){}
 }

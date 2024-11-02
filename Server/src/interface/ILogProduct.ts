@@ -1,8 +1,8 @@
-import Product from "./Product";
-import User from "./User";
+import Product from "./IProduct";
+import User from "./IUser";
 
 
-interface ILogProduct {
+interface InterfaceLogProduct {
     id?: number;
     product: Product;
     quantity: number;
@@ -11,7 +11,7 @@ interface ILogProduct {
     eTypeAction: number;
     motivo: string;
   }
-  class LogProduct {
+  class ILogProduct {
     id?: number;
     product: Product;
     quantity: number;
@@ -20,7 +20,7 @@ interface ILogProduct {
     motivo: string;
     dateTime?: Date;
   
-    public constructor({ product, quantity, eTypeAction, motivo, user }: ILogProduct) {
+    public constructor({ product, quantity, eTypeAction, motivo, user }: InterfaceLogProduct) {
       this.product = product;
       this.dateTime = new Date();
       this.quantity = quantity;
@@ -30,4 +30,4 @@ interface ILogProduct {
     }
   }
   
-  export default LogProduct;
+  export default ILogProduct;
