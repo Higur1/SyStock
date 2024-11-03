@@ -1,7 +1,9 @@
 import { TextField } from '@mui/material';
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import styled from 'styled-components';
 import { TableContainer, TableData, TableRow } from '../styles';
+import { SellRegistersContext } from '../SellRegistersPage';
+import { dateToTextField } from '../../../utils/utils';
 
 const Container = styled("div")({
   display: 'flex',
@@ -30,7 +32,11 @@ const columns = [
 
 export default function ClosingOfTheDay() {
 
-  const [list, setList] = useState([]);
+  const { closingList, dateFiltered, setDateFiltered} = useContext(SellRegistersContext);
+
+  useEffect(() => {
+
+  }, []);
   return (
     <Container>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, flexBasis: 48, fontSize: "1.5rem" }}>
@@ -40,12 +46,13 @@ export default function ClosingOfTheDay() {
         <TextField
           label="Data"
           type="date"
-          defaultValue="2017-05-24"
           size='small'
+          value={dateToTextField(dateFiltered)}
           style={{ gridArea: "date" }}
           InputLabelProps={{
             shrink: true,
           }}
+          onChange={(e) => setDateFiltered(e.target.value)}
         />
         <div style={{ gridArea: "table", position: 'relative' }}>
           <div style={{ display: 'flex', width: '100%', height: '100%', overflow: 'hidden' }}>
@@ -66,7 +73,7 @@ export default function ClosingOfTheDay() {
                 ))}
               </TableRow>
               <div className="customScroll">
-                {list.map((log, index) => (
+                {closingList.map((log, index) => (
                   <TableRow key={index}>
                     {columns.map((column, i) => {
                       return (

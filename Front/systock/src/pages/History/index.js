@@ -1,9 +1,10 @@
 import { Tab, Tabs } from '@mui/material';
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Container, TableContainer, TableData, TableRow } from './styles';
 import ProductMovementTable from './Tabs/ProductMovementTable';
 import SupplyTable from './Tabs/SupplyTable';
 import SalesTable from './Tabs/SalesTable';
+import { HistoryContext } from './HistoryPage';
 
 const TABS = {
   PRODUCT_MOVEMENT: "PRODUCT_MOVEMENT",
@@ -19,7 +20,15 @@ const tabsList = [
 
 export default function History() {
 
+  const { productMovementList, supplyList, salesList, loading, getProductMovementList, getSalesList, getSupplyList  } = useContext(HistoryContext);
+
   const [tab, setTab] = useState(TABS.PRODUCT_MOVEMENT);
+
+  useEffect(() => {
+    if(tab === TABS.PRODUCT_MOVEMENT) getProductMovementList();
+    if(tab === TABS.SALES) getSalesList();
+    if(tab === TABS.SUPPLY) getSupplyList();
+  }, [tab]);
 
   const handleChange = (event, newValue) => {
     setTab(newValue);

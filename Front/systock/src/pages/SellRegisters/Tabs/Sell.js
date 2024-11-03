@@ -40,7 +40,7 @@ export default function Sell() {
   return (
     <Container>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, flexBasis: 48, fontSize: "1.5rem" }}>
-        {"Lista de vendas realizadas"}
+        {"Editar Venda"}
       </div>
       <GridContainer>
         <FormControl style={{ gridArea: "category", height: "100%" }}>

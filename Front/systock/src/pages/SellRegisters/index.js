@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Container } from './styles'
 import { Tab, Tabs } from '@mui/material'
 import SellList from './Tabs/SellList';
 import EditSell from './dialogs/EditSell';
 import Sell from './Tabs/Sell';
 import ClosingOfTheDay from './Tabs/ClosingOfTheDay';
+import { SellRegistersContext } from './SellRegistersPage';
 
 const TABS = {
   SELL_LIST: "SELL_LIST",
@@ -19,9 +20,14 @@ const tabsList = [
 ];
 
 export default function SellRegisters() {
+  const { getSellsList, getClosingLists } = useContext(SellRegistersContext);
 
   const [tab, setTab] = useState(TABS.SELL_LIST);
 
+  useEffect(() => {
+    if(tab === TABS.SELL_LIST) getSellsList();
+    if(tab === TABS.CLOSING_OF_THE_DAY) getClosingLists();
+  }, [tab]);
   const handleChange = (event, newValue) => {
     setTab(newValue);
   };
