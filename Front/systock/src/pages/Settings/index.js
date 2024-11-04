@@ -1,9 +1,10 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Container, TableContainer, TableData, TableRow } from './styles'
 import { Button, TextField } from '@mui/material'
 import { Person } from '@mui/icons-material'
 import { SettingsContext } from './SettingsPage'
 import EditUser, { TYPE_USER_DIALOG } from './dialogs/EditUser'
+import Account from '../../classes/Account'
 
 const columns = [
   { fixedWidth: true, label: "Nome", value: "name", width: 120 },
@@ -14,14 +15,28 @@ const columns = [
 
 export default function Settings() {
 
-  const { users } = useContext(SettingsContext);
+  const { users, getUsers } = useContext(SettingsContext);
+
+  const [editDialogProps, setEditDialogProps] = useState({open: false, user: null, type: TYPE_USER_DIALOG.NEW});
+
+  function handleEditUser(user = new Account({})) {
+    setEditDialogProps({open: true, user, type: TYPE_USER_DIALOG.EDIT});
+  }
+
+  function handleNewUser() {
+    setEditDialogProps({open: true, user: null, type: TYPE_USER_DIALOG.NEW});
+  }
+
+  useEffect(() => {
+    getUsers();
+  }, []);
   return (
     <Container>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontWeight: 600, fontSize: "1.5rem" }}>
         {"Usuários"}
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <Button size="small" variant='contained' startIcon={<Person />}>Meu Usuário</Button>
-          <Button size="small" variant='contained'>Novo Usuário</Button>
+          <Button size="small" onClick={() => handleEditUser()} variant='contained' startIcon={<Person />}>Meu Usuário</Button>
+          <Button size="small" onClick={handleNewUser} variant='contained'>Novo Usuário</Button>
         </div>
 
       </div>
@@ -68,7 +83,7 @@ export default function Settings() {
           </TableContainer>
         </div>
       </div>
-      {/* <EditUser type={TYPE_USER_DIALOG.EDIT}/> */}
+      {editDialogProps.open && (<EditUser type={editDialogProps.type} user={editDialogProps.user || new Account({})}/>)}
     </Container>
   )
 }
