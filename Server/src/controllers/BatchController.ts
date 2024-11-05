@@ -1,6 +1,8 @@
 import IBatch from "../interface/IBatch";
-import BatchService from "../models/BatchModel";
+import BatchService from "../service/BatchService";
 import z from "zod"
+import {dateBase} from "../functions/baseFunctions";
+
 export default class BatchController {
     static async findAll(request, response) {
         try {
@@ -67,7 +69,7 @@ export default class BatchController {
             }
             const findResult = await BatchService.findByProduct(batchData);
             response.status(200).send(JSON.stringify({
-                Batchs: findResult.batch
+                Batchs: findResult.batchs
             }));
         } catch (error) {
             if (error.message === "Product not found") {
@@ -85,6 +87,45 @@ export default class BatchController {
             }));
         }
     }
+    static async create(request, response){
+        try {
+            const batchValidation = z.object({
+                expirationDate: z.date(),
+                product_id: z.number().positive(),
+                quantity: z.number().positive()
+            });
+
+            const {expirationDate, product_id, quantity} = batchValidation.parse(request.body);
+
+            const batchData: IBatch = {
+                expirantionDate: expirationDate,
+                product_id: product_id,
+                quantity: quantity,
+                deletationStatus: false,
+                eValidationStatus: 2
+            };
+
+            const createResult = await BatchService.create(batchData);
+
+            response.status(201).send(JSON.stringify({
+                Batch: createResult.batch
+            }));
+        } catch (error) {
+            if(error.message == "Batch with expiration date already exists"){
+                return response.status(409).send(JSON.stringify({
+                    Message: error.message
+                }));
+            };
+            if (error.message === "Internal Server Error") {
+                return response.status(500).send(JSON.stringify({
+                    Error: error.message
+                }));
+            };
+            response.status(400).send(JSON.stringify({
+                Error: error.issues[0].message,
+            }));
+         };
+    };
     static async delete(request, response) {
         try {
             const batchValidation = z.object({
@@ -106,13 +147,13 @@ export default class BatchController {
                 Message: "Batch deleted successfully"
             }))
         } catch (error) {
-            if (error.message === "It is not possible to delete a batch that has an expiration date") {
+            if (error.message === "it is not possible to delete a batch with products") {
                 response.status(409).send(JSON.stringify({
                     Message: error.message
                 }));
             };
             if (error.message === "Batch not found") {
-                response.status(500).send(JSON.stringify({
+                response.status(404).send(JSON.stringify({
                     Message: error.message
                 }));
             };
@@ -126,44 +167,34 @@ export default class BatchController {
             }));
         }
     }
-    static async supply(request, response) {
+    static async addQuantity(request, response) {
         try {
-            const baseData = ("2024-01-01T03:00:01.000Z");
             const batchValidation = z.object({
                 product_id: z.number(),
-                expirationDate: z.string().transform((val) => new Date(val)).default(baseData),
-                quantity: z.number(),
-                operation: z.number()
+                expirationDate: z.string().transform((val) => new Date(val)),
+                quantity: z.number()
             });
-            const { product_id, expirationDate, quantity, operation } = batchValidation.parse(request.body);
+            const { product_id, expirationDate, quantity } = batchValidation.parse(request.body);
 
             const batchData: IBatch = {
                 product_id: product_id,
-                expirantionDate: expirationDate,
+                expirantionDate: expirationDate ? expirationDate: dateBase(),
                 quantity: quantity
-            }
+            };
 
-            if(operation == 1){
-                await BatchService.addQuantity(batchData);
-            }else{
-                await BatchService.subQuantity(batchData);
-            }
+            await BatchService.addQuantity(batchData);
+
             response.status(200).send(JSON.stringify({
-                Message: "Operation successfully"
-            }))
+                Message: "Amount added"
+            }));
         } catch (error) {
             if (error.message === "Batch not found") {
-                response.status(404).send(JSON.stringify({
-                    Error: error.message
-                }));
-            };
-            if (error.message === "Insufficient stock to withdraw quantity") {
-                response.status(400).send(JSON.stringify({
+                return response.status(404).send(JSON.stringify({
                     Error: error.message
                 }));
             };
             if (error.message === "Internal Server Error") {
-                response.status(500).send(JSON.stringify({
+                return response.status(500).send(JSON.stringify({
                     Error: error.message
                 }));
             };
@@ -172,4 +203,45 @@ export default class BatchController {
             }));
         }
     }
-}
+    static async subQuantity(request, response) {
+        try {
+            const batchValidation = z.object({
+                product_id: z.number(),
+                expirationDate: z.string().transform((val) => new Date(val)),
+                quantity: z.number()
+            });
+            const { product_id, expirationDate, quantity } = batchValidation.parse(request.body);
+
+            const batchData: IBatch = {
+                product_id: product_id,
+                expirantionDate: expirationDate ? expirationDate: dateBase(),
+                quantity: quantity
+            };
+
+            await BatchService.subQuantity(batchData);
+
+            response.status(200).send(JSON.stringify({
+                Message: "Amount subtracted"
+            }));
+        } catch (error) {
+            if(error.message === "Batch not found"){
+                return response.status(404).send(JSON.stringify({
+                    Message: error.message
+                }));
+            };
+            if(error.message === "Insufficient stock to withdraw quantity"){
+                return response.status(409).send(JSON.stringify({
+                    Message: error.message
+                }));
+            };
+            if (error.message === "Internal Server Error") {
+                return response.status(500).send(JSON.stringify({
+                    Error: error.message
+                }));
+            };
+            response.status(400).send(JSON.stringify({
+                Error: error.issues[0].message,
+            }));
+        };
+    };
+};

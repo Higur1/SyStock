@@ -1,7 +1,7 @@
 import { z } from "zod";
 import IUser from "../interface/IUser";
 import UserService from "../service/UserService";
-import convert from "../functions/convertToNumber";
+import {convertStringToNumber} from "../functions/baseFunctions";
 
 export default class UserController {
     static async list(request, response) {
@@ -13,7 +13,7 @@ export default class UserController {
             }));
         } catch (error) {
             if (error.message === "Internal Server Error") {
-                response.status(500).send(JSON.stringify({
+                return response.status(500).send(JSON.stringify({
                     Error: error.message
                 }));
             };
@@ -28,7 +28,7 @@ export default class UserController {
                 id: z.string().min(1)
             });
             const { id } = userValidation.parse(request.params);
-            const convertID = convert(id);
+            const convertID = convertStringToNumber(id);
            
             const userData: IUser = {
                 id: convertID,
@@ -45,17 +45,17 @@ export default class UserController {
             }));
         } catch (error) {
             if (error.message == "Expected a number and received a string") {
-                response.status(400).send(JSON.stringify({
+                return response.status(400).send(JSON.stringify({
                     Message: error.message
                 }));
             };
             if (error.message == "User not found") {
-                response.status(404).send(JSON.stringify({
+                return response.status(404).send(JSON.stringify({
                     Message: error.message
                 }));
             };
             if (error.message === "Internal Server Error") {
-                response.status(500).send(JSON.stringify({
+                return response.status(500).send(JSON.stringify({
                     Error: error.message
                 }));
             };
@@ -89,7 +89,7 @@ export default class UserController {
             }));
         } catch (error) {
             if (error.message === "Internal Server Error") {
-                response.status(500).send(JSON.stringify({
+                return response.status(500).send(JSON.stringify({
                     Error: error.message
                 }));
             };
@@ -123,12 +123,12 @@ export default class UserController {
             }));
         } catch (error) {
             if (error.message == "User not found") {
-                response.status(404).send(JSON.stringify({
+                return response.status(404).send(JSON.stringify({
                     Message: error.message
                 }));
             };
             if (error.message === "Internal Server Error") {
-                response.status(500).send(JSON.stringify({
+                return response.status(500).send(JSON.stringify({
                     Error: error.message
                 }));
             };
@@ -176,17 +176,17 @@ export default class UserController {
             }));
         } catch (error) {
             if (error.message === "Pre_user not found") {
-                response.status(404).send(JSON.stringify({
+                return response.status(404).send(JSON.stringify({
                     Message: error.message
                 }));
             };
             if (error.message === "Email already used") {
-                response.status(409).send(JSON.stringify({
+                return response.status(409).send(JSON.stringify({
                     Message: error.message
                 }));
             };
             if (error.message === "Internal Server Error") {
-                response.status(500).send(JSON.stringify({
+                return response.status(500).send(JSON.stringify({
                     Error: error.message
                 }));
             };
@@ -220,26 +220,27 @@ export default class UserController {
             const updateResult = await UserService.update(userData);
 
             response.status(200).send(JSON.stringify({
+                Message: "User updated Successfully",
                 User: updateResult.user
             }));
         } catch (error) {
             if (error.message === "Name already exists") {
-                response.status(409).send(JSON.stringify({
+                return response.status(409).send(JSON.stringify({
                     Message: error.message
                 }));
             };
             if (error.message === "Email already exists") {
-                response.status(409).send(JSON.stringify({
+                return response.status(409).send(JSON.stringify({
                     Message: error.message
                 }));
             };
             if (error.message === "User not found") {
-                response.status(404).send(JSON.stringify({
+                return response.status(404).send(JSON.stringify({
                     Message: error.message
                 }));
             };
             if (error.message === "Internal Server Error") {
-                response.status(500).send(JSON.stringify({
+                return response.status(500).send(JSON.stringify({
                     Error: error.message
                 }));
             };
@@ -311,17 +312,17 @@ export default class UserController {
             }));
         } catch (error) {
             if (error.message === "User not found") {
-                response.status(404).send(JSON.stringify({
+                return response.status(404).send(JSON.stringify({
                     Message: error.message
                 }));
             };
             if (error.message === "It is not possible to delete the admin user") {
-                response.status(403).send(JSON.stringify({
+                return response.status(403).send(JSON.stringify({
                     Message: error.message
                 }));
             };
             if (error.message === "Internal Server Error") {
-                response.status(500).send(JSON.stringify({
+                return response.status(500).send(JSON.stringify({
                     Error: error.message
                 }));
             };
@@ -352,22 +353,22 @@ export default class UserController {
             }));
         } catch (error) {
             if (error.message === "User not found") {
-                response.status(404).send(JSON.stringify({
+                return response.status(404).send(JSON.stringify({
                     Message: error.message
                 }));
             };
             if (error.message === "Token already used") {
-                response.status(400).send(JSON.stringify({
+                return response.status(400).send(JSON.stringify({
                     Message: error.message
                 }));
             };
             if (error.message === "Invalid token") {
-                response.status(409).send(JSON.stringify({
+                return response.status(409).send(JSON.stringify({
                     Message: error.message
                 }));
             };
             if (error.message === "Internal Server Error") {
-                response.status(500).send(JSON.stringify({
+                return response.status(500).send(JSON.stringify({
                     Error: error.message
                 }));
             };

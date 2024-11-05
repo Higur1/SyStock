@@ -9,18 +9,18 @@ export default class ProductController {
 
             response.status(200).send(JSON.stringify({
                 Products: listResult.products
-            }))
+            }));
         } catch (error) {
             if (error.message === "Internal Server Error") {
-                response.status(500).send(JSON.stringify({
+                return response.status(500).send(JSON.stringify({
                     Error: error.message
-                }))
-            }
+                }));
+            };
             response.status(400).send(JSON.stringify({
                 Error: error.issues[0].message,
             }));
-        }
-    }
+        };
+    };
     static async create(request, response) {
         try {
             const productValidation = z.object({
@@ -52,25 +52,25 @@ export default class ProductController {
               }));
         } catch (error) {
             if (error.message === "Name already exists") {
-                response.status(409).send(JSON.stringify({
+                return response.status(409).send(JSON.stringify({
                     Message: error.message
-                }))
-            }
+                }));
+            };
             if (error.message === "Category doesn't found") {
-                response.status(404).send(JSON.stringify({
+                return response.status(404).send(JSON.stringify({
                     Message: error.message
-                }))
-            }
+                }));
+            };
             if (error.message === "Internal Server Error") {
-                response.status(500).send(JSON.stringify({
+                return response.status(500).send(JSON.stringify({
                     Error: error.message
-                }))
-            }
+                }));
+            };
             response.status(400).send(JSON.stringify({
                 Error: error.issues[0].message,
             }));
-        }
-    }
+        };
+    };
     static async find(request, response) {
         try {
             const product_id = z.object({
@@ -97,20 +97,20 @@ export default class ProductController {
               }));
         } catch (error) {
             if (error.message === "Product not found") {
-                response.status(404).send(JSON.stringify({
+                return response.status(404).send(JSON.stringify({
                     Message: error.message
-                }))
-            }
+                }));
+            };
             if (error.message === "Internal Server Error") {
-                response.status(500).send(JSON.stringify({
+                return response.status(500).send(JSON.stringify({
                     Error: error.message
-                }))
-            }
+                }));
+            };
             response.status(400).send(JSON.stringify({
                 Error: error.issues[0].message,
             }));
-        }
-    }
+        };
+    };
     static async findByCategory(request, response) {
         try {
             const category = z.object({
@@ -136,20 +136,20 @@ export default class ProductController {
               }));
         } catch (error) {
             if (error.message === "Category not found") {
-                response.status(500).send(JSON.stringify({
+                return response.status(500).send(JSON.stringify({
                     Message: error.message
-                }))
-            }
+                }));
+            };
             if (error.message === "Internal Server Error") {
-                response.status(500).send(JSON.stringify({
+                return response.status(500).send(JSON.stringify({
                     Error: error.message
-                }))
+                }));
             }
             response.status(400).send(JSON.stringify({
                 Error: error.issues[0].message,
             }));
-        }
-    }
+        };
+    };
     static async findByName(request, response){
         try {
             const product_id = z.object({
@@ -175,20 +175,20 @@ export default class ProductController {
               }));
         } catch (error) {
             if (error.message === "Product not found") {
-                response.status(404).send(JSON.stringify({
+                return response.status(404).send(JSON.stringify({
                     Message: error.message
                 }))
             }
             if (error.message === "Internal Server Error") {
-                response.status(500).send(JSON.stringify({
+                return response.status(500).send(JSON.stringify({
                     Error: error.message
-                }))
-            }
+                }));
+            };
             response.status(400).send(JSON.stringify({
                 Error: error.issues[0].message,
             }));
-        }
-    }
+        };
+    };
     static async update(request, response) {
         try {
             const productValidation = z.object({
@@ -212,7 +212,7 @@ export default class ProductController {
                 observation: observation,
                 category_id: category_id,
                 excludedStatus: false,
-              }
+              };
 
               const updatedResult = await ProductService.update(productData);
 
@@ -222,25 +222,25 @@ export default class ProductController {
               }));
         } catch (error) {
             if (error.message === "Category not found") {
-                response.status(404).send(JSON.stringify({
+                return response.status(404).send(JSON.stringify({
                     Message: error.message
-                }))
-            }
+                }));
+            };
             if (error.message === "Could not update product, name already exists") {
-                response.status(409).send(JSON.stringify({
+                return response.status(409).send(JSON.stringify({
                     Message: error.message
-                }))
-            }
+                }));
+            };
             if (error.message === "Internal Server Error") {
-                response.status(500).send(JSON.stringify({
+                return response.status(500).send(JSON.stringify({
                     Error: error.message
-                }))
-            }
+                }));
+            };
             response.status(400).send(JSON.stringify({
                 Error: error.issues[0].message,
             }));
-        }
-    }
+        };
+    };
     static async delete(request, response) {
         try {
             const product_id = z.object({
@@ -255,7 +255,7 @@ export default class ProductController {
                 name: "",
                 price: new Decimal(0),
                 minimunQuantity: 0,
-              }
+              };
 
               await ProductService.delete(productData);
 
@@ -264,23 +264,23 @@ export default class ProductController {
               }));
         } catch (error) {
             if (error.message === "Product has batchs with products") {
-                response.status(400).send(JSON.stringify({
+                return response.status(400).send(JSON.stringify({
                     Message: error.message
-                }))
-            }
+                }));
+            };
             if (error.message === "Product not found") {
-                response.status(404).send(JSON.stringify({
+                return response.status(404).send(JSON.stringify({
                     Message: error.message
-                }))
-            }
+                }));
+            };
             if (error.message === "Internal Server Error") {
-                response.status(500).send(JSON.stringify({
+                return response.status(500).send(JSON.stringify({
                     Error: error.message
-                }))
-            }
+                }));
+            };
             response.status(400).send(JSON.stringify({
                 Error: error.issues[0].message,
             }));
-        }
-    }
-}
+        };
+    };
+};

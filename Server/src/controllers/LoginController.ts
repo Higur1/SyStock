@@ -33,17 +33,17 @@ export default class LoginController {
       }));
     } catch (error) {
       if (error.message === "User not found") {
-        response.status(404).send(JSON.stringify({
+        return response.status(404).send(JSON.stringify({
           Message: error.message
         }));
       };
       if (error.message === "Incorrect login or password") {
-        response.status(401).send(JSON.stringify({
+        return response.status(401).send(JSON.stringify({
           Message: error.message
         }));
       };
       if (error.message === "Internal Server Error") {
-        response.status(500).send(JSON.stringify({
+        return response.status(500).send(JSON.stringify({
           Error: error.message
         }));
       };
@@ -73,12 +73,12 @@ export default class LoginController {
       }));
     } catch (error) {
       if (error.message === "Email not found") {
-        response.status(404).send(JSON.stringify({
+        return response.status(404).send(JSON.stringify({
           Message: error.message
         }));
       };
       if (error.message === "Internal Server Error") {
-        response.status(500).send(JSON.stringify({
+        return response.status(500).send(JSON.stringify({
           Error: error.message
         }));
       };

@@ -20,8 +20,8 @@ export default class SupplierModel {
         : { status: true, suppliers: {} };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
+    };
+  };
   static async create(supplierData: ISupplier) {
     try { 
         const supplierResult = await prisma.supplier.create({
@@ -45,8 +45,8 @@ export default class SupplierModel {
           : { status: true, supplier: {} };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
+    };
+  };
   static async find(supplierData: ISupplier) {
     try {
       const supplierResult = await prisma.supplier.findUnique({
@@ -66,8 +66,8 @@ export default class SupplierModel {
         : { status: true, supplier: undefined };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
+    };
+  }; 
   static async findByName(supplierData: ISupplier) {
     try {
       const supplierResult = await prisma.supplier.findFirst({
@@ -83,8 +83,8 @@ export default class SupplierModel {
         : { status: true, exists: false };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
+    };
+  };
   static async findByEmail(supplierData: ISupplier) {
     try {
       const supplierResult = await prisma.supplier.findFirst({
@@ -99,8 +99,8 @@ export default class SupplierModel {
         : { status: true, exists: false };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
+    };
+  };
   static async findByPhone(supplierData: ISupplier) {
     try {
       const supplierResult = await prisma.supplier.findFirst({
@@ -115,8 +115,8 @@ export default class SupplierModel {
         : { status: true, exists: false };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
+    };
+  };
   static async findNameStartsWith(supplierData: ISupplier) {
     try {
       const supplierResult = await prisma.supplier.findMany({
@@ -138,8 +138,8 @@ export default class SupplierModel {
         : { status: true, supplier: {} };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
+    };
+  };
   static async update(supplierData: ISupplier) {
     try {
       const supplier = await prisma.supplier.update({
@@ -156,8 +156,8 @@ export default class SupplierModel {
       return { supplier: supplier };
     } catch (error) {
       return { error: error };
-    }
-  }
+    };
+  };
   static async delete(supplierData: ISupplier) {
     try {
       await prisma.supplier.update({
@@ -171,8 +171,8 @@ export default class SupplierModel {
       return { status: true };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
+    };
+  };
   static async deleteAll() {
     try {
       await prisma.supplier.updateMany({
@@ -183,6 +183,6 @@ export default class SupplierModel {
       return { status: true };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
-}
+    };
+  };
+};

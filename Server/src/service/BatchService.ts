@@ -4,20 +4,20 @@ import IProduct from "../interface/IProduct";
 import ProductModel from "../models/ProductModel";
 import Decimal from "decimal.js";
 
-export default class BatchService{
-    static async findAll(){
+export default class BatchService {
+    static async findAll() {
         try {
             const list = await BatchModel.findAll();
 
             return list;
         } catch (error) {
             throw error;
-        }
-    }
-    static async create(batchData: IBatch){
+        };
+    };
+    static async create(batchData: IBatch) {
         try {
             const find = await BatchModel.findByExpirationDate(batchData);
-            if(find.batch != undefined){
+            if (find.batch != undefined) {
                 throw new Error("Batch with expiration date already exists")
             };
             const productData: IProduct = {
@@ -27,9 +27,11 @@ export default class BatchService{
                 name: "",
                 price: new Decimal(0),
                 id: batchData.product_id
-            }
+            };
+
             const findProduct = await ProductModel.find(productData);
-            if(findProduct.product == undefined){
+
+            if (findProduct.product == undefined) {
                 throw new Error("Product not found");
             };
 
@@ -38,22 +40,22 @@ export default class BatchService{
             return createdResult;
         } catch (error) {
             throw error;
-        }
-    }
-    static async find(batchData: IBatch){
+        };
+    };
+    static async find(batchData: IBatch) {
         try {
             const findResult = await BatchModel.find(batchData);
 
-            if(findResult.batch == undefined){
-                throw new Error("Batch not found")
+            if (findResult.batch == undefined) {
+                throw new Error("Batch not found");
             }
 
             return findResult;
         } catch (error) {
             throw error;
-        }
-    }
-    static async findByProduct(batchData: IBatch){
+        };
+    };
+    static async findByProduct(batchData: IBatch) {
         try {
             const productData: IProduct = {
                 category_id: 0,
@@ -62,62 +64,86 @@ export default class BatchService{
                 name: "",
                 price: new Decimal(0),
                 id: batchData.product_id
-            }
+            };
+
             const findProduct = await ProductModel.find(productData);
-            if(findProduct.product == undefined){
+
+            if (findProduct.product == undefined) {
                 throw new Error("Product not found")
-            }
+            };
             const findResult = await BatchModel.findByProduct(batchData);
 
             return findResult;
         } catch (error) {
             throw error;
-        }
-    }
-    static async update(batchData: IBatch, operation: number){
+        };
+    };
+    static async addQuantity(batchData: IBatch) {
         try {
             const find = await BatchModel.find(batchData);
-            if(find.batch == undefined){
+            if (find.batch == undefined) {
                 throw new Error("Batch not found");
-            }
-            if(operation == 2){
-                if(find.batch.quantity < batchData.quantity){
-                    throw new Error("Insufficient stock to withdraw quantity")
-                }
-                const supplyResult = await BatchModel.subQuantity(batchData);
-                if(supplyResult.batch?.quantity == 0){
-                    await BatchModel.setDateTheBatchWasCleared(batchData)
-                }
-                return supplyResult;
-            }else{
-                const supplyResult = await BatchModel.addQuantity(batchData);
-                return supplyResult;
-            }
+            };
+            const supplyResult = await BatchModel.addQuantity(batchData);
+            return supplyResult;
+
         } catch (error) {
             throw error;
-        }
-    }
-    static async delete(batchData: IBatch){
+        };
+    };
+    static async subQuantity(batchData: IBatch) {
         try {
+            const findByProduct = await BatchModel.findByProduct(batchData);
+
             const find = await BatchModel.find(batchData);
-            const actuallyDate = new Date();
-            const futureDate = new Date(actuallyDate);
-
-            futureDate.setDate(actuallyDate.getDate() + 7);
-
-            if(find.batch == undefined){
+            if (find.batch == undefined) {
                 throw new Error("Batch not found");
             };
 
-            if(find.batch.expirationDate <= futureDate){
-                throw new Error("It is not possible to delete a batch that has an expiration date")
-            }
+            if(findByProduct.batchs != undefined && findByProduct.batchs.length > 1){
+                batchData.id = findByProduct.batchs[2].id;
+
+                const subResult = await BatchModel.subQuantityDesc(batchData);
+
+                if (subResult.batch?.quantity == 0) {
+                    await BatchModel.setDateTheBatchWasCleared(batchData);
+                };
+    
+                return subResult
+            }   
+           
+            if (find.batch.quantity < batchData.quantity) {
+                throw new Error("Insufficient stock to withdraw quantity");
+            };
+
+            const subResult = await BatchModel.subQuantityGeneric(batchData);
+
+            if (subResult.batch?.quantity == 0) {
+                await BatchModel.setDateTheBatchWasCleared(batchData);
+            };
+
+            return subResult
+            
+        } catch (error) {
+            throw error;
+        };
+    };
+    static async delete(batchData: IBatch) {
+        try {
+            const find = await BatchModel.find(batchData);
+
+            if (find.batch == undefined) {
+                throw new Error("Batch not found");
+            };
+            if (find.batch.quantity > 0) {
+                throw new Error("it is not possible to delete a batch with products")
+            };
 
             const deletedResult = await BatchModel.delete(batchData);
 
             return deletedResult;
         } catch (error) {
             throw error;
-        }
-    }
-}
+        };
+    };
+};

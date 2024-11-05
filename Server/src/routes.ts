@@ -36,6 +36,7 @@ async function category_routes(app: FastifyInstance) {
   app.get("/categories",{ preHandler: auth_middleware },CategoryController.list);
   app.get("/category/:id",{ preHandler: auth_middleware },CategoryController.findById);
   app.get("/category/findByName/:name",{ preHandler: auth_middleware },CategoryController.findByName);
+  app.get("/category/listByName/:name",{ preHandler: auth_middleware },CategoryController.listByName);
   app.put("/category",{ preHandler: auth_middleware },CategoryController.edit);
   app.delete("/category/:id",{ preHandler: auth_middleware },CategoryController.delete);
 };
@@ -44,6 +45,7 @@ async function supplier_routes(app: FastifyInstance) {
   app.post("/supplier", { preHandler: auth_middleware }, SupplierController.create);
   app.get("/supplier/:id", { preHandler: auth_middleware }, SupplierController.find);
   app.get("/supplier/findByName/:name",{ preHandler: auth_middleware }, SupplierController.findByName);
+  app.get("/supplier/listByName/:name", {preHandler: auth_middleware}, SupplierController.listByName);
   app.put("/supplier", { preHandler: auth_middleware }, SupplierController.update);
   app.delete("/supplier/:id", { preHandler: auth_middleware }, SupplierController.delete);
 };
@@ -59,7 +61,8 @@ async function product_routes(app: FastifyInstance) {
 async function batch_routes(app: FastifyInstance) {
   app.get("/batchs", { preHandler: auth_middleware }, BatchController.findAll);
   app.get("/batch/product/:product_id",{ preHandler: auth_middleware },BatchController.findByProduct);
-  app.post("/batch", { preHandler: auth_middleware }, BatchController.supply);
+  app.post("/batch/addQuantity", { preHandler: auth_middleware }, BatchController.addQuantity);
+  app.post("/batch/subQuantity", {preHandler: auth_middleware}, BatchController.subQuantity);
   app.delete("/batch/:id", { preHandler: auth_middleware }, BatchController.delete);
 };
 export {

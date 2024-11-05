@@ -15,8 +15,8 @@ export default class CategoryModel {
         : { status: true, listOfCategory: {} };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
+    };
+  };
   static async create(categoryData: ICategory) {
     try {
       const categoria = await prisma.category.create({
@@ -28,8 +28,8 @@ export default class CategoryModel {
       return {status: true, categoria:categoria};
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
+    };
+  } ;
   static async find(categoryData: ICategory) {
     try {
       const category = await prisma.category.findFirst({
@@ -42,8 +42,8 @@ export default class CategoryModel {
         : { status: true, exists: false, category: {} };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
+    };
+  };
   static async findByTextsThatStartsWithName(categoryData: ICategory) {
     try {
       const categories = await prisma.category.findMany({
@@ -62,11 +62,11 @@ export default class CategoryModel {
         : { status: true, exists: false, categories: {} };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
+    };
+  };
   static async findByName(categoryData: ICategory) {
     try {
-      const categories = await prisma.category.findFirst({
+      const category = await prisma.category.findFirst({
         where: {
           name: categoryData.name
         },
@@ -75,13 +75,13 @@ export default class CategoryModel {
           name: true,
         },
       });
-      return categories != undefined
-        ? { status: true, exists: true, categories: categories }
-        : { status: true, exists: false, categories: {} };
+      return category != undefined
+        ? { status: true, exists: true, category: category }
+        : { status: true, exists: false, category: undefined };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
+    };
+  };
   static async edit(categoryData: ICategory) {
     try {
       const categoryUpdated = await prisma.category.update({
@@ -101,8 +101,8 @@ export default class CategoryModel {
         : { status: true, category: undefined };
     } catch (error) {
       return { status: false, error: error };
-    }
-  }
+    };
+  };
   static async delete(categoryData: ICategory) {
     try {
       const categoryDeleted = await prisma.category.delete({
@@ -115,6 +115,6 @@ export default class CategoryModel {
         : { status: true, exists: false, category: {} };
     } catch (error) {
       return {status: false, categoryHaveProducts: true}
-    }
+    };
   };
 };

@@ -3,6 +3,7 @@ import IProduct from "../interface/IProduct";
 import IBatch from "../interface/IBatch";
 import batch from "./BatchModel";
 import User from "../interface/IUser";
+import {dateBase} from "../functions/baseFunctions";
 
 export default class ProductService {
   static async findAll() {
@@ -73,12 +74,11 @@ export default class ProductService {
           },
         });
         const batchData: IBatch = {
-          expirantionDate: new Date("2024-01-01T00:00:01.000"),
+          expirantionDate: dateBase(),
           product_id: productResult.id,
           quantity: 0,
           batchs_fills: [],
         };
-        //await batch.create(batchData);
 
         return productResult != null
           ? { status: true, product: productResult }
@@ -225,3 +225,5 @@ export default class ProductService {
     }
   }
 }
+
+

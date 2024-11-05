@@ -2,6 +2,9 @@ import IProduct from "../interface/IProduct";
 import ProducModel from "../models/ProductModel";
 import CategoryModel from "../models/CategoryModel";
 import ICategory from "../interface/ICategory";
+import IBatch from "../interface/IBatch";
+import BatchModel from "../models/BatchModel";
+import {dateBase} from "../functions/baseFunctions";
 
 export default class ProducService{
     static async findAll(){
@@ -22,21 +25,29 @@ export default class ProducService{
             const categoryData: ICategory = {
                 id: category_id_replace,
                 name: ""
-            }
+            };
             const findCategory = await CategoryModel.find(categoryData);
 
             if(!findCategory.exists){
-                throw new Error("Category doesn't found")
-            }
+                throw new Error("Category doesn't found");
+            };
 
             const verifyNameDuplicate = await ProducModel.findByName(productData);
 
             if(verifyNameDuplicate.exists){
-                throw new Error("Name already exists")
-            }
-
+                throw new Error("Name already exists");
+            };
             const createResult = await ProducModel.create(productData);
-        
+            const batchData: IBatch = {
+                expirantionDate: dateBase(),
+                product_id: createResult.product!.id,
+                quantity: 0,
+                deletationStatus: false,
+                eValidationStatus: 2
+            };
+
+            await BatchModel.create(batchData); 
+            
             return createResult;
         } catch (error) {
             throw error;

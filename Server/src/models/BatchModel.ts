@@ -4,7 +4,7 @@ import ILogProduct from "../interface/ILogProduct";
 import IProduct from "../interface/IProduct";
 import IUser from "../interface/IUser";
 
-export default class BatchService {
+export default class BatchModel {
   static async findAll() {
     try {
       const batchs = await prisma.batch.findMany({
@@ -35,18 +35,22 @@ export default class BatchService {
   }
   static async findByProduct(batchData: IBatch) {
     try {
-      const batch = await prisma.batch.findMany({
+      const batchs = await prisma.batch.findMany({
         where: {
           AND: {
             product_id: batchData.product_id,
           },
         },
         select: {
+          id: true,
           expirationDate: true,
           quantity: true,
         },
+        orderBy:{
+          expirationDate: 'asc'
+        }
       });
-      return { status: true, batch: batch };
+      return batchs != undefined ? { status: true, batchs: batchs } : { status: true, batchs: []};
     } catch (error) {
       return { status: false, error: error };
     }
@@ -81,7 +85,24 @@ export default class BatchService {
       return { status: false, error: error };
     }
   }
-  static async subQuantity(batchData: IBatch){
+  static async subQuantityGeneric(batchData: IBatch){
+    try {
+      const batchUpdated = await prisma.batch.update({
+        data: {
+          quantity: {
+            decrement: batchData.quantity,
+          },
+        },
+        where: {
+          id: batchData.id,
+        },
+      });
+      return { status: true, batch: batchUpdated };
+    } catch (error) {
+      return { status: false, error: error };
+    }
+  }
+  static async subQuantityDesc(batchData: IBatch){
     try {
       const batchUpdated = await prisma.batch.update({
         data: {

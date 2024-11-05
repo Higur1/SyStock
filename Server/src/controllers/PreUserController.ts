@@ -12,7 +12,7 @@ export default class PreUserController {
             }));
         } catch (error) {
             if (error.message === "An error has occurred") {
-                response.status(500).send(JSON.stringify({
+                return response.status(500).send(JSON.stringify({
                     Error: error.message
                 }));
             };
@@ -45,12 +45,12 @@ export default class PreUserController {
             }));
         } catch (error) {
             if(error.message === "An operation could not be performed. Email already used"){
-                response.status(409).send(JSON.stringify({
-                    Error: error.message
+                return response.status(409).send(JSON.stringify({
+                    Message: error.message
                 }));
             };
             if (error.message === "Internal Server Error") {
-                response.status(500).send(JSON.stringify({
+                return response.status(500).send(JSON.stringify({
                     Error: error.message
                 }));
             };

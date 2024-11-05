@@ -14,7 +14,7 @@ export default class CategoryController {
 
     } catch (error) {
       if (error.message === "Internal Server Error") {
-        response.status(500).send(JSON.stringify({
+        return response.status(500).send(JSON.stringify({
           Error: error.message
         }));
       };
@@ -42,12 +42,12 @@ export default class CategoryController {
 
     } catch (error) {
       if (error.message == "Category Already exists") {
-        response.status(409).send(JSON.stringify({
+        return response.status(409).send(JSON.stringify({
           Message: error.message
         }));
       };
       if (error.message === "Internal Server Error") {
-        response.status(500).send(JSON.stringify({
+        return response.status(500).send(JSON.stringify({
           Error: error.message
         }));
       };
@@ -72,15 +72,15 @@ export default class CategoryController {
       }));
     } catch (error) {
       if (error.message === "Category not found") {
-        response.status(404).send(JSON.stringify({
+        return response.status(404).send(JSON.stringify({
           Message: error.message
         }));
-      }
+      };
       if (error.message === "Internal Server Error") {
-        response.status(500).send(JSON.stringify({
+        return response.status(500).send(JSON.stringify({
           Error: error.message
-        }))
-      }
+        }));
+      };
       response.status(400).send(JSON.stringify({
         Error: error.issues[0].message,
       }));
@@ -89,7 +89,7 @@ export default class CategoryController {
   static async findByName(request, response) {
     try {
       const category_name = z.object({
-        name: z.string().trim().min(1).max(15),
+        name: z.string().trim().min(1),
       });
 
       const { name } = category_name.parse(request.params);
@@ -98,20 +98,46 @@ export default class CategoryController {
       const findCategory = await CategoryService.findByName(categoryData);
 
       response.status(200).send(JSON.stringify({
+        Categories: findCategory.category
+      }));
+
+    } catch (error) {
+      if (error.message === "Category not found") {
+        return response.status(409).send(JSON.stringify({
+          Message: error.message
+        }));
+      };
+      if (error.message === "Internal Server Error") {
+        return response.status(500).send(JSON.stringify({
+          Error: error.message
+        }));
+      };
+      response.status(400).send(JSON.stringify({
+        Error: error.issues[0].message,
+      }));
+    };
+  };
+  static async listByName(request, response) {
+    try {
+      const category_name = z.object({
+        name: z.string().trim().min(1).max(15),
+      });
+
+      const { name } = category_name.parse(request.params);
+      const categoryData: ICategory = { id: 0, name };
+
+      const findCategory = await CategoryService.listByName(categoryData);
+
+      response.status(200).send(JSON.stringify({
         Categories: findCategory.categories
       }));
 
     } catch (error) {
       if (error.message === "Internal Server Error") {
-        response.status(500).send(JSON.stringify({
+        return response.status(500).send(JSON.stringify({
           Error: error.message
         }));
-      }
-      if (error.message === "Category not found") {
-        response.status(409).send(JSON.stringify({
-          Error: error.message
-        }));
-      }
+      };
       response.status(400).send(JSON.stringify({
         Error: error.issues[0].message,
       }));
@@ -136,25 +162,24 @@ export default class CategoryController {
         Message: "Category updated successfully",
         Category: categoryUpdated.category
       }));
-       
     } catch (error) {
-      if(error.message === "Internal Server Error"){
-        response.status(500).send(JSON.stringify({
+      if (error.message === "Name of category already exists") {
+        return response.status(409).send(JSON.stringify({
+          Message: error.message,
+        }));
+      };
+      if (error.message === "Category doesn't found") {
+        return response.status(404).send(JSON.stringify({
+          Message: error.message,
+        }));
+      };
+      if (error.message === "Internal Server Error") {
+        return response.status(500).send(JSON.stringify({
           Error: error.message,
         }));
-      }
-      if(error.message === "Name of category already exists"){
-        response.status(409).send(JSON.stringify({
-          Message: error.message,
-        }));
-      }
-      if(error.message === "Category doesn't found"){
-        response.status(404).send(JSON.stringify({
-          Message: error.message,
-        }));
-      }
+      };
       response.status(400).send(JSON.stringify({
-        error: error.issues[0].message,
+        Error: error.issues[0].message,
       }));
     };
   };
@@ -173,23 +198,23 @@ export default class CategoryController {
         Message: "Category deleted successfully"
       }));
     } catch (error) {
-      if(error.message === "Category doesn't found"){
-        response.status(404).send(JSON.stringify({
+      if (error.message === "Category doesn't found") {
+        return response.status(404).send(JSON.stringify({
+          Message: error.message,
+        }));
+      };
+      if (error.message === "it is not possible to delete a category with registered products") {
+        return response.status(409).send(JSON.stringify({
           Message: error.message,
         }));
       }
-      if(error.message === "Internal Server Error"){
-        response.status(500).send(JSON.stringify({
+      if (error.message === "Internal Server Error") {
+        return response.status(500).send(JSON.stringify({
           Error: error.message,
         }));
-      }
-      if(error.message === "it is not possible to delete a category with registered products"){
-        response.status(409).send(JSON.stringify({
-          Error: error.message,
-        }));
-      }
+      };
       response.status(400).send(JSON.stringify({
-        error: error,
+        Error: error,
       }));
     };
   };

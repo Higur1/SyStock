@@ -5,7 +5,7 @@ import ProductModel from "../models/ProductModel";
 export default class CategoryService {
     static async findAll() {
         try {
-            const categories = await CategoryModel.findAll()
+            const categories = await CategoryModel.findAll();
 
             return categories;
         } catch (error) {
@@ -38,17 +38,26 @@ export default class CategoryService {
             return findCategory;
         } catch (error) {
             throw error;
-        };
+        }; 
     };
     static async findByName(categoryData: ICategory) {
         try {
-            const findCategory = await CategoryModel.findByTextsThatStartsWithName(categoryData);
+            const findCategory = await CategoryModel.findByName(categoryData);
 
             if (!findCategory.exists) {
                 throw new Error("Category not found");
             };
 
             return findCategory;
+        } catch (error) {
+            throw error;
+        };
+    };
+    static async listByName(categoryData: ICategory){
+        try {
+            const listCategories = await CategoryModel.findByTextsThatStartsWithName(categoryData);
+
+            return listCategories;
         } catch (error) {
             throw error;
         };
