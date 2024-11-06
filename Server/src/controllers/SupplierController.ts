@@ -66,6 +66,8 @@ export default class SupplierController {
                 id: z.string().trim(),
             });
             const { id } = supplierValidation.parse(request.params);
+
+            const covnertString = convertStringToNumber(id);
             const supplierData: ISupplier = {
                 email: "",
                 name: "",
@@ -79,6 +81,11 @@ export default class SupplierController {
                 Supplider: findResult.supplier
             }));
         } catch (error) {
+            if (error.message == "Expected a number and received a string") {
+                return response.status(400).send(JSON.stringify({
+                    Message: error.message
+                }));
+            };
             if (error.message === "Supplier not found") {
                 return response.status(404).send(JSON.stringify({
                     Message: error.message
@@ -176,9 +183,9 @@ export default class SupplierController {
             const updatedResult = await SupplierService.update(supplierData);
 
             response.status(200).send(JSON.stringify({
-                Message: "Supplider updated Successfully",
+                Message: "Supplier updated Successfully",
                 Supplier: updatedResult.supplier
-            }))
+            }));
         } catch (error) {
             if (error.message.includes("already exists")) {
                 return response.status(409).send(JSON.stringify({

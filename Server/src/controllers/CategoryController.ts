@@ -1,6 +1,7 @@
 import { z } from "zod";
 import CategoryService from "../service/CategoryService";
 import ICategory from "../interface/ICategory";
+import { convertStringToNumber } from "../functions/baseFunctions";
 
 export default class CategoryController {
   static async list(request, response) {
@@ -63,7 +64,8 @@ export default class CategoryController {
       });
       const { id } = category_id.parse(request.params);
 
-      const category: ICategory = { id: Number(id), name: "" };
+      const convertString = convertStringToNumber(id);
+      const category: ICategory = { id: convertString, name: "" };
 
       const findCategory = await CategoryService.find(category);
 
@@ -71,6 +73,11 @@ export default class CategoryController {
         Category: findCategory.category
       }));
     } catch (error) {
+      if (error.message == "Expected a number and received a string") {
+        return response.status(400).send(JSON.stringify({
+          Message: error.message
+        }));
+      };
       if (error.message === "Category not found") {
         return response.status(404).send(JSON.stringify({
           Message: error.message
@@ -103,7 +110,7 @@ export default class CategoryController {
 
     } catch (error) {
       if (error.message === "Category not found") {
-        return response.status(409).send(JSON.stringify({
+        return response.status(404).send(JSON.stringify({
           Message: error.message
         }));
       };
@@ -190,7 +197,8 @@ export default class CategoryController {
       });
 
       const { id } = categoryValidation.parse(request.params);
-      const categoryData: ICategory = { id: Number(id), name: "" };
+      const convertString = convertStringToNumber(id);
+      const categoryData: ICategory = { id: convertString, name: "" };
 
       await CategoryService.delete(categoryData);
 
@@ -198,6 +206,11 @@ export default class CategoryController {
         Message: "Category deleted successfully"
       }));
     } catch (error) {
+      if (error.message == "Expected a number and received a string") {
+        return response.status(400).send(JSON.stringify({
+          Message: error.message
+        }));
+      };
       if (error.message === "Category doesn't found") {
         return response.status(404).send(JSON.stringify({
           Message: error.message,

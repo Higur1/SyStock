@@ -60,6 +60,7 @@ async function product_routes(app: FastifyInstance) {
 };
 async function batch_routes(app: FastifyInstance) {
   app.get("/batchs", { preHandler: auth_middleware }, BatchController.findAll);
+  app.post("/batch", {preHandler: auth_middleware}, BatchController.create);
   app.get("/batch/product/:product_id",{ preHandler: auth_middleware },BatchController.findByProduct);
   app.post("/batch/addQuantity", { preHandler: auth_middleware }, BatchController.addQuantity);
   app.post("/batch/subQuantity", {preHandler: auth_middleware}, BatchController.subQuantity);

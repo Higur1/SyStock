@@ -296,9 +296,9 @@ export default class UserController {
                 id: z.string().min(1, "id required minimum 1 character(s)").trim(),
             });
             const { id } = userValidation.parse(request.params);
-
+            const convertString = convertStringToNumber(id);
             const userData: IUser = {
-                id: Number(id),
+                id: convertString,
                 email: "",
                 login: "",
                 name: "",
@@ -311,6 +311,11 @@ export default class UserController {
                 Message: "User deleted succesfully"
             }));
         } catch (error) {
+            if (error.message == "Expected a number and received a string") {
+                return response.status(400).send(JSON.stringify({
+                    Message: error.message
+                }));
+            };
             if (error.message === "User not found") {
                 return response.status(404).send(JSON.stringify({
                     Message: error.message

@@ -45,9 +45,9 @@ export default class ProducService{
                 deletationStatus: false,
                 eValidationStatus: 2
             };
-
-            await BatchModel.create(batchData); 
-            
+          
+            const returBatch = await BatchModel.create(batchData); 
+            console.log(returBatch.error)
             return createResult;
         } catch (error) {
             throw error;

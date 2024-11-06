@@ -131,6 +131,7 @@ No parameters is required.
 If successful, this response returns a list of registered pre-users.
 
 Response Example:
+```
 {
 	"Pre_users": [
 		{
@@ -140,6 +141,19 @@ Response Example:
 		}
 	]
 }
+```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
+}
+```
 ##### Internal Error! 500
 This response indicates a server error.
 Reasons: Possibly due to issues such as file problems, server downtime, or database issues.
@@ -207,7 +221,6 @@ Response Example:
 	"Error": "Expected string, received number"
 }
 ```
-
 
 ## Endpoints User 
 ### GET /users 
@@ -458,6 +471,7 @@ Response Example:
 	"Error": "Expected string, received number"
 }
 ```
+
 ### GET /user/findById/:id
 The route returns a user registered in the system who has the requested parameters. This endpoint is used to search for a user by id
 #### Parameters
@@ -739,7 +753,7 @@ Response Example:
     "Message": "It is not possible to delete the admin user",
 } 
 ```
-##### User Not Found! 404 OK
+##### User Not Found! 404 
 If this response occurs, it means that the requested user does not exist.
 Reason: User don't exits.
 
@@ -747,6 +761,16 @@ Response Example:
 ```
 {
    "Message": "User not found"
+}
+```
+##### Bad Request convert! 400
+If this response occurs, expected a number and received a string.
+Reasons: Parameter is not a number
+
+Response Example:
+```
+{
+	"Message": "Expected a number and received a string"
 }
 ```
 ##### Internal Error! 500
@@ -840,7 +864,7 @@ Response Example:
 ```
 
 ## Endpoints Category 
-### POST /category OK
+### POST /category 
 The route allows users to create a new category in the system by providing a unique name for the category.
 #### Parameters
 name: The name of the category to be created.
@@ -858,6 +882,18 @@ Response Example:
 ```
 {
     "Category": "categoryExample"
+}
+```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
 }
 ```
 ##### Category already exists! 409
@@ -910,6 +946,18 @@ Response Example:
     ]
 }
 ```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
+}
+```
 ##### Internal Error! 500
 This response indicates a server error.
 Reasons: Possibly due to issues such as file problems, server downtime, or database issues.
@@ -939,6 +987,28 @@ Response Example:
         "id": 1,
         "name": "categoryExample"
     }
+}
+```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
+}
+```
+##### Bad Request convert! 400
+If this response occurs, expected a number and received a string.
+Reasons: Parameter is not a number
+
+Response Example:
+```
+{
+	"Message": "Expected a number and received a string"
 }
 ```
 ##### Category not found! 404
@@ -972,13 +1042,13 @@ Response Example:
 }
 ```
 
-### GET /category/name/:name 
+### GET /category/findByName/:name 
 This endpoint retrieves a specific category by its name.
 #### Parameters
 name: The name of the category.
 #### Request example
 The name is passed as a URL parameter, so no body is needed for the request.
-Example URL: /category/name/categoryExample
+Example URL: /category/findByName/categoryExample
 #### Responses
 ##### Success! 200
 If this response occurs, the requested category will be returned.
@@ -990,6 +1060,18 @@ Response Example:
         "id": 1,
         "name": "categoryExample"
     }
+}
+```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
 }
 ```
 ##### Category not found! 404
@@ -1023,6 +1105,62 @@ Response Example:
 }
 ```
 
+### GET /category/listByName/:name 
+This endpoint retrieves a specific category by its name.
+#### Parameters
+name: The name of the category.
+#### Request example
+The name is passed as a URL parameter, so no body is needed for the request.
+Example URL: /category/listByName/categoryExample
+#### Responses
+##### Success! 200
+If this response occurs, the requested category will be returned.
+
+Response Example:
+```
+{
+    "Categories":[
+        {
+        "id": 1,
+        "name": "categoryExample"
+        }
+    ]
+}
+```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
+}
+```
+##### Internal Error! 500
+This response indicates a server error.
+Reasons: Possibly due to issues such as file problems, server downtime, or database issues.
+
+Response Example:
+```
+{
+    "Error": "An error has ocurred"
+}
+```
+##### Data error! 400
+This response indicates an error in the data sent with the request.
+Reasons: Such as incorrect data type or field size.
+
+Response Example:
+```
+{
+	"Error": "Expected string, received number"
+}
+```
+
+
 ### PUT /category 
 This endpoint allows users to update an existing category.
 #### Parameters
@@ -1042,8 +1180,23 @@ If this response occurs, the updated category will be returned.
 Response Example:
 ```
 {
-	"id": 1,
-    "name": "categoryExample"
+    Message: "Category updated successfully",
+    {
+        "id": 1,
+        "name": "categoryExample"
+    }
+}
+```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
 }
 ```
 ##### Name already exists! 409
@@ -1087,16 +1240,13 @@ Response Example:
 }
 ```
 
-### DELETE /category
+### DELETE /category/:id
 This endpoint deletes an existing category by its unique identifier.
 #### Parameters
 id: The unique identifier of the category to be deleted.
 #### Request example
-```
-{
-	"id": 1
-}
-```
+The ID is passed as a URL parameter, so no body is needed for the request.
+Example URL: /category/1
 #### Reponses
 ##### Success! 200
 If successful, this response confirms that the category has been deleted from the system.
@@ -1107,14 +1257,36 @@ Response Example:
     "Message": "Category deleted successfully"
 }
 ```
-##### Category not found! 404
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
+}
+```
+##### Bad Request convert! 400
+If this response occurs, expected a number and received a string.
+Reasons: Parameter is not a number
+
+Response Example:
+```
+{
+	"Message": "Expected a number and received a string"
+}
+```
+##### Category doesn't found! 404
 If this response occurs, it means that the requested category does not exist.
 Reasons: Category don't exits.
 
 Response Example:
 ```
 {
-    "Message": "Category not found"
+    "Message": "Category doesn't found"
 }
 ```
 ##### Deletion not possible! 409
@@ -1170,6 +1342,18 @@ Response Example:
     ]
 }
 ```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
+}
+```
 ##### Internal Error! 500
 This response indicates a server error.
 Reasons: Possibly due to issues such as file problems, server downtime, or database issues.
@@ -1206,6 +1390,18 @@ Response Example:
     "name": "test",
     "phone": "(00)00000-0000",
     "email": "test@test.com"
+}
+```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
 }
 ```
 ##### Registration not possible! 409 
@@ -1269,6 +1465,28 @@ Response Example:
     "Message": "Supplier does not exist"
 }
 ```
+##### Bad Request convert! 400
+If this response occurs, expected a number and received a string.
+Reasons: Parameter is not a number
+
+Response Example:
+```
+{
+	"Message": "Expected a number and received a string"
+}
+```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
+}
+```
 ##### Internal Error! 500
 This response indicates a server error.
 Reasons: Possibly due to issues such as file problems, server downtime, or database issues.
@@ -1310,6 +1528,18 @@ Response Example:
     email: "test@test.com"
 }
 ```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
+}
+```
 ##### Supplier not found! 404
 If this response occurs, it means the supplier with the specified name does not exist in the system.
 Reasons: Supplier does not exist.
@@ -1318,6 +1548,64 @@ Response Example:
 ```
 {
     "Message": "Supplier not found"
+}
+```
+##### Internal Error! 500
+This response indicates a server error.
+Reasons: Possibly due to issues such as file problems, server downtime, or database issues.
+
+Response Example:
+```
+{
+    "Error": "An error has ocurred"
+}
+```
+##### Data error! 400
+This response indicates an error in the data sent with the request.
+Reasons: Such as incorrect data type or field size.
+
+Response Example:
+```
+{
+	"Error": "Expected string, received number"
+}
+```
+
+### GET /supplier/listByName/:name 
+This endpoint retrieves a supplier by their name.
+#### Parameters
+name: Name of the requested supplier (passed as a URL parameter).
+#### Request example
+The ID is passed as a URL parameter, so no body is needed for the request.
+Example URL: /supplier/listByName/supplier
+#### Response
+##### Success! 200
+If this response occurs, the requested supplier is returned.
+
+Response Example:
+```
+{
+    Suppliers: [
+        {
+            id: 1,
+            name: "supplierExample",
+            phone: "(00)00000-0000",
+            email: "test@test.com"
+        }
+    ]
+   
+}
+```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
 }
 ```
 ##### Internal Error! 500
@@ -1364,10 +1652,25 @@ If this response occurs, the supplier has been successfully updated, and the upd
 Response Example:
 ```
 {
+    Message: "Supplier updated Successfully"
+{
     id: 1,
     name: "supplierExample",
     phone: "(00)00000-0000",
     email: "test@test.com"
+}
+}
+```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
 }
 ```
 ##### Supplier not found! 404
@@ -1411,16 +1714,13 @@ Response Example:
 }
 ```
 
-### DELETE /supplier 
+### DELETE /supplier/:id
 This endpoint deletes an existing supplier based on the provided unique identifier.
 #### Parameters
 id: Unique identifier of the supplier to be deleted.
 #### Request example
-```
-{
-	"id": 1
-}
-```
+The ID is passed as a URL parameter, so no body is needed for the request.
+Example URL: /supplier/1
 #### Responses
 ##### Success! 200
 If this response occurs, the supplier has been successfully deleted.
@@ -1431,7 +1731,28 @@ Response Exemple:
     "Message": "Supplier deleted successfully"
 }
 ```
+##### Bad Request convert! 400
+If this response occurs, expected a number and received a string.
+Reasons: Parameter is not a number
 
+Response Example:
+```
+{
+	"Message": "Expected a number and received a string"
+}
+```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
+}
+```
 ##### Supplier not found! 404
 If this response occurs, it means that the supplier was not found in the system.
 Reasons: Supplier does not exist.
@@ -1491,6 +1812,18 @@ Response Example:
     ]
 }
 ```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
+}
+```
 ##### Internal Error! 500
 This response indicates a server error.
 Reasons: Possibly due to issues such as file problems, server downtime, or database issues.
@@ -1536,6 +1869,18 @@ Response Example:
     "minimunQuantity": 200,
     "observation": "Example",
     "category_id": 1
+}
+```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
 }
 ```
 ##### Product already exists! 409
@@ -1594,6 +1939,18 @@ Response Example:
             "category_id": 1
         }
     ]
+}
+```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
 }
 ```
 ##### Category not found! 404
@@ -1663,6 +2020,18 @@ Response Example:
     "category_id": 1
 }
 ```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
+}
+```
 ##### Name already exists! 409
 The product update failed.
 Reasons: A product with the same name already exists.
@@ -1707,7 +2076,18 @@ id: Unique product identifier to be deleted.
 #### Responses
 ##### Success! 200
 The product has been deleted from the system.
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
 
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
+}
+```
 ##### Not possible! 409
 It is not possible to delete the product.
 Reasons: Product has stock.
@@ -1767,6 +2147,18 @@ Response Example:
     ]
 }
 ```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
+}
+```
 ##### Internal Error! 500
 This response indicates a server error.
 Reasons: Possibly due to issues such as file problems, server downtime, or database issues.
@@ -1805,6 +2197,18 @@ Response Example:
             "updatedAt": "2024-01-01"
         }
     ]
+}
+```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
 }
 ```
 ##### Internal Error! 500
@@ -1861,6 +2265,18 @@ Response Example:
     "eValidationStatus": 1,
     "createdAt": "2024-01-01",
     "updatedAt": "2024-01-01"   
+}
+```
+##### Unauthorized! 401
+This response means that the user must be authenticated to access a route.
+Reasons: Token expired, user has not logged or does not have access to this route
+
+Response Example:
+```
+{
+	"statusCode": 401,
+	"error": "Unauthorized",
+	"message": "jwt expired"
 }
 ```
 ##### Batch not found! 404
