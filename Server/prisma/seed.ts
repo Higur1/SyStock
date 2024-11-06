@@ -72,6 +72,24 @@ await Promise.all([
       id: 3,
       type: "dentroDaValidade"
     },
+  }),
+  prisma.eTypeAction.create({  
+    data: {
+      id: 1,
+      type: "Incluido no sistema"
+    },
+  }),
+  prisma.eTypeAction.create({  
+    data: {
+      id: 2,
+      type: "Removido por venda"
+    },
+  }),
+  prisma.eTypeAction.create({  
+    data: {
+      id: 3,
+      type: "Removido por usuário"
+    },
   })
 
   /*Create generic category*/

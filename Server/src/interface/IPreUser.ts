@@ -1,20 +1,20 @@
-interface IPreUser{
+interface InterfacePreUser{
     name: string;
     email: string;
 }
 
-class PreUser{
+class IPreUser{
     id?: number;
     name: string;
     email: string;
 
-    private constructor({
+    public constructor({
         name, 
         email
-    }: IPreUser){
+    }: InterfacePreUser){
         this.name = name,
         this.email = email
     }
 }
 
-export default PreUser;
+export default IPreUser;

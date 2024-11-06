@@ -1,203 +1,131 @@
-import { prisma } from "../config/prisma";
-import Batch from "../models/Batch";
-import Product from "../models/Product";
+import IProduct from "../interface/IProduct";
+import ProducModel from "../models/ProductModel";
+import CategoryModel from "../models/CategoryModel";
+import ICategory from "../interface/ICategory";
+import IBatch from "../interface/IBatch";
+import BatchModel from "../models/BatchModel";
+import {dateBase} from "../functions/baseFunctions";
 
-export default class ProductService {
-  static async findAll() {
-    try {
-      const products = await prisma.product.findMany({
-        select: {
-          id: true,
-          name: true,
-          price: true,
-          costPrice: true,
-          minimunQuantity: true,
-          observation: true,
-          totalQuantityInStock: true,
-          category_id: true,
-        },
-        where: {
-          excludedStatus: false,
-        },
-      });
+export default class ProducService{
+    static async findAll(){
+        try {
+            const list = await ProducModel.findAll();
 
-      return products != null
-        ? { status: true, products: products }
-        : { status: false, products: {} };
-    } catch (error) {
-      return { status: false, error: error };
-    };
-  };
-  static async create(productData: Product) {
-    try {
-      const verifyProductExists = await ProductService.findByName(productData);
-
-      if (!verifyProductExists.exists) {
-        const productResult = await prisma.product.create({
-          data: {
-            name: productData.name,
-            price: productData.price,
-            costPrice: productData.costPrice,
-            minimunQuantity: productData.minimunQuantity,
-            observation: productData.observation ?? "",
-            totalQuantityInStock: 0,
-            category_id: productData.category_id,
-            excludedStatus: false,
-          },
-          select: {
-            id: true,
-            name: true,
-            price: true,
-            costPrice: true,
-            minimunQuantity: true,
-            observation: true,
-            totalQuantityInStock: true,
-            category_id: true
-          },
-        })
-        return productResult != null
-          ? { status: true, product: productResult }
-          : { status: true, product: undefined };
-      } else {
-        return { status: true, message: "Product alredy exists" };
-      };
-    } catch (error) {
-      return { status: false, error: error };
-    };
-  };
-  static async findById(productData: Product) {
-    try {
-      const product = await prisma.product.findUnique({
-        where: {
-          id: productData.id,
-          excludedStatus: false,
-        },
-      });
-
-      return product != null
-        ? { status: true, product: product }
-        : { status: true, product: null };
-    } catch (error) {
-      return { status: false, error: error };
-    };
-  };
-  static async findByCategory(productData: Product) {
-    try {
-      const productsByCategory = await prisma.product.findMany({
-        where: {
-          AND: {
-            category_id: productData.category_id,
-            excludedStatus: false,
-          },
-        },
-        select: {
-          id: true,
-          name: true,
-          category_id: true,
-          Batch: {
-            select: {
-              quantity: true,
-            },
-          },
-          price: true,
-        },
-      });
-
-      return productsByCategory != null
-        ? { status: true, products: productsByCategory }
-        : { status: true, products: undefined };
-    } catch (error) {
-      return { status: false, error: error };
-    };
-  };
-  static async findByName(productData: Product) {
-    try {
-      const productResult = await prisma.product.findFirst({
-        where: {
-          name: productData.name,
-          excludedStatus: false
+            return list;
+        } catch (error) {
+            throw error;
         }
-      });
-      return productResult != null ? { status: true, exists: true, product: productResult } : { status: true, exists: false }
-    } catch (error) {
-      return { status: false, error: error };
-    };
-  };
-  static async update(productData: Product) {
-    try {
-      const product = await prisma.product.update({
-        data: {
-          name: productData.name,
-          price: productData.price,
-          costPrice: productData.costPrice,
-          minimunQuantity: productData.minimunQuantity,
-          observation: productData.observation,
-          category_id: productData.category_id,
-        },
-        where: {
-          id: productData.id,
-          excludedStatus: false,
-        },
-        select: {
-          id: true,
-          name: true,
-          price: true,
-          costPrice: true,
-          minimunQuantity: true,
-          observation: true,
-          category_id: true,
-        },
-      });
+    }
+    static async create(productData: IProduct){
+        try {
+            let category_id_replace = 0
+            if(productData.category_id != 0){
+                category_id_replace = productData.category_id
+            };
+            const categoryData: ICategory = {
+                id: category_id_replace,
+                name: ""
+            };
+            const findCategory = await CategoryModel.find(categoryData);
 
-      return product != null
-        ? { status: true, product: product }
-        : { status: true, product: undefined };
-    } catch (error) {
-      return { status: false, error: error };
-    };
-  };
-  static async delete(productData: Product) {
+            if(!findCategory.exists){
+                throw new Error("Category doesn't found");
+            };
 
-    try {
-      const productBatch = await prisma.batch.findFirst({
-        where: {
-          product_id: productData.id
-        }, 
-        select: {
-          id: true,
-          quantity: true
-        },
-      })
+            const verifyNameDuplicate = await ProducModel.findByName(productData);
 
-      if(productBatch != null){
-        
-        return { status: false, mensagem: "Não é possível deletar o produto! Produto possui quantidade em estoque!"}
-      }
+            if(verifyNameDuplicate.exists){
+                throw new Error("Name already exists");
+            };
+            const createResult = await ProducModel.create(productData);
+            const batchData: IBatch = {
+                expirantionDate: dateBase(),
+                product_id: createResult.product!.id,
+                quantity: 0,
+                deletationStatus: false,
+                eValidationStatus: 2
+            };
+          
+            const returBatch = await BatchModel.create(batchData); 
+            console.log(returBatch.error)
+            return createResult;
+        } catch (error) {
+            throw error;
+        }
+    }
+    static async find(productData: IProduct){
+        try {
+            const findResult = await ProducModel.find(productData);
 
-      await prisma.product.update({
-        where: {
-          id: productData.id,
-        },
-        data: {
-          excludedStatus: true,
-        },
-      });
-      return { status: true };
-    } catch (error) {
-      console.log(error)
-      return { status: false, error: error };
-    };
-  };
-  static async deleteAll() {
-    try {
-      await prisma.product.updateMany({
-        data: {
-          excludedStatus: true,
-        },
-      });
-      return { status: true };
-    } catch (error) {
-      return { status: false, error: error };
-    };
-  };
-};
+            if(findResult.product == undefined){
+                throw new Error("Product not found")
+            }
+            return findResult;
+        } catch (error) {
+            throw error;
+        }
+    }
+    static async findByCategory(productData: IProduct){
+        try {
+            const categoryData: ICategory = {
+                name: "",
+                id: productData.category_id
+            }
+            const findCategory = await CategoryModel.find(categoryData);
+            if(!findCategory.exists){
+                throw new Error("Category doesn't found");
+            };
+
+            const findResult = await ProducModel.findByCategory(productData.category_id);
+
+            return findResult;
+        } catch (error) {
+            throw error;
+        }
+    }
+    static async findByName(productData: IProduct){
+        try {
+            const findResult = await ProducModel.findByName(productData);
+
+            if(!findResult.exists){ 
+                throw new Error("Product not found");
+            };
+
+            return findResult;
+        } catch (error) {
+            throw error;
+        }
+    }
+    static async update(productData: IProduct){
+        try {
+            const categoryData: ICategory = {
+                name: "",
+                id: productData.category_id
+            };
+            const verifyCategoryExists = await CategoryModel.find(categoryData)
+            if(!verifyCategoryExists.exists){
+                throw new Error("Category not found");
+            };
+            const verifyDuplicateName = await ProducModel.findByName(productData);
+            
+            if(verifyDuplicateName.exists){
+                throw new Error("Could not update product, name already exists");
+            };
+
+            const updatedResult = await ProducModel.update(productData);
+
+            return updatedResult;
+        } catch (error) {
+            throw error;
+        }
+    }
+    //criar dps do batch
+    static async delete(productData: IProduct){
+        try {
+            
+        } catch (error) {
+            throw error;
+        }
+    }
+    static async deleteAll(){}
+}

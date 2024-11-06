@@ -12,6 +12,7 @@ describe("Create preUser model", () => {
 
         expect(createPreUser).toHaveProperty("preuser.id");
      });
+
      it("Should not be able to create a new preUser", async () => {
         const preUserData: PreUser = {
             name: "Teste",
@@ -22,6 +23,7 @@ describe("Create preUser model", () => {
 
         expect(createPreUser).toHaveProperty("message");
      });
+     
     it("Should be able to delete a preUser", async () => {
         const preUserData: PreUser = {
             name: "Teste",
@@ -30,7 +32,7 @@ describe("Create preUser model", () => {
         
         preUserData.id = (await preUser.findPreUser(preUserData)).preuser?.id;
         const preUserExcluded = await preUser.delete(preUserData);
-
+        console.log(preUserExcluded)
         expect(preUserExcluded.status).toBe(true);
     }),
      afterAll( async () =>{

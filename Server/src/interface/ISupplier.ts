@@ -1,29 +1,28 @@
-interface ISupplier{
+interface InterfaceSupplier{
     name: string;
     phone: string;
     email: string;
     excludedStatus?: false;
 };
 
-class Supplier{
+class ISupplier{
     id?: number;
     name: string;
     phone: string;
     email: string;
     excludedStatus?: boolean;
 
-    private constructor({
+    public constructor({
         name, 
         phone, 
         email, 
-        excludedStatus
-    }: ISupplier){
+    }: InterfaceSupplier){
         this.name = name,
         this.phone = phone;
         this.email = email;
-        this.excludedStatus = excludedStatus;
+        this.excludedStatus = false;
     };
 };
 
-export default Supplier;
+export default ISupplier;
 

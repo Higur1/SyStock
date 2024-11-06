@@ -1,11 +1,11 @@
-interface IUser{
+interface InterfaceUser{
     name: string;
     login: string;
     password: string;
     email: string;
     excludedStatus?: boolean;
 }
-class User{
+class IUser{
     id?: number
     name: string
     login: string
@@ -18,14 +18,13 @@ class User{
         login, 
         password, 
         email, 
-        excludedStatus = false
-    }: IUser){
+    }: InterfaceUser){
         this.name = name;
         this.login = login;
         this.password = password;
         this.email = email;
-        this.excludedStatus = excludedStatus;    
+        this.excludedStatus = false;    
     }
 }
 
-export default User;
+export default IUser;

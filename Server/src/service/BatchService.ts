@@ -1,125 +1,149 @@
-import { existsSync } from "fs";
-import { prisma } from "../config/prisma";
-import Batch from "../models/Batch";
+import IBatch from "../interface/IBatch";
+import BatchModel from "../models/BatchModel";
+import IProduct from "../interface/IProduct";
+import ProductModel from "../models/ProductModel";
+import Decimal from "decimal.js";
 
 export default class BatchService {
     static async findAll() {
         try {
-            const batchs = await prisma.batch.findMany({
-                where: {
-                    deletionStatus: false
-                }
-            });
-            return { status: true, batchs: batchs };
-        } catch (error) {
-            return { status: false, error: error };
-        };
-    };
-    static async create(batchData: Batch) {
-        try {
-            const verifyBatchExistst = await BatchService.verifyBatchAlredyExists(batchData);
+            const list = await BatchModel.findAll();
 
-            if (verifyBatchExistst.exists) {
-                await prisma.batch.update({
-                    where: {
-                        id: verifyBatchExistst.batch_id
-                    },
-                    data: {
-                        quantity: {
-                            increment: batchData.quantity
-                        }
-                    }
-                });
-                return { status: true, message: "Update quantity" }
-            }
-            else {
-                const batchResult = await prisma.batch.create({
-                    data: {
-                        expirationDate: batchData.expirantionDate,
-                        quantity: batchData.quantity,
-                        deletionStatus: false,
-                        product_id: batchData.product_id,
-                        eValidationStatus: batchData.eValidationStatus == undefined ? 0 : batchData.eValidationStatus,
-                    }
-                });
-                return { status: true, batch: batchResult }
+            return list;
+        } catch (error) {
+            throw error;
+        };
+    };
+    static async create(batchData: IBatch) {
+        try {
+            const find = await BatchModel.findByExpirationDate(batchData);
+            if (find.batch != undefined) {
+                throw new Error("Batch with expiration date already exists")
             };
+            const productData: IProduct = {
+                category_id: 0,
+                costPrice: new Decimal(0),
+                minimunQuantity: 0,
+                name: "",
+                price: new Decimal(0),
+                id: batchData.product_id
+            };
+
+            const findProduct = await ProductModel.find(productData);
+
+            if (findProduct.product == undefined) {
+                throw new Error("Product not found");
+            };
+
+            const createdResult = await BatchModel.create(batchData);
+
+            return createdResult;
         } catch (error) {
-            return { status: false, error: error }
+            throw error;
         };
     };
-    static async findByProduct(batchData: Batch) {
+    static async find(batchData: IBatch) {
         try {
-            const batch = await prisma.batch.findMany({
-                where: {
-                    AND: {
-                        product_id: batchData.product_id
-                    },
-                },
-                select:{
-                    expirationDate: true,
-                    quantity: true,
-                }
-            });
-            return { status: true, batch: batch };
+            const findResult = await BatchModel.find(batchData);
+
+            if (findResult.batch == undefined) {
+                throw new Error("Batch not found");
+            }
+
+            return findResult;
         } catch (error) {
-            return { status: false, error: error };
+            throw error;
         };
     };
-    static async findBatch(batchData: Batch) {
+    static async findByProduct(batchData: IBatch) {
         try {
-            const batch = await prisma.batch.findFirst({
-                where: {
-                    id: batchData.id
-                }
-            });
-            return { status: true, batch: batch };
+            const productData: IProduct = {
+                category_id: 0,
+                costPrice: new Decimal(0),
+                minimunQuantity: 0,
+                name: "",
+                price: new Decimal(0),
+                id: batchData.product_id
+            };
+
+            const findProduct = await ProductModel.find(productData);
+
+            if (findProduct.product == undefined) {
+                throw new Error("Product not found")
+            };
+            const findResult = await BatchModel.findByProduct(batchData);
+
+            return findResult;
         } catch (error) {
-            return { status: false, error: error };
+            throw error;
         };
     };
-    static async update(batchData: Batch) {
+    static async addQuantity(batchData: IBatch) {
         try {
-            const findBatch = await this.findBatch(batchData);
-            const batchUpdated = await prisma.batch.update({
-                data: {
-                    quantity: batchData.quantity
-                },
-                where: {
-                    id: findBatch.batch?.id
-                }
-            });
-            return { status: true, batch: batchUpdated };
+            const find = await BatchModel.find(batchData);
+            if (find.batch == undefined) {
+                throw new Error("Batch not found");
+            };
+            const supplyResult = await BatchModel.addQuantity(batchData);
+            return supplyResult;
+
         } catch (error) {
-            return { status: false, error: error };
+            throw error;
         };
     };
-    static async delete(batchData: Batch) {
+    static async subQuantity(batchData: IBatch) {
         try {
-            const batchResult = await prisma.batch.delete({
-                where:{
-                    id: batchData.id
-                }
-            });
-            return { status: true };
+            const findByProduct = await BatchModel.findByProduct(batchData);
+
+            const find = await BatchModel.find(batchData);
+            if (find.batch == undefined) {
+                throw new Error("Batch not found");
+            };
+
+            if(findByProduct.batchs != undefined && findByProduct.batchs.length > 1){
+                batchData.id = findByProduct.batchs[2].id;
+
+                const subResult = await BatchModel.subQuantityDesc(batchData);
+
+                if (subResult.batch?.quantity == 0) {
+                    await BatchModel.setDateTheBatchWasCleared(batchData);
+                };
+    
+                return subResult
+            }   
+           
+            if (find.batch.quantity < batchData.quantity) {
+                throw new Error("Insufficient stock to withdraw quantity");
+            };
+
+            const subResult = await BatchModel.subQuantityGeneric(batchData);
+
+            if (subResult.batch?.quantity == 0) {
+                await BatchModel.setDateTheBatchWasCleared(batchData);
+            };
+
+            return subResult
+            
         } catch (error) {
-            return { status: false, error: error };
+            throw error;
         };
     };
-    static async verifyBatchAlredyExists(batch: Batch) {
+    static async delete(batchData: IBatch) {
         try {
-            const batchResult = await prisma.batch.findFirst({
-                where: {
-                    AND: {
-                        product_id: batch.product_id,
-                        expirationDate: batch.expirantionDate,
-                    }
-                }
-            });
-            return batchResult != undefined ? { status: true, exists: true, batch_id: batchResult!.id } :
-                { status: true, exists: false };
+            const find = await BatchModel.find(batchData);
+
+            if (find.batch == undefined) {
+                throw new Error("Batch not found");
+            };
+            if (find.batch.quantity > 0) {
+                throw new Error("it is not possible to delete a batch with products")
+            };
+
+            const deletedResult = await BatchModel.delete(batchData);
+
+            return deletedResult;
         } catch (error) {
-            return { status: false, error: error };
+            throw error;
         };
     };
 };

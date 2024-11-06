@@ -1,139 +1,104 @@
-import { prisma } from "../config/prisma";
-import Category from "../models/Category";
+import ICategory from "../interface/ICategory";
+import CategoryModel from "../models/CategoryModel";
+import ProductModel from "../models/ProductModel";
 
 export default class CategoryService {
-  static async findAll() {
-    try {
-      const listOfCategory = await prisma.category.findMany({
-        select: {
-          id: true,
-          name: true,
-        }
-      });
-      return listOfCategory != undefined
-        ? { status: true, listOfCategory: listOfCategory }
-        : { status: true, listOfCategory: {} };
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  };
-  static async create(categoryData: Category) {
-    try {
+    static async findAll() {
+        try {
+            const categories = await CategoryModel.findAll();
 
-      const categoryResult = await prisma.category.create({
-        data: {
-          name: categoryData.name,
-          excludedStatus: false
-        },
-      });
+            return categories;
+        } catch (error) {
+            throw error;
+        };
+    };
+    static async create(categoryData: ICategory) {
+        try {
+            const categoryAlreadyExists = await CategoryModel.findByName(categoryData);
 
-      return categoryResult != undefined
-        ? {
-          status: true,
-          category: {
-            category_id: categoryResult.id,
-            category_name: categoryResult.name,
-          },
-        }
-        : { status: true,  message: "category alredy exists"  };
-    } catch (error) {
-      return { status: false, error: error};
+            if (categoryAlreadyExists.exists) {
+                throw new Error("Category Already exists");
+            };
+            const createCategory = await CategoryModel.create(categoryData);
+
+            return createCategory;
+
+        } catch (error) {
+            throw error;
+        };
     };
-  };
-  static async findById(categoryData: Category) {
-    try {
-      const category = await prisma.category.findFirst({
-        where: {
-          id: categoryData.id,
-          excludedStatus: false
-        },
-      });
-      return category != undefined
-        ? { status: true, category: category }
-        : { status: true, category: {} };
-    } catch (error) {
-      return { status: false, error: error };
+    static async find(categoryData: ICategory) {
+        try {
+            const findCategory = await CategoryModel.find(categoryData);
+
+            if (!findCategory.exists) {
+                throw new Error("Category not found");
+            };
+
+            return findCategory;
+        } catch (error) {
+            throw error;
+        }; 
     };
-  };
-  static async findByTextsThatStartsWithName(categoryData: Category) {
-    try {
-      const categories = await prisma.category.findMany({
-        where: {
-          name: {
-            startsWith: categoryData.name
-          },
-          excludedStatus: false
-        },
-        select: {
-          id: true,
-          name: true,
-        }
-      });
-      return categories != undefined
-        ? { status: true, categories: categories }
-        : { status: true, categories: {} };
-    } catch (error) {
-      return { status: false, error: error };
+    static async findByName(categoryData: ICategory) {
+        try {
+            const findCategory = await CategoryModel.findByName(categoryData);
+
+            if (!findCategory.exists) {
+                throw new Error("Category not found");
+            };
+
+            return findCategory;
+        } catch (error) {
+            throw error;
+        };
     };
-  };
-  static async findByName(categoryData: Category) {
-    try {
-      const categories = await prisma.category.findMany({
-        where: {
-          name: {
-            startsWith: categoryData.name
-          },
-          excludedStatus: false
-        },
-        select: {
-          id: true,
-          name: true,
-        }
-      });
-      return categories != undefined
-        ? { status: true, categories: categories }
-        : { status: true, categories: {} };
-    } catch (error) {
-      return { status: false, error: error };
+    static async listByName(categoryData: ICategory){
+        try {
+            const listCategories = await CategoryModel.findByTextsThatStartsWithName(categoryData);
+
+            return listCategories;
+        } catch (error) {
+            throw error;
+        };
     };
-  };
-  static async update(categoryData: Category) {
-    try {
-      const categoryUpdated = await prisma.category.update({
-        where: {
-          id: categoryData.id,
-          excludedStatus: false
-        },
-        data: {
-          name: categoryData.name,
-        },
-        select: {
-          id: true,
-          name: true,
-        }
-      });
-      return categoryUpdated != undefined
-        ? { status: true, category: categoryUpdated }
-        : { status: true, category: undefined };
-    } catch (error) {
-      return { status: false, error: error };
+    static async edit(categoryData: ICategory) {
+        try {
+            const verifyDuplicateName = await CategoryModel.findByName(categoryData);
+
+            if (verifyDuplicateName.exists) {
+                throw new Error("Name of category already exists");
+            };
+
+            const verifyCategoryExists = await CategoryModel.find(categoryData);
+
+            if (!verifyCategoryExists.exists) {
+                throw new Error("Category doesn't found");
+            };
+
+            const editCategoryResult = await CategoryModel.edit(categoryData);
+            return editCategoryResult;
+        } catch (error) {
+            throw error;
+        };
     };
-  };
-  static async delete(categoryData: Category) {
-    try {
-      const categoryDeleted = await prisma.category.update({
-        where: {
-          id: categoryData.id,
-        },
-        data: {
-          excludedStatus: true
-        }
-      });
-      return categoryDeleted != undefined
-        ? { status: true, category: categoryDeleted }
-        : { status: true, category: {} };
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  };
+    static async delete(categoryData: ICategory) {
+        try {
+            const findCategory = await CategoryModel.find(categoryData);
+
+            if (!findCategory.exists) {
+                throw new Error("Category doesn't found");
+            };
+            const verifyProductExistsInCategory = await ProductModel.findByCategory(categoryData.id);
+
+            if (verifyProductExistsInCategory.products!.length > 0) {
+                throw new Error("it is not possible to delete a category with registered products");
+            };
+
+            const categoryRemove = await CategoryModel.delete(categoryData);
+            return categoryRemove;
+        } catch (error) {
+            throw error;
+        };
+    };
 };

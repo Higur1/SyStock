@@ -1,30 +1,35 @@
-interface IBatch {
+import Batch_Fill from "./IBatchFill"; 
+
+interface InterfaceBatch {
     expirantionDate: Date;
     quantity: number;
-    deletationStatus?: false;
+    deletationStatus?: boolean;
     dateTimeEmptyStock?: Date;
     product_id: number;
-    eValidationStatus?: number
+    eValidationStatus?: number;
+    batchs_fills?: Array<Batch_Fill>;
 }
 
-class Batch {
+class IBatch {
     id?: number
     product_id: number
     expirantionDate: Date
     quantity: number
-    deletationStatus?: false
+    deletationStatus?: boolean
     eValidationStatus?: number
+    batchs_fills?: Array<Batch_Fill>;
 
     public constructor({
         expirantionDate,
         quantity,
-        deletationStatus,
         product_id,
-    }: IBatch) {
+        batchs_fills
+    }: InterfaceBatch) {
         this.expirantionDate = expirantionDate,
             this.quantity = quantity;
-        this.deletationStatus = deletationStatus;
+        this.deletationStatus = false;
         this.product_id = product_id;
+        this.expirantionDate.setDate(this.expirantionDate.getDate()+1)
         this.expirantionDate.setHours(-3);
         this.expirantionDate.setMinutes(0);
         this.expirantionDate.setSeconds(0);
@@ -34,7 +39,7 @@ class Batch {
         dateNow.setMinutes(0);
         dateNow.setSeconds(0);
         dateNow.setMilliseconds(0);
-        if (expirantionDate.toISOString() === dateNow.toISOString()) {
+        if ((expirantionDate.toISOString() === dateNow.toISOString()) || (dateNow.toISOString() > expirantionDate.toISOString())) {
             this.eValidationStatus = 1;
         }
         else {
@@ -48,6 +53,7 @@ class Batch {
                 this.eValidationStatus = 3;
             }
         }
+        this.batchs_fills = batchs_fills;
     }
 }
-export default Batch;
+export default IBatch;

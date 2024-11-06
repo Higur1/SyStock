@@ -1,248 +1,249 @@
-import { z } from "zod";
-import supplierService from "../service/SupplierService";
-import Supplier from "../models/Supplier";
+import SupplierService from "../service/SupplierService";
+import ISupplier from "../interface/ISupplier";
+import z from "zod";
+import {convertStringToNumber} from "../functions/baseFunctions";
 
 export default class SupplierController {
-  static async findAll(request, response) {
-    try {
-      const suppliers = await supplierService.findAll();
-      if (suppliers.status) {
-        response.status(200).send(
-          JSON.stringify({
-            suppliers: suppliers.suppliers,
-          })
-        );
-      } else {
-        response.status(500).send(
-          JSON.stringify({
-            error: suppliers.error,
-          })
-        );
-      }
-    } catch (error) {
-      response.status(400).send(
-        JSON.stringify({
-          error: error,
-        })
-      );
-    }
-  };
-  static async create(request, response) {
-    try {
-      const supplierValidation = z.object({
-        name: z.string().trim().min(3).max(51),
-        email: z.string().email(),
-        phone: z.string().trim().length(11).regex(RegExp("[0-9]{11}")),
-      });
+    static async findAll(request, response) {
+        try {
+            const list = await SupplierService.findAll();
 
-      const { name, email, phone } = supplierValidation.parse(request.body);
-      const supplierData = {
-        name: name,
-        email: email,
-        phone: phone,
-        excludedStatus: false
-      };
-
-      const supplierValidated = await supplierService.validatedSupplierData(supplierData);
-
-      if (supplierValidated.status) {
-        if (supplierValidated.isValid) {
-          const supplierCreated = await supplierService.create(supplierData);
-          if (supplierCreated.supplier != null) {
-            response.status(201).send(
-              JSON.stringify({
-                supplier: supplierCreated.supplier,
-              })
-            );
-          }
-          response.status(500).send(
-            JSON.stringify({
-              supplier: supplierCreated.error,
-            })
-          );
-        }
-        response.status(200).send(
-          JSON.stringify({
-            error: supplierValidated.message,
-          })
-        );
-      }
-    } catch (error) {
-      response.status(400).send(
-        JSON.stringify({
-          path: error.issues[0].path,
-          error: error.issues[0].message,
-        })
-      );
-    }
-  };
-  static async findById(request, response) {
-    try {
-      const supplierValidation = z.object({
-        id: z.string().trim(),
-      });
-      const { id } = supplierValidation.parse(request.params);
-      const supplierData: Supplier = {
-        email: "",
-        phone: "",
-        name: "",
-        id: Number(id)
-      };
-      const supplierFound = await supplierService.findById(supplierData);
-
-      if (supplierFound.status) {
-        if (supplierFound.supplier != undefined) {
-          response.status(200).send(
-            JSON.stringify({
-              supplier: supplierFound.supplier,
-            })
-          );
-        }
-        response.status(200).send(
-          JSON.stringify({
-            error: "supplier don't exists",
-          })
-        );
-      } else {
-        response.status(500).send(
-          JSON.stringify({
-            error: supplierFound.error,
-          })
-        );
-      }
-    } catch (error) {
-      response.status(400).send(
-        JSON.stringify({
-          path: error.issues[0].path,
-          error: error.issues[0].message,
-        })
-      );
-    }
-  };
-  static async findByName(request, response) {
-    try {
-      const supplierValidation = z.object({
-        name: z.string().trim().min(3).max(51),
-      });
-      const { name } = supplierValidation.parse(request.params);
-      const supplierData: Supplier = {
-        email: "",
-        phone: "",
-        name: name,
-      };
-      const supplierFound = await supplierService.findByName(supplierData);
-
-      if (supplierFound.status) {
-        if (supplierFound.supplier != undefined) {
-          response.status(200).send(
-            JSON.stringify({
-              supplier: supplierFound.supplier,
-            })
-          );
-        }
-        response.status(200).send(
-          JSON.stringify({
-            error: "supplier don't exists",
-          })
-        );
-      } else {
-        response.status(500).send(
-          JSON.stringify({
-            error: supplierFound.error,
-          })
-        );
-      }
-    } catch (error) {
-      response.status(400).send(
-        JSON.stringify({
-          path: error.issues[0].path,
-          error: error.issues[0].message,
-        })
-      );
-    }
-  };
-  static async update(request, response) {
-    try {
-      const supplierValidation = z.object({
-        id: z.number(),
-        name: z.string().trim().min(3).max(51),
-        email: z.string().email(),
-        phone: z.string().length(11).regex(RegExp("[0-9]{11}")),
-      });
-
-      const { id, name, email, phone } = supplierValidation.parse(request.body);
-
-      const supplierData = {
-        id: id,
-        name: name,
-        email: email,
-        phone: phone,
-      };
-
-      const supplierExists = await supplierService.validatedSupplierExists(supplierData);
-
-      if (!supplierExists.status) {
-        return response.status(200).send(JSON.stringify({
-          message: "Supplier not found"
-        }));
-      };
-
-      const supplierValidationInDataBase = await supplierService.validatedSupplierData(supplierData);
-
-      if (supplierValidationInDataBase.isValid) {
-        const supplierUpdated = await supplierService.update(supplierData);
-        return response.status(200).send(JSON.stringify({
-          supplier: supplierUpdated.supplier
-        }));
-      } else {
-        return response.status(200).send(JSON.stringify({
-          error: supplierValidationInDataBase.message
-        }));
-      };
-    } catch (error) {
-      response.status(400).send(JSON.stringify({
-        error: error
-      }));
+            response.status(200).send(JSON.stringify({
+                Suppliers: list,
+            }));
+        } catch (error) {
+            if (error.message === "Internal Server Error") {
+                return response.status(500).send(JSON.stringify({
+                    Error: error.message
+                }));
+            };
+            response.status(400).send(JSON.stringify({
+                Error: error.issues[0].message,
+            }));
+        };
     };
-  };
-  static async delete(request, response) {
-    try {
-      const supplierValidation = z.object({
-        id: z.number(),
-      });
-      const { id } = supplierValidation.parse(request.body);
+    static async create(request, response) {
+        try {
+            const supplierValidation = z.object({
+                name: z.string().trim().min(3).max(51),
+                email: z.string().email(),
+                phone: z.string().trim().length(11).regex(RegExp("[0-9]{11}")),
+            });
 
-      const supplierData: Supplier = {
-        id: id,
-        email: "",
-        name: "",
-        phone: ""
-      }
+            const { name, email, phone } = supplierValidation.parse(request.body);
 
-      const supplierDeleted = await supplierService.delete(supplierData);
+            const supplierData: ISupplier = {
+                name: name,
+                email: email,
+                phone: phone,
+                excludedStatus: false
+            };
 
-      if (supplierDeleted.status) {
-        response.status(200).send(JSON.stringify({}));
-      }
-      if (supplierDeleted.error.meta.cause.includes("not exist")) {
-        response.status(200).send(
-          JSON.stringify({
-            error: "supplier don't exists",
-          })
-        );
-      }
-      response.status(500).send(
-        JSON.stringify({
-          error: supplierDeleted.error,
-        })
-      );
-    } catch (error) {
-      response.status(400).send(
-        JSON.stringify({
-          path: error.issues[0].path,
-          error: error.issues[0].message,
-        })
-      );
+            const createResult = await SupplierService.create(supplierData);
+
+            response.status(201).send(JSON.stringify({
+                Supplier: createResult
+            }));
+        } catch (error) {
+            if (error.message.includes("already exists")) {
+                return response.status(409).send(JSON.stringify({
+                    Message: error.message
+                }));
+            };
+            if (error.message === "Internal Server Error") {
+                return response.status(500).send(JSON.stringify({
+                    Error: error.message
+                }));
+            };
+            response.status(400).send(JSON.stringify({
+                Error: error.issues[0].message || "Unexpected error",
+            }));
+        }
     }
-  };
+    static async find(request, response) {
+        try {
+            const supplierValidation = z.object({
+                id: z.string().trim(),
+            });
+            const { id } = supplierValidation.parse(request.params);
+
+            const covnertString = convertStringToNumber(id);
+            const supplierData: ISupplier = {
+                email: "",
+                name: "",
+                phone: "",
+                id: Number(id)
+            };
+
+            const findResult = await SupplierService.find(supplierData);
+
+            response.status(200).send(JSON.stringify({
+                Supplider: findResult.supplier
+            }));
+        } catch (error) {
+            if (error.message == "Expected a number and received a string") {
+                return response.status(400).send(JSON.stringify({
+                    Message: error.message
+                }));
+            };
+            if (error.message === "Supplier not found") {
+                return response.status(404).send(JSON.stringify({
+                    Message: error.message
+                }));
+            };
+            if (error.message === "Internal Server Error") {
+                return response.status(500).send(JSON.stringify({
+                    Error: error.message
+                }));
+            };
+            response.status(400).send(JSON.stringify({
+                Error: error.issues[0].message,
+            }));
+        };
+    };
+    static async findByName(request, response) {
+        try {
+            const supplierValidation = z.object({
+                name: z.string().trim(),
+            });
+            const { name } = supplierValidation.parse(request.params);
+            const supplierData: ISupplier = {
+                email: "",
+                name: name,
+                phone: "",
+            };
+
+            const findResult = await SupplierService.findByName(supplierData);
+
+            response.status(200).send(JSON.stringify({
+                Supplider: findResult.supplier
+            }));
+        } catch (error) {
+            if (error.message === "Supplier not found") {
+                return response.status(404).send(JSON.stringify({
+                    Message: error.message
+                }));
+            };
+            if (error.message === "Internal Server Error") {
+                return response.status(500).send(JSON.stringify({
+                    Error: error.message
+                }));
+            };
+            response.status(400).send(JSON.stringify({
+                Error: error.issues[0].message,
+            }));
+        };
+    };
+    static async listByName(request, response){
+        try {
+            const supplierValidation = z.object({
+                name: z.string().trim(),
+            });
+            const { name } = supplierValidation.parse(request.params);
+            const supplierData: ISupplier = {
+                email: "",
+                name: name,
+                phone: "",
+            };
+
+            const findResult = await SupplierService.findNameStartWith(supplierData);
+
+            response.status(200).send(JSON.stringify({
+                Supplier: findResult.supplier
+            }));
+        } catch (error) {
+            if (error.message === "Internal Server Error") {
+                return response.status(500).send(JSON.stringify({
+                    Error: error.message
+                }));
+            };
+            response.status(400).send(JSON.stringify({
+                Error: error.issues[0].message,
+            }));
+        };
+    };
+    static async update(request, response) {
+        try {
+            const supplierValidation = z.object({
+                id: z.number(),
+                name: z.string().trim().min(3).max(51),
+                email: z.string().email(),
+                phone: z.string().length(11).regex(RegExp("[0-9]{11}")),
+            });
+
+            const { id, name, email, phone } = supplierValidation.parse(request.body);
+
+            const supplierData: ISupplier = {
+                id: id,
+                name: name,
+                email: email,
+                phone: phone,
+            };
+
+            const updatedResult = await SupplierService.update(supplierData);
+
+            response.status(200).send(JSON.stringify({
+                Message: "Supplier updated Successfully",
+                Supplier: updatedResult.supplier
+            }));
+        } catch (error) {
+            if (error.message.includes("already exists")) {
+                return response.status(409).send(JSON.stringify({
+                    Message: error.message
+                }));
+            };
+            if (error.message === "Supplier not found") {
+                return response.status(404).send(JSON.stringify({
+                    Message: error.message
+                }));
+            };
+            if (error.message === "Internal Server Error") {
+                return response.status(500).send(JSON.stringify({
+                    Error: error.message
+                }));
+            };
+            response.status(400).send(JSON.stringify({
+                Error: error.issues[0].message,
+            }));
+        };
+    };
+    static async delete(request, response) {
+        try {
+            const supplierValidation = z.object({
+                id: z.string().min(1),
+              });
+              const { id } = supplierValidation.parse(request.params);
+              const convertString = convertStringToNumber(id);
+              const supplierData: ISupplier = {
+                id: convertString,
+                email: "",
+                name: "",
+                phone: ""
+              };
+
+              await SupplierService.delete(supplierData);
+              response.status(200).send(JSON.stringify({
+                Message: "Supplier deleted successfully"
+              }))
+        } catch (error) {
+            if (error.message === "Supplier not found") {
+                return response.status(404).send(JSON.stringify({
+                    Message: error.message
+                }));
+            };
+            if (error.message == "Expected a number and received a string") {
+                return response.status(400).send(JSON.stringify({
+                    Message: error.message
+                }));
+            };
+            if (error.message === "Internal Server Error") {
+                return response.status(500).send(JSON.stringify({
+                    Error: error.message
+                }));
+            };
+            response.status(400).send(JSON.stringify({
+                Error: error.issues[0].message,
+            }));
+        };
+    };
 };
