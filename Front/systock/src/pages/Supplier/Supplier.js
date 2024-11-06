@@ -10,6 +10,7 @@ import { LocationOn, Visibility } from "@mui/icons-material";
 import ButtonGroupCustom from "../../components/common/ButtonGroupCustom/ButtonGroupCustom";
 import LocationDialog from "./dialogs/LocationDialog";
 import BatchListDialog from "./dialogs/BatchListDialog";
+import { formatPhoneNumber } from "../../utils/utils";
 
 export default function Supplier() {
 
@@ -31,16 +32,18 @@ export default function Supplier() {
     open: false,
     sup: null
   });
-  const [deleteSupplier, setDeleteSupplier] = useState(false);
+  const [deleteSupplier, setDeleteSupplier] = useState({
+    open: false, id: null
+  });
   const [openLocationDialog, setOpenLocationDialog] = useState({ open: false, index: null });
   const [openBatchDialog, setOpenBatchDialog] = useState({ open: false, index: null });
 
   useEffect(() => {
-    if (!openCreateEditSupplier.open || !deleteSupplier || !openLocationDialog.open) {
+    if (!openCreateEditSupplier.open || !deleteSupplier.open || !openLocationDialog.open) {
       handleCloseMenu();
     }
 
-  }, [openCreateEditSupplier.open, deleteSupplier, openLocationDialog.open]);
+  }, [openCreateEditSupplier.open, deleteSupplier.open, openLocationDialog.open]);
 
   function handleBatchList(index) {
     setOpenBatchDialog({ open: true, index });
@@ -110,7 +113,7 @@ export default function Supplier() {
                 }}>
                   <TableData style={{ flex: 1, minWidth: '10%', maxWidth: 'calc(100% - (75% + 40px + 96px))' }}><ToolTipAndEllipsis item={sup.name} /></TableData>
                   <TableData style={{ flexBasis: '25%', maxWidth: '25%', minWidth: '25%' }}><ToolTipAndEllipsis item={sup.email} /></TableData>
-                  <TableData style={{ flexBasis: '20%', maxWidth: '20%', minWidth: '20%', gap: 8 }}><ToolTipAndEllipsis item={sup.phone} /></TableData>
+                  <TableData style={{ flexBasis: '20%', maxWidth: '20%', minWidth: '20%', gap: 8 }}><ToolTipAndEllipsis item={formatPhoneNumber(sup.phone)} /></TableData>
                   <TableData style={{ flex: 1, justifyContent: 'flex-end' }}>
                     <IconButton onClick={(e) => handleMenuOptions(e, index)}>
                       <MoreVertIcon fontSize='small' />
@@ -132,7 +135,7 @@ export default function Supplier() {
           onClose={handleCloseMenu}
         >
           <MenuItem style={{ borderRadius: '16px 16px 0px 0px' }} onClick={handleOpenCreateEditDialog}>{"Editar Fornecedor"}</MenuItem>
-          <MenuItem onClick={() => setDeleteSupplier(true)} style={{ borderBottom: '0px', borderRadius: '0px 0px 16px 16px' }} >{"Apagar Fornecedor"}</MenuItem>
+          <MenuItem onClick={() => setDeleteSupplier({open: true, id: suppliers[menuOption.index].id})} style={{ borderBottom: '0px', borderRadius: '0px 0px 16px 16px' }} >{"Apagar Fornecedor"}</MenuItem>
         </Menu>
       )}
 
@@ -154,18 +157,18 @@ export default function Supplier() {
         supplierObj={openCreateEditSupplier.sup}
       />}
 
-      {deleteSupplier && (
+      {deleteSupplier.open && (
         <Dialog
-          open={deleteSupplier}
+          open={deleteSupplier.open}
           maxWidth="md"
           fullWidth
         >
           <DialogTitle>{"Deseja  mesmo apagar esse Fornecedor?"}</DialogTitle>
           <DialogActions>
-            <Button onClick={() => setDeleteSupplier(false)}>Cancelar</Button>
+            <Button onClick={() => setDeleteSupplier({open: false, id: null})}>Cancelar</Button>
             <Button onClick={() => {
-              handleDeleteSupplier({ id: suppliers[menuOption.index].id });
-              setDeleteSupplier(false);
+              handleDeleteSupplier({ id: deleteSupplier.id });
+              setDeleteSupplier({open: false, id: null});
             }}>Confirmar</Button>
           </DialogActions>
         </Dialog>

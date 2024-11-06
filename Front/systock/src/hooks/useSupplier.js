@@ -3,6 +3,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { DEBUG_LOCAL, MainContext } from "../App";
 import { ENTITIES } from "../utils/debug-local-helper";
 import SupplierActions from "../Service/Supplier/SupplierActions";
+import Supplier from "../classes/Supplier";
 
 export default function useSupplier() {
 
@@ -58,6 +59,7 @@ export default function useSupplier() {
         case 'email':
           sup[atr.key] = atr.value;
           break;
+        case 'phone':
         case 'phone1':
         case 'phone2':
           phones.push(atr.value);
@@ -93,42 +95,22 @@ export default function useSupplier() {
       return setSuppliers(suppliers);
     }
     try {
-      const obj = await SupplierActions.getAll();
-      const suppliers = obj.suppliers;
-      setSuppliers(suppliers.map(sup => {
-        const Phone = sup.Phone.map((phone, index) => ({...phone, isSelected: index === 0}));
-
-        return {...sup, Phone};
-      }) );
+      const suppliers = await SupplierActions.getAll();
+      setSuppliers(suppliers);
     } catch (error) {
       console.log(error.message);
     }
   }
 
-  async function createSupplier(obj) {
-
-    if(DEBUG_LOCAL) {
-      const nextSuppliers = [...suppliers, obj];
-      setSuppliers(nextSuppliers);
-      return updateData(ENTITIES.SUPPLIERS);
-    }
-
+  async function createSupplier(obj = new Supplier()) {
     handleOpenSnackBar("info", "Fornecedor está sendo adicionado");
 
-    const sup = convertSupplierDialogToBody(obj);
-
     try {
-      const newItem = await SupplierActions.create(sup);
-      if(typeof newItem === 'string') {
-        handleOpenSnackBar("error", newItem, 3500);
-        return;
-      }
+      const newItem = await SupplierActions.create(obj);
       
       console.log(newItem);
-      const supplierUpdated = convertResponseToSupplier(newItem);
-      console.log(supplierUpdated);
       setSuppliers(prevState => {
-        return [...prevState, supplierUpdated];
+        return [...prevState, newItem];
       });
       
       handleOpenSnackBar("success", "Fornecedor adicionado com sucesso!!", 3500)
@@ -138,28 +120,15 @@ export default function useSupplier() {
     }
   }
 
-  async function updateSupplier(obj) {
-    if(DEBUG_LOCAL) {
-      const nextSuppliers = suppliers.map(sup => sup.id === obj.id ? {...obj} : {...sup});
-      setSuppliers(nextSuppliers);
-      return updateData(ENTITIES.SUPPLIERS);
-    }
+  async function updateSupplier(obj = new Supplier()) {
 
     handleOpenSnackBar("info", "Fornecedor está sendo atualizado");
 
-    const sup = convertSupplierDialogToBody(obj);
-
     try {
-      const newItem = await SupplierActions.update(sup);
-      
-      if(typeof newItem === 'string') {
-        handleOpenSnackBar("error", newItem, 3500);
-        return;
-      }
+      const newItem = await SupplierActions.update(obj);
 
-      const supplierUpdated = convertResponseToSupplier(newItem);
       setSuppliers(prevState => {
-        return prevState.map(sup => sup.id === supplierUpdated.id ? {...supplierUpdated} : {...sup});
+        return prevState.map(sup => sup.id === obj.id ? {...newItem} : {...sup});
       });
       
       handleOpenSnackBar("success", "Fornecedor atualizado com sucesso!!", 3500);
@@ -173,16 +142,10 @@ export default function useSupplier() {
    * * delete category by id
    * @param {*} id 
    */
-  async function handleDeleteSupplier(id) {
-    if(DEBUG_LOCAL) {
-      const nextSuppliers = suppliers.filter(cat => cat.id !== id.id);
-      setSuppliers(nextSuppliers);
-      return updateData(ENTITIES.SUPPLIERS);
-    }
-
+  async function handleDeleteSupplier({id}) {
     try {
       await SupplierActions.delete(id);
-      setSuppliers(prevState => prevState.filter(cat => cat.id !== id.id));
+      setSuppliers(prevState => prevState.filter(cat => cat.id !== id));
       handleOpenSnackBar("success", "Fornecedor apagado com sucesso!!", 3500);
     } catch (e) {
       handleOpenSnackBar("error", e.message, 3500);

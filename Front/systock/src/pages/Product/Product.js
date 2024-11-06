@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Container } from "./styles";
 import { Box, Button, Chip, ClickAwayListener, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl, FormControlLabel, IconButton, InputLabel, MenuItem, OutlinedInput, Paper, Radio, RadioGroup, Select, Tab, Tabs } from "@mui/material";
 import ToolTipAndEllipsis from "../../components/dialogs/ComponentUtils/ToolTipAndEllipsis";
@@ -43,16 +43,24 @@ const tabsList = [
 ];
 
 export default function Product() {
+  const isMountRef = useRef(false);
 
   const { productsFiltered, createProduct, errorInsert, updateProduct, loadProducts } = useContext(ProductContext);
 
   const [dialog, setDialog] = useState({ type: TYPES_DIALOG.NONE });
   const [tab, setTab] = useState(TABS.PRODUCTS_LIST);
-
+  
   useEffect(() => {
+    if(!isMountRef) return;
+    if(!isMountRef.current) return;
     if(tab !== TABS.PRODUCTS_LIST) return;
+    console.log(tab);
     loadProducts();
   }, [tab]);
+
+  useEffect(() => {
+    isMountRef.current = true;
+  }, []); 
 
   function handleEditProductDialog(index) {
     setDialog({ type: TYPES_DIALOG.EDIT_PRODUCT, index });

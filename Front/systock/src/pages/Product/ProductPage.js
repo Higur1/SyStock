@@ -24,10 +24,6 @@ export default function ProductPage() {
   const { updateData, getData, handleOpenSnackBar } = useContext(MainContext);
 
   useEffect(() => {
-    getProducts();
-  }, []);
-
-  useEffect(() => {
     if(productsFiltered === null) return;
 
     setLoading(false);

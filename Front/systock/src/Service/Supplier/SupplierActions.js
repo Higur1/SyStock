@@ -11,7 +11,8 @@ export default class SupplierActions {
 
     return Client.get()
       .then(dataObj => {
-        return dataObj.suppliers.map(this.mapper.toInterface);
+        if(!dataObj?.Suppliers?.suppliers) return [];
+        return dataObj.Suppliers.suppliers.map(this.mapper.toInterface);
       })
       .catch(error => {
         console.error("Error fetching users:", error);
@@ -22,24 +23,24 @@ export default class SupplierActions {
   static async create(supp = new Supplier({})) {
     const Client = new HTTPClient("/supplier");
 
-    return Client.post(this.mapper.toServer(supp)).then(response => this.mapper.toInterface(response.supplier));
+    return Client.post(this.mapper.toServer(supp)).then(response => this.mapper.toInterface(response.Supplier));
   }
 
   static async getById(id) {
     const Client = new HTTPClient(`/supplier/${id}`);
 
-    return Client.get().then(response => this.mapper.toInterface(response.supplier));
+    return Client.get().then(response => this.mapper.toInterface(response.Supplier));
   }
 
   static async update(sup = new Supplier({})) {
     const Client = new HTTPClient("/supplier");
 
     return Client.put(this.mapper.toServer(sup))
-      .then(response => this.mapper.toInterface(response.supplier));
+      .then(response => this.mapper.toInterface(response.Supplier));
   }
 
   static async delete(id) {
-    const Client = new HTTPClient("/supplier");
+    const Client = new HTTPClient(`/supplier/${id}`);
 
     return Client.delete({id});
   }

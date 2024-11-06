@@ -14,7 +14,7 @@ export default class ProductActions {
 
     return Client.get()
       .then(dataObj => {
-        return dataObj.products.map(products => this.mapper.toInterface(products, {categories}));
+        return dataObj.Products.map(products => this.mapper.toInterface(products, {categories}));
       })
       .catch(error => {
         console.error("Error fetching users:", error);
@@ -26,7 +26,7 @@ export default class ProductActions {
     const Client = new HTTPClient("/product");
 
     try {
-      const nextProduct = await Client.post(this.mapper.toServer(supp)).then(response => response.product);
+      const nextProduct = await Client.post(this.mapper.toServer(supp)).then(response => response.Product);
 
       const category = await CategoryActions.getById(nextProduct.category_id);
 
@@ -40,7 +40,7 @@ export default class ProductActions {
   static async getById(id) {
     const Client = new HTTPClient(`/product/${id}`);
     try {
-      const nextProduct = await Client.get().then(response => response.product);
+      const nextProduct = await Client.get().then(response => response.Product);
 
       const category = await CategoryActions.getById(nextProduct.category_id);
 
@@ -54,7 +54,7 @@ export default class ProductActions {
   static async update(sup = new Product({})) {
     const Client = new HTTPClient("/product");
     try {
-      const nextProduct = Client.put(this.mapper.toServer(sup, "PUT")).then(response => response.product);
+      const nextProduct = Client.put(this.mapper.toServer(sup, "PUT")).then(response => response.Product);
 
       const category = await CategoryActions.getById(nextProduct.category_id);
 
