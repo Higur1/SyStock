@@ -90,3 +90,11 @@ export function dateToTextField(dateString = "") {
 
   return formatDate;
 }
+
+export const CURRENT_INSTANCE = window.location.host;
+
+export function getErrorTypeByMessage(message = "") {
+  // switch(message) {
+  //   case
+  // }
+}

@@ -6,6 +6,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CreateCategoryDialog from './dialogs/CreateCategoryDialog';
 import EditCategoryDialog from './dialogs/EditCategoryDialog';
 import CustomizedSnackbars from '../../components/CustomizedSnackBar';
+import NoData from '../../components/common/NoData';
 
 export default function Category() {
 
@@ -31,7 +32,6 @@ export default function Category() {
     handleMenuOptions
   } = useCategory();
 
-  if(categories.length === 0) return;
   console.log(categories)
   return (
     <>
@@ -65,36 +65,42 @@ export default function Category() {
             Adicionar Categoria</Button>
         </HeaderContainer>
         <TableContainer>
-          <TableRow style={{background: '#DCDCDC', borderRadius: '8px 8px 0px 0px'}}>
+          <TableRow style={{ background: '#DCDCDC', borderRadius: '8px 8px 0px 0px' }}>
             <TableData>{"Nome"}</TableData>
           </TableRow>
           <div className="customScroll">
-            {categoriesFiltered.map((cat, index) => (
-              <TableRow key={cat.id} style={{
-                borderRadius: index === categoriesFiltered.length - 1 ? '0px 0px 8px 8px' : '0px',
-                borderBottom: index === categoriesFiltered.length - 1 ? '0px' : '1px solid #d3D3D3',
-                background: index & 2 === 0 ? "#ebebeb" : "#F5f5f5"
-                }}>
-                <TableData size={'400px'} >{cat.name}</TableData>
-                <TableData size={'56px'} style={{justifyContent: 'flex-end', flex: 1}}>
-                <IconButton onClick={() => handleMenuOptions(cat.id)} style={{position: 'relative'}}>
-                  <MoreVertIcon fontSize='small' />
-                  {menuOption && idMenu === cat.id && (
-                    <Menu>
-                      <MenuOption onClick={() => setEditCategory(true)}>{"Editar Categoria"}</MenuOption>
-                      <MenuOption style={{borderBottom: '0px', borderRadius: '0px 0px 16px 16px'}} onClick={() => setDeleteCategory(true)}>{"Apagar Categoria"}</MenuOption>
-                    </Menu>
-                  )}
-                </IconButton>                
-                </TableData>
-              </TableRow> 
-            ))}
+            {categoriesFiltered.length > 0 ? (
+              <>
+                {categoriesFiltered.map((cat, index) => (
+                  <TableRow key={cat.id} style={{
+                    borderRadius: index === categoriesFiltered.length - 1 ? '0px 0px 8px 8px' : '0px',
+                    borderBottom: index === categoriesFiltered.length - 1 ? '0px' : '1px solid #d3D3D3',
+                    background: index & 2 === 0 ? "#ebebeb" : "#F5f5f5"
+                  }}>
+                    <TableData size={'400px'} >{cat.name}</TableData>
+                    <TableData size={'56px'} style={{ justifyContent: 'flex-end', flex: 1 }}>
+                      <IconButton onClick={() => handleMenuOptions(cat.id)} style={{ position: 'relative' }}>
+                        <MoreVertIcon fontSize='small' />
+                        {menuOption && idMenu === cat.id && (
+                          <Menu>
+                            <MenuOption onClick={() => setEditCategory(true)}>{"Editar Categoria"}</MenuOption>
+                            <MenuOption style={{ borderBottom: '0px', borderRadius: '0px 0px 16px 16px' }} onClick={() => setDeleteCategory(true)}>{"Apagar Categoria"}</MenuOption>
+                          </Menu>
+                        )}
+                      </IconButton>
+                    </TableData>
+                  </TableRow>
+                ))}
+              </>
+            ) : (
+              <NoData />
+            )}
           </div>
-          
+
         </TableContainer>
       </Container>
       {openCreateCategory && (
-        <CreateCategoryDialog 
+        <CreateCategoryDialog
           open={openCreateCategory}
           handleCloseSnackBar={handleCloseSnackBar}
           handleClose={() => setOpenCreateCategory(false)}
@@ -111,22 +117,22 @@ export default function Category() {
       )}
       {deleteCategory && (
         <Dialog
-        open={deleteCategory}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle>{"Deseja  mesmo apagar essa categoria?"}</DialogTitle>
-        <DialogActions>
-          <Button onClick={() => setDeleteCategory(false)}>Cancelar</Button>
-          <Button onClick={() => {
-            handleDeleteCategory({id: idMenu});
-            setDeleteCategory(false);
-          }}>Confirmar</Button>
-        </DialogActions>
-      </Dialog>
+          open={deleteCategory}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle>{"Deseja  mesmo apagar essa categoria?"}</DialogTitle>
+          <DialogActions>
+            <Button onClick={() => setDeleteCategory(false)}>Cancelar</Button>
+            <Button onClick={() => {
+              handleDeleteCategory({ id: idMenu });
+              setDeleteCategory(false);
+            }}>Confirmar</Button>
+          </DialogActions>
+        </Dialog>
       )}
       {openSnackBar && (
-        <CustomizedSnackbars 
+        <CustomizedSnackbars
           open={openSnackBar}
           autoHide={autoHideSnackBar}
           handleClose={handleCloseSnackBar}

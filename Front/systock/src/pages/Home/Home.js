@@ -3,7 +3,7 @@ import { IconButton} from '@mui/material';
 import React, { useContext, useEffect } from 'react';
 import { useState } from 'react';
 import ViewAdvicesDialog from '../Supplier/dialogs/ViewAdvicesDialog';
-import { MainContext } from '../../App';
+import { DEBUG_LOCAL, MainContext } from '../../App';
 
 export const ADVICE_VARIANT = {
   "ERROR": 0,
@@ -50,7 +50,7 @@ export default function Home() {
     handleInitialData();
   }, []);
 
-  function getAdvices() {
+  function getAdvicesDEBUG() {
     const { supplyList } = dbBase;
 
     const supplyListFiltered = supplyList.map(supply => {
@@ -95,7 +95,7 @@ export default function Home() {
   }
 
   function handleInitialData() {
-    getAdvices();
+    if(DEBUG_LOCAL) getAdvicesDEBUG();
   }
 
   // function openSuppliers(obj) {

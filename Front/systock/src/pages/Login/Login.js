@@ -25,11 +25,10 @@ const Login = () => {
     snackBar,
     onLogin, onResetPassword, clearInfo,
     firstAccess, handleChangeFirstAccess,
-    loading, onCreateFirstAccess
+    loading, onCreateFirstAccess, screen, handleScreen
   } = useLogin();
 
   const [showPassword, setShowPassword] = useState(false);
-  const [screen, setScreen] = useState("login");
 
   const mountSnackBar = useRef();
 
@@ -41,14 +40,9 @@ const Login = () => {
 
     if(mountSnackBar.current) {
       console.log('funcionou current');
-      setScreen("login");
+      handleScreen("login");
     }
   }, [snackBar.open]);
-
-
-  const handleScreen = (scr) => {
-    setScreen(scr);
-  }
 
   return (
     <>

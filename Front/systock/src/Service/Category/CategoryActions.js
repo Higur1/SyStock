@@ -11,7 +11,7 @@ export default class CategoryActions {
 
     return Client.get()
       .then(dataObj => {
-        return dataObj.categories.map(this.mapper.toInterface);
+        return dataObj.Categories.map(this.mapper.toInterface);
       })
       .catch(error => {
         console.error("Error fetching users:", error);
@@ -22,25 +22,26 @@ export default class CategoryActions {
   static async create(cat = new Category({})) {
     const Client = new HTTPClient("/category");
 
-    return Client.post(this.mapper.toServer(cat)).then(this.mapper.toInterface);
+    return Client.post(this.mapper.toServer(cat))
+      .then(response => this.mapper.toInterface(response.Category));
   }
 
   static async getById(id) {
     const Client = new HTTPClient(`/category/${id}`);
 
-    return Client.get().then(response => this.mapper.toInterface(response.category));
+    return Client.get().then(response => this.mapper.toInterface(response.Category));
   }
 
   static async update(cat = new Category({})) {
     const Client = new HTTPClient("/category");
 
     return Client.put(this.mapper.toServerPut(cat))
-      .then(response => this.mapper.toInterface(response.category));
+      .then(response => this.mapper.toInterface(response.Category));
   }
 
-  static async delete(id) {
-    const Client = new HTTPClient("/funcionario");
+  static async delete({id}) {
+    const Client = new HTTPClient(`/category/${id}`);
 
-    return Client.delete({id});
+    return Client.delete();
   }
 }

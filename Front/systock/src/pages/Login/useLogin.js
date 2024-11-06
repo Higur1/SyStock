@@ -3,9 +3,11 @@ import { ENTITIES } from "../../utils/debug-local-helper";
 import { DEBUG_LOCAL, MainContext } from "../../App";
 import UsersActions from "../../Service/Users/UsersActions";
 import Account from "../../classes/Account";
+import { CURRENT_INSTANCE } from "../../utils/utils";
 
 export const useLogin = () => {
 
+  const [screen, setScreen] = useState("login");
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState({
@@ -26,6 +28,10 @@ export const useLogin = () => {
   const [firstAccess, setFirstAccess] = useState({email: "", name: "", user: "", password: ""});
 
   const { getData } = useContext(MainContext);
+
+  const handleScreen = (scr) => {
+    setScreen(scr);
+  }
 
   const onChangeUser = (event) => {
     setError({...error, user: ''});
@@ -74,7 +80,7 @@ export const useLogin = () => {
     }
 
     try {
-      const token = await UsersActions.login({user_login: user, user_password: password});
+      const token = await UsersActions.login({user, password});
       window.localStorage.setItem('tokenLogin', token);
       window.location.pathname = 'home';
     } catch {
@@ -87,18 +93,13 @@ export const useLogin = () => {
 
   const onResetPassword = async () => {
     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    const instance =  window.location.href.split('/')[2];
     if(regex.test(email)) {
       setError({...error, email: ''});
 
       try {
-        const response = await UsersActions.recovery({email, instance});
-        console.log('onReset', response.ok);
-
-        if(!response.ok) {
-          return setError({...error, email: 'E-mail não encontrado. Digite o e-mail novamente.'});
-        }
+        await UsersActions.recovery({email, instance: CURRENT_INSTANCE});
         
+        handleScreen("login");
         setSnackBar({
           ...snackBar, 
           open: true, 
@@ -176,6 +177,7 @@ export const useLogin = () => {
     email, onChangeEmail, 
     onLogin, onResetPassword, clearInfo,
     loading, snackBar,
-    firstAccess, handleChangeFirstAccess, onCreateFirstAccess
+    firstAccess, handleChangeFirstAccess, onCreateFirstAccess,
+    screen, handleScreen
   };
 }

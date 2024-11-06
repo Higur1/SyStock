@@ -140,17 +140,18 @@ export default function useCategory() {
    * * delete category by id
    * @param {*} id 
    */
-  async function handleDeleteCategory(id) {
+  async function handleDeleteCategory(category) {
     if(DEBUG_LOCAL) {
-      const updatedCategories = categories.filter(cat => cat.id !== id.id);
+      const updatedCategories = categories.filter(cat => cat.id !== category.id);
       setCategories(updatedCategories);
       return updateData(ENTITIES.CATEGORIES, updatedCategories);
     }
 
     try {
-      await CategoryActions.delete(id);
+      await CategoryActions.delete(category);
 
-      const updatedCategories = categories.filter(cat => cat.id !== id.id);
+      handleOpenSnackBar("success", "Categoria deletada com sucesso!!", 3500);
+      const updatedCategories = categories.filter(cat => cat.id !== category.id);
       setCategories(updatedCategories);
     } catch (e) {
       handleOpenSnackBar("error", e.message, 3500);

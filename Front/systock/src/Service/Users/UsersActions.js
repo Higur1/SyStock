@@ -50,10 +50,11 @@ export default class UsersActions {
     return Client.delete({id});
   }
 
-  static async login(obj) {
+  static async login(obj = new Account()) {
+    const postObject = this.mapper.toServerLogin(obj);
     const Client = new HTTPClient("/auth");
 
-    return Client.post(obj).then(response => response.token);
+    return Client.post(postObject).then(response => response.token);
   }
 
   static async recovery(obj) {

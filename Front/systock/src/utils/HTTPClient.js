@@ -2,7 +2,7 @@ export default class HTTPClient {
   constructor(route) {
     this.route = route;
   }
-  baseURL = "";
+  baseURL = "192.168.15.15:3333";
 
   async get(headers = {}) {
     return this.request("GET", null, headers);
@@ -25,7 +25,7 @@ export default class HTTPClient {
   }
 
   async request(method, body = null, headers = {}) {
-    const url = `${this.baseURL}${this.route}`;
+    const url = `http://${this.baseURL}${this.route}`;
 
     const contentJSON = body !== null ? { 'Content-Type': 'application/json' } : {};
     const options = {
@@ -44,15 +44,11 @@ export default class HTTPClient {
 
       if (!response.ok) throw new Error(`Erro: ${response.statusText}`);
 
-      const contentType = response.headers.get("Content-Type");
-    
-    if (!contentType) {
-      return null;
-    } else if (contentType.includes("application/json")) {
-      return await response.json();
-    } else {
-      return await response.text();
-    }
+      try {
+        return await response.json();
+      } catch {
+        return await response.text();
+      }
     } catch (error) {
       console.error("Error:", error);
       throw error;
