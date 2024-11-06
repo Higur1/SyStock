@@ -101,13 +101,13 @@ async function validatedSupplierData(suppliderData: ISupplier) {
     const validatedEmail = await SupplierModel.findByEmail(suppliderData);
     const validatedPhone = await SupplierModel.findByPhone(suppliderData);
 
-    if(validatedName.supplier?.name !== undefined){
+    if(validatedName.supplier?.name !== undefined && validatedName.supplier?.id != suppliderData.id){
         messages.push("Name already exists");
     }
-    if(validatedEmail.supplier?.email !== undefined){
+    if(validatedEmail.supplier?.email !== undefined && validatedEmail.supplier?.id != suppliderData.id){
         messages.push("Email already exists");
     }
-    if(validatedPhone.supplier?.phone !== undefined){
+    if(validatedPhone.supplier?.phone !== undefined  && validatedPhone.supplier?.id != suppliderData.id){
         messages.push("Phone already exists");
     }
 

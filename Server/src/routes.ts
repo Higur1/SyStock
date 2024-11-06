@@ -46,7 +46,7 @@ async function supplier_routes(app: FastifyInstance) {
   app.get("/supplier/:id", { preHandler: auth_middleware }, SupplierController.find);
   app.get("/supplier/findByName/:name",{ preHandler: auth_middleware }, SupplierController.findByName);
   app.get("/supplier/listByName/:name", {preHandler: auth_middleware}, SupplierController.listByName);
-  app.put("/supplier", { preHandler: auth_middleware }, SupplierController.update);
+  app.patch("/supplier", { preHandler: auth_middleware }, SupplierController.update);
   app.delete("/supplier/:id", { preHandler: auth_middleware }, SupplierController.delete);
 };
 async function product_routes(app: FastifyInstance) {

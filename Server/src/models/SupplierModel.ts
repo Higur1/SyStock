@@ -32,6 +32,7 @@ export default class SupplierModel {
             excludedStatus: false,
           },
           select: {
+            id: true,
             name: true,
             email: true,
             phone: true

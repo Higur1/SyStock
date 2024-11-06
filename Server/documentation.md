@@ -881,6 +881,7 @@ If this response occurs, the created category will be returned.
 Response Example:
 ```
 {
+        
     "Category": "categoryExample"
 }
 ```
