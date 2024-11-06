@@ -73,19 +73,6 @@ export default function ProductList(props) {
   const { handleEditProductDialog, handleDeleteProductDialog } = props;
   const { productsBase, productsFiltered, filter, handleFilter, loading } = useContext(ProductContext);
 
-  const [menuOption, setMenuOption] = useState(false);
-  const [idMenu, setIdMenu] = useState(null);
-
-  function handleMenuOptions(id) {
-    setMenuOption(true);
-    setIdMenu(id);
-  }
-
-  function handleCloseMenu() {
-    setMenuOption(false);
-    setIdMenu(null);
-  }
-
   return (
     <ContainerProductsList>
       <span style={{ fontWeight: 600 }}>Filtros</span>
@@ -127,10 +114,10 @@ export default function ProductList(props) {
                           <IconButton onClick={() => { }}>
                             <Search fontSize='small' />
                           </IconButton>
-                          <IconButton onClick={() => { }}>
+                          <IconButton onClick={() => handleEditProductDialog(index)}>
                             <Edit fontSize='small' />
                           </IconButton>
-                          <IconButton onClick={() => { }}>
+                          <IconButton onClick={() => handleDeleteProductDialog(index)}>
                             <Delete fontSize='small' />
                           </IconButton>
                         </TableData>
