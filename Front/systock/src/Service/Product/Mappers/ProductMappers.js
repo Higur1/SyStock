@@ -3,12 +3,16 @@ import Product from "../../../classes/Product"
 export default class ProductMappers {
   toServer(obj = new Product({}), type = "POST") {
     const additional = type === "PUT" ? {id: obj.id} : {};
+
+    const price = Number(obj.priceBaseSell);
+    const costPrice = Number(obj.priceBaseBuy);
+    const minimunQuantity = Number(obj.minimumQuantity);
     return {
       ...additional,
       name: obj.name,
-      price: obj.priceBaseSell,
-      costPrice: obj.priceBaseBuy,
-      minimunQuantity: obj.minimumQuantity,
+      price,
+      costPrice,
+      minimunQuantity,
       observation: obj.description,
       category_id: obj.category?.id,
     }

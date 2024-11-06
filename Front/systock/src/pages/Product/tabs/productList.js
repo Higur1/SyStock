@@ -6,6 +6,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { ProductContext } from '../ProductPage';
 import { formatDate } from '../../../utils/utils';
 import { Delete, Edit, Search } from '@mui/icons-material';
+import NoData from '../../../components/common/NoData';
 
 
 export const FILTER_TYPES = {
@@ -100,6 +101,9 @@ export default function ProductList(props) {
               ))}
             </TableRow>
             <div className="customScroll">
+              {Boolean(productsFiltered.length === 0) && (
+                <NoData />
+              )}
               {(productsFiltered.length > 0) && productsFiltered.map((prod, index) => (
                 <TableRow key={`row-${index}`} style={{
                   borderRadius: index === productsFiltered.length - 1 ? '0px 0px 8px 8px' : '0px',

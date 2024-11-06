@@ -37,7 +37,7 @@ export default function CreateProductDialog(props) {
   const [hasError, setHasError] = useState(false);
   const [hasErrorPrice, setHasErrorPrice] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [minimumQuantity, setMinimumQuantity] = useState(false);
+  const [minimumQuantity, setMinimumQuantity] = useState(0);
   const isMount = useRef();
   const currencyRegex = /^[0-9]+(\.[0-9]{1,2})?$/;
 
@@ -93,6 +93,19 @@ export default function CreateProductDialog(props) {
     prod.category = categoryID ? categories.find(cat => cat.id === categoryID) : null;
     
     handleCreate(prod);
+    reset();
+  }
+
+  function reset() {
+    setName("");
+    setDescription("");
+    setPriceBuy(0);
+    setPriceSell(0);
+    setCategoryID("");
+    setHasError(false);
+    setHasErrorPrice(false);
+    setIsLoading(false);
+    setMinimumQuantity(0);
   }
 
   return (

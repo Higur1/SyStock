@@ -173,6 +173,7 @@ export default function ProductPage() {
     try {
       const prod = await ProductActions.create(product);
 
+      handleOpenSnackBar("success", "Produto criado com sucesso!", 3500);
       const productss = [...productsBase, prod]
       setFilteredProducts(productss);
       setProductsBase(productss);
@@ -192,6 +193,7 @@ export default function ProductPage() {
 
     try {
       const nextProduct = await ProductActions.update(product);
+      handleOpenSnackBar("success", "Produto editado com sucesso!", 3500);
       const newProducts = productsBase.map(p => (p.refCode === nextProduct.refCode ? nextProduct : { ...p }));
 
       setProductsBase(newProducts);

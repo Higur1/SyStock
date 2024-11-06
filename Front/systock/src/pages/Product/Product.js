@@ -54,7 +54,6 @@ export default function Product() {
     if(!isMountRef) return;
     if(!isMountRef.current) return;
     if(tab !== TABS.PRODUCTS_LIST) return;
-    console.log(tab);
     loadProducts();
   }, [tab]);
 
