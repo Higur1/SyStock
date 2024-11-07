@@ -7,7 +7,7 @@ export default class CategoryService {
         try {
             const categories = await CategoryModel.findAll();
 
-            return categories;
+            return categories.listOfCategory;
         } catch (error) {
             throw error;
         };

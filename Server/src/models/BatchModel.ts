@@ -25,7 +25,7 @@ export default class BatchModel {
             expirationDate: batchData.expirantionDate,
             quantity: batchData.quantity,
             product_id: batchData.product_id,
-            eValidationStatus: 0,
+            eValidationStatus: 1,
           },
         })
         return { status: true, batch: createBatch }
@@ -33,12 +33,12 @@ export default class BatchModel {
       return { status: false, error: error };
     }
   }
-  static async findByProduct(batchData: IBatch) {
+  static async findByProduct(product_id: number) {
     try {
       const batchs = await prisma.batch.findMany({
         where: {
           AND: {
-            product_id: batchData.product_id,
+            product_id: product_id,
           },
         },
         select: {

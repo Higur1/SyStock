@@ -224,6 +224,22 @@ export default class ProductService {
       return { status: false, error: error };
     }
   }
+  static async updatePrice(productData: IProduct){
+    try {
+        const newPrice = await prisma.product.update({
+          where:{
+            id: productData.id
+          },
+          data:{
+            price: productData.price,
+            costPrice: productData.costPrice
+          }
+        })
+        return {status: true, newPrice: newPrice}
+    } catch (error) {
+        return {status: false, error: error}
+    }
+  }
 }
 
 

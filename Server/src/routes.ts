@@ -9,6 +9,7 @@ import ProductController from "../src/controllers/ProductController";
 import BatchController from "../src/controllers/BatchController";
 import PreUserController from "../src/controllers/PreUserController";
 import LoginController from "../src/controllers/LoginController";
+import FillController from "../src/controllers/FillController";
 
 const app = fastify();
 
@@ -66,6 +67,12 @@ async function batch_routes(app: FastifyInstance) {
   app.post("/batch/subQuantity", {preHandler: auth_middleware}, BatchController.subQuantity);
   app.delete("/batch/:id", { preHandler: auth_middleware }, BatchController.delete);
 };
+async function fill_routes(app: FastifyInstance){
+  //app.post("/fill", {preHandler: auth_middleware}, FillController.);
+  app.get("/fill", {preHandler: auth_middleware}, FillController.findAll);
+  app.get("/fill/findById/:id", {preHandler: auth_middleware}, FillController.findById);
+  app.get("/fill/findBySupplierName/:id", {preHandler: auth_middleware}, FillController.findBySupplierId);
+}
 export {
   user_routes,
   category_routes,
@@ -74,4 +81,5 @@ export {
   batch_routes,
   preuser_routes,
   login_routes,
+  fill_routes,
 };

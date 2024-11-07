@@ -1,5 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import {dateBase} from "../src/functions/baseFunctions";
+
 const prisma = new PrismaClient();
 
 const salt = bcrypt.genSaltSync(10);
@@ -16,15 +18,16 @@ resetId();
 try {
   /*Delete */ await prisma.$transaction([
     prisma.token_Recovery.deleteMany(),
-    prisma.eValitadionStatus.deleteMany(),
-    prisma.eTypeAction.deleteMany(),
+    prisma.pre_User.deleteMany(),
     prisma.user.deleteMany(),
-    prisma.eTypeUser.deleteMany(),
     prisma.batch.deleteMany(),
     prisma.product.deleteMany(),
     prisma.category.deleteMany(),
     prisma.supplier.deleteMany(),
     prisma.category.deleteMany(),
+    prisma.eValitadionStatus.deleteMany(),
+    prisma.eTypeAction.deleteMany(),
+    prisma.eTypeUser.deleteMany(),
   ]);
   
   await Promise.all([
@@ -41,7 +44,12 @@ try {
         }
       ]
     }),
-  
+    prisma.pre_User.create({
+      data:{
+        email: "hgbsystemstock@gmail.com",
+        name: "Admin HGB",
+      }
+    }),
     /*Create users */
     prisma.user.create({
       data: {
@@ -59,15 +67,15 @@ try {
       data: [
         {
           id: 1,
-          type: "dataValidadeAtingida"
+          type: "Validade atingida"
         },
         {
           id: 2,
-          type: "dataValidadeProximaASerAtingida"
+          type: "Validade proxima a ser atingida"
         },
         {
           id: 3,
-          type: "dentroDaValidade"
+          type: "Dentro da validade"
         },
       ]
     }),
@@ -105,6 +113,29 @@ try {
         excludedStatus: false,
         phone: "14578955198",
       },
+    }),
+
+    /*Create generic product*/
+    prisma.product.create({
+      data:{
+        name: "GenericProduct",
+        costPrice: 100,
+        minimunQuantity: 10,
+        totalQuantityInStock: 0,
+        price: 200,
+        observation: "Generic product",
+        excludedStatus: false
+      }
+    }).then((productCreate) => {
+      prisma.batch.create({
+        data:{
+          quantity: 10,
+          deletionStatus: false,
+          expirationDate: dateBase(),
+          eValidationStatus: 1,
+          product_id: productCreate.id
+        }
+      })
     })
   ])
 } catch (error) {

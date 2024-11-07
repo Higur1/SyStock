@@ -1,88 +1,85 @@
-import { prisma } from "../config/prisma";
-import Fill from "../models/Fill";
-import Supplier from "../models/Supplier";
-import User from "../models/User";
+import Decimal from "decimal.js";
+import IFill from "../interface/IFill";
+import ISupplier from "../interface/ISupplier";
+import FillModel from "../models/FillModel";
+import BatchModel from "../models/BatchModel";
+import SupplierModel from "../models/SupplierModel";
+import IProduct from "../interface/IProduct";
+import IBatch from "../interface/IBatch";
+import BatchFillModel from "../models/BatchFillModel";
+import IBatch_Fill from "../interface/IBatchFill";
+import ProductModel from "../models/ProductModel";
+import BatchFill from "../models/BatchFillModel";
 
 export default class FillService {
+  static async create(fill: IFill) {
+    try {
+
+      const createdFill = await FillModel.create(fill);
+
+      return createdFill;
+    } catch (error) {
+      throw error;
+    }
+  }
   static async findAll() {
     try {
-      const fills = await prisma.fill.findMany({
-        orderBy: { dateTime: "desc" },
-      });
-      return { status: true, fills: fills };
+      const fills = await FillModel.findAll();
+
+      return fills;
     } catch (error) {
-      return { status: false, error: error };
+      throw error;
+    };
+  };
+  static async findById(fill: IFill) {
+    try {
+      const findFill = await FillModel.findById(fill);
+
+      if (!findFill.exists) {
+        throw new Error("Fill not found");
+      };
+
+      return findFill;
+    } catch (error) {
+      throw error;
     }
   }
-  static async findById(fill: Fill) {
+  static async findBySupplierId(supplier: ISupplier) {
     try {
-      const fillFinded = await prisma.fill.findUnique({
-        where: { id: fill?.id },
-      });
-      return { status: true, fill: fillFinded };
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async findBySupplierName(supplier: Supplier) {
-    try {
-      const supplierFinded = await prisma.supplier.findFirst({
-        where: { name: supplier.name },
-      });
-      const fillFinded = await prisma.fill.findMany({
-        where: { supplier_id: supplierFinded?.id },
-      });
-      return { status: true, fill: fillFinded };
-    } catch (error) {
-      return { status: false, error: error };
-    }
-  }
-  static async create(fill: Fill, user: User) {
-    try {
-      fill.dateTime = new Date();
-      fill.totalPrice = fill.calcTotalPrice(fill).totalPrice;
-      const fillResult = await prisma.fill.create({
-        data: {
-          dateTime: fill.dateTime,
-          observation: fill.observation,
-          totalPrice: fill.totalPrice,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          supplier_id: fill.supplier_id,
-          user_id: fill.user_id,
-        },
-      });
-      if (fillResult != null) {
-        const logFillCreated = await prisma.logFill.create({
-          data: {
-            fill: {
-              connect: { id: fillResult.id },
-            },
-            user: {
-              connect: { id: fillResult.id },
-            },
-          },
-        });
-        const batchFillPromises = fill.batchs_fills.map(async (batch_fill) => {
-          return await prisma.batch_Fill.create({
-            data: {
-              costPrice: batch_fill.costPrice,
-              quantity: batch_fill.quantity,
-              subTotal: batch_fill.subtotal,
-              createdAt: new Date(),
-              fill_id: batch_fill.fill.id == undefined ? 0 : batch_fill.fill.id,
-              batch_id:
-                batch_fill.batch.id == undefined ? 0 : batch_fill.batch.id,
-              updatedAt: new Date(),
-            },
-          });
-        });
-        await Promise.all(batchFillPromises);
+      const findSupplier = await SupplierModel.find(supplier);
+
+      if (findSupplier.supplier == undefined) {
+        throw new Error("Supplier not found");
+      };
+      const fillData: IFill = {
+        totalPrice: new Decimal(100),
+        supplier_id: findSupplier.supplier.id,
+        user_id: 0
       }
-      return { status: true, fill: fillResult };
+
+      const findFill = await FillModel.findBySupplierId(fillData);
+
+      return findFill;
     } catch (error) {
-      return { status: false, error: error };
+      throw error;
     }
   }
-  static async getHistoryFill() {}
+  static async relationBatchFill(batch_Fill: IBatch_Fill, batch: IBatch, product: IProduct) {
+    try {
+      const findBatch = await BatchModel.findByExpirationDate(batch);
+      if (findBatch.batch) {
+        await BatchModel.addQuantity(batch);
+        await ProductModel.updatePrice(product);
+        await BatchFillModel.create(batch_Fill);
+
+        return { message: "Batch already exists, updated and batch_fill created." }
+      }
+      await BatchModel.create(batch);
+      await ProductModel.updatePrice(product);
+      await BatchFillModel.create(batch_Fill);
+      return { message: 'New batch created and batch_fill created.' }
+    } catch (error) {
+      throw error;
+    }
+  }
 }

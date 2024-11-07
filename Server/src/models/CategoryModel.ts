@@ -8,7 +8,7 @@ export default class CategoryModel {
         select: {
           id: true,
           name: true,
-        },
+          createdAt: true        },
       });
       return listOfCategory != undefined
         ? { status: true, listOfCategory: listOfCategory }

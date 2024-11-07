@@ -1,6 +1,7 @@
 import Batch_Fill from "./IBatchFill"; 
 
 interface InterfaceBatch {
+    id?: number;
     expirantionDate: Date;
     quantity: number;
     deletationStatus?: boolean;

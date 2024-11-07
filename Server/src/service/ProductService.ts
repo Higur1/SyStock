@@ -122,7 +122,8 @@ export default class ProducService{
     //criar dps do batch
     static async delete(productData: IProduct){
         try {
-            
+            //const findBatch = await BatchModel.findByProduct(productData.id);
+            //const resultProduct = await 
         } catch (error) {
             throw error;
         }

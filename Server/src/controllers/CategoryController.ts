@@ -1,19 +1,20 @@
 import { z } from "zod";
 import CategoryService from "../service/CategoryService";
 import ICategory from "../interface/ICategory";
-import { convertStringToNumber } from "../functions/baseFunctions";
+import { convertStringToNumber,convertDate } from "../functions/baseFunctions";
 
 export default class CategoryController {
   static async list(request, response) {
     try {
-
+     
       const lisOfCategories = await CategoryService.findAll();
-
+      console.log(convertDate("2024-11-07T02:03:50.327Z"))
       response.status(200).send(JSON.stringify({
-        Categories: lisOfCategories.listOfCategory,
+        Categories: lisOfCategories
       }));
 
     } catch (error) {
+      console.log(error)
       if (error.message === "Internal Server Error") {
         return response.status(500).send(JSON.stringify({
           Error: error.message
