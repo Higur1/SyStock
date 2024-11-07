@@ -45,7 +45,7 @@ const tabsList = [
 export default function Product() {
   const isMountRef = useRef(false);
 
-  const { productsFiltered, createProduct, errorInsert, updateProduct, loadProducts } = useContext(ProductContext);
+  const { productsFiltered, createProduct, errorInsert, updateProduct, loadProducts, loadSupplies } = useContext(ProductContext);
 
   const [dialog, setDialog] = useState({ type: TYPES_DIALOG.NONE });
   const [tab, setTab] = useState(TABS.PRODUCTS_LIST);
@@ -53,6 +53,7 @@ export default function Product() {
   useEffect(() => {
     if(!isMountRef) return;
     if(!isMountRef.current) return;
+    if(tab === TABS.VIEW_SUPPLIES) loadSupplies();
     if(tab !== TABS.PRODUCTS_LIST) return;
     loadProducts();
   }, [tab]);

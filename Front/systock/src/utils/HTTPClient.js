@@ -41,8 +41,16 @@ export default class HTTPClient {
 
     try {
       const response = await fetch(url, options);
+      
+      if (!response.ok) {
+        try {
+          const errorResponse = await response.json();
 
-      if (!response.ok) throw new Error(`Erro: ${response.statusText}`);
+          throw new Error(errorResponse.Message);
+        } catch (e) {
+          throw new Error(e);
+        }
+      }
 
       try {
         return await response.json();
@@ -50,7 +58,7 @@ export default class HTTPClient {
         return await response.text();
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error(error);
       throw error;
     }
   }

@@ -1,6 +1,7 @@
 import React, { createContext, useState } from 'react'
 import Settings from '.';
 import UsersActions from '../../Service/Users/UsersActions';
+import Account from '../../classes/Account';
 
 export const SettingsContext = createContext();
 
@@ -25,8 +26,26 @@ export default function SettingsPage() {
     }
   }
 
+  async function createUser(user = new Account()) {
+    try {
+      const nextUser = await UsersActions.create(user);
+      setUsers(prevUsers => [...prevUsers, nextUser]);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async function editUser(user = new Account()) {
+    try {
+      const nextUser = await UsersActions.update(user);
+      setUsers(prevUsers => prevUsers.map(pUser => pUser.id === nextUser.id ? nextUser : pUser));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   return (
-    <SettingsContext.Provider value={{ users, getUsers, loading }}>
+    <SettingsContext.Provider value={{ users, getUsers, loading, createUser, editUser }}>
       <Settings />
     </SettingsContext.Provider>
   )

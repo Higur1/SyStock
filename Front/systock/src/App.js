@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import Master from './Master.js';
 import './App.css';
 import Sidebar from './pages/Sidebar/Sidebar.js';
@@ -8,7 +8,7 @@ import { DB_DEBUG_NAME, getDBBase, setInitialData, verifyHasContent } from './ut
 import CustomizedSnackbars from './components/CustomizedSnackBar.js';
 
 export const MainContext = createContext();
-export const DEBUG_LOCAL = true;
+export const DEBUG_LOCAL = false;
 const initialStateSnack = {open: false, autoHide: 3000, severity: "info", message: ""}
 
 function App() {
@@ -16,6 +16,8 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); 
   const [dbBase, setDbBase] = useState(null);
   const [snackbar, setSnackbar] = useState(initialStateSnack);
+
+  const tokenRef = useRef();
 
   function handleOpenSnackBar(severity, message="Unexpected Error Occurred", autoHide=3000) {
     setSnackbar({open: true, severity, message, autoHide});
@@ -65,6 +67,7 @@ function App() {
         return;
       } else {
         setIsLoggedIn(true);
+        tokenRef.current = token;
         getDB();
         initialNavigation();
       }
@@ -111,7 +114,7 @@ function App() {
   }
 
 
-
+  console.log(tokenRef);
   return (
     <MainContext.Provider value={{
       isLoggedIn, navigate, setIsLoggedIn,
@@ -122,7 +125,8 @@ function App() {
       handleOpenSnackBar,
       dbBase,
       updateData,
-      getData
+      getData,
+      token: tokenRef.current
     }}>
       <div className='main' style={{display: !isLoggedIn ? 'flex' : 'grid'}}>
         {isLoggedIn && <Sidebar logOff={logOff}/>}

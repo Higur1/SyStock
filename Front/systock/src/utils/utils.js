@@ -93,13 +93,14 @@ export function dateToTextField(dateString = "") {
 
 export const CURRENT_INSTANCE = window.location.host;
 
-export function getErrorTypeByMessage(message = "") {
-  // switch(message) {
-  //   case
-  // }
-}
+// export function getErrorTypeByMessage(message = "") {
+//   switch(message) {
+//     case "Category Already exists": {
+
+//     }
+//   }
+// }
 
 export function formatPhoneNumber(numberString) {
   return numberString.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
 }
-
