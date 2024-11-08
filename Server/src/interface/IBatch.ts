@@ -14,7 +14,7 @@ interface InterfaceBatch {
 class IBatch {
     id?: number
     product_id: number
-    expirantionDate: Date
+    expirantionDate?: Date
     quantity: number
     deletationStatus?: boolean
     eValidationStatus?: number

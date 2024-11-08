@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from "@jest/globals";
-import Supplier from "../models/Supplier";
-import supplier from "../service/SupplierService";
+import Supplier from "../models/SupplierModel";
+import ISupplier from "../interface/ISupplier";
 
 describe("Create supplier model", () => {
   let supplierName;
@@ -17,14 +17,14 @@ describe("Create supplier model", () => {
     supplierPhone = genarateUniquePhone;
   });
   it("Dado um fornecedor X Quando criado no BD Então resultado deve ser igual ao id do fornecedor", async () => {
-    const supplierData: Supplier = {
+    const supplierData: ISupplier = {
       name: supplierName,
       email: supplierEmail,
       phone: supplierPhone,
       excludedStatus: false,
     };
 
-    const createBatch = await supplier.create(supplierData);
+    const createBatch = await Supplier.create(supplierData);
 
     expect(createBatch).toHaveProperty("supplier.id");
   });

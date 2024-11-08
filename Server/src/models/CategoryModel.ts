@@ -36,10 +36,15 @@ export default class CategoryModel {
         where: {
           id: categoryData.id,
         },
+        select: {
+          id: true,
+          name: true,
+          createdAt: true,
+        }
       });
       return category != undefined
         ? { status: true, exists: true, category: category }
-        : { status: true, exists: false, category: {} };
+        : { status: true, exists: false };
     } catch (error) {
       return { status: false, error: error };
     };

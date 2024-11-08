@@ -147,7 +147,7 @@ model Product {
 
 model Batch {
   id                 Int       @id @default(autoincrement())
-  expirationDate     DateTime
+  expirationDate     DateTime?
   quantity           Int
   deletionStatus     Boolean
   dateTimeEmptyStock DateTime?

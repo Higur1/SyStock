@@ -1,14 +1,13 @@
 import { z } from "zod";
 import CategoryService from "../service/CategoryService";
 import ICategory from "../interface/ICategory";
-import { convertStringToNumber,convertDate } from "../functions/baseFunctions";
+import { convertStringToNumber, dateBase, dateMask } from "../functions/baseFunctions";
 
 export default class CategoryController {
   static async list(request, response) {
     try {
      
       const lisOfCategories = await CategoryService.findAll();
-      console.log(convertDate("2024-11-07T02:03:50.327Z"))
       response.status(200).send(JSON.stringify({
         Categories: lisOfCategories
       }));
@@ -70,6 +69,11 @@ export default class CategoryController {
 
       const findCategory = await CategoryService.find(category);
 
+      //findCategory.category?.createdAt.setHours(findCategory.category?.createdAt.getHours()-3)
+      const createAt = findCategory.category?.createdAt || dateBase();
+      const resultDateMask = dateMask(createAt)
+      
+      console.log(resultDateMask)
       response.status(200).send(JSON.stringify({
         Category: findCategory.category
       }));
