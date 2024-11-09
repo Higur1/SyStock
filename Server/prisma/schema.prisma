@@ -7,6 +7,7 @@ generator client {
 
 generator erd {
   provider = "prisma-erd-generator"
+  format = "svg"
 }
 
 datasource db {
@@ -96,7 +97,6 @@ model Supplier {
 model Fill {
   id          Int      @id @default(autoincrement())
   totalPrice  Decimal
-  dateTime    DateTime
   observation String
   supplier_id Int
   user_id     Int
@@ -147,7 +147,7 @@ model Product {
 
 model Batch {
   id                 Int       @id @default(autoincrement())
-  expirationDate     DateTime
+  expirationDate     DateTime?
   quantity           Int
   deletionStatus     Boolean
   dateTimeEmptyStock DateTime?

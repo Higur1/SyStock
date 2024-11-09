@@ -1,19 +1,19 @@
 import { z } from "zod";
 import CategoryService from "../service/CategoryService";
 import ICategory from "../interface/ICategory";
-import { convertStringToNumber } from "../functions/baseFunctions";
+import { convertStringToNumber, dateBase, dateMask } from "../functions/baseFunctions";
 
 export default class CategoryController {
   static async list(request, response) {
     try {
-
+     
       const lisOfCategories = await CategoryService.findAll();
-
       response.status(200).send(JSON.stringify({
-        Categories: lisOfCategories.listOfCategory,
+        Categories: lisOfCategories
       }));
 
     } catch (error) {
+      console.log(error)
       if (error.message === "Internal Server Error") {
         return response.status(500).send(JSON.stringify({
           Error: error.message
@@ -69,6 +69,11 @@ export default class CategoryController {
 
       const findCategory = await CategoryService.find(category);
 
+      //findCategory.category?.createdAt.setHours(findCategory.category?.createdAt.getHours()-3)
+      const createAt = findCategory.category?.createdAt || dateBase();
+      const resultDateMask = dateMask(createAt)
+      
+      console.log(resultDateMask)
       response.status(200).send(JSON.stringify({
         Category: findCategory.category
       }));

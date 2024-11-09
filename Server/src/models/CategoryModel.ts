@@ -8,7 +8,7 @@ export default class CategoryModel {
         select: {
           id: true,
           name: true,
-        },
+          createdAt: true        },
       });
       return listOfCategory != undefined
         ? { status: true, listOfCategory: listOfCategory }
@@ -19,13 +19,13 @@ export default class CategoryModel {
   };
   static async create(categoryData: ICategory) {
     try {
-      const categoria = await prisma.category.create({
+      const category = await prisma.category.create({
         data: {
           name: categoryData.name,
         },
       });
 
-      return {status: true, categoria:categoria};
+      return {status: true, category:category};
     } catch (error) {
       return { status: false, error: error };
     };
@@ -36,10 +36,15 @@ export default class CategoryModel {
         where: {
           id: categoryData.id,
         },
+        select: {
+          id: true,
+          name: true,
+          createdAt: true,
+        }
       });
       return category != undefined
         ? { status: true, exists: true, category: category }
-        : { status: true, exists: false, category: {} };
+        : { status: true, exists: false };
     } catch (error) {
       return { status: false, error: error };
     };

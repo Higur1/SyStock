@@ -21,6 +21,7 @@ export default class LoginService {
             const kwnokey = process.env.JWTSecret;
             const token = jwt.sign({
                 id: findUser.user.id,
+                name: findUser.user.name,
                 email: findUser.user.email,
                 user_type: findUser.user.user_type
             },

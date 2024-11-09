@@ -1,6 +1,7 @@
 import Batch_Fill from "./IBatchFill"; 
 
 interface InterfaceBatch {
+    id?: number;
     expirantionDate: Date;
     quantity: number;
     deletationStatus?: boolean;
@@ -13,7 +14,7 @@ interface InterfaceBatch {
 class IBatch {
     id?: number
     product_id: number
-    expirantionDate: Date
+    expirantionDate?: Date
     quantity: number
     deletationStatus?: boolean
     eValidationStatus?: number

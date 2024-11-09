@@ -19,7 +19,7 @@ async function auth_middleware(request, response) {
       response.status(401).send(error);
     } else {
       request.token = authHeader;
-      request.loggedUser = { id: data.user_login };
+      request.loggedUser = { id: data.id, name: data.name};
     }
   });
 }

@@ -1,7 +1,7 @@
 import { prisma } from "../config/prisma";
 import IUser from "../interface/IUser";
 
-export default class UserService {
+export default class UserModel {
   static async findAll() {
     try {
       const listUsers = await prisma.user.findMany({
@@ -41,7 +41,7 @@ export default class UserService {
           id: userResult.id,
           name: userResult.name,
           login: userResult.login,
-          email: userResult.email
+          email: userResult.email,
         },
       };
     } catch (error) {
