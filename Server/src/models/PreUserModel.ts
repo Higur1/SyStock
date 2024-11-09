@@ -38,7 +38,7 @@ export default class PreUserService {
       return { status: false}
     };
   };
-  static async findPreUser(preUserData: preUser) {
+  static async find(preUserData: preUser) {
     try {
       const preuser = await prisma.pre_User.findFirst({
         where: {

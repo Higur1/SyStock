@@ -19,13 +19,13 @@ export default class CategoryModel {
   };
   static async create(categoryData: ICategory) {
     try {
-      const categoria = await prisma.category.create({
+      const category = await prisma.category.create({
         data: {
           name: categoryData.name,
         },
       });
 
-      return {status: true, categoria:categoria};
+      return {status: true, category:category};
     } catch (error) {
       return { status: false, error: error };
     };

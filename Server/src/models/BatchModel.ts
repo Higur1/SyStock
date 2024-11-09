@@ -19,17 +19,17 @@ export default class BatchModel {
   }
   static async create(batchData: IBatch) {
     try {
-        const createBatch = await prisma.batch.create({
-          data: {
-            deletionStatus: false,
-            expirationDate: batchData.expirantionDate,
-            quantity: batchData.quantity,
-            product_id: batchData.product_id,
-            eValidationStatus: 1,
-          },
-        })
-        return { status: true, batch: createBatch }
-      } catch (error) {
+      const createBatch = await prisma.batch.create({
+        data: {
+          deletionStatus: false,
+          expirationDate: batchData.expirantionDate,
+          quantity: batchData.quantity,
+          product_id: batchData.product_id,
+          eValidationStatus: 1,
+        },
+      });
+      return { status: true, batch: createBatch };
+    } catch (error) {
       return { status: false, error: error };
     }
   }
@@ -45,12 +45,15 @@ export default class BatchModel {
           id: true,
           expirationDate: true,
           quantity: true,
+          product_id: true
         },
-        orderBy:{
-          expirationDate: 'asc'
-        }
+        orderBy: {
+          expirationDate: "asc",
+        },
       });
-      return batchs != undefined ? { status: true, batchs: batchs } : { status: true, batchs: []};
+      return batchs != undefined
+        ? { status: true, exists: true, batchs: batchs }
+        : { status: true, exists: false, batchs: [] };
     } catch (error) {
       return { status: false, error: error };
     }
@@ -65,27 +68,31 @@ export default class BatchModel {
           ],
         },
       });
-      return batch != null ? { status: true, batch: batch } : {status: true, batch: undefined};
+      return batch != null
+        ? { status: true, batch: batch }
+        : { status: true, batch: undefined };
     } catch (error) {
       return { status: false, error: error };
     }
   }
-  static async findByExpirationDate(batchData: IBatch){
+  static async findByExpirationDate(batchData: IBatch) {
     try {
       const findResult = await prisma.batch.findFirst({
         where: {
-          AND:[
-            {expirationDate: batchData.expirantionDate},{ product_id: batchData.product_id}
-          ]
-          
-        }
-      })
-      return findResult != null ? {status: true, batch: findResult } : {status: true, batch: undefined}
+          AND: [
+            { expirationDate: batchData.expirantionDate },
+            { product_id: batchData.product_id },
+          ],
+        },
+      });
+      return findResult != null
+        ? { status: true, batch: findResult }
+        : { status: true, batch: undefined };
     } catch (error) {
       return { status: false, error: error };
     }
   }
-  static async subQuantityGeneric(batchData: IBatch){
+  static async subQuantityGeneric(batchData: IBatch) {
     try {
       const batchUpdated = await prisma.batch.update({
         data: {
@@ -102,7 +109,7 @@ export default class BatchModel {
       return { status: false, error: error };
     }
   }
-  static async subQuantityDesc(batchData: IBatch){
+  static async subQuantityDesc(batchData: IBatch) {
     try {
       const batchUpdated = await prisma.batch.update({
         data: {
@@ -121,17 +128,17 @@ export default class BatchModel {
   }
   static async addQuantity(batchData: IBatch) {
     try {
-        const batchUpdated = await prisma.batch.update({
-          data: {
-            quantity: {
-              increment: batchData.quantity,
-            },
+      const batchUpdated = await prisma.batch.update({
+        data: {
+          quantity: {
+            increment: batchData.quantity,
           },
-          where: {
-            id: batchData.id,
-          },
-        });
-        return { status: true, batch: batchUpdated };
+        },
+        where: {
+          id: batchData.id,
+        },
+      });
+      return { status: true, batch: batchUpdated };
     } catch (error) {
       return { status: false, error: error };
     }
@@ -148,16 +155,28 @@ export default class BatchModel {
       return { status: false, error: error };
     }
   }
-  static async setDateTheBatchWasCleared(batchData: IBatch){
+  static async deleteManyByProduct(productId: number) {
+    try {
+      await prisma.batch.deleteMany({
+        where: {
+          product_id: batchData.product_id,
+        },
+      });
+      return { status: true };
+    } catch (error) {
+      return { status: false, error: error };
+    }
+  }
+  static async setDateTheBatchWasCleared(batchData: IBatch) {
     try {
       await prisma.batch.update({
         where: {
-          id: batchData.id
+          id: batchData.id,
         },
-        data:{
-          expirationDate: new Date()
-        }
-      })
+        data: {
+          expirationDate: new Date(),
+        },
+      });
     } catch (error) {
       return { status: false, error: error };
     }

@@ -4,7 +4,7 @@ interface InterfaceCategory {
     excludedStatus?: boolean;
   }
   class ICategory {
-    id: number;
+    id?: number;
     name: string;
     excludedStatus ?: boolean;
   
