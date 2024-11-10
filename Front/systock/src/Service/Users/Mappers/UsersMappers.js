@@ -10,6 +10,15 @@ export default class UsersMappers {
     }
   }
 
+  toServerPreUser(obj = new Account({})) {
+    return {
+      name: obj.name,
+      login: obj.user,
+      password: obj.password,
+      email: obj.email
+    }
+  }
+
   toServerPut(obj = new Account({})) {
     return {
       id: obj.id,

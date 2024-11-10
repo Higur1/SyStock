@@ -1,39 +1,62 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Container, TableContainer, TableData, TableRow } from './styles'
-import { Button, TextField } from '@mui/material'
-import { Person } from '@mui/icons-material'
+import { Button, IconButton, Menu, MenuItem, Popper, TextField } from '@mui/material'
+import { MoreVert, Person } from '@mui/icons-material'
 import { SettingsContext } from './SettingsPage'
 import EditUserDialog, { TYPE_USER_DIALOG } from './dialogs/EditUser'
 import Account from '../../classes/Account'
 import { MainContext } from '../../App'
+import MyUser from './dialogs/MyUser'
 
 const columns = [
   { fixedWidth: false, label: "Nome", value: "name", width: 120 },
   { fixedWidth: false, label: "E-mail", value: "email", width: 200 },
   { fixedWidth: true, label: "Telefone", value: "phone", width: 150 },
-  { fixedWidth: true, label: "Funções", value: "functions", width: 150 },
+  { fixedWidth: true, label: "", value: "functions", width: 50 },
 ];
 
 export default function Settings() {
 
   const { token } = useContext(MainContext);
-  const { users, getUsers, createUser, editUser } = useContext(SettingsContext);
+  const { users, getUsers, createUser, editUser, updateUserOnList, deleteUser} = useContext(SettingsContext);
 
   const [editDialogProps, setEditDialogProps] = useState({ open: false, user: null, type: TYPE_USER_DIALOG.NEW });
+  const [dialogMyUser, setDialogMyUser] = useState({open: false, user: null});
+  const [menu, setMenu] = useState({anchor: null, user: null});
 
+  function handleMenu(e, user) {
+    const anchor = e.currentTarget;
+    setMenu({anchor, user});
+  }
   function handleEditUser(user = new Account({})) {
-    setEditDialogProps({ open: true, user, type: TYPE_USER_DIALOG.EDIT });
+    setMenu({anchor: null, user: null});
+    setDialogMyUser({ open: true, user });
   }
 
   function handleNewUser() {
     setEditDialogProps({ open: true, user: null, type: TYPE_USER_DIALOG.NEW });
   }
 
+  async function handleDeleteUser(user) {
+    try {
+      await deleteUser(user);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setMenu({anchor: null, user: null});
+    }
+  }
+
   function handleMyUser() {
 
-    const myUser = users.find(user => user.email === token.email);
-    handleEditUser(myUser);
+    const myUser = users.find(user => user.id === token.id);
+    setDialogMyUser({open: true, user: myUser});
   }
+
+  function updateMyUser(user) {
+    updateUserOnList(user);
+    setDialogMyUser({open: false, user: null});
+  }  
 
   useEffect(() => {
     getUsers();
@@ -81,7 +104,13 @@ export default function Settings() {
                           flex: column.fixedWidth ? "none" : "1"
                         }}
                       >
-                        {log[column.value]}
+                        <>
+                          {column.value !== "functions" ? (<>{log[column.value]}</>) : (
+                            <IconButton onClick={e => handleMenu(e, log)}>
+                              <MoreVert />
+                            </IconButton>
+                          )}
+                        </>
                       </TableData>
                     );
                   })}
@@ -102,6 +131,20 @@ export default function Settings() {
             return editUser(user);
           }}
         />
+      )}
+      {dialogMyUser.open && <MyUser user={dialogMyUser.user} handleConfirm={updateMyUser} onClose={() => setDialogMyUser({open: false, user: null})}/>}
+
+      {menu.anchor !== null && (
+        <Menu
+          id="simple-menu"
+          anchorEl={menu.anchor}
+          keepMounted
+          open
+          onClose={() => setMenu({anchor: null, user: null})}
+        >
+          <MenuItem onClick={() => handleEditUser(menu.user)}>Editar Usuário</MenuItem>
+          <MenuItem onClick={() => handleDeleteUser(menu.user)}>Excluir Usuário</MenuItem>
+        </Menu>
       )}
     </Container>
   )

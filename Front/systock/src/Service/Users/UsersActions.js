@@ -25,6 +25,12 @@ export default class UsersActions {
     return ClientUser.post(this.mapper.toServer(user)).then(result => this.mapper.toInterface(result.User));
   }
 
+  static async createPreUser(user = new Account({})) {
+    const ClientUser = new HTTPClient("/preuser");
+
+    return ClientUser.post(this.mapper.toServerPreUser(user)).then(result => this.mapper.toInterface(result.User));
+  }
+
   static async update(user = new Account({})) {
     const ClientUser = new HTTPClient("/user");
 
@@ -35,13 +41,13 @@ export default class UsersActions {
   static async updateMail(user = new Account({})) {
     const Client = new HTTPClient("/user/editEmail");
 
-    return Client.patch(this.mapper.toServerPutMail(user));
+    return Client.patch(this.mapper.toServerPutMail(user)).then(() => user);
   }
 
   static async updatePassword(user = new Account({})) {
     const Client = new HTTPClient("/user/editPassword");
 
-    return Client.patch(this.mapper.toServerPutMail(user));
+    return Client.patch(this.mapper.toServerPutMail(user)).then(() => user);
   }
 
   static async delete(id) {

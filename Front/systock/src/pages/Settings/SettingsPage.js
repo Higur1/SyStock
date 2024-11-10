@@ -28,7 +28,7 @@ export default function SettingsPage() {
 
   async function createUser(user = new Account()) {
     try {
-      const nextUser = await UsersActions.create(user);
+      const nextUser = await UsersActions.createPreUser(user);
       setUsers(prevUsers => [...prevUsers, nextUser]);
     } catch (e) {
       console.error(e);
@@ -44,8 +44,21 @@ export default function SettingsPage() {
     }
   }
 
+  async function deleteUser(user = new Account()) {
+    try {
+      await UsersActions.delete(user.id);
+      setUsers(prevUsers => prevUsers.filter(pUser => pUser.id !== user.id));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  function updateUserOnList(user = new Account()) {
+    setUsers(prevUsers => prevUsers.map(pUser => pUser.id === user.id ? user : pUser));
+  }
+
   return (
-    <SettingsContext.Provider value={{ users, getUsers, loading, createUser, editUser }}>
+    <SettingsContext.Provider value={{ users, getUsers, loading, createUser, editUser, updateUserOnList, deleteUser }}>
       <Settings />
     </SettingsContext.Provider>
   )

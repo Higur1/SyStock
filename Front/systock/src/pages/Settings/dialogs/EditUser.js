@@ -46,11 +46,19 @@ export default function EditUserDialog({ type, user: account = new Account({}), 
       <DialogContent style={{display: 'flex', justifyContent: 'center', flexDirection: 'column', gap: 8}}>
         {!isEditUser && (<span style={{fontWeight: 500}}>Autorizar primeiro acesso ao usuário</span>)}
         <Container>
-          <TextField label="Nome" style={{ gridArea: "name" }} value={user.name} onChange={(e) => onChange("name", e.target.value)}/>
-          <TextField label="Username" style={{ gridArea: "username" }} value={user.username} onChange={(e) => onChange("username", e.target.value)}/>
-          <TextField disabled={isEditUser}  label="E-mail" style={{ gridArea: "email" }} value={user.email} onChange={(e) => onChange("email", e.target.value)}/>
-          <TextField label="Senha" style={{ gridArea: "email" }} value={user.password} onChange={(e) => onChange("password", e.target.value)} type="password"/>
-          {isEditUser && <Button size="small" style={{ gridArea: "redefinePassword" }}>Redefinir Senha</Button>}
+          {!isEditUser ? (
+            <>
+              <TextField label="Nome" style={{ gridArea: "name" }} value={user.name} onChange={(e) => onChange("name", e.target.value)}/>
+              <TextField label="E-mail" style={{ gridArea: "email" }} value={user.email} onChange={(e) => onChange("email", e.target.value)}/>
+            </>
+          ) : (
+            <>
+              <TextField label="Nome" disabled style={{ gridArea: "name" }} value={user.name} onChange={(e) => onChange("name", e.target.value)}/>
+              <TextField label="Username" disabled style={{ gridArea: "username" }} value={user.username} onChange={(e) => onChange("username", e.target.value)}/>
+              <TextField label="E-mail" style={{ gridArea: "email" }} value={user.email} onChange={(e) => onChange("email", e.target.value)}/>
+              <TextField label="Senha" style={{ gridArea: "email" }} value={user.password} onChange={(e) => onChange("password", e.target.value)} type="password"/>
+            </>
+          )}
         </Container>
       </DialogContent>
       
