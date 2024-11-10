@@ -55,7 +55,7 @@ export default class HTTPClient {
       }
     } catch (error) {
       console.error(error);
-      throw error;
+      throw getErrorMessage(method, this.route, 1000);
     }
   }
 }
