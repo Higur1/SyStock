@@ -27,9 +27,9 @@ export default class SupplierActions {
   }
 
   static async getById(id) {
-    const Client = new HTTPClient(`/supplier/${id}`);
+    const Client = new HTTPClient(`/supplier`);
 
-    return Client.get().then(response => this.mapper.toInterface(response.Supplier));
+    return Client.get({}, `/${id}`).then(response => this.mapper.toInterface(response.Supplier));
   }
 
   static async update(sup = new Supplier({})) {
@@ -40,8 +40,8 @@ export default class SupplierActions {
   }
 
   static async delete(id) {
-    const Client = new HTTPClient(`/supplier/${id}`);
+    const Client = new HTTPClient(`/supplier`);
 
-    return Client.delete({id});
+    return Client.delete({}, `/${id}`);
   }
 }

@@ -10,6 +10,15 @@ export default class UsersMappers {
     }
   }
 
+  toServerPatch(obj = new Account({})) {
+    const nextObj = { id: obj.id };
+
+    if(obj.name !== "") nextObj.name = obj.name;
+    if(obj.password !== "") nextObj.password = obj.password;
+    if(obj.email !== "") nextObj.email = obj.email;
+    return nextObj;
+  }
+
   toServerPreUser(obj = new Account({})) {
     return {
       name: obj.name,

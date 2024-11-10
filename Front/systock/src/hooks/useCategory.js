@@ -59,7 +59,8 @@ export default function useCategory() {
       const categories = await CategoryActions.getAll();
       setCategories(categories);
     } catch (error) {
-      console.log(error.message);
+      handleOpenSnackBar("error", error);
+      console.log(error);
     }
   }
 
@@ -111,7 +112,7 @@ export default function useCategory() {
       insertCategory(newItem);
       setOpenCreateCategory(false);
     } catch (error) {
-      handleOpenSnackBar("error", error.message, null);
+      handleOpenSnackBar("error", error, null);
     }
   }
 
@@ -132,7 +133,7 @@ export default function useCategory() {
 
       handleOpenSnackBar("success", "Categoria atualizada com sucesso!!", 3500);
     } catch (error) {
-      handleOpenSnackBar("error", error.message, 3500);
+      handleOpenSnackBar("error", error, 3500);
     }
   }
 
@@ -154,7 +155,7 @@ export default function useCategory() {
       const updatedCategories = categories.filter(cat => cat.id !== category.id);
       setCategories(updatedCategories);
     } catch (e) {
-      handleOpenSnackBar("error", e.message, 3500);
+      handleOpenSnackBar("error", e, 3500);
     }
   }
 

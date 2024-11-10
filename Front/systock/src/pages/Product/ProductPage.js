@@ -158,7 +158,7 @@ export default function ProductPage() {
       setFilteredProducts(products);
       setProductsBase(products);
     } catch (error) {
-      handleOpenSnackBar("error", error.message, 3500);
+      handleOpenSnackBar("error", error, 3500);
     }
   }
 
@@ -178,7 +178,7 @@ export default function ProductPage() {
       setFilteredProducts(productss);
       setProductsBase(productss);
     } catch (error) {
-      handleOpenSnackBar("error", error.message, 3500);
+      handleOpenSnackBar("error", error, 3500);
     }
   }
 
@@ -199,7 +199,7 @@ export default function ProductPage() {
       setProductsBase(newProducts);
       setFilteredProducts(newProducts);
     } catch (error) {
-      handleOpenSnackBar("error", error.message, 3500);
+      handleOpenSnackBar("error", error, 3500);
     }
   }
 
@@ -223,7 +223,7 @@ export default function ProductPage() {
       setFilteredProducts(updatedProducts);
       setProductsBase(updatedProducts);
     } catch (e) {
-      handleOpenSnackBar("error", e.message, 3500);
+      handleOpenSnackBar("error", e, 3500);
     }
   }
 

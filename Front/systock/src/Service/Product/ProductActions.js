@@ -68,7 +68,7 @@ export default class ProductActions {
   static async delete(id) {
     const Client = new HTTPClient("/product");
 
-    return Client.delete({id});
+    return Client.delete({}, `/${id}`);
   }
 
   static async addMultipleQuantityProducts(productsToAdd = []) {

@@ -27,9 +27,9 @@ export default class CategoryActions {
   }
 
   static async getById(id) {
-    const Client = new HTTPClient(`/category/${id}`);
+    const Client = new HTTPClient(`/category`);
 
-    return Client.get().then(response => this.mapper.toInterface(response.Category));
+    return Client.get({}, `/${id}`).then(response => this.mapper.toInterface(response.Category));
   }
 
   static async update(cat = new Category({})) {
@@ -40,8 +40,8 @@ export default class CategoryActions {
   }
 
   static async delete({id}) {
-    const Client = new HTTPClient(`/category/${id}`);
+    const Client = new HTTPClient(`/category`);
 
-    return Client.delete();
+    return Client.delete({}, `/${id}`);
   }
 }

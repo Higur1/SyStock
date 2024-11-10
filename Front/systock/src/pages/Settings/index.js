@@ -17,8 +17,8 @@ const columns = [
 
 export default function Settings() {
 
-  const { token } = useContext(MainContext);
-  const { users, getUsers, createUser, editUser, updateUserOnList, deleteUser} = useContext(SettingsContext);
+  const { token, handleOpenSnackBar } = useContext(MainContext);
+  const { users, getUsers, editUser, updateUserOnList, deleteUser} = useContext(SettingsContext);
 
   const [editDialogProps, setEditDialogProps] = useState({ open: false, user: null, type: TYPE_USER_DIALOG.NEW });
   const [dialogMyUser, setDialogMyUser] = useState({open: false, user: null});
@@ -40,6 +40,8 @@ export default function Settings() {
   async function handleDeleteUser(user) {
     try {
       await deleteUser(user);
+
+      handleOpenSnackBar("success", "Usuário deletado", 3000);
     } catch (e) {
       console.log(e);
     } finally {
@@ -56,6 +58,7 @@ export default function Settings() {
   function updateMyUser(user) {
     updateUserOnList(user);
     setDialogMyUser({open: false, user: null});
+    handleOpenSnackBar("success", "Usuário atualizado", 3000);
   }  
 
   useEffect(() => {
@@ -125,11 +128,6 @@ export default function Settings() {
           type={editDialogProps.type}
           user={editDialogProps.user || new Account({})}
           onClose={() => setEditDialogProps({open: false, user: null})}
-          handleConfirm={(user) => {
-            if(TYPE_USER_DIALOG.NEW === editDialogProps.type) return createUser(user);
-
-            return editUser(user);
-          }}
         />
       )}
       {dialogMyUser.open && <MyUser user={dialogMyUser.user} handleConfirm={updateMyUser} onClose={() => setDialogMyUser({open: false, user: null})}/>}

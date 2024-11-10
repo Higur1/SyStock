@@ -60,7 +60,7 @@ export default function CreateProductDialog(props) {
       const categories = await CategoryActions.getAll();
       setCategories(categories);
     } catch (error) {
-      console.log(error.message);
+      console.log(error);
     }
   }
 

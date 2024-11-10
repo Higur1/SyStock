@@ -98,7 +98,9 @@ export default function useSupplier() {
       const suppliers = await SupplierActions.getAll();
       setSuppliers(suppliers);
     } catch (error) {
-      console.log(error.message);
+      handleOpenSnackBar("error", error);
+
+      console.log(error);
     }
   }
 
@@ -116,7 +118,7 @@ export default function useSupplier() {
       handleOpenSnackBar("success", "Fornecedor adicionado com sucesso!!", 3500)
 
     } catch (error) {
-      handleOpenSnackBar("error", error.error, 3500);
+      handleOpenSnackBar("error", error, 3500);
     }
   }
 
@@ -134,7 +136,7 @@ export default function useSupplier() {
       handleOpenSnackBar("success", "Fornecedor atualizado com sucesso!!", 3500);
 
     } catch (error) {
-      handleOpenSnackBar("error", error.message, 3500);
+      handleOpenSnackBar("error", error, 3500);
     }
   }
 
@@ -148,7 +150,7 @@ export default function useSupplier() {
       setSuppliers(prevState => prevState.filter(cat => cat.id !== id));
       handleOpenSnackBar("success", "Fornecedor apagado com sucesso!!", 3500);
     } catch (e) {
-      handleOpenSnackBar("error", e.message, 3500);
+      handleOpenSnackBar("error", e, 3500);
     }
   }
 

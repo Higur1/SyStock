@@ -1,8 +1,10 @@
 import { Close, Save } from '@mui/icons-material';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, TextField } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import styled from 'styled-components';
 import Account from '../../../classes/Account';
+import UsersActions from '../../../Service/Users/UsersActions';
+import { MainContext } from '../../../App';
 
 export const TYPE_USER_DIALOG = {
   NEW: "NEW",
@@ -19,7 +21,8 @@ export const Container = styled.div`
   padding: 16px;
 `
 
-export default function EditUserDialog({ type, user: account = new Account({}), handleConfirm, onClose }) {
+export default function EditUserDialog({ type, user: account = new Account({}), onClose }) {
+  const { handleOpenSnackBar } = useContext(MainContext);
 
   const [user, setUser] = useState({name: account.name, email: account.email, username: account.user, password: account.password});
   const isEditUser = type === TYPE_USER_DIALOG.EDIT;
@@ -36,7 +39,17 @@ export default function EditUserDialog({ type, user: account = new Account({}), 
     nextAccount.user = user.username;
     nextAccount.password = user.password;
 
-    handleConfirm(nextAccount);
+    createUser(nextAccount);
+  }
+
+  async function createUser(user = new Account()) {
+    try {
+      await UsersActions.createPreUser(user);
+      handleOpenSnackBar("success", "Usuário autorizado para primeiro acesso!", 4000);
+      onClose();
+    } catch (e) {
+      handleOpenSnackBar("error", "Ocorreu um erro ao autorizar esse usuário", 4000);
+    }
   }
 
   return (

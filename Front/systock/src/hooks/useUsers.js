@@ -45,7 +45,7 @@ export default function useUsers() {
       const users = await UsersActions.getAll();
       setUsers(users);
     } catch (error) {
-      console.log(error.message);
+      console.log(error);
     }
   }
 
@@ -68,7 +68,7 @@ export default function useUsers() {
       handleOpenSnackBar("success", "Usuário adicionado com sucesso!!", 3500)
 
     } catch (error) {
-      handleOpenSnackBar("error", error.message, 3500);
+      handleOpenSnackBar("error", error, 3500);
     }
   }
 
@@ -92,7 +92,7 @@ export default function useUsers() {
       handleOpenSnackBar("success", "Usuário atualizado com sucesso!!", 3500);
 
     } catch (error) {
-      handleOpenSnackBar("error", error.message, 3500);
+      handleOpenSnackBar("error", error, 3500);
     }
   }
 
@@ -108,7 +108,7 @@ export default function useUsers() {
       setUsers(usersList);
       handleOpenSnackBar("success", "Usuário apagado com sucesso!!", 3500)
     } catch (e) {
-      handleOpenSnackBar("error", e.message, 3500);
+      handleOpenSnackBar("error", e, 3500);
     }
   }
 

@@ -58,7 +58,7 @@ export default function EditProductDialog(props) {
       const categories = await CategoryActions.getAll();
       setCategories(categories);
     } catch (error) {
-      console.log(error.message);
+      console.log(error);
     }
   }
 

@@ -1,7 +1,8 @@
-import React, { createContext, useState } from 'react'
+import React, { createContext, useContext, useState } from 'react'
 import Settings from '.';
 import UsersActions from '../../Service/Users/UsersActions';
 import Account from '../../classes/Account';
+import { MainContext } from '../../App';
 
 export const SettingsContext = createContext();
 
@@ -10,6 +11,7 @@ const loadingTypes = {
 }
 
 export default function SettingsPage() {
+  const { handleOpenSnackBar } = useContext(MainContext);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState([]);
 
@@ -26,15 +28,6 @@ export default function SettingsPage() {
     }
   }
 
-  async function createUser(user = new Account()) {
-    try {
-      const nextUser = await UsersActions.createPreUser(user);
-      setUsers(prevUsers => [...prevUsers, nextUser]);
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
   async function editUser(user = new Account()) {
     try {
       const nextUser = await UsersActions.update(user);
@@ -48,8 +41,11 @@ export default function SettingsPage() {
     try {
       await UsersActions.delete(user.id);
       setUsers(prevUsers => prevUsers.filter(pUser => pUser.id !== user.id));
+
+      handleOpenSnackBar("success", "Usuário deletado", 3000);
     } catch (e) {
       console.error(e);
+      handleOpenSnackBar("error", "Ocorreu um erro ao apagar esse usuário", 3000);
     }
   }
 
@@ -58,7 +54,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <SettingsContext.Provider value={{ users, getUsers, loading, createUser, editUser, updateUserOnList, deleteUser }}>
+    <SettingsContext.Provider value={{ users, getUsers, loading, editUser, updateUserOnList, deleteUser }}>
       <Settings />
     </SettingsContext.Provider>
   )

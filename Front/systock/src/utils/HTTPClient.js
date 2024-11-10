@@ -1,11 +1,13 @@
+import { getErrorMessage } from "./utils";
+
 export default class HTTPClient {
   constructor(route) {
     this.route = route;
   }
   baseURL = "192.168.15.15:3333";
 
-  async get(headers = {}) {
-    return this.request("GET", null, headers);
+  async get(headers = {}, param = "") {
+    return this.request("GET", null, headers, param);
   }
 
   async post(body, headers = {}) {
@@ -16,16 +18,16 @@ export default class HTTPClient {
     return this.request("PUT", body, headers);
   }
 
-  async delete(headers = {}) {
-    return this.request("DELETE", null, headers);
+  async delete(headers = {}, param = "") {
+    return this.request("DELETE", null, headers, param);
   }
 
   async patch(body, headers = {}) {
     return this.request('PATCH', body, headers);
   }
 
-  async request(method, body = null, headers = {}) {
-    const url = `http://${this.baseURL}${this.route}`;
+  async request(method, body = null, headers = {}, param = "") {
+    const url = `http://${this.baseURL}${this.route}${param}`;
 
     const contentJSON = body !== null ? { 'Content-Type': 'application/json' } : {};
     const options = {
@@ -43,13 +45,7 @@ export default class HTTPClient {
       const response = await fetch(url, options);
       
       if (!response.ok) {
-        try {
-          const errorResponse = await response.json();
-
-          throw new Error(errorResponse.Message);
-        } catch (e) {
-          throw new Error(e);
-        }
+        throw getErrorMessage(method, this.route, response.status);
       }
 
       try {

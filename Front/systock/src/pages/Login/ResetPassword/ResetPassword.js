@@ -29,18 +29,12 @@ const ResetPassword = () => {
     } 
 
     try {
-      const response = await UsersActions.resetPassword({token, user_password: password});
+      await UsersActions.resetPassword({token, user_password: password});
 
-      console.log(response);
-
-      if(!response.ok) {
-        return setError(response.message);
-      }
-      
       handleSuccess();
 
     } catch (e) {
-      return setError(e.message);
+      return setError(e);
     }
   }
 
