@@ -19,6 +19,7 @@ export default class ProducService {
   static async create(productData: IProduct) {
     try {
       let category_id_replace = 0;
+      let errorTratado:string="";
       if (productData.category_id != 0) {
         category_id_replace = productData.category_id;
       }
@@ -28,8 +29,9 @@ export default class ProducService {
       };
       const findCategory = await CategoryModel.find(categoryData);
 
-      if (!findCategory.exists) {
-        throw new Error("Category doesn't found");
+      if (findCategory.category == undefined) {
+        //throw new Error("Category doesn't found");
+        errorTratado="Category doesn't found"
       }
 
       const verifyNameDuplicate = await ProducModel.findByName(productData);
@@ -48,7 +50,8 @@ export default class ProducService {
 
       const returBatch = await BatchModel.create(batchData);
       console.log(returBatch.error);
-      return createResult;
+      return errorTratado == "" ?
+      {createResult} :  {errorTratado}
     } catch (error) {
       throw error;
     }
@@ -141,7 +144,7 @@ export default class ProducService {
       await ProducModel.delete(productData);
       return { message: "Product deleted sucessfully!" };
     } catch (error) {
-      throw error;
+      return error;
     }
   }
 }
