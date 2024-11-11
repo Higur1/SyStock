@@ -1,7 +1,10 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Slide, TextField } from "@mui/material";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import PropTypes from 'prop-types';
 import styled from "styled-components";
+import CategoryActions from "../../../Service/Category/CategoryActions";
+import { MainContext } from "../../../App";
+import Category from "../../../classes/Category";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
@@ -21,10 +24,23 @@ const Container = styled.div`
 `
 
 export default function EditCategoryDialog(props) {
-  const { open, handleClose, category, handleSave } = props;
+  const { handleOpenSnackBar } = useContext(MainContext);
+  const { open, handleClose, category } = props;
 
   const [categoryLabel, setCategoryLabel] = useState(category.name);
-  const [hasError, setHasError] = useState(false);
+
+  async function onSave() {
+    const newCategory = new Category({...category, name: categoryLabel});
+    try {
+      const newItem = await CategoryActions.update(newCategory);
+      props.insertCategory(newItem);
+      
+      handleOpenSnackBar("success", "Categoria atualizada com sucesso!!", 3500);
+      props.onClose();
+    } catch (error) {
+      handleOpenSnackBar("error", error, 3500);
+    }
+  }
 
   return (
     <Dialog
@@ -41,22 +57,13 @@ export default function EditCategoryDialog(props) {
             label="Nome da categoria"
             value={categoryLabel}
             onChange={(e) => setCategoryLabel(e.target.value)}
-            error={hasError}
           />
-          <div style={{color: 'red', display: hasError ? 'block' : 'none'}}>Preencha os campos obrigatórios!</div>
         </Container>
 
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancelar</Button>
-        <Button onClick={() => {
-          if(categoryLabel === '') {
-            setHasError(true);
-            return;
-          }
-          handleSave({id: category.id, name: categoryLabel});
-          handleClose();
-          }}>Salvar</Button>
+        <Button disabled={categoryLabel === ""} onClick={onSave}>Salvar</Button>
       </DialogActions>
 
     </Dialog>

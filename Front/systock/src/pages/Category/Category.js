@@ -1,6 +1,6 @@
-import { Autocomplete, Button, Chip, Dialog, DialogActions, DialogTitle, IconButton, TextField } from '@mui/material'
+import { Autocomplete, Button, Chip, Dialog, DialogActions, DialogTitle, IconButton, Menu, MenuItem, TextField } from '@mui/material'
 import React from 'react'
-import { Container, HeaderContainer, Menu, MenuOption, TableContainer, TableData, TableRow } from './styles'
+import { Container, HeaderContainer, TableContainer, TableData, TableRow } from './styles'
 import useCategory from '../../hooks/useCategory';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CreateCategoryDialog from './dialogs/CreateCategoryDialog';
@@ -23,16 +23,14 @@ export default function Category() {
     severitySnackBar,
     snackMessageSnackBar,
     handleCloseSnackBar,
+    insertCategory,
 
     openCreateCategory, setOpenCreateCategory,
-    menuOption,
-    idMenu,
     editCategory, setEditCategory,
     deleteCategory, setDeleteCategory,
-    handleMenuOptions
+    handleMenu, menu, setMenu
   } = useCategory();
 
-  console.log(categories)
   return (
     <>
       <Container>
@@ -79,14 +77,8 @@ export default function Category() {
                   }}>
                     <TableData size={'400px'} >{cat.name}</TableData>
                     <TableData size={'56px'} style={{ justifyContent: 'flex-end', flex: 1 }}>
-                      <IconButton onClick={() => handleMenuOptions(cat.id)} style={{ position: 'relative' }}>
+                      <IconButton onClick={(e) => handleMenu(e, cat)} style={{ position: 'relative' }}>
                         <MoreVertIcon fontSize='small' />
-                        {menuOption && idMenu === cat.id && (
-                          <Menu>
-                            <MenuOption onClick={() => setEditCategory(true)}>{"Editar Categoria"}</MenuOption>
-                            <MenuOption style={{ borderBottom: '0px', borderRadius: '0px 0px 16px 16px' }} onClick={() => setDeleteCategory(true)}>{"Apagar Categoria"}</MenuOption>
-                          </Menu>
-                        )}
                       </IconButton>
                     </TableData>
                   </TableRow>
@@ -110,9 +102,12 @@ export default function Category() {
       {editCategory && (
         <EditCategoryDialog
           open={editCategory}
-          category={categoriesFiltered.find(cat => cat.id === idMenu)}
-          handleClose={() => setEditCategory(false)}
-          handleSave={handleUpdateCategory}
+          category={categoriesFiltered.find(cat => cat.id === menu.category.id)}
+          onClose={() => {
+            setEditCategory(false);
+            setMenu({anchor: null, category: null});
+          }}
+          insertCategory={insertCategory}
         />
       )}
       {deleteCategory && (
@@ -125,7 +120,7 @@ export default function Category() {
           <DialogActions>
             <Button onClick={() => setDeleteCategory(false)}>Cancelar</Button>
             <Button onClick={() => {
-              handleDeleteCategory({ id: idMenu });
+              handleDeleteCategory(menu.category);
               setDeleteCategory(false);
             }}>Confirmar</Button>
           </DialogActions>
@@ -139,6 +134,19 @@ export default function Category() {
           severity={severitySnackBar}
           snackMessage={snackMessageSnackBar}
         />
+      )}
+
+      {menu.anchor !== null && (
+        <Menu
+          id="simple-menu"
+          anchorEl={menu.anchor}
+          keepMounted
+          open
+          onClose={() => setMenu({anchor: null, category: null})}
+        >
+          <MenuItem onClick={() => setEditCategory(true)}>Editar Categoria</MenuItem>
+          <MenuItem onClick={() => setDeleteCategory(true)}>Excluir Categoria</MenuItem>
+        </Menu>
       )}
     </>
   )

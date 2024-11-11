@@ -35,7 +35,7 @@ export default class CategoryMappers {
     }
   }
 
-  toInterface({ id, name }) {
-    return new Category({ id, name });
+  toInterface(props) {
+    return new Category({...props});
   }
 }

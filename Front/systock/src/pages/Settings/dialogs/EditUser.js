@@ -48,7 +48,8 @@ export default function EditUserDialog({ type, user: account = new Account({}), 
       handleOpenSnackBar("success", "Usuário autorizado para primeiro acesso!", 4000);
       onClose();
     } catch (e) {
-      handleOpenSnackBar("error", "Ocorreu um erro ao autorizar esse usuário", 4000);
+      console.log(e);
+      handleOpenSnackBar("error", e, 4000);
     }
   }
 

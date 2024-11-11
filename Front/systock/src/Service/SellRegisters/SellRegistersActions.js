@@ -12,10 +12,6 @@ export default class SellRegistersActions {
       .then(dataObj => {
         return dataObj.history.map(history => this.mapper.toInterface(history));
       })
-      .catch(error => {
-        console.error("Error fetching users:", error);
-        throw error;  // Propagate the error so it can be handled by the caller
-      });
   }
 
   static async getAllClosingList () {
@@ -25,9 +21,5 @@ export default class SellRegistersActions {
       .then(dataObj => {
         return dataObj.history.map(history => this.mapper.toInterface(history));
       })
-      .catch(error => {
-        console.error("Error fetching users:", error);
-        throw error;  // Propagate the error so it can be handled by the caller
-      });
   }
 }

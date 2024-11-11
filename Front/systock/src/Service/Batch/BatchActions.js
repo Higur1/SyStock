@@ -13,10 +13,6 @@ export default class BatchActions {
       .then(dataObj => {
         return dataObj.batchs.map(this.mapper.toInterface);
       })
-      .catch(error => {
-        console.error("Error fetching users:", error);
-        throw error;  // Propagate the error so it can be handled by the caller
-      });
   }
 
   static async getByProduct(productID) {

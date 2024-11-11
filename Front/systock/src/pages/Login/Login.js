@@ -8,7 +8,6 @@ import { AccountCircle, Key, Visibility, VisibilityOff } from '@mui/icons-materi
 import ButtonCustom from '../../components/common/ButtonCustom/ButtonCustom'
 import { useLogin } from './useLogin'
 import styled from 'styled-components'
-import CustomizedSnackbars from '../../components/CustomizedSnackBar';
 
 const DivColumnFlex8 = styled("div")({ display: 'flex', flexDirection: 'column', gap: 8 });
 const DivGrid8 = styled("div")({ display: 'grid', gap: 8, gridTemplate: '1fr / 50% 50%' });
@@ -22,27 +21,12 @@ const Login = () => {
     password, onChangePassword,
     error,
     email, onChangeEmail,
-    snackBar,
     onLogin, onResetPassword, clearInfo,
     firstAccess, handleChangeFirstAccess,
     loading, onCreateFirstAccess, screen, handleScreen
   } = useLogin();
 
   const [showPassword, setShowPassword] = useState(false);
-
-  const mountSnackBar = useRef();
-
-  useEffect(() => {
-    if(snackBar.open) {
-      mountSnackBar.current = true;
-      return;
-    }
-
-    if(mountSnackBar.current) {
-      console.log('funcionou current');
-      handleScreen("login");
-    }
-  }, [snackBar.open]);
 
   return (
     <>
@@ -205,10 +189,6 @@ const Login = () => {
         <Backdrop open>
           <CircularProgress color="primary" />
         </Backdrop>
-      )}
-
-      {snackBar.open && (
-        <CustomizedSnackbars {...snackBar} />
       )}
     </> 
   )

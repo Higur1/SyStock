@@ -7,6 +7,8 @@ import { CURRENT_INSTANCE } from "../../utils/utils";
 
 export const useLogin = () => {
 
+  const { handleOpenSnackBar } = useContext(MainContext);
+
   const [screen, setScreen] = useState("login");
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
@@ -18,13 +20,6 @@ export const useLogin = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const [snackBar, setSnackBar] = useState({
-    open: false, 
-    severity: "",
-    snackMessage: "",
-    autoHide: 5000,
-    handleClose: null
-  });
   const [firstAccess, setFirstAccess] = useState({email: "", name: "", user: "", password: ""});
 
   const { getData } = useContext(MainContext);
@@ -48,18 +43,6 @@ export const useLogin = () => {
     setError({...error, email: ''});
     setEmail(email);
   }
-
-  const closeSnackBar = () => {
-    console.log('closeSnackBar');
-    setSnackBar({
-      open: false, 
-      severity: "",
-      snackMessage: "",
-      autoHide: 3000,
-      handleClose: null
-    });
-  }
-
   async function onLogin () {
     setLoading(true);
 
@@ -100,15 +83,7 @@ export const useLogin = () => {
         await UsersActions.recovery({email, instance: CURRENT_INSTANCE});
         
         handleScreen("login");
-        setSnackBar({
-          ...snackBar, 
-          open: true, 
-          severity: 'success', 
-          snackMessage: 'A recuperação de senha foi enviada ao seu e-mail!!',
-          autoHide: 3000,
-          handleClose: closeSnackBar
-        });
-
+        handleOpenSnackBar('success','A recuperação de senha foi enviada ao seu e-mail!!', 3000);
       } catch {
         return setError({...error, email: 'E-mail não encontrado. Digite o e-mail novamente.'});
       }
@@ -125,23 +100,10 @@ export const useLogin = () => {
 
       if(!(userCreated instanceof Account)) return;
 
-      setSnackBar({
-        ...snackBar, 
-        open: true, 
-        severity: 'success', 
-        snackMessage: 'O usuário foi criado!',
-        autoHide: 3000,
-        handleClose: closeSnackBar
-      });
+      handleOpenSnackBar('success','O usuário foi criado!', 3000);
     } catch (e) {
-      setSnackBar({
-        ...snackBar, 
-        open: true, 
-        severity: 'error', 
-        snackMessage: e,
-        autoHide: 3000,
-        handleClose: closeSnackBar
-      });
+      
+      handleOpenSnackBar('error',e, 3000);
     }
   }
 
@@ -176,7 +138,7 @@ export const useLogin = () => {
     error,
     email, onChangeEmail, 
     onLogin, onResetPassword, clearInfo,
-    loading, snackBar,
+    loading,
     firstAccess, handleChangeFirstAccess, onCreateFirstAccess,
     screen, handleScreen
   };

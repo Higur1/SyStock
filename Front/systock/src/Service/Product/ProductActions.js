@@ -16,10 +16,6 @@ export default class ProductActions {
       .then(dataObj => {
         return dataObj.Products.map(products => this.mapper.toInterface(products, {categories}));
       })
-      .catch(error => {
-        console.error("Error fetching users:", error);
-        throw error;  // Propagate the error so it can be handled by the caller
-      });
   }
 
   static async create(supp = new Product({})) {

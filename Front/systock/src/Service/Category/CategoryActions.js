@@ -13,10 +13,6 @@ export default class CategoryActions {
       .then(dataObj => {
         return dataObj.Categories.map(this.mapper.toInterface);
       })
-      .catch(error => {
-        console.error("Error fetching users:", error);
-        throw error;  // Propagate the error so it can be handled by the caller
-      });
   }
 
   static async create(cat = new Category({})) {

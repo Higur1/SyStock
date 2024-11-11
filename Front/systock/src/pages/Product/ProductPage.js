@@ -138,26 +138,13 @@ export default function ProductPage() {
   }
 
   async function getProducts() {
-    if (DEBUG_LOCAL) {
-      const supplies = getData(ENTITIES.SUPPLY_LIST);
-      const productsData = getData(ENTITIES.PRODUCTS); 
-
-      const products = [];
-      supplies.forEach(supply => {
-        products.push(...supply.batches);
-      });
-
-      setProductsWithoutSupply(productsData);
-      setProductsListAutoComplete(productsData.map((prod) => ({ label: prod.name, value: prod.refCode })));
-
-      setFilteredProducts(products);
-      return setProductsBase(products);
-    }
     try {
       const products = await ProductActions.getAll();
       setFilteredProducts(products);
       setProductsBase(products);
     } catch (error) {
+      setProductsBase([]);
+      setFilteredProducts([]);
       handleOpenSnackBar("error", error, 3500);
     }
   }

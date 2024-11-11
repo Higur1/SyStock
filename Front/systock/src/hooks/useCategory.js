@@ -11,8 +11,7 @@ export default function useCategory() {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [categoriesFiltered, setCategoriesFiltered] = useState([]);
   const [openCreateCategory, setOpenCreateCategory] = useState(false);
-  const [menuOption, setMenuOptions] = useState(false);
-  const [idMenu, setIdMenu] = useState(null);
+  const [menu, setMenu] = useState({anchor: null, category: null});
   const [editCategory, setEditCategory] = useState(false);
   const [deleteCategory, setDeleteCategory] = useState(false);
 
@@ -44,9 +43,10 @@ export default function useCategory() {
     getCategories();
   }, []);
 
-  function handleMenuOptions(id) {
-    setMenuOptions(!menuOption);
-    setIdMenu(id);
+  function handleMenu(e, category) {
+    const anchor = e.currentTarget;
+
+    setMenu({anchor, category});
   }
 
   async function getCategories() {
@@ -108,11 +108,12 @@ export default function useCategory() {
 
     try {
       const newItem = await CategoryActions.create(obj);
-
+      
       insertCategory(newItem);
       setOpenCreateCategory(false);
     } catch (error) {
-      handleOpenSnackBar("error", error, null);
+      console.log(error);
+      handleOpenSnackBar("error", error, 3500);
     }
   }
 
@@ -120,17 +121,12 @@ export default function useCategory() {
    * * update category
    * @param {*} 
    */
-  async function handleUpdateCategory(category) {
-    if(DEBUG_LOCAL) return insertCategory(category);     
+  async function handleUpdateCategory(category) {   
     try {
       const newItem = await CategoryActions.update(category);
-      if(typeof newItem === 'string') {
-        handleOpenSnackBar("error", newItem, 3500);
-        return;
-      }
-
       insertCategory(newItem);
 
+      setMenu({anchor: null, category: null});
       handleOpenSnackBar("success", "Categoria atualizada com sucesso!!", 3500);
     } catch (error) {
       handleOpenSnackBar("error", error, 3500);
@@ -154,6 +150,7 @@ export default function useCategory() {
       handleOpenSnackBar("success", "Categoria deletada com sucesso!!", 3500);
       const updatedCategories = categories.filter(cat => cat.id !== category.id);
       setCategories(updatedCategories);
+      setMenu({anchor: null, category: null});
     } catch (e) {
       handleOpenSnackBar("error", e, 3500);
     }
@@ -166,10 +163,8 @@ export default function useCategory() {
     handleCreateCategory, handleUpdateCategory, handleDeleteCategory,
     handleCloseSnackBar, openSnackBar, autoHideSnackBar, snackMessageSnackBar, severitySnackBar,
     openCreateCategory, setOpenCreateCategory,
-    menuOption, setMenuOptions,
-    idMenu, setIdMenu,
     editCategory, setEditCategory,
     deleteCategory, setDeleteCategory,
-    handleMenuOptions
+    handleMenu, setMenu, menu, insertCategory
   }
 }

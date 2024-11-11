@@ -14,10 +14,6 @@ export default class SupplierActions {
         if(!dataObj?.Suppliers?.suppliers) return [];
         return dataObj.Suppliers.suppliers.map(this.mapper.toInterface);
       })
-      .catch(error => {
-        console.error("Error fetching users:", error);
-        throw error;  // Propagate the error so it can be handled by the caller
-      });
   }
 
   static async create(supp = new Supplier({})) {

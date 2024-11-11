@@ -11,10 +11,6 @@ export default class HistoryActions {
       .then(dataObj => {
         return dataObj.history.map(history => this.mapper.toInterface(history));
       })
-      .catch(error => {
-        console.error("Error fetching users:", error);
-        throw error;  // Propagate the error so it can be handled by the caller
-      });
   }
 
   static async getAllSupply () {
@@ -24,10 +20,6 @@ export default class HistoryActions {
       .then(dataObj => {
         return dataObj.history.map(history => this.mapper.toInterface(history));
       })
-      .catch(error => {
-        console.error("Error fetching users:", error);
-        throw error;  // Propagate the error so it can be handled by the caller
-      });
   }
 
   static async getAllSales () {
@@ -37,9 +29,5 @@ export default class HistoryActions {
       .then(dataObj => {
         return dataObj.history.map(history => this.mapper.toInterface(history));
       })
-      .catch(error => {
-        console.error("Error fetching users:", error);
-        throw error;  // Propagate the error so it can be handled by the caller
-      });
   }
 }

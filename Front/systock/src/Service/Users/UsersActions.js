@@ -13,10 +13,6 @@ export default class UsersActions {
       .then(dataObj => {
         return dataObj.Users.map(this.mapper.toInterface);
       })
-      .catch(error => {
-        console.error("Error fetching users:", error);
-        throw error;  // Propagate the error so it can be handled by the caller
-      });
   }
 
   static async create(user = new Account({})) {
@@ -28,7 +24,7 @@ export default class UsersActions {
   static async createPreUser(user = new Account({})) {
     const ClientUser = new HTTPClient("/preuser");
 
-    return ClientUser.post(this.mapper.toServerPreUser(user)).then(result => this.mapper.toInterface(result.User));
+    return ClientUser.post(this.mapper.toServerPreUser(user));
   }
 
   static async update(user = new Account({})) {
