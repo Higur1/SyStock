@@ -119,7 +119,7 @@ export default class CategoryModel {
         ? { status: true, exists: true, category: categoryDeleted }
         : { status: true, exists: false, category: {} };
     } catch (error) {
-      return {status: false, categoryHaveProducts: true}
+      return {status: false, categoryHaveProducts: true, error: error}
     };
   };
 };

@@ -38,7 +38,7 @@ export default class CategoryController {
       const createCategory = await CategoryService.create(categoryData);
 
       response.status(200).send(JSON.stringify({
-        Category: createCategory.categoria
+        Category: createCategory.category
       }));
 
     } catch (error) {
@@ -73,7 +73,6 @@ export default class CategoryController {
       const createAt = findCategory.category?.createdAt || dateBase();
       const resultDateMask = dateMask(createAt)
       
-      console.log(resultDateMask)
       response.status(200).send(JSON.stringify({
         Category: findCategory.category
       }));

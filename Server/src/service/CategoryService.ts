@@ -32,7 +32,7 @@ export default class CategoryService {
     try {
       const findCategory = await CategoryModel.find(categoryData);
 
-      if (!findCategory.exists) {
+      if (!findCategory || !findCategory.exists) {
         throw new Error("Category not found");
       }
 
@@ -69,7 +69,7 @@ export default class CategoryService {
     try {
       const verifyDuplicateName = await CategoryModel.findByName(categoryData);
 
-      if (verifyDuplicateName.exists) {
+      if (verifyDuplicateName && verifyDuplicateName.exists) {
         throw new Error("Name of category already exists");
       }
 
@@ -88,13 +88,12 @@ export default class CategoryService {
   static async delete(categoryData: ICategory) {
     try {
       const findCategory = await CategoryModel.find(categoryData);
-
       if (!findCategory.exists) {
         throw new Error("Category doesn't found");
       }
-
       const verifyProductExistsInCategory = await ProductModel.findByCategory(
         findCategory.category?.id || 0,
+        
         categoryData.id
       );
 
@@ -107,7 +106,7 @@ export default class CategoryService {
       const categoryRemove = await CategoryModel.delete(categoryData);
       return categoryRemove;
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 }
