@@ -66,12 +66,14 @@ export default class FillService {
   }
   static async relationBatchFill(batch_Fill: IBatch_Fill, batch: IBatch, product: IProduct) {
     try {
+      
       const findBatch = await BatchModel.findByExpirationDate(batch);
       if (findBatch.batch) {
+        batch.id = findBatch.batch.id
+        
         await BatchModel.addQuantity(batch);
         await ProductModel.updatePrice(product);
         await BatchFillModel.create(batch_Fill);
-
         return { message: "Batch already exists, updated and batch_fill created." }
       }
       await BatchModel.create(batch);

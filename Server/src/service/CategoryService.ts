@@ -84,7 +84,7 @@ export default class CategoryService {
     } catch (error) {
       throw error;
     }
-  }
+  } 
   static async delete(categoryData: ICategory) {
     try {
       const findCategory = await CategoryModel.find(categoryData);

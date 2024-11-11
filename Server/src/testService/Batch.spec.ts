@@ -1,4 +1,4 @@
-/*import {
+import {
   describe,
   it,
   expect,
@@ -7,13 +7,14 @@
   jest,
   beforeEach,
 } from "@jest/globals";
-import Batch from "../models/Batch";
-import batchService from "../service/BatchService";
 import category from "../service/CategoryService";
 import product from "../service/ProductService";
-import Product from "../models/Product";
+
 import Decimal from "decimal.js";
 import BatchService from "../service/BatchService";
+import ICategory from "../interface/ICategory";
+import IProduct from "../interface/IProduct";
+import IBatch from "../interface/IBatch";
 import { prisma } from "../config/prisma";
 
 describe("Create batch model", () => {
@@ -28,17 +29,17 @@ describe("Create batch model", () => {
     )}`;
     uniqueCategoryName = genarateUniqueCategoryName;
 
-    const mockCategory = {
+    const mockCategory: ICategory = {
       name: uniqueCategoryName,
     };
 
     const categoryResult = await category.create(mockCategory);
-    category_id = categoryResult.category?.category_id;
+    category_id = categoryResult.category?.id;
 
     const genarateUniqueProductName = `Mock ProductBatch-${String(Date.now())}`;
     uniqueProductName = genarateUniqueProductName;
 
-    const mockProduct: Product = {
+    const mockProduct: IProduct = {
       name: uniqueProductName,
       price: new Decimal(1500.0),
       costPrice: new Decimal(1000.0),
@@ -50,69 +51,78 @@ describe("Create batch model", () => {
     };
 
     const productResult = await product.create(mockProduct);
-    product_id = productResult.product?.id;
+    product_id = productResult.createResult?.product?.id;
+
   });
 
   it("Should be able to create a new batch", async () => {
-    const batchDatanew = new Batch({
-      expirantionDate: new Date("2024-10-02"),
-      quantity: 1,
+    const batchDatanew: IBatch = ({
+      expirantionDate: new Date("2024-01-01T00:00:01.000Z"),
+      quantity: 0,
       product_id: product_id,
     });
     
     const createBatch = await BatchService.create(batchDatanew);
-    console.log(createBatch)
     await expect(createBatch).toHaveProperty("batch.id");
+    batchDatanew.id = createBatch.batch!.id;
+    await prisma.batch.deleteMany({where:{product_id: batchDatanew.product_id}});
   });
-
-  it("Should be able to create a new batch with eValidationStatus 2", async () => {
-
-    const batchData = new Batch({
-      expirantionDate: new Date("2024-10-18"),
-      quantity: 1,
-      product_id: product_id,
+  it("Should not be able to create a new bathc, Because product not found", async () => {
+    const batchDatanew: IBatch = ({
+      expirantionDate: new Date("2025-01-01T00:00:01.000Z"),
+      quantity: 0,
+      product_id: 999999999999,
     });
 
-    const createBatch = await BatchService.create(batchData);
-
-    await expect(createBatch).toHaveProperty("batch.id");
+    await expect (async () => await BatchService.create(batchDatanew)).rejects.toThrowError("Product not found")
   });
-  
-  it("Should be able to create a new batch with eValidationStatus 3", async () => {
-    const batchData = new Batch({
-      expirantionDate:  new Date("2024-10-31T10:05:00.000Z"),
-      quantity: 1,
+  it("Should not be able to create a new batch, because expirationDate already exists", async () =>{
+    const batchDatanew: IBatch = ({
+      expirantionDate: new Date("2026-01-01T00:00:01.000Z"),
+      quantity: 0,
       product_id: product_id,
     });
-
-    const createBatch = await BatchService.create(batchData);
-
-    await expect(createBatch).toHaveProperty("batch.id");
-    const idParaApagarBatch = ((await batchService.findBatch(batchData)).batch?.id)
-    console.log(idParaApagarBatch)
-    await prisma.batch.delete({where: {id: idParaApagarBatch}});
+    const createBatch = await BatchService.create(batchDatanew);
+    await expect (async () => await BatchService.create(batchDatanew)).rejects.toThrowError("Batch with expiration date already exists")
+    await prisma.batch.delete({where:{id: createBatch.batch?.id}});
   });
-
+  it("Should be able to find a batch", async () => {
+    const batchDatanew: IBatch = ({
+      expirantionDate: new Date("2027-01-01T00:00:01.000Z"),
+      quantity: 0,
+      product_id: product_id,
+    });
+    const createBatch = await BatchService.create(batchDatanew);
+    batchDatanew.id = createBatch.batch?.id;
+    const findBatch = await BatchService.find(batchDatanew);
+    
+    await expect(findBatch).toHaveProperty("batch");
+    await prisma.batch.delete({where:{id: findBatch.batch.id}});
+  });
+  it("Should not be possible to find a batch, because batch not found", async () => {
+    const batchDatanew: IBatch = ({
+      expirantionDate: new Date("2027-01-01T00:00:01.000Z"),
+      quantity: 0,
+      product_id: product_id,
+    });
+    await expect(async () => await BatchService.find(batchDatanew)).rejects.toThrowError("Batch not found")
+  });
   it("Should be able to delete a batch", async () => {
-    const batchDatanew = new Batch({
-      expirantionDate: new Date("2024-10-02"),
-      quantity: 1,
+    const batchDatanew = new IBatch({
+      expirantionDate: new Date("2028-01-01T00:00:01.000Z"),
+      quantity: 0,
       product_id: product_id,
     });
-    batchDatanew.id = (await batchService.findBatch(batchDatanew)).batch?.id
-    console.log(batchDatanew)
-    const batchDeleted = await batchService.delete(batchDatanew) 
+    const createBatch = await BatchService.create(batchDatanew);
+    batchDatanew.id = createBatch.batch!.id
+    const batchDeleted = await BatchService.delete(batchDatanew) 
 
     await expect(batchDeleted.status).toBe(true);
   });
-/*
+ 
+
   afterAll(async () => {
-    const batchencontrado = await prisma.batch.findFirst({where: {product_id: product_id}});
-    console.log(batchencontrado)
-    const encontrado = await prisma.product.findUnique({where: {id: product_id}});
-    console.log(encontrado)
     await prisma.product.delete({where: {id: product_id}});
     await prisma.category.delete({where: {id: category_id}});
   });
 });
-*/

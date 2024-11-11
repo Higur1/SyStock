@@ -68,7 +68,7 @@ async function batch_routes(app: FastifyInstance) {
   app.delete("/batch/:id", { preHandler: auth_middleware }, BatchController.delete);
 };
 async function fill_routes(app: FastifyInstance){
-  //app.post("/fill", {preHandler: auth_middleware}, FillController.);
+  app.post("/fill", {preHandler: auth_middleware}, FillController.create);
   app.get("/fill", {preHandler: auth_middleware}, FillController.findAll);
   app.get("/fill/findById/:id", {preHandler: auth_middleware}, FillController.findById);
   app.get("/fill/findBySupplierName/:id", {preHandler: auth_middleware}, FillController.findBySupplierId);

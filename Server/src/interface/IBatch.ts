@@ -2,7 +2,7 @@ import Batch_Fill from "./IBatchFill";
 
 interface InterfaceBatch {
     id?: number;
-    expirantionDate: Date;
+    expirantionDate?: Date;
     quantity: number;
     deletationStatus?: boolean;
     dateTimeEmptyStock?: Date;
@@ -30,27 +30,27 @@ class IBatch {
             this.quantity = quantity;
         this.deletationStatus = false;
         this.product_id = product_id;
-        this.expirantionDate.setDate(this.expirantionDate.getDate()+1)
-        this.expirantionDate.setHours(-3);
-        this.expirantionDate.setMinutes(0);
-        this.expirantionDate.setSeconds(0);
-        this.expirantionDate.setMilliseconds(0);
+        this.expirantionDate?.setDate(this.expirantionDate?.getDate()+1)
+        this.expirantionDate?.setHours(-3);
+        this.expirantionDate?.setMinutes(0);
+        this.expirantionDate?.setSeconds(0);
+        this.expirantionDate?.setMilliseconds(0);
         const dateNow = new Date();
         dateNow.setHours(-3);
         dateNow.setMinutes(0);
         dateNow.setSeconds(0);
         dateNow.setMilliseconds(0);
-        if ((expirantionDate.toISOString() === dateNow.toISOString()) || (dateNow.toISOString() > expirantionDate.toISOString())) {
+        if ((expirantionDate != undefined && expirantionDate?.toISOString() === dateNow.toISOString()) || expirantionDate != undefined && (dateNow.toISOString() > expirantionDate.toISOString())) {
             this.eValidationStatus = 1;
         }
         else {
             const dateCalcValidadeProxima = dateNow
             dateCalcValidadeProxima.setDate(dateNow.getDate() + 7)
             
-            if (expirantionDate.toISOString() <= dateCalcValidadeProxima.toISOString()) {
+            if (expirantionDate != undefined && expirantionDate?.toISOString() <= dateCalcValidadeProxima.toISOString()) {
                 this.eValidationStatus = 2;
             }
-            else if (expirantionDate.toISOString() > dateCalcValidadeProxima.toISOString()) {
+            else if (expirantionDate != undefined && expirantionDate?.toISOString() > dateCalcValidadeProxima.toISOString()) {
                 this.eValidationStatus = 3;
             }
         }
