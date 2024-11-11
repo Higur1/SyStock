@@ -1,29 +1,12 @@
 import { prisma } from "../config/prisma";
 import IProduct from "../interface/IProduct";
 import IBatch from "../interface/IBatch";
-import batch from "./BatchModel";
-import User from "../interface/IUser";
 import {dateBase} from "../functions/baseFunctions";
 
 export default class ProductService {
   static async findAll() {
     try {
-      const products = await prisma.$queryRaw`
-        SELECT
-          id,
-          name,
-          price,
-          costPrice,
-          minimunQuantity,
-          observation,
-          totalQuantityInStock,
-          CASE 
-            WHEN category_id IS NULL THEN 'Generic'
-            ELSE category_id
-          END AS category_id
-          FROM product
-          WHERE excludedStatus = false
-      ` 
+      const products = await prisma.product.findMany();
       return products != null
         ? { status: true, products: products }
         : { status: false, products: {} };
@@ -59,7 +42,7 @@ export default class ProductService {
             minimunQuantity: productData.minimunQuantity,
             observation: productData.observation ?? "",
             totalQuantityInStock: 0,
-            category_id: productData.category_id,
+            category_id: productData.category_id ?? 1,
             excludedStatus: false,
           },
           select: {

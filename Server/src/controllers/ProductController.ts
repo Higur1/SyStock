@@ -42,13 +42,13 @@ export default class ProductController {
                 minimunQuantity,
                 observation,
                 totalQuantityInStock: 0,
-                category_id: category_id ?? 0
+                category_id: category_id ?? 1
               };
 
               const createdResult = await ProductService.create(productData);
 
               response.status(201).send(JSON.stringify({
-                Product: createdResult.product
+                Product: createdResult.createResult?.product
               }));
         } catch (error) {
             if (error.message === "Name already exists") {
