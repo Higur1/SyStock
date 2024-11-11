@@ -41,7 +41,7 @@ export default function MyUser({ type, user, handleConfirm, onClose }) {
   const [page, setPage] = useState(PAGETYPE.MAIN);
   const [content, setContent] = useState({content: "", confirmContent: ""});
   const [error, setError] = useState(false);
-  const isEditUser = type === TYPE_USER_DIALOG.EDIT;
+  const isEditUser = true;
 
   async function saveEmail() {
     if(content.content !== content.confirmContent) return setError(true);
@@ -97,8 +97,8 @@ export default function MyUser({ type, user, handleConfirm, onClose }) {
 
         {[PAGETYPE.EMAIL, PAGETYPE.PASSWORD].includes(page) && (
           <Container>
-            <TextField type={PAGETYPE.PASSWORD === page ? "password" : "text"} variant="standard" label={page === PAGETYPE.EMAIL ? "Novo e-mail" : "Nova senha"} style={{ gridArea: "name" }} value={content.content} onChange={(e) => onChange("content", e.target.value)}/>
-            <TextField type={PAGETYPE.PASSWORD === page ? "password" : "text"} variant="standard" label={page === PAGETYPE.EMAIL ? "Confirmar novo e-mail" : "Confirmar nova senha"} style={{ gridArea: "email" }} value={content.confirmContent} onChange={(e) => onChange("confirmContent", e.target.value)}/>
+            <TextField type={PAGETYPE.PASSWORD === page ? "password" : "email"} variant="standard" label={page === PAGETYPE.EMAIL ? "Novo e-mail" : "Nova senha"} style={{ gridArea: "name" }} value={content.content} onChange={(e) => onChange("content", e.target.value)}/>
+            <TextField type={PAGETYPE.PASSWORD === page ? "password" : "email"} variant="standard" label={page === PAGETYPE.EMAIL ? "Confirmar novo e-mail" : "Confirmar nova senha"} style={{ gridArea: "email" }} value={content.confirmContent} onChange={(e) => onChange("confirmContent", e.target.value)}/>
             {error && (<span style={{color: 'red'}}>Verifique se as informações estão equivalentes</span>)}
           </Container>
         )}

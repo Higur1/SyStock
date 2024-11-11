@@ -78,7 +78,7 @@ export default function EditUserDialog({ type, user: account = new Account({}), 
       
       <DialogActions>
         <Button startIcon={<Close />} onClick={onClose}>Cancelar</Button>
-        <Button variant="contained" startIcon={<Save />} onClick={onConfirm}>Salvar</Button>
+        <Button variant="contained" disabled={[user.name, user.email].includes("")} startIcon={<Save />} onClick={onConfirm}>Salvar</Button>
       </DialogActions>
     </Dialog>
   )

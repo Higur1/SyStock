@@ -2,6 +2,7 @@
 import Account from "../../classes/Account";
 import HTTPClient from "../../utils/HTTPClient";
 import UsersMappers from "./Mappers/UsersMappers";
+import { PreUsersValidations } from "./Validations/UsersValidations";
 
 export default class UsersActions {
   static mapper = new UsersMappers();
@@ -23,6 +24,9 @@ export default class UsersActions {
 
   static async createPreUser(user = new Account({})) {
     const ClientUser = new HTTPClient("/preuser");
+
+    const validationError = PreUsersValidations(user);
+    if(validationError !== null) return Promise.reject(validationError);
 
     return ClientUser.post(this.mapper.toServerPreUser(user));
   }
