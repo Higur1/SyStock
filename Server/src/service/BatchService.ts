@@ -71,7 +71,7 @@ export default class BatchService {
             if (findProduct.product == undefined) {
                 throw new Error("Product not found")
             };
-            const findResult = await BatchModel.findByProduct(batchData);
+            const findResult = await BatchModel.findByProduct(batchData.product_id);
 
             return findResult;
         } catch (error) {
@@ -93,7 +93,7 @@ export default class BatchService {
     };
     static async subQuantity(batchData: IBatch) {
         try {
-            const findByProduct = await BatchModel.findByProduct(batchData);
+            const findByProduct = await BatchModel.findByProduct(batchData.product_id);
 
             const find = await BatchModel.find(batchData);
             if (find.batch == undefined) {

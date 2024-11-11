@@ -44,7 +44,7 @@ export default class CategoryModel {
       });
       return category != undefined
         ? { status: true, exists: true, category: category }
-        : { status: true, exists: false };
+        : { status: true, exists: false, category: undefined};
     } catch (error) {
       return { status: false, error: error };
     };

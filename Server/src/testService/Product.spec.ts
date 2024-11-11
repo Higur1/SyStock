@@ -33,9 +33,7 @@ describe("Create Product model", () => {
     };
 
     const categoryResult = await CategoryService.create(categoryData);
-    console.log(categoryResult);
     categoryId = categoryResult.category!.id;
-    console.log(categoryId);
 
     const genarateUniqueEmail = `Mock UserEmailInProduct-${String(Date.now())}`;
     userEmail = genarateUniqueEmail;
@@ -62,24 +60,20 @@ describe("Create Product model", () => {
       observation: "De mesa",
       category_id: categoryId,
     });
-    console.log(UserData);
     const createPreUser = await PreUserService.create(PreUserData);
     const createUser = await UserService.create(UserData);
-    console.log(createUser);
     UserData.id = createUser.user?.id;
-    console.log(UserData.id);
     const createProduct = await ProductService.create(ProductData);
+
     await expect(createProduct).toHaveProperty("product.id");
 
-    console.log(createProduct.product?.id);
     const batchFinded = await prisma.batch.findFirst({
       where: { product_id: createProduct.product?.id },
     });
-    console.log(batchFinded);
     await expect(batchFinded).not.toBe(null);
   });
 
-  it("Dado um novo produto X Quando criado com uma  categoria inexistente Então ocorre um erro com a seguinte mensagem: 'Categoria é inexistente' e o bacth nao deve ser criado", async () => {
+  it("Dado um novo produto X Quando criado com uma categoria inexistente Então ocorre um erro com a seguinte mensagem: 'Categoria é inexistente' e o bacth nao deve ser criado", async () => {
     const genarateUniqueProductName = `Mock Product-${String(Date.now())}`;
     let UniqueNameNew = genarateUniqueProductName;
     const ProductData = new IProduct({
@@ -94,8 +88,8 @@ describe("Create Product model", () => {
     const findedUser = await UserService.find(UserData);
     UserData.id = findedUser.user?.id;
     const createProduct = await ProductService.create(ProductData);
-
-    await expect(createProduct.error).toBe("Categoria é inexistente");
+    console.log(createProduct)
+    await expect(createProduct.).rejects.toThrow("Category doesn't found");
     const batchFinded = await prisma.batch.findFirst({
       where: { product_id: createProduct.product?.id },
     });
@@ -124,17 +118,16 @@ describe("Create Product model", () => {
     });
 
     await expect(createProduct.product?.totalQuantityInStock).toBe(0);
-    await expect(excludedStatus).toBe(false);
-    const idParaApagar = (await ProductService.findByName(ProductData)).product
-      ?.id;
-    await prisma.product.update({
+    await expect(excludedStatus?.excludedStatus).toBe(false);
+    const productFinded = (await ProductService.findByName(ProductData)).product;
+    /*await prisma.product.update({
       where: { id: idParaApagar },
-      data: { category_id: undefined },
-    });
+      data: { category_id:  },
+    });*/
+    console.log(productFinded)
     const deleteProduct = await prisma.product.delete({
-      where: { id: idParaApagar },
+      where: { id: productFinded?.id },
     });
-    console.log(deleteProduct);
   });
 
   it("Dado um produto X não existente no BD Quando criado uma instancia do objeto dele Então a quantidade em estoque deve ser 0", async () => {
@@ -164,8 +157,8 @@ describe("Create Product model", () => {
     UserData.id = findedUser.user?.id;
     const createProduct = await ProductService.create(ProductData);
 
-    await expect(createProduct.error).toBe("Name already exists");
-    /*const idParaApagar = (await product.findByName(ProductData)).product?.id
+    await expect(createProduct.error.message).toBe("Name already exists");
+    /*const idParaApagar = (await ProductService.findByName(ProductData)).product?.id
     await prisma.product.delete({where: {id: idParaApagar}});*/
   });
   //pois o produto possui lotes
@@ -185,7 +178,6 @@ describe("Create Product model", () => {
     UserData.id = findedUser.user?.id;
 
     ProductData.id = (await ProductService.findByName(ProductData)).product?.id;
-    console.log(ProductData);
     const batch = new IBatch({
       expirantionDate: new Date("2024-12-30T05:00:00.000Z"),
       quantity: 1,
@@ -247,16 +239,15 @@ describe("Create Product model", () => {
 
     const productExcluded = await ProductService.delete(ProductData);
 
-    expect(productExcluded.message).toBe(
+    expect(productExcluded.error.message).toBe(
       "It is not possible to delete a product that has a quantity greater than zero "
     );
     //deletando batch do produto para poder deletar o produto no metodo abaixo (metodo com o nome Should be able to delete a produto')
-    const idParaApagarBatch = (await batchService.findBatch(batch)).batch?.id;
-    console.log(idParaApagarBatch, batch);
+    const idParaApagarBatch = (await BatchService.find(batch)).batch?.id;
     await prisma.batch.delete({ where: { id: idParaApagarBatch } });
   }),
     it("Should be able to delete a produto", async () => {
-      const ProductData: Product = {
+      const ProductData: IProduct = {
         name: UniqueName,
         price: new Decimal(1500.0),
         costPrice: new Decimal(1000.0),
@@ -267,11 +258,11 @@ describe("Create Product model", () => {
         category_id: categoryId,
       };
 
-      ProductData.id = (await product.findByName(ProductData)).product?.id;
-      console.log(ProductData);
-      const productExcluded = await product.delete(ProductData);
-      console.log(productExcluded);
-      expect(productExcluded.status).toBe(true);
+      ProductData.id = (
+        await ProductService.findByName(ProductData)
+      ).product?.id;
+      const productExcluded = await ProductService.delete(ProductData);
+      expect(productExcluded.message).toBe("Product deleted sucessfully!");
     }),
     afterAll(async () => {
       await prisma.category.delete({ where: { id: categoryId } });
