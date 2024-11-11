@@ -41,7 +41,7 @@ export default class ProducService {
       }
       const createResult = await ProducModel.create(productData);
       const batchData: IBatch = {
-        expirantionDate: dateBase(),
+        expirantionDate: undefined,
         product_id: createResult.product!.id,
         quantity: 0,
         deletationStatus: false,
@@ -49,7 +49,6 @@ export default class ProducService {
       };
 
       const returBatch = await BatchModel.create(batchData);
-      console.log(returBatch.error);
       return errorTratado == "" ?
       {createResult} :  {errorTratado}
     } catch (error) {

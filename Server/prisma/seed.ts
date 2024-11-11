@@ -243,24 +243,6 @@ try {
           eValidationStatus: 3,
         },
         {
-          product_id: 3,
-          quantity: 15,
-          deletionStatus: false,
-          eValidationStatus: 4,
-        },
-        {
-          product_id: 4,
-          quantity: 7,
-          deletionStatus: false,
-          eValidationStatus: 4,
-        },
-        {
-          product_id: 5,
-          quantity: 15,
-          deletionStatus: false,
-          eValidationStatus: 4,
-        },
-        {
           product_id: 6,
           quantity: 9,
           deletionStatus: false,
@@ -282,6 +264,24 @@ try {
           eValidationStatus: 3,
         },
         {
+          product_id: 3,
+          quantity: 15,
+          deletionStatus: false,
+          eValidationStatus: 4,
+        },
+        {
+          product_id: 4,
+          quantity: 7,
+          deletionStatus: false,
+          eValidationStatus: 4,
+        },
+        {
+          product_id: 5,
+          quantity: 15,
+          deletionStatus: false,
+          eValidationStatus: 4,
+        },
+        {
           product_id: 9,
           quantity: 6,
           deletionStatus: false,
@@ -289,7 +289,6 @@ try {
         },
       ],
     }),
-
     /*Create generic supplier*/
     await prisma.supplier.createMany({
       data: [

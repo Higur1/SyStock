@@ -14,12 +14,12 @@ export default class FillController {
         try {
             const batch_fill = z.object({
                 quantity: z.number().positive(),
-                expirationDate: z.date().optional(),
+                expirationDate: z.string().transform((val) => new Date(val)).optional(),
                 product_id: z.number().positive(),
                 price: z.number().positive(),
                 subTotal: z.number().positive(),
                 costPrice: z.number().positive()
-            })
+            })  
             const fillValidation = z.object({
                 supplier_id: z.number().positive().optional(),
                 totalPrice: z.number().positive(),
@@ -29,18 +29,17 @@ export default class FillController {
 
             const {totalPrice, batchs_fill, supplier_id, observation} = fillValidation.parse(request.body);
 
-
+         
             const fillData: IFill = {
                 totalPrice: new Decimal(totalPrice),
                 supplier_id: supplier_id || 1,
                 user_id: getUserToken(request).id,
                 observation: observation || ""
             };
-            
-            const resultFill = await FillService.create(fillData);
 
-            batchs_fill.forEach(async (element) =>
-                {
+            const resultFill = await FillService.create(fillData);
+            
+            for(const element of batchs_fill){
                 const productData: IProduct = {
                     category_id: 1,
                     costPrice: new Decimal(element.costPrice),
@@ -48,12 +47,12 @@ export default class FillController {
                     name: "",
                     price: new Decimal(element.price),
                 }
+                
                 const batchData: IBatch = {
-                    expirantionDate: element.expirationDate || dateBase() ,
+                    expirantionDate: element.expirationDate,
                     product_id: element.product_id, 
                     quantity: element.quantity
                 }
-
                 const batchFill: IBatch_Fill ={
                     costPrice: new Decimal(element.costPrice),
                     subtotal: new Decimal(element.subTotal),
@@ -62,9 +61,8 @@ export default class FillController {
                     fill_id: resultFill.fill!.id
                 }
                 await FillService.relationBatchFill(batchFill, batchData, productData);
-            })
-            
-
+            }
+        
             response.status(201).send(JSON.stringify({
                 Message: "Fill successfully"
             }));
@@ -74,6 +72,7 @@ export default class FillController {
                   Error: error.message
                 }));
               };
+              console.log(error)
               response.status(400).send(JSON.stringify({
                 Error: error.issues[0].message,
               }));

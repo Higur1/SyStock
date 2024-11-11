@@ -22,7 +22,7 @@ export default class BatchModel {
       const createBatch = await prisma.batch.create({
         data: {
           deletionStatus: false,
-          expirationDate: batchData.expirantionDate,
+          expirationDate: batchData.expirantionDate || undefined,
           quantity: batchData.quantity,
           product_id: batchData.product_id,
           eValidationStatus: 1,
@@ -80,7 +80,7 @@ export default class BatchModel {
       const findResult = await prisma.batch.findFirst({
         where: {
           AND: [
-            { expirationDate: batchData.expirantionDate },
+            { expirationDate: batchData.expirantionDate ?? null},
             { product_id: batchData.product_id },
           ],
         },
@@ -131,8 +131,8 @@ export default class BatchModel {
       const batchUpdated = await prisma.batch.update({
         data: {
           quantity: {
-            increment: batchData.quantity,
-          },
+            increment: batchData.quantity
+          }
         },
         where: {
           id: batchData.id,
@@ -159,7 +159,7 @@ export default class BatchModel {
     try {
       await prisma.batch.deleteMany({
         where: {
-          product_id: batchData.product_id,
+          product_id: productId,
         },
       });
       return { status: true };

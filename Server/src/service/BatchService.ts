@@ -93,36 +93,28 @@ export default class BatchService {
     };
     static async subQuantity(batchData: IBatch) {
         try {
-            const findByProduct = await BatchModel.findByProduct(batchData.product_id);
-
             const find = await BatchModel.find(batchData);
             if (find.batch == undefined) {
                 throw new Error("Batch not found");
             };
 
-            if(findByProduct.batchs != undefined && findByProduct.batchs.length > 1){
-                batchData.id = findByProduct.batchs[2].id;
-
-                const subResult = await BatchModel.subQuantityDesc(batchData);
-
-                if (subResult.batch?.quantity == 0) {
-                    await BatchModel.setDateTheBatchWasCleared(batchData);
-                };
-    
-                return subResult
-            }   
-           
             if (find.batch.quantity < batchData.quantity) {
                 throw new Error("Insufficient stock to withdraw quantity");
             };
 
-            const subResult = await BatchModel.subQuantityGeneric(batchData);
+            if(batchData.expirantionDate == undefined){
+                const subResult = await BatchModel.subQuantityGeneric(batchData);
+                if (subResult.batch?.quantity == 0) {
+                    await BatchModel.setDateTheBatchWasCleared(batchData);
+                };
 
+                return subResult;
+            }
+            const subResult = await BatchModel.subQuantityDesc(batchData);
             if (subResult.batch?.quantity == 0) {
                 await BatchModel.setDateTheBatchWasCleared(batchData);
             };
-
-            return subResult
+            return subResult;
             
         } catch (error) {
             throw error;
@@ -131,7 +123,6 @@ export default class BatchService {
     static async delete(batchData: IBatch) {
         try {
             const find = await BatchModel.find(batchData);
-
             if (find.batch == undefined) {
                 throw new Error("Batch not found");
             };

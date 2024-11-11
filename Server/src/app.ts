@@ -8,6 +8,7 @@ import {
   batch_routes,
   preuser_routes,
   login_routes,
+  fill_routes,
 } from "./routes";
 import cors from "@fastify/cors";
 
@@ -26,6 +27,7 @@ app.register(supplier_routes)
 app.register(product_routes)
 app.register(preuser_routes)
 app.register(login_routes)
+app.register(fill_routes);
 
 
 
