@@ -31,6 +31,13 @@ export default class FillModel {
         try {
             const fillFinded = await prisma.fill.findUnique({
                 where: { id: fill.id },
+                include:{
+                    Batch_Fill: {
+                        select:{
+                            batch_id: true
+                        }
+                    }
+                }
             });
             return fill != undefined ? { status: true, exists: true, fill: fillFinded } 
                                      : { status: true, exists: false, fill: undefined };

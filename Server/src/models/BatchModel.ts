@@ -181,4 +181,40 @@ export default class BatchModel {
       return { status: false, error: error };
     }
   }
+  static async expiredBatchs(date: Date){
+    try {
+      const list = await prisma.batch.findMany({
+        where:{
+          expirationDate:{
+            lt: date
+          },
+          deletionStatus: false
+        },
+        include:{
+          product_id_fk: true
+        }
+      })
+      return list != undefined ? {status: true, exists: true, list: list} : {status: true, exists: false, list:{}}
+    } catch (error) {
+      return { status: false, error: error };
+    }
+  }
+  static async closeToExpiration(date: Date){
+    try {
+      const list = await prisma.batch.findMany({
+        where:{
+          expirationDate:{
+            lte: date,
+            gte: new Date()
+          }
+        },
+        include:{
+          product_id_fk: true
+        }
+      })
+      return list != null ? {status: true, exists: true, list: list} : {status: true, exists: false, list: {}}
+    } catch (error) {
+      return { status: false, error: error };
+    }
+  }
 }

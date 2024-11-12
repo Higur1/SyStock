@@ -48,7 +48,7 @@ export default class ProductController {
               const createdResult = await ProductService.create(productData);
 
               response.status(201).send(JSON.stringify({
-                Product: createdResult.createResult?.product
+                Product: createdResult.product
               }));
         } catch (error) {
             if (error.message === "Name already exists") {
@@ -283,4 +283,76 @@ export default class ProductController {
             }));
         };
     };
+    static async listExpired(request, response){
+        try {
+            const listResult = await ProductService.expired();
+
+            response.status(200).send(JSON.stringify({
+                Products: listResult.list
+            }));
+        } catch (error) {
+            if (error.message === "Internal Server Error") {
+                return response.status(500).send(JSON.stringify({
+                    Error: error.message
+                }));
+            };
+            response.status(400).send(JSON.stringify({
+                Error: error.issues[0].message,
+            }));
+        }
+    }
+    static async listZeroStock(request, response){
+        try {
+            const listResult = await ProductService.zeroStock();
+
+            response.status(200).send(JSON.stringify({
+                Products: listResult.list
+            }));
+        } catch (error) {
+            if (error.message === "Internal Server Error") {
+                return response.status(500).send(JSON.stringify({
+                    Error: error.message
+                }));
+            };
+            response.status(400).send(JSON.stringify({
+                Error: error.issues[0].message,
+            }));
+        }
+    }
+    static async listLowQuantity(request, response){
+        try {
+            const listResult = await ProductService.lowQuantity();
+
+            response.status(200).send(JSON.stringify({
+                Products: listResult.list
+            }));
+        } catch (error) {
+            if (error.message === "Internal Server Error") {
+                return response.status(500).send(JSON.stringify({
+                    Error: error.message
+                }));
+            };
+            response.status(400).send(JSON.stringify({
+                Error: error.issues[0].message,
+            }));
+        }
+    }
+    static async listCloseToExpiration(request, response){
+        try {
+            const listResult = await ProductService.closeToExpiration();
+
+            response.status(200).send(JSON.stringify({
+                Products: listResult.list
+            }));
+        } catch (error) {
+            if (error.message === "Internal Server Error") {
+                return response.status(500).send(JSON.stringify({
+                    Error: error.message
+                }));
+            };
+            response.status(400).send(JSON.stringify({
+                Error: error.issues[0].message,
+            }));
+        }
+    }
 };

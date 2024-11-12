@@ -58,6 +58,10 @@ async function product_routes(app: FastifyInstance) {
   app.get("/product/category/:category_id",{ preHandler: auth_middleware },ProductController.findByCategory);
   app.put("/product",{ preHandler: auth_middleware },ProductController.update);
   app.delete("/product/:id",{ preHandler: auth_middleware },ProductController.delete);
+  app.get("/products/expired", {preHandler: auth_middleware}, ProductController.listExpired)
+  app.get("/products/zeroStock", {preHandler: auth_middleware}, ProductController.listZeroStock)
+  app.get("/products/lowQuantity", {preHandler: auth_middleware}, ProductController.listLowQuantity)
+  app.get("/products/closeToExpiration", {preHandler: auth_middleware}, ProductController.listCloseToExpiration)
 };
 async function batch_routes(app: FastifyInstance) {
   app.get("/batchs", { preHandler: auth_middleware }, BatchController.findAll);
