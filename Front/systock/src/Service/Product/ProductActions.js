@@ -7,14 +7,58 @@ import ProductMappers from "./Mappers/ProductMappers";
 export default class ProductActions {
   static mapper = new ProductMappers();
 
-  static async getAll() {
+  static async getAll(categoriesList = null) {
     const Client = new HTTPClient("/products");
 
-    const categories = await CategoryActions.getAll();
+    const categories = categoriesList ? categoriesList : await CategoryActions.getAll();
 
     return Client.get()
       .then(dataObj => {
-        return dataObj.Products.map(products => this.mapper.toInterface(products, {categories}));
+        return dataObj.Products.map(products => this.mapper.toInterface(products, { categories }));
+      })
+  }
+
+  static async getAllExpired(categoriesList = null) {
+    const Client = new HTTPClient("/products/expired");
+
+    const categories = categoriesList ? categoriesList : await CategoryActions.getAll();
+
+    return Client.get()
+      .then(dataObj => {
+        return dataObj.Products.map(products => this.mapper.toInterface(products, { categories }));
+      })
+  }
+
+  static async getAllEmpty(categoriesList = null) {
+    const Client = new HTTPClient("/products/zeroStock");
+
+    const categories = categoriesList ? categoriesList : await CategoryActions.getAll();
+
+    return Client.get()
+      .then(dataObj => {
+        return dataObj.Products.map(products => this.mapper.toInterface(products, { categories }));
+      })
+  }
+
+  static async getAllLowQuantity(categoriesList = null) {
+    const Client = new HTTPClient("/products/lowQuantity");
+
+    const categories = categoriesList ? categoriesList : await CategoryActions.getAll();
+
+    return Client.get()
+      .then(dataObj => {
+        return dataObj.Products.map(products => this.mapper.toInterface(products, { categories }));
+      })
+  }
+
+  static async getAllCloseToExpiry(categoriesList = null) {
+    const Client = new HTTPClient("/products/closeToExpiration");
+
+    const categories = categoriesList ? categoriesList : await CategoryActions.getAll();
+
+    return Client.get()
+      .then(dataObj => {
+        return dataObj.Products.map(products => this.mapper.toInterface(products, { categories }));
       })
   }
 
@@ -26,7 +70,7 @@ export default class ProductActions {
 
       const category = await CategoryActions.getById(nextProduct.category_id);
 
-      return this.mapper.toInterface(nextProduct, {category});
+      return this.mapper.toInterface(nextProduct, { category });
     } catch (e) {
       console.error("Error:", e);
       throw e;
@@ -40,7 +84,7 @@ export default class ProductActions {
 
       const category = await CategoryActions.getById(nextProduct.category_id);
 
-      return this.mapper.toInterface(nextProduct, {category});
+      return this.mapper.toInterface(nextProduct, { category });
     } catch (e) {
       console.error("Error:", e);
       throw e;
@@ -67,7 +111,7 @@ export default class ProductActions {
 
       const category = await CategoryActions.getById(nextProduct.category_id);
 
-      return this.mapper.toInterface(nextProduct, {category});
+      return this.mapper.toInterface(nextProduct, { category });
     } catch (e) {
       console.error("Error:", e);
       throw e;

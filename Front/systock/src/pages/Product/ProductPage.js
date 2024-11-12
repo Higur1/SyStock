@@ -6,11 +6,13 @@ import { convertMsToDay, extraDateToString } from '../../utils/utils';
 import { ENTITIES } from '../../utils/debug-local-helper';
 import { SuperArray } from '../../utils/arrayFunctions';
 import ProductActions from '../../Service/Product/ProductActions';
+import CategoryActions from '../../Service/Category/CategoryActions';
 
 export const ProductContext = createContext();
 
 export default function ProductPage() {
 
+  const [categories, setCategories] = useState([]);
   const [productsWithoutSupply, setProductsWithoutSupply] = useState([]);
   const [productsBase, setProductsBase] = useState(null);
   const [productsFiltered, setProductsFiltered] = useState(null);
@@ -28,6 +30,20 @@ export default function ProductPage() {
 
     setLoading(false);
   }, [productsFiltered]);
+
+  useEffect(() => {
+    getCategories();
+  }, []);
+
+  async function getCategories() {
+    try {
+      const categories = await CategoryActions.getAll();
+      setCategories(categories);
+    } catch (error) {
+      handleOpenSnackBar("error", error);
+      console.log(error);
+    }
+  }
 
   async function loadProducts() {
     setLoading(true);
@@ -232,7 +248,8 @@ export default function ProductPage() {
         productsWithoutSupply, getProductTotalQuantity,
         getExpiryDatesByProduct,
         loading,
-        loadProducts
+        loadProducts,
+        categories
       }}
     >
       <Product />
