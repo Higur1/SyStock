@@ -2,10 +2,12 @@ import { useEffect, useState, useMemo, useRef } from "react";
 
 // Validation schemas can be passed in dynamically to make the hook more reusable.
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const currencyRegex = /^[0-9]+(\.[0-9]{1,2})?$/;
 
 export const FORM_TYPE = {
   PREUSER: "USER",
-  USER: "CREATE_USER"
+  USER: "CREATE_USER",
+  PRODUCT: "CREATE_PRODUCT"
 };
 
 const defaultValidationMessages = {
@@ -18,6 +20,12 @@ const defaultValidationMessages = {
     user: "Nome de usuário deve conter entre 5 à 10 caracteres",
     password: "Senha deve conter entre 5 à 10 caracteres",
     email: "Email inválido",
+  },
+  [FORM_TYPE.PRODUCT]: {
+    name: "Nome deve conter entre 2 à 20 caracteres",
+    priceSell: "O Preço deve ser um valor positivo e no formato adequado",
+    priceBuy: "O Preço deve ser um valor positivo e no formato adequado",
+    minimumQuantity: "A quantidade deve ser um valor positivo"
   }
 };
 
@@ -38,6 +46,12 @@ const useValidateForm = (entity, formType) => {
       password: (value) => value.length > 5 && value.length < 10,
       email: (value) => emailRegex.test(value),
     },
+    [FORM_TYPE.PRODUCT]: {
+      name: (value) => value.length > 2 && value.length < 20,
+      priceSell: (value) => value >= 0 && currencyRegex.test(value),
+      priceBuy: (value) => value >= 0 && currencyRegex.test(value),
+      minimumQuantity: (value) => value >= 0
+    }
   }), []);
 
   const getValidationMessage = (formType, attribute) => {
@@ -69,10 +83,7 @@ const useValidateForm = (entity, formType) => {
     Object.entries(entity).forEach(([attribute, value]) => {
       if (validateFunctions[formType][attribute]) {
         const result = validateFunctions[formType][attribute](value);
-        console.log("!result",!result);
-        console.log("interacted[attribute]",interacted[attribute]);
         if (!result && interacted[attribute]) {
-          console.log("came here");
           nextError[attribute] = getValidationMessage(formType, attribute);
         }
       }
@@ -88,11 +99,18 @@ const useValidateForm = (entity, formType) => {
 
   console.log({error});
 
+  function resetValidate() {
+    refEntity.current = entity;
+    setError({});
+    setInteracted({});
+  }
+
   return {
     error,
     hasError,
     hasAnyError,
-    hasInteracted
+    hasInteracted,
+    resetValidate
   };
 };
 

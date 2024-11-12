@@ -50,7 +50,7 @@ const columnsBase = {
     { fixedWidth: true, label: "Código de Referência", value: "refCode", width: 120 },
     { fixedWidth: false, width: 200, label: "Nome", value: "name" },
     { fixedWidth: true, width: 200, label: "Categoria", value: "category" },
-    { fixedWidth: true, width: 80, label: "Quantidade Mínima Informada", value: "minimumQuantity" },
+    { fixedWidth: true, width: 120, label: "Quantidade Mínima", value: "minimumQuantity" },
     { fixedWidth: true, width: 80, label: "Quantidade", value: "quantity" },
     { fixedWidth: true, width: 100, label: "Funções", value: "menu" }
   ],
@@ -83,7 +83,7 @@ export default function ProductList(props) {
 
   useEffect(() => {
     getProducts();
-  }, []);
+  }, [filter]);
 
   const columns = useMemo(() => columnsBase[filter], [filter]);
   const MenuActions = useMemo(() => ({
@@ -103,6 +103,7 @@ export default function ProductList(props) {
   }
 
   async function getProducts() {
+    setProducts(null);
     try {
       const products = await get();
       setProducts(products);
@@ -137,7 +138,7 @@ export default function ProductList(props) {
           <TableContainer>
             <TableRow style={{ background: '#DCDCDC', borderRadius: '8px 8px 0px 0px' }}>
               {columns.map((column, i) => (
-                <TableData style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.width, maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }} key={`header-column-${i}`}>{column.label}</TableData>
+                <TableData style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }} key={`header-column-${i}`}>{column.label}</TableData>
               ))}
             </TableRow>
             <div className="customScroll">
@@ -174,7 +175,7 @@ export default function ProductList(props) {
                     }
 
                     return (
-                      <TableData key={`row-${index}-${i}`} style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.width, maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }}>{prod[column.value]}</TableData>
+                      <TableData key={`row-${index}-${i}`} style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }}>{prod[column.value]}</TableData>
                     );
                   })}
                 </TableRow>

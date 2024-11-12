@@ -7,15 +7,9 @@ import { DEBUG_LOCAL, MainContext } from "../../../App";
 import { ENTITIES } from "../../../utils/debug-local-helper";
 import CategoryActions from "../../../Service/Category/CategoryActions";
 import Product from "../../../classes/Product";
-
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="down" ref={ref} {...props} />;
-});
-
-const Title = styled.div`
-  font-size: 24px;
-  font-weight: 700;
-`
+import { ProductContext } from "../ProductPage";
+import useValidateForm, { FORM_TYPE } from "../../../hooks/useValidateForm";
+import ProductActions from "../../../Service/Product/ProductActions";
 
 const Container = styled.div`
   display: flex;
@@ -24,88 +18,62 @@ const Container = styled.div`
   gap: 32px;
   padding-top: 16px;
 `;
-export default function CreateProductDialog(props) {
-  const { handleCreate, error } = props;
+export default function CreateProductDialog({onChangeTab}) {
+  const { categories } = useContext(ProductContext);
+
+  const [values, setValues] = useState({name: "", description: "", priceSell: 0, priceBuy: 0, categoryID: "", minimumQuantity: 0});
+  const [loading, setLoading] = useState(false);
+
+  const { error, hasError, hasInteracted, hasAnyError, resetValidate } = useValidateForm(values, FORM_TYPE.PRODUCT);
 
 
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [priceSell, setPriceSell] = useState(0);
-  const [priceBuy, setPriceBuy] = useState(0);
-  const [categoryID, setCategoryID] = useState("");
-  const [categories, setCategories] = useState([])
-  const [hasError, setHasError] = useState(false);
-  const [hasErrorPrice, setHasErrorPrice] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [minimumQuantity, setMinimumQuantity] = useState(0);
-  const isMount = useRef();
-  const currencyRegex = /^[0-9]+(\.[0-9]{1,2})?$/;
+  const { handleOpenSnackBar } = useContext(MainContext);
 
-  const { getData } = useContext(MainContext);
+  function onChange(type, value) {
+    setValues(prev => ({...prev, [type]: value}))
+  }
 
-  useEffect(() => {
-    if (isMount.current) return;
+  async function onConfirm() {
+    setLoading(true);
+    const product = new Product();
 
-    isMount.current = true;
-    getCategories();
-  }, []);
+    const category = categories.find(cat => cat.id === values.categoryID);
 
-  async function getCategories() {
-    if (DEBUG_LOCAL) {
-      const categArr = getData(ENTITIES.CATEGORIES);
+    product.category = category;
+    product.description = values.description;
+    product.minimumQuantity = values.minimumQuantity;
+    product.name = values.name;
+    product.priceBaseBuy = values.priceBuy;
+    product.priceBaseSell = values.priceSell;
 
-      return setTimeout(() => setCategories(categArr), 350);
-    }
     try {
-      const categories = await CategoryActions.getAll();
-      setCategories(categories);
+      await ProductActions.create(product);
+      reset();
+      handleOpenSnackBar("success", "Produto criado!!", 3000);
     } catch (error) {
-      console.log(error);
+      handleOpenSnackBar("error", error);
+    } finally {
+      setLoading(false);
     }
   }
 
-  const handlePriceChangeSell = e => {
-    let value = e.target.value;
+  // function create() {
+  //   const prod = new Product({});
 
-    if (!currencyRegex.test(value)) {
-      setHasErrorPrice(true);
-    }
-    setPriceSell(e.target.value);
-  }
-
-  const handlePriceChangeBuy = e => {
-    let value = e.target.value;
-
-    if (!currencyRegex.test(value)) {
-      setHasErrorPrice(true);
-    }
-    setPriceBuy(e.target.value);
-  }
-
-  function create() {
-    const prod = new Product({});
-
-    prod.name = name;
-    prod.priceBaseSell = priceSell;
-    prod.priceBaseBuy = priceBuy;
-    prod.minimumQuantity = minimumQuantity;
-    prod.description = description;
-    prod.category = categoryID ? categories.find(cat => cat.id === categoryID) : null;
+  //   prod.name = name;
+  //   prod.priceBaseSell = priceSell;
+  //   prod.priceBaseBuy = priceBuy;
+  //   prod.minimumQuantity = minimumQuantity;
+  //   prod.description = description;
+  //   prod.category = categoryID ? categories.find(cat => cat.id === categoryID) : null;
     
-    handleCreate(prod);
-    reset();
-  }
+  //   handleCreate(prod);
+  //   reset();
+  // }
 
   function reset() {
-    setName("");
-    setDescription("");
-    setPriceBuy(0);
-    setPriceSell(0);
-    setCategoryID("");
-    setHasError(false);
-    setHasErrorPrice(false);
-    setIsLoading(false);
-    setMinimumQuantity(0);
+    setValues({name: "", description: "", priceSell: 0, priceBuy: 0, categoryID: "", minimumQuantity: 0});
+    resetValidate();
   }
 
   return (
@@ -114,57 +82,62 @@ export default function CreateProductDialog(props) {
         <TextField
           required
           label="Nome do Produto"
-          value={name}
-          onChange={(e) => setName(e.target.value.slice(0, 50))}
-          disabled={isLoading}
+          value={values.name}
+          onChange={(e) => onChange("name", e.target.value)}
+          error={hasError("name") && hasInteracted("name")}
+          helperText={error["name"]}
+          disabled={loading}
         />
         <TextField
           label="Preço de Venda"
-          value={priceSell}
-          onChange={handlePriceChangeSell}
+          value={values.priceSell}
+          onChange={(e) => onChange("priceSell", e.target.value)}
           placeholder={"ex: 100.00"}
           name="numberformat"
-          id="formatted-numberformat-input"
-          disabled={isLoading}
-          error={hasErrorPrice}
+          id="formatted-numberformat-input-sell"
+          error={hasError("priceSell") && hasInteracted("priceSell")}
+          disabled={loading}
+          helperText={error["priceSell"]}
           InputProps={{
             startAdornment: <InputAdornment position="start">R$</InputAdornment>
           }}
         />
         <TextField
           label="Preço de Compra"
-          value={priceBuy}
-          onChange={handlePriceChangeBuy}
+          value={values.priceBuy}
+          onChange={(e) => onChange("priceBuy", e.target.value)}
           placeholder={"ex: 100.00"}
           name="numberformat"
-          id="formatted-numberformat-input"
-          disabled={isLoading}
-          error={hasErrorPrice}
+          id="formatted-numberformat-input-buy"
+          error={hasError("priceBuy") && hasInteracted("priceBuy")}
+          disabled={loading}
+          helperText={error["priceBuy"]}
           InputProps={{
             startAdornment: <InputAdornment position="start">R$</InputAdornment>
           }}
         />
         <TextField
           label="Quantidade Mínima"
-          value={minimumQuantity}
-          onChange={(e) => setMinimumQuantity(e.target.value.slice(0, 255))}
-          disabled={isLoading}
+          value={values.minimumQuantity}
+          onChange={(e) => onChange("minimumQuantity", e.target.value)}
+          disabled={loading}
+          helperText={error["minimumQuantity"]}
+          error={hasError("minimumQuantity") && hasInteracted("minimumQuantity")}
           type="number"
         />
         <TextField
           label="Descrição"
-          value={description}
-          onChange={(e) => setDescription(e.target.value.slice(0, 255))}
-          disabled={isLoading}
+          value={values.description}
+          onChange={(e) => onChange("description", e.target.value)}
+          disabled={loading}
         />
         <FormControl>
           <InputLabel id="test-select-label">Categoria do Produto</InputLabel>
           <Select
-            value={categoryID}
-            onChange={(e) => setCategoryID(e.target.value)}
-            labelId="test-select-label"
+            value={values.categoryID}
+            onChange={(e) => onChange("categoryID", e.target.value)}
             label="Categoria"
-            disabled={isLoading}
+            disabled={loading}
           >
             <MenuItem value="">
               <em>None</em>
@@ -175,52 +148,9 @@ export default function CreateProductDialog(props) {
             )}
           </Select>
         </FormControl>
-        {/* <FormControl>
-              <InputLabel id="test-select-label">Supplier</InputLabel>
-              <Select
-                value={supplierID}
-                onChange={(e) => setSupplierID(e.target.value)}
-                labelId="test-select-label"
-                label="Supplier"
-                disabled={isLoading}
-                defaultValue={1}
-              >
-                <MenuItem value='1'>
-                  <em>None</em>
-                </MenuItem>
-                {suppliers.map((cat, index) => (
-                  <MenuItem value={cat.id} key={index}>{cat.name}</MenuItem>
-                )
-                )}
-              </Select>
-            </FormControl> */}
-        <div style={{ color: 'red', display: 'flex', flexDirection: 'column' }}>
-          {hasErrorPrice && <>{"Vírgulas não são necessárias, apenas pontos."}</>}
-          {hasError && <>{"Preencha os campos obrigatórios!"}</>}
-          {error !== null && <>{error.message}</>}
-        </div>
       </Container>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 16 }}>
-        <Button variant={"contained"} onClick={() => {
-          if (description === '' ||
-            priceSell === 0 || priceBuy === 0 ||categoryID === '') {
-            setHasError(true);
-            return;
-          }
-
-          if (!currencyRegex.test(priceSell)) {
-            setHasErrorPrice(true);
-            return;
-          }
-          if (!currencyRegex.test(priceBuy)) {
-            setHasErrorPrice(true);
-            return;
-          }
-
-          setIsLoading(true);
-
-          create();
-        }}>Adicionar</Button>
+        <Button variant={"contained"} disabled={loading || hasAnyError} onClick={onConfirm}>Adicionar</Button>
       </div>
     </div>
   );

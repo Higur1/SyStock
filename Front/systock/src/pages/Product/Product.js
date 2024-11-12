@@ -100,12 +100,7 @@ export default function Product() {
           )}
 
           {tab === TABS.CREATE_PRODUCT && (
-            <CreateProductDialog
-              handleCreate={(prod) => {
-                createProduct(prod);
-              }}
-              error={errorInsert}
-            />
+            <CreateProductDialog onChangeTab={handleChange}/>
           )}
 
           {tab === TABS.ADD_QUANTITY && (<AddSupply onClose={() => handleChange(null, TABS.PRODUCTS_LIST)}/>)}
