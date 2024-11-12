@@ -9,7 +9,7 @@ export const Container = styled.div`
   box-sizing: border-box;
 `
 
-export const Option = styled("div")(({selected}) => ({
+export const Option = styled("div")(({selected = "false"}) => ({
   display: "flex",
   alignItems: "center",
   width: "100%",

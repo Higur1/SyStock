@@ -106,7 +106,7 @@ export default function Sidebar({logOff}) {
         })}
       </div>
       
-      <Option onClick={logOff} selected={`false`}>
+      <Option onClick={logOff} selected={`${Boolean(0)}`}>
         <IconCustom type={"logOut"} />
         <p>{"Sair da Conta"}</p>
       </Option>

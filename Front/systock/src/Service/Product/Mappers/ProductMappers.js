@@ -28,6 +28,7 @@ export default class ProductMappers {
   toInterface({ id, name, price, costPrice, minimunQuantity, observation, totalQuantityInStock, category_id }, {categories, category} = {category: null}) {
     const nextCategory = category ? category : categories.find(cat => cat.id === category_id);
     return new Product({ 
+      id,
       refCode: id,
       name, 
       priceBaseSell: price, 

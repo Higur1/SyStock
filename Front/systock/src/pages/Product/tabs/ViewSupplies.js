@@ -46,6 +46,9 @@ export default function ViewSupplies({handleViewProducts}) {
     try {
       const supplies = await SupplyActions.getAll();
       suppliesBase.current = supplies;
+
+      const suppliersNotFiltered = supplies.map(supply => supply.supplier).filter(supplier => supplier !== null);
+      setSuppliersAutoComplete(suppliersNotFiltered.filter((sup, index) => suppliersNotFiltered.findIndex(supFind => supFind.id === sup.id) === index));
     } catch (error) {
       handleOpenSnackBar("error", error);
       suppliesBase.current = [];

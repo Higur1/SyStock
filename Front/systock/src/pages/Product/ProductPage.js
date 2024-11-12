@@ -194,19 +194,11 @@ export default function ProductPage() {
    * * delete product by id
    * @param {*} id 
    */
-  async function handleDeleteProduct(index) {
-    const obj = productsFiltered.find(prod => prod.id === index);
-    if (DEBUG_LOCAL) {
-      const nextProducts = productsBase.filter(cat => cat.id !== obj.id);
-
-      setFilteredProducts(nextProducts);
-      setProductsBase(nextProducts);
-      return updateData(ENTITIES.PRODUCTS, nextProducts);
-    }
-
+  async function handleDeleteProduct(product) {
+    console.log(product);
     try {
-      await ProductActions.delete(obj.id);
-      const updatedProducts = productsBase.filter(cat => cat.id !== obj.id);
+      await ProductActions.delete(product.id);
+      const updatedProducts = productsBase.filter(cat => cat.id !== product.id);
       setFilteredProducts(updatedProducts);
       setProductsBase(updatedProducts);
     } catch (e) {

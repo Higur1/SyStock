@@ -1,11 +1,11 @@
 import React, { useContext, useState } from 'react'
 import CircularLoading from '../../../components/common/CircularLoading';
 import { ContainerProductsList, MenuOption, TableContainer, TableData, TableRow } from '../styles';
-import { ClickAwayListener, Divider, FormControlLabel, IconButton, Menu, Radio, RadioGroup } from '@mui/material';
+import { ClickAwayListener, Divider, FormControlLabel, IconButton, Menu, MenuItem, Radio, RadioGroup } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { ProductContext } from '../ProductPage';
 import { formatDate } from '../../../utils/utils';
-import { Delete, Edit, Search } from '@mui/icons-material';
+import { Delete, Edit, MoreVert, Search } from '@mui/icons-material';
 import NoData from '../../../components/common/NoData';
 
 
@@ -41,7 +41,7 @@ const columns = {
     { fixedWidth: false, width: 200, label: "Nome", value: "name" },
     { fixedWidth: true, width: 200, label: "Categoria", value: "category" },
     { fixedWidth: true, width: 100, label: "Quantidade Total", value: "totalQuantity" },
-    { fixedWidth: true, width: 80, label: "Quantidade nessa Validade", value: "totalQuantitySameExpiry" },
+    { fixedWidth: true, width: 120, label: "Quantidade nessa Validade", value: "totalQuantitySameExpiry" },
     { fixedWidth: true, width: 100, label: "Funções", value: "menu" }
   ],
   [FILTER_TYPES.LOW_QUANTITY]: [
@@ -73,6 +73,16 @@ export default function ProductList(props) {
 
   const { handleEditProductDialog, handleDeleteProductDialog } = props;
   const { productsBase, productsFiltered, filter, handleFilter, loading } = useContext(ProductContext);
+
+  const [menu, setMenu] = useState({anchor: null, prod: null});
+
+  function openMenu(e,prod) {
+    setMenu({anchor: e.currentTarget, prod});
+  }
+
+  function closeMenu() {
+    setMenu({anchor: null, prod: null});
+  }
 
   return (
     <ContainerProductsList>
@@ -115,14 +125,8 @@ export default function ProductList(props) {
                     if (column.value === "menu") {
                       return (
                         <TableData style={{ justifyContent: 'center', gap: 8, width: column.width, maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }} key={`row-${index}-${i}`}>
-                          <IconButton onClick={() => { }}>
-                            <Search fontSize='small' />
-                          </IconButton>
-                          <IconButton onClick={() => handleEditProductDialog(index)}>
-                            <Edit fontSize='small' />
-                          </IconButton>
-                          <IconButton onClick={() => handleDeleteProductDialog(index)}>
-                            <Delete fontSize='small' />
+                          <IconButton onClick={(e) => openMenu(e,prod)}>
+                            <MoreVert />
                           </IconButton>
                         </TableData>
                       )
@@ -151,6 +155,18 @@ export default function ProductList(props) {
         }
       </div>
 
+      {menu.anchor !== null && (
+        <Menu
+          id="simple-menu"
+          anchorEl={menu.anchor}
+          keepMounted
+          open
+          onClose={closeMenu}
+        >
+          <MenuItem onClick={() => handleEditProductDialog(menu.prod)}>Editar Produto</MenuItem>
+          <MenuItem onClick={() => handleDeleteProductDialog(menu.prod)}>Excluir Produto</MenuItem>
+        </Menu>
+      )}
     </ContainerProductsList>
   )
 }

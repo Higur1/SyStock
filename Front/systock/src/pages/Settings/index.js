@@ -3,7 +3,7 @@ import { Container, TableContainer, TableData, TableRow } from './styles'
 import { Button, IconButton, Menu, MenuItem, Popper, TextField } from '@mui/material'
 import { MoreVert, Person } from '@mui/icons-material'
 import { SettingsContext } from './SettingsPage'
-import EditUserDialog, { TYPE_USER_DIALOG } from './dialogs/EditUser'
+import NewUserDialog, { TYPE_USER_DIALOG } from './dialogs/NewUser'
 import Account from '../../classes/Account'
 import { MainContext } from '../../App'
 import MyUser from './dialogs/MyUser'
@@ -124,7 +124,7 @@ export default function Settings() {
         </div>
       </div>
       {editDialogProps.open && (
-        <EditUserDialog
+        <NewUserDialog
           type={editDialogProps.type}
           user={editDialogProps.user || new Account({})}
           onClose={() => setEditDialogProps({open: false, user: null})}

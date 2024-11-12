@@ -61,12 +61,12 @@ export default function Product() {
     isMountRef.current = true;
   }, []); 
 
-  function handleEditProductDialog(index) {
-    setDialog({ type: TYPES_DIALOG.EDIT_PRODUCT, index });
+  function handleEditProductDialog(prod) {
+    setDialog({ type: TYPES_DIALOG.EDIT_PRODUCT, prod });
   }
 
-  function handleDeleteProductDialog(index) {
-    setDialog({ type: TYPES_DIALOG.DELETE_PRODUCT, index });
+  function handleDeleteProductDialog(prod) {
+    setDialog({ type: TYPES_DIALOG.DELETE_PRODUCT, prod });
   }
 
   function closeDialog() {
@@ -124,11 +124,11 @@ export default function Product() {
         handleClose={closeDialog}
         error={errorInsert}
         open
-        product={productsFiltered[dialog.index]}
+        product={dialog.prod}
       />
       }
 
-      {dialog.type === TYPES_DIALOG.DELETE_PRODUCT && (<DeleteProductDialog closeDialog={closeDialog} index={dialog.index} />)}
+      {dialog.type === TYPES_DIALOG.DELETE_PRODUCT && (<DeleteProductDialog closeDialog={closeDialog} product={dialog.prod} />)}
 
       {dialog.type === TYPES_DIALOG.VIEW_PRODUCTS_BY_SUPPLY && (<ViewProductsBySupply supply={dialog.supply} onClose={closeDialog} />)}
     </>

@@ -4,7 +4,7 @@ import { ProductContext } from '../ProductPage';
 
 export default function DeleteProductDialog(props) {
 
-  const { closeDialog, index } = props;
+  const { closeDialog, product } = props;
   const { handleDeleteProduct } = useContext(ProductContext);
 
   return (
@@ -13,11 +13,11 @@ export default function DeleteProductDialog(props) {
       maxWidth="md"
       fullWidth
     >
-      <DialogTitle>{"Deseja  mesmo apagar essa categoria?"}</DialogTitle>
+      <DialogTitle>{"Deseja  mesmo apagar esse produto?"}</DialogTitle>
       <DialogActions>
         <Button onClick={closeDialog}>Cancelar</Button>
         <Button onClick={() => {
-          handleDeleteProduct(index);
+          handleDeleteProduct(product);
           closeDialog();
         }}>Confirmar</Button>
       </DialogActions>
