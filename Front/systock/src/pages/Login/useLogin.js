@@ -96,11 +96,9 @@ export const useLogin = () => {
     const account = new Account({...firstAccess});
 
     try {
-      const userCreated = await UsersActions.create(account);
-
-      if(!(userCreated instanceof Account)) return;
-
+      await UsersActions.create(account);
       handleOpenSnackBar('success','O usuário foi criado!', 3000);
+      handleScreen("login");
     } catch (e) {
       
       handleOpenSnackBar('error',e, 3000);

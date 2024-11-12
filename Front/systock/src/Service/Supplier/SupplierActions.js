@@ -12,7 +12,7 @@ export default class SupplierActions {
     return Client.get()
       .then(dataObj => {
         if(!dataObj?.Suppliers?.suppliers) return [];
-        return dataObj.Suppliers.suppliers.map(this.mapper.toInterface);
+        return dataObj.Suppliers.suppliers.map(this.mapper.toInterface).filter(obj => obj.id !== 1);
       })
   }
 

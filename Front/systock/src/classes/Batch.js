@@ -14,9 +14,13 @@ export default class Batch extends Product {
    * @param {number} [options.quantity=0] - The quantity of the product in the batch.
    * @param {Date|null} [options.expiry=null] - The expiry date of the batch, or null if not applicable.
    * @param {Supplier|null} [options.supplier=null] - The supplier;
+   * @param {number} [options.supplierID=0] - The supplier;
+   * @param {number} [options.productID=0] - The supplier;
    */
-  constructor({ product = new Product(), priceBuy = 0, priceSell = 0, quantity = 0, expiry = null, supplier = null } = {}) {
+  constructor({ product = new Product(), priceBuy = 0, priceSell = 0, quantity = 0, expiry = null, supplier = null, supplierID = 0, productID = 0 } = {}) {
     super(product);
+    this.supplierID = supplierID;
+    this.productID = productID;
     
     /**
      * The buying price of the batch.

@@ -113,8 +113,6 @@ function App() {
     window.location.pathname = 'login';
   }
 
-
-  console.log(tokenRef);
   return (
     <MainContext.Provider value={{
       isLoggedIn, navigate, setIsLoggedIn,

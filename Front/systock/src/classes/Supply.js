@@ -8,9 +8,16 @@ export default class Supply {
    * @param {Object} options - The options for the Supply instance.
    * @param {Batch[]} [options.batches=[]] - An array of Batch instances associated with the supply.
    * @param {string} [options.description=""] - The description of the supply.
+   * @param {String} [options.totalValue="0"] - The total of the supply.
+   * @param {String} [options.dateInsert=""] - The total of the supply.
+   * @param {Number} [options.id=0] - The total of the supply.
    * @param {Supplier|null} [options.supplier=null] - The supplier of the supply;
+   * @param {number} [options.supplierID=0] - The supplier;
    */
-  constructor({ batches = [], description = "", supplier = null } = {}) {
+  constructor({ id = 0, batches = [], description = "", supplier = null, totalValue = "0", supplierID = 0, dateInsert = new Date().toString() } = {}) {
+    this.id = id;
+    this.supplierID = supplierID;
+    this.dateInsert = dateInsert;
     /**
      * An array of Batch instances.
      * @type {Batch[]}
@@ -29,6 +36,11 @@ export default class Supply {
      */
     this.supplier = supplier;
 
+    /**
+     * The description of the supply.
+     * @type {Number}
+     */
+    this.totalValue = totalValue;
   }
 
   /**

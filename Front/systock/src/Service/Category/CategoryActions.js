@@ -12,7 +12,7 @@ export default class CategoryActions {
 
     return Client.get()
       .then(dataObj => {
-        return dataObj.Categories.map(this.mapper.toInterface);
+        return dataObj.Categories.map(this.mapper.toInterface).filter(obj => obj.id !== 1);
       })
   }
 

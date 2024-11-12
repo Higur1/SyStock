@@ -5,12 +5,13 @@ import { ENTITIES } from '../../../utils/debug-local-helper';
 import { TableContainer, TableData, TableRow } from '../styles';
 import { formatDate } from '../../../utils/utils';
 import { Visibility } from '@mui/icons-material';
+import SupplyActions from '../../../Service/Supply/SupplyActions';
 
 const columns = [
   { value: "dateInsert", label: "Data e Hora"},
   { value: "id", label: "Código do Abastecimento"},
   { value: "supplier", label: "Fornecedor"},
-  { value: "totalCost", label: "Total do Custo"},
+  { value: "totalValue", label: "Total do Custo"},
   { value: "description", label: "Observação"},
   { value: "products", label: "Produtos"}
 ];
@@ -18,18 +19,14 @@ const columns = [
 export default function ViewSupplies({handleViewProducts}) {
   const suppliesBase = useRef();
 
+  const { handleOpenSnackBar } = useContext(MainContext);
+
   const [suppliersAutoComplete, setSuppliersAutoComplete] = useState([]);
   const [filteredSupplier, setFilteredSupplier] = useState(null);
   const [supplies, setSupplies] = useState([]);
 
-  const { getData } = useContext(MainContext);
-
   useEffect(() => {
-    const arr = getData(ENTITIES.SUPPLIERS);
-    suppliesBase.current = getData(ENTITIES.SUPPLY_LIST);
-    setSuppliersAutoComplete(arr);
-
-    filterList(suppliesBase.current, null);
+    getBatches();
   }, []);
 
   useEffect(() => {
@@ -45,6 +42,18 @@ export default function ViewSupplies({handleViewProducts}) {
     setSupplies(nextFilteredList);
   }
 
+  async function getBatches() {
+    try {
+      const supplies = await SupplyActions.getAll();
+      suppliesBase.current = supplies;
+    } catch (error) {
+      handleOpenSnackBar("error", error);
+      suppliesBase.current = [];
+    } finally {
+      filterList(suppliesBase.current, filteredSupplier);
+    }
+  }
+  
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16, height: "100%", width: "100%", alignItems: 'center' }}>
       <span style={{ fontWeight: 600, textAlign: 'center' }}>
@@ -93,7 +102,7 @@ export default function ViewSupplies({handleViewProducts}) {
 
                   if (column.value === "supplier") {
                     return (
-                      <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{prod[column.value].name}</TableData>
+                      <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{prod[column.value]?.name}</TableData>
                     );
                   }
                   if (column.value === "dateInsert") {

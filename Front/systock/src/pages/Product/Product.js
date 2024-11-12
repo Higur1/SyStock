@@ -13,7 +13,7 @@ import ProductList from "./tabs/productList";
 import { ProductContext } from "./ProductPage";
 import DeleteProductDialog from "./dialogs/DeleteProductDialog";
 import ViewSupplies from "./tabs/ViewSupplies";
-import ViewProducts from "./dialogs/ViewProducts";
+import ViewProductsBySupply from "./dialogs/ViewProductsBySupply";
 import ChangeQuantityProduct from "./tabs/ChangeQuantityProductDialog";
 
 
@@ -31,7 +31,7 @@ const TYPES_DIALOG = {
   EDIT_PRODUCT: 3,
   DELETE_PRODUCT: 4,
   VIEW_SUPPLIES: 5,
-  VIEW_PRODUCTS: 6
+  VIEW_PRODUCTS_BY_SUPPLY: 6
 }
 
 const tabsList = [
@@ -45,7 +45,7 @@ const tabsList = [
 export default function Product() {
   const isMountRef = useRef(false);
 
-  const { productsFiltered, createProduct, errorInsert, updateProduct, loadProducts, loadSupplies } = useContext(ProductContext);
+  const { productsFiltered, createProduct, errorInsert, updateProduct, loadProducts, } = useContext(ProductContext);
 
   const [dialog, setDialog] = useState({ type: TYPES_DIALOG.NONE });
   const [tab, setTab] = useState(TABS.PRODUCTS_LIST);
@@ -53,7 +53,6 @@ export default function Product() {
   useEffect(() => {
     if(!isMountRef) return;
     if(!isMountRef.current) return;
-    if(tab === TABS.VIEW_SUPPLIES) loadSupplies();
     if(tab !== TABS.PRODUCTS_LIST) return;
     loadProducts();
   }, [tab]);
@@ -79,7 +78,7 @@ export default function Product() {
   };
 
   function handleViewProducts(supply) {
-    setDialog({ type: TYPES_DIALOG.VIEW_PRODUCTS, supply});
+    setDialog({ type: TYPES_DIALOG.VIEW_PRODUCTS_BY_SUPPLY, supply});
   }
 
   return (
@@ -131,7 +130,7 @@ export default function Product() {
 
       {dialog.type === TYPES_DIALOG.DELETE_PRODUCT && (<DeleteProductDialog closeDialog={closeDialog} index={dialog.index} />)}
 
-      {dialog.type === TYPES_DIALOG.VIEW_PRODUCTS && (<ViewProducts supply={dialog.supply} onClose={closeDialog} />)}
+      {dialog.type === TYPES_DIALOG.VIEW_PRODUCTS_BY_SUPPLY && (<ViewProductsBySupply supply={dialog.supply} onClose={closeDialog} />)}
     </>
   )
 }

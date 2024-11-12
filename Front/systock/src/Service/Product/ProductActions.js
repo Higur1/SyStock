@@ -47,6 +47,19 @@ export default class ProductActions {
     }
   }
 
+  static async getBySupply(id) { ///! ESPERAR
+    const Client = new HTTPClient(`/product/supply`);
+    try {
+      const nextProduct = await Client.get({}, `/${id}`).then(response => response.Product);
+
+
+      return this.mapper.toInterface(nextProduct);
+    } catch (e) {
+      console.error("Error:", e);
+      throw e;
+    }
+  }
+
   static async update(sup = new Product({})) {
     const Client = new HTTPClient("/product");
     try {
