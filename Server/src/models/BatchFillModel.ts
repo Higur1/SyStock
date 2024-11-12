@@ -1,11 +1,11 @@
-import {prisma} from "../config/prisma";
+import { prisma } from "../config/prisma";
 import IBatchFill from "../interface/IBatchFill";
-import {} from "../functions/baseFunctions"
-export default class BatchFill{
-    static async create(batchFill: IBatchFill){
+import { } from "../functions/baseFunctions"
+export default class BatchFill {
+    static async create(batchFill: IBatchFill) {
         try {
             const batchFillResult = await prisma.batch_Fill.create({
-                data:{
+                data: {
                     costPrice: batchFill.costPrice,
                     quantity: batchFill.quantity,
                     subTotal: batchFill.subtotal,
@@ -13,9 +13,28 @@ export default class BatchFill{
                     fill_id: batchFill.fill_id,
                 }
             })
-            return {status: true, batch_fill: batchFillResult}
+            return { status: true, batch_fill: batchFillResult }
         } catch (error) {
-            return {status: false, error:error}
+            return { status: false, error: error }
+        }
+    }
+    static async findById(fillId: number) {
+        try {
+            const batchFillResult = await prisma.batch_Fill.findMany(
+                {
+                    where: { 
+                        AND: [
+                            { fill_id: fillId }
+                        ] 
+                    },include:{
+                        batch_id_fk: true
+                    }
+                }
+            )
+
+            return { status: true, batch_fill: batchFillResult }
+        } catch (error) {
+            return { status: false, error: error }
         }
     }
 }

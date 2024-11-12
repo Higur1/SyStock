@@ -164,24 +164,6 @@ export default class ProductService {
   }
   static async delete(productData: IProduct) {
     try {
-      const productBatch = await prisma.batch.findFirst({
-        where: {
-          product_id: productData.id,
-        },
-        select: {
-          id: true,
-          quantity: true,
-        },
-      });
-
-      if (
-        productBatch?.quantity == undefined ? 0 : productBatch?.quantity > 0
-      ) {
-        return {
-          status: false
-        };
-      }
-
       await prisma.product.update({
         where: {
           id: productData.id,
@@ -191,6 +173,39 @@ export default class ProductService {
         },
       });
       return { status: true };
+    } catch (error) {
+      return { status: false, error: error };
+    }
+  }
+  static async updatedAddQuantityInStock(product_id: number, quantity: number){
+    try {
+      await prisma.product.update({
+        where:{
+          id: product_id
+        },
+        data:{
+          totalQuantityInStock: {
+            increment: quantity
+          }
+        }
+      })
+      return {status: true}
+    } catch (error) {
+      return { status: false, error: error };
+    }
+  }
+  static async updatedSubQuantityInStock(product_id: number, quantity: number){
+    try {
+      await prisma.product.update({
+        where:{
+          id: product_id
+        },
+        data:{
+          totalQuantityInStock: {
+            decrement: quantity
+          }
+        }
+      })
     } catch (error) {
       return { status: false, error: error };
     }
@@ -221,6 +236,29 @@ export default class ProductService {
         return {status: true, newPrice: newPrice}
     } catch (error) {
         return {status: false, error: error}
+    }
+  }
+  static async zeroStock(){
+    try {
+      const list = await prisma.product.findMany({
+        where: {
+          totalQuantityInStock: 0
+        }
+      })
+      return list != undefined ? {status: true, exists: true, list:list} : {status: true, exists: false, list: {}}
+    } catch (error) {
+      return { status: false, error: error };
+    }
+  }
+  static async lowQuantity(){
+    try {
+      const list = await prisma.$queryRaw`
+        SELECT * FROM product
+        WHERE totalQuantityInStock < minimunQuantity
+      ` 
+      return list != null ? {status: true, exists: true, list: list} : {status: true, exists: false, list: {}}
+    } catch (error) {
+      return { status: false, error: error };
     }
   }
 }

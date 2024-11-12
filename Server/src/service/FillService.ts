@@ -33,13 +33,15 @@ export default class FillService {
   };
   static async findById(fill: IFill) {
     try {
-      const findFill = await FillModel.findById(fill);
+      if(fill.id != undefined){
+        const findFill = await BatchFillModel.findById(fill.id);
 
-      if (!findFill.exists) {
-        throw new Error("Fill not found");
-      };
-
-      return findFill;
+        if (!findFill) {
+          throw new Error("Fill not found");
+        };
+  
+        return findFill;
+      }
     } catch (error) {
       throw error;
     }
@@ -66,18 +68,21 @@ export default class FillService {
   }
   static async relationBatchFill(batch_Fill: IBatch_Fill, batch: IBatch, product: IProduct) {
     try {
-      
       const findBatch = await BatchModel.findByExpirationDate(batch);
       if (findBatch.batch) {
         batch.id = findBatch.batch.id
         
         await BatchModel.addQuantity(batch);
+        batch_Fill.batch_id = findBatch.batch.id
         await ProductModel.updatePrice(product);
+        await ProductModel.updatedAddQuantityInStock(batch.product_id, batch.quantity)
         await BatchFillModel.create(batch_Fill);
         return { message: "Batch already exists, updated and batch_fill created." }
       }
-      await BatchModel.create(batch);
+      const createBatch = await BatchModel.create(batch);
       await ProductModel.updatePrice(product);
+      await ProductModel.updatedAddQuantityInStock(batch.product_id, batch.quantity)
+      batch_Fill.batch_id = createBatch.batch!.id;
       await BatchFillModel.create(batch_Fill);
       return { message: 'New batch created and batch_fill created.' }
     } catch (error) {

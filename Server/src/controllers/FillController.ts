@@ -7,8 +7,6 @@ import ISupplier from "../interface/ISupplier";
 import IProduct from "../interface/IProduct";
 import IBatch from "../interface/IBatch";
 import IBatch_Fill from "../interface/IBatchFill";
-import BatchFill from "../models/BatchFillModel";
-
 export default class FillController {
     static async create(request, response){
         try {
@@ -61,11 +59,12 @@ export default class FillController {
                     fill_id: resultFill.fill!.id
                 }
                 await FillService.relationBatchFill(batchFill, batchData, productData);
+                response.status(201).send(JSON.stringify({
+                    Message: "Fill successfully"
+                }));
             }
         
-            response.status(201).send(JSON.stringify({
-                Message: "Fill successfully"
-            }));
+         
         } catch (error) {
             if (error.message === "Internal Server Error") {
                 return response.status(500).send(JSON.stringify({
@@ -104,22 +103,24 @@ export default class FillController {
     static async findById(request, response) {
         try {
             const fillValidation = z.object({
-                id: z.string().trim().min(1)
+                id: z.string().trim().min(1),
             });
 
-            const { id } = fillValidation.parse(request.params);
-            const convertString = convertStringToNumber(id);
+            const { id  } = fillValidation.parse(request.params);
+            const convertFillIdToString = convertStringToNumber(id);
+
             const fillData: IFill = {
                 supplier_id: 1,
-                id: convertString,
+                id: convertFillIdToString,
                 user_id: 1,
                 totalPrice: new Decimal(0)
             };
+   
 
             const findFill = await FillService.findById(fillData);
         
             response.status(200).send(JSON.stringify({
-                Fill: findFill.fill
+                Fill: findFill?.batch_fill
             }));
         } catch (error) {
             if (error.message === "Fill not found") {
