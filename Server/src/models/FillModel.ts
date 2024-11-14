@@ -33,9 +33,7 @@ export default class FillModel {
                 where: { id: fill.id },
                 include:{
                     Batch_Fill: {
-                        select:{
-                            batch_id: true
-                        }
+                       
                     }
                 }
             });

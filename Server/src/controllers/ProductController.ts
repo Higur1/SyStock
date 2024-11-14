@@ -2,6 +2,7 @@ import ProductService from "../service/ProductService";
 import IProduct from "../interface/IProduct";
 import Decimal from "decimal.js";
 import z from "zod";
+import { convertStringToNumber } from "../functions/baseFunctions";
 export default class ProductController {
     static async findAll(request, response) {
         try {
@@ -244,12 +245,14 @@ export default class ProductController {
     static async delete(request, response) {
         try {
             const product_id = z.object({
-                id: z.number().positive(),
+                id: z.string().trim().min(1),
               });
-              const { id } = product_id.parse(request.body);
+              const { id } = product_id.parse(request.params);
         
+              const convertStringToNum = convertStringToNumber(id);
+
               const productData: IProduct = {
-                id: id,
+                id: convertStringToNum,
                 category_id: 0,
                 costPrice: new Decimal(0),
                 name: "",

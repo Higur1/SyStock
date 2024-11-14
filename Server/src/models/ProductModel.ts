@@ -6,7 +6,11 @@ import {dateBase} from "../functions/baseFunctions";
 export default class ProductService {
   static async findAll() {
     try {
-      const products = await prisma.product.findMany();
+      const products = await prisma.product.findMany({
+        where:{
+          excludedStatus: false
+        }
+      });
       return products != null
         ? { status: true, products: products }
         : { status: false, products: {} };
