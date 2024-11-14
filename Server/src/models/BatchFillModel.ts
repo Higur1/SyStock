@@ -26,9 +26,23 @@ export default class BatchFill {
                         AND: [
                             { fill_id: fillId }
                         ] 
-                    },include:{
-                        batch_id_fk: true
+                    },select:{
+                        batch_id_fk:{
+                            select:{
+                                product_id_fk: {
+                                    select:{
+                                        id: true,
+                                        name: true,
+                                        costPrice: true,
+                                    }
+                                },
+                                quantity: true,
+                                expirationDate: true,
+                            }
+                        },
+                        subTotal: true
                     }
+
                 }
             )
 

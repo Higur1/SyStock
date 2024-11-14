@@ -11,20 +11,32 @@ async function resetId() {
           SET 'seq' = 0
       `;
 }
+async function updateQuantityProduct(product_id, quantity) {
+  await prisma.product.update({
+    where: {
+      id: product_id
+    },
+    data: {
+      totalQuantityInStock: {
+        increment: quantity
+      }
+    }
+  })
+}
 
 resetId();
 try {
   /*Delete */ await prisma.$transaction([
-    prisma.token_Recovery.deleteMany(),
-    prisma.user.deleteMany(),
-    prisma.batch.deleteMany(),
-    prisma.product.deleteMany(),
-    prisma.category.deleteMany(),
-    prisma.supplier.deleteMany(),
-    prisma.eValitadionStatus.deleteMany(),
-    prisma.eTypeAction.deleteMany(),
-    prisma.eTypeUser.deleteMany(),
-  ]);
+  prisma.token_Recovery.deleteMany(),
+  prisma.user.deleteMany(),
+  prisma.batch.deleteMany(),
+  prisma.product.deleteMany(),
+  prisma.category.deleteMany(),
+  prisma.supplier.deleteMany(),
+  prisma.eValitadionStatus.deleteMany(),
+  prisma.eTypeAction.deleteMany(),
+  prisma.eTypeUser.deleteMany(),
+]);
 
   await Promise.all([
     /*Create type of users */
@@ -120,7 +132,6 @@ try {
         },
       ],
     }),
-
     await prisma.product.createMany({
       data: [
         {
@@ -224,70 +235,100 @@ try {
         },
       ],
     }),
-
-    /*Create categories*/
-    await prisma.batch.createMany({
-      data: [
-        {
-          product_id: 1,
-          quantity: 30,
-          deletionStatus: false,
-          expirationDate: "2024-01-01T00:00:01.000Z",
-          eValidationStatus: 1,
-        },
-        {
-          product_id: 2,
-          quantity: 15,
-          deletionStatus: false,
-          expirationDate: "2024-12-25T00:00:01.000Z",
-          eValidationStatus: 3,
-        },
-        {
-          product_id: 6,
-          quantity: 9,
-          deletionStatus: false,
-          expirationDate: "2024-12-10T00:00:01.000Z",
-          eValidationStatus: 3,
-        },
-        {
-          product_id: 7,
-          quantity: 4,
-          deletionStatus: false,
-          expirationDate: "2024-11-10T00:00:01.000Z",
-          eValidationStatus: 2,
-        },
-        {
-          product_id: 8,
-          quantity: 4,
-          deletionStatus: false,
-          expirationDate: "2025-02-05T00:00:01.000Z",
-          eValidationStatus: 3,
-        },
-        {
-          product_id: 3,
-          quantity: 15,
-          deletionStatus: false,
-          eValidationStatus: 4,
-        },
-        {
-          product_id: 4,
-          quantity: 7,
-          deletionStatus: false,
-          eValidationStatus: 4,
-        },
-        {
-          product_id: 5,
-          quantity: 15,
-          deletionStatus: false,
-          eValidationStatus: 4,
-        },
-        {
-          product_id: 9,
-          quantity: 6,
-          deletionStatus: false,
-          eValidationStatus: 4,
-        },
-      ],
+    await prisma.batch.create({
+      data: {
+        product_id: 1,
+        quantity: 30,
+        deletionStatus: false,
+        expirationDate: "2024-01-01T00:00:01.000Z",
+        eValidationStatus: 1,
+      }
+    }).then(async (element) => {
+      updateQuantityProduct(element.id, element.quantity)
+    }),
+    await prisma.batch.create({
+      data: {
+        product_id: 2,
+        quantity: 15,
+        deletionStatus: false,
+        expirationDate: "2024-12-25T00:00:01.000Z",
+        eValidationStatus: 3,
+      }
+    }).then(async (element) => {
+      updateQuantityProduct(element.id, element.quantity)
+    }),
+    await prisma.batch.create({
+      data: {
+        product_id: 3,
+        quantity: 15,
+        deletionStatus: false,
+        eValidationStatus: 4,
+      }
+    }).then(async (element) => {
+      updateQuantityProduct(element.id, element.quantity)
+    }),
+    await prisma.batch.create({
+      data: {
+        product_id: 4,
+        quantity: 7,
+        deletionStatus: false,
+        eValidationStatus: 4,
+      }
+    }).then(async (element) => {
+      updateQuantityProduct(element.id, element.quantity)
+    }),
+    await prisma.batch.create({
+      data: {
+        product_id: 5,
+        quantity: 15,
+        deletionStatus: false,
+        eValidationStatus: 4,
+      }
+    }).then(async (element) => {
+      updateQuantityProduct(element.id, element.quantity)
+    }),
+    await prisma.batch.create({
+      data: {
+        product_id: 6,
+        quantity: 9,
+        deletionStatus: false,
+        expirationDate: "2024-12-10T00:00:01.000Z",
+        eValidationStatus: 3,
+      }
+    }).then(async (element) => {
+      updateQuantityProduct(element.id, element.quantity)
+    }),
+    await prisma.batch.create({
+      data: {
+        product_id: 7,
+        quantity: 4,
+        deletionStatus: false,
+        expirationDate: "2024-11-10T00:00:01.000Z",
+        eValidationStatus: 2,
+      }
+    }).then(async (element) => {
+      updateQuantityProduct(element.id, element.quantity)
+    }),
+    await prisma.batch.create({
+      data: {
+        product_id: 8,
+        quantity: 4,
+        deletionStatus: false,
+        expirationDate: "2025-02-05T00:00:01.000Z",
+        eValidationStatus: 3,
+      }
+    }).then(async (element) => {
+      updateQuantityProduct(element.id, element.quantity)
+    }),
+    await prisma.batch.create({
+      data: {
+        product_id: 9,
+        quantity: 6,
+        deletionStatus: false,
+        eValidationStatus: 4,
+      }
+    }).then(async (element) => {
+      updateQuantityProduct(element.id, element.quantity)
     }),
     /*Create generic supplier*/
     await prisma.supplier.createMany({

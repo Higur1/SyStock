@@ -120,7 +120,7 @@ export default class FillController {
             const findFill = await FillService.findById(fillData);
         
             response.status(200).send(JSON.stringify({
-                Fill: findFill?.batch_fill
+               Fill: findFill?.batch_fill
             }));
         } catch (error) {
             if (error.message === "Fill not found") {

@@ -85,6 +85,7 @@ export default class BatchService {
                 throw new Error("Batch not found");
             };
             const supplyResult = await BatchModel.addQuantity(batchData);
+            await ProductModel.updatedAddQuantityInStock(supplyResult.batch!.product_id, supplyResult.batch!.quantity);
             return supplyResult;
 
         } catch (error) {

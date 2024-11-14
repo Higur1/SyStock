@@ -189,9 +189,21 @@ export default class BatchModel {
             lt: date
           },
           deletionStatus: false
-        },
-        include:{
-          product_id_fk: true
+        },select:{
+          product_id_fk: {
+            select:{
+              id: true,
+              name: true,
+              totalQuantityInStock: true,
+              category_id_fk:{
+                select: {
+                  name: true,
+                }
+              }
+            }
+          },
+          quantity: true,
+          expirationDate: true,
         }
       })
       return list != undefined ? {status: true, exists: true, list: list} : {status: true, exists: false, list:{}}
@@ -208,8 +220,21 @@ export default class BatchModel {
             gte: new Date()
           }
         },
-        include:{
-          product_id_fk: true
+        select:{
+          product_id_fk: {
+            select:{
+              id: true,
+              name: true,
+              totalQuantityInStock: true,
+              category_id_fk:{
+                select: {
+                  name: true,
+                }
+              }
+            }
+          },
+          quantity: true,
+          expirationDate: true,
         }
       })
       return list != null ? {status: true, exists: true, list: list} : {status: true, exists: false, list: {}}
