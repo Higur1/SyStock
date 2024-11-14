@@ -1,20 +1,15 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { Container } from "./styles";
-import { Box, Button, Chip, ClickAwayListener, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl, FormControlLabel, IconButton, InputLabel, MenuItem, OutlinedInput, Paper, Radio, RadioGroup, Select, Tab, Tabs } from "@mui/material";
-import ToolTipAndEllipsis from "../../components/dialogs/ComponentUtils/ToolTipAndEllipsis";
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import CreateProductDialog from "./dialogs/CreateProductDialog";
-import CustomizedSnackbars from "../../components/CustomizedSnackBar";
+import { Divider, Tab, Tabs } from "@mui/material";
+import CreateProduct from "./dialogs/CreateProduct";
 import EditProductDialog from "./dialogs/EditProductDialog";
-import CircularLoading from "../../components/common/CircularLoading";
 import AddSupply from "./dialogs/AddSupply";
-import { formatDate } from "../../utils/utils";
 import ProductList from "./tabs/productList";
 import { ProductContext } from "./ProductPage";
 import DeleteProductDialog from "./dialogs/DeleteProductDialog";
 import ViewSupplies from "./tabs/ViewSupplies";
 import ViewProductsBySupply from "./dialogs/ViewProductsBySupply";
-import ChangeQuantityProduct from "./tabs/ChangeQuantityProductDialog";
+import DecreaseQuantityProduct from "./tabs/DecreaseQuantityProduct";
 
 
 export const TABS = {
@@ -100,12 +95,12 @@ export default function Product() {
           )}
 
           {tab === TABS.CREATE_PRODUCT && (
-            <CreateProductDialog onChangeTab={handleChange}/>
+            <CreateProduct onChangeTab={handleChange}/>
           )}
 
           {tab === TABS.ADD_QUANTITY && (<AddSupply onClose={() => handleChange(null, TABS.PRODUCTS_LIST)}/>)}
 
-          {tab === TABS.DECREASE_QUANTITY && (<ChangeQuantityProduct />)}
+          {tab === TABS.DECREASE_QUANTITY && (<DecreaseQuantityProduct />)}
 
           {tab === TABS.VIEW_SUPPLIES && (<ViewSupplies handleViewProducts={handleViewProducts}/>)}
         </div>

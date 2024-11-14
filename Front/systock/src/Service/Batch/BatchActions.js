@@ -33,4 +33,10 @@ export default class BatchActions {
     return Client.put(this.mapper.toServer(batch))
       .then(response => this.mapper.toInterface(response.batch));
   }
+
+  static async decreaseQuantity(obj = { product_id: 0, expirationDate: new Date().toString(), quantity: 0 }) {
+    const Client = new HTTPClient("/batch/subQuantity");
+
+    return Client.post(obj);
+  }
 }

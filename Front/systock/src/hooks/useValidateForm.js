@@ -7,7 +7,8 @@ const currencyRegex = /^[0-9]+(\.[0-9]{1,2})?$/;
 export const FORM_TYPE = {
   PREUSER: "USER",
   USER: "CREATE_USER",
-  PRODUCT: "CREATE_PRODUCT"
+  PRODUCT: "CREATE_PRODUCT",
+  DECREASE_PRODUCT: "DECREASE_PRODUCT"
 };
 
 const defaultValidationMessages = {
@@ -26,10 +27,13 @@ const defaultValidationMessages = {
     priceSell: "O Preço deve ser um valor positivo e no formato adequado",
     priceBuy: "O Preço deve ser um valor positivo e no formato adequado",
     minimumQuantity: "A quantidade deve ser um valor positivo"
+  },
+  [FORM_TYPE.DECREASE_PRODUCT]: {
+    quantityToRemove: "A quantidade deve ser um valor positivo e menor que a quantidade atual"
   }
 };
 
-const useValidateForm = (entity, formType) => {
+const useValidateForm = (entity, formType, extraValue = {}) => {
   const [error, setError] = useState({});
   const [interacted, setInteracted] = useState({});
 
@@ -51,8 +55,13 @@ const useValidateForm = (entity, formType) => {
       priceSell: (value) => value >= 0 && currencyRegex.test(value),
       priceBuy: (value) => value >= 0 && currencyRegex.test(value),
       minimumQuantity: (value) => value >= 0
+    },
+    [FORM_TYPE.DECREASE_PRODUCT]: {
+      quantityToRemove: (value) => value > 0 && value < extraValue?.currentQuantity
     }
   }), []);
+
+  console.log(extraValue);
 
   const getValidationMessage = (formType, attribute) => {
     return defaultValidationMessages[formType]?.[attribute] || '';

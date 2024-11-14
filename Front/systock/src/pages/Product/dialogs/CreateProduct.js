@@ -18,7 +18,7 @@ const Container = styled.div`
   gap: 32px;
   padding-top: 16px;
 `;
-export default function CreateProductDialog({onChangeTab}) {
+export default function CreateProduct() {
   const { categories } = useContext(ProductContext);
 
   const [values, setValues] = useState({name: "", description: "", priceSell: 0, priceBuy: 0, categoryID: "", minimumQuantity: 0});
@@ -156,7 +156,7 @@ export default function CreateProductDialog({onChangeTab}) {
   );
 }
 
-CreateProductDialog.propTypes = {
+CreateProduct.propTypes = {
   open: PropTypes.bool,
   handleClose: PropTypes.func,
   category: PropTypes.object,
