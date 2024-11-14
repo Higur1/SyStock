@@ -50,7 +50,6 @@ export default class Supply {
   getTotalValue() {
     try {
       const arr = this.batches.map(batch => batch.getSubTotal());
-      console.log(arr);
       const sum = arr.reduce((accumulator, batch) => {
         return accumulator + batch;
       }, 0);

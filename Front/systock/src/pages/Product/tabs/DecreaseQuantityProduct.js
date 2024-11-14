@@ -1,4 +1,4 @@
-import { Add, Delete, Remove } from '@mui/icons-material';
+import { Add, Remove } from '@mui/icons-material';
 import { Autocomplete, Button, Divider, IconButton, Popper, Skeleton, TextField } from '@mui/material';
 import React, { useContext, useEffect, useMemo, useRef } from 'react'
 import { useState } from 'react';
@@ -9,6 +9,7 @@ import useValidateForm, { FORM_TYPE } from '../../../hooks/useValidateForm';
 import { MainContext } from '../../../App';
 import ProductActions from '../../../Service/Product/ProductActions';
 import BatchActions from '../../../Service/Batch/BatchActions';
+import { SuperArray } from '../../../utils/arrayFunctions';
 
 const TYPES = {
   MINUS: "MINUS",
@@ -33,29 +34,30 @@ const LOADING_TYPE = {
 
 export default function DecreaseQuantityProduct() {
 
-  const { productsWithoutSupply, getProductTotalQuantity, getExpiryDatesByProduct } = useContext(ProductContext);
   const { handleOpenSnackBar } = useContext(MainContext);
 
+  const batchsRef = useRef([]);
   const productsRef = useRef(null);
   const [product, setProduct] = useState(null);
   const [currentQuantity, setCurrentQuantity] = useState(0);
   const extraHelpersValidate = useMemo(() => ({ currentQuantity }), [currentQuantity]);
-  const [expiryList, setExpiryList] = useState(null);
+  const [expiryList, setExpiryList] = useState([]);
   const [loading, setLoading] = useState([LOADING_TYPE.PRODUCTS]);
 
   const [values, setValues] = useState({ quantityToRemove: 0, expiryDate: null, reason: "" });
   const { error, hasError, hasInteracted, hasAnyError, resetValidate } = useValidateForm(values, FORM_TYPE.DECREASE_PRODUCT, extraHelpersValidate);
 
-
   useEffect(() => {
-    getProducts();
+    getInitialInfos();
   }, []);
 
-  async function getProducts() {
+  async function getInitialInfos() {
     try {
+      const batchs = await BatchActions.getAll();
       const products = await ProductActions.getAll();
 
       productsRef.current = products;
+      batchsRef.current = batchs;
       handleLoading(LOADING_TYPE.PRODUCTS, false);
     } catch (e) {
       handleOpenSnackBar("error", e);
@@ -100,10 +102,53 @@ export default function DecreaseQuantityProduct() {
 
   function handleChangeProduct(value) {
     setProduct(value);
-    console.log(value);
     setCurrentQuantity(getProductTotalQuantity(value.refCode));
-    setExpiryList(getExpiryDatesByProduct(value.refCode));
     onChange("expiryDate", null);
+
+    updateExpiryListByProduct(value.refCode);
+  }
+
+  function updateExpiryListByProduct(productID) {
+    try {
+      onChange("expiryDate", null);
+      const expiryList = batchsRef.current
+        .filter(batch => batch.productID === productID)
+        .map(batch => batch.expiry)
+        .filter(expiry => expiry !== null);
+
+      const expiryListFiltered = new SuperArray(expiryList).removeEquals();
+
+      setExpiryList(expiryListFiltered);
+
+    } catch (error) {
+      console.error(error);
+      setExpiryList(null);
+    }
+  }
+
+  function getProductTotalQuantity(productID) {
+    try {
+      const batchs = batchsRef.current.filter(batch => batch.productID === productID)
+        .map(batch => batch.quantity);
+
+      const totalQuantity = batchs.reduce((acc, batch) => acc + batch, 0);
+
+      return totalQuantity;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  function getQuantityByExpiryDate(expiryDate = new Date().toString()) {
+    try {
+      const date = new Date(expiryDate);
+
+      const batch = batchsRef.current.find(batch => batch.expiry?.getTime() === date.getTime());
+
+      if (batch) return setCurrentQuantity(batch.quantity);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   function reset() {
@@ -114,30 +159,29 @@ export default function DecreaseQuantityProduct() {
     resetValidate();
   }
 
-  const disabled = loading.includes(LOADING_TYPE.DECREASING);
-  const disableConfirm = hasAnyError || disabled;
+  const disabled = useMemo(() => loading.includes(LOADING_TYPE.DECREASING), [loading]);
+  const disableConfirm = useMemo(() => hasAnyError || disabled, [hasAnyError, disabled]);
 
   const loadingProducts = loading.includes(LOADING_TYPE.PRODUCTS);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingTop: 16 }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        {(loadingProducts || productsRef.current === null) ? (<Skeleton variant="text" width="100%" height={48}/>) :
-          <Autocomplete
-            disablePortal
-            options={productsRef.current}
-            value={product}
-            onChange={(event, newInputValue) => {
-              handleChangeProduct(newInputValue);
-            }}
-            getOptionLabel={(option) => option.name}
-            sx={{ flex: 1 }}
-            renderInput={(params) => <TextField {...params} label="Produto" />}
-            placeholder='Selecione o produto a ser abastecido'
-            ListboxProps={{ style: { zIndex: 100 } }}
-            PopperComponent={props => <Popper {...props} style={{ ...props.style, zIndex: 100000 }} disablePortal={false} />}
-          />
-        }
-        <span>Quantidade Atual: {loadingProducts ? <Skeleton variant="text" width={30} style={{display: 'inline-block'}} /> : <strong>{currentQuantity}</strong>}</span>
+        <Autocomplete
+          disablePortal
+          options={productsRef.current}
+          value={product}
+          onChange={(event, newInputValue) => {
+            handleChangeProduct(newInputValue);
+          }}
+          disabled={loadingProducts || productsRef.current === null}
+          getOptionLabel={(option) => option.name}
+          sx={{ flex: 1 }}
+          renderInput={(params) => <TextField {...params} label="Produto" />}
+          placeholder='Selecione o produto a ser abastecido'
+          ListboxProps={{ style: { zIndex: 100 } }}
+          PopperComponent={props => <Popper {...props} style={{ ...props.style, zIndex: 100000 }} disablePortal={false} />}
+        />
+        <span>Quantidade Atual: {loadingProducts ? <Skeleton variant="text" width={30} style={{ display: 'inline-block' }} /> : <strong>{currentQuantity}</strong>}</span>
       </div>
       <Divider />
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -165,9 +209,9 @@ export default function DecreaseQuantityProduct() {
           options={expiryList}
           value={values.expiryDate}
           onChange={(event, newInputValue) => {
-            handleChangeProduct(newInputValue);
+            onChange("expiryDate", newInputValue);
+            getQuantityByExpiryDate(newInputValue);
           }}
-          disabled={expiryList === null}
           getOptionLabel={(option) => formatDate(option, false)}
           sx={{ flex: 1 }}
           renderInput={(params) => <TextField {...params} label="Data de Validade" />}

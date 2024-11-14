@@ -1,19 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import styled from 'styled-components';
 import VirtualizedTableCustom from '../../../components/VirtualizedTableCustom';
 import BatchActions from '../../../Service/Batch/BatchActions';
+import { MainContext } from '../../../App';
 
 const Title = styled('div')({
   fontSize: 24,
   fontWeight: 700
 });
 
-function BatchListDialog(props) {
-
-  const { id } = props;
-
-  console.log(id);
+function BatchListDialog() {
 
   const [batchs, setBatchs] = useState([
     {id: 0, productName: 'teste', createdAt: new Date(), updateAt: new Date(), quantity: 123, unitValue: 'R$12,00'},
@@ -25,6 +22,7 @@ function BatchListDialog(props) {
 
   const isMount = useRef();
 
+  const { handleOpenSnackBar } = useContext(MainContext);
   useEffect(() => {
     if(isMount.current) return;
     
@@ -52,7 +50,7 @@ function BatchListDialog(props) {
       if(batchs.length === 0) return;
       setBatchs(batchs);
     } catch (error) {
-      console.log(error.message);
+      handleOpenSnackBar("error", error);
     }
   }
 

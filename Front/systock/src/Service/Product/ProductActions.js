@@ -126,8 +126,9 @@ export default class ProductActions {
 
   static async addMultipleQuantityProducts(productsToAdd = []) {
 
-    const results = await Promise.all(productsToAdd.map(this.update));
+    const results = await Promise.all(productsToAdd.map(product => ProductActions.update(product)));
 
-    return results;
+    if(results.every(result => result instanceof Product)) return Promise.result();
+    return Promise.reject(results.some(result => typeof result === "string"));
   }
 }

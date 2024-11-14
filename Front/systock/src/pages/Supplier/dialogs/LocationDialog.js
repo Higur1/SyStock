@@ -17,7 +17,6 @@ const TextFieldStyled = styled(TextField)({
 });
 
 function LocationDialog(props) {
-  console.log(props.address)
   const { street, cep, number, district, state, city, complement } = props.address;
 
 

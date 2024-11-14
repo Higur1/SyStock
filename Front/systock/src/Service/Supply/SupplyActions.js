@@ -13,7 +13,6 @@ export default class SupplyActions {
     
     const suppliers = await SupplierActions.getAll();
 
-    console.log(suppliers);
     return Client.get()
       .then(dataObj => {
         return dataObj.Mesage.map(response => this.mapper.toInterface(response, suppliers));

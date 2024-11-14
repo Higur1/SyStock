@@ -195,8 +195,6 @@ export default function CreateSupplierDialog(props) {
     handleCreate(supp);
   }
 
-  console.log(isCreate);
-
   return (
     <>
       <Dialog

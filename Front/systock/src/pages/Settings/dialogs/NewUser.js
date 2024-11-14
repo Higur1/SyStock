@@ -50,7 +50,6 @@ export default function NewUserDialog({ user: account = new Account({}), onClose
       handleOpenSnackBar("success", "Usuário autorizado para primeiro acesso!", 4000);
       onClose();
     } catch (e) {
-      console.log(e);
       handleOpenSnackBar("error", e, 4000);
     }
   }

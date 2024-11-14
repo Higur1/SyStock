@@ -2,6 +2,7 @@ import Product from "../../../classes/Product"
 
 export default class ProductMappers {
   toServer(obj = new Product({}), type = "POST") {
+    console.log(obj);
     const additional = type === "PUT" ? {id: obj.id} : {};
 
     const price = Number(obj.priceBaseSell);

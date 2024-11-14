@@ -7,7 +7,6 @@ export default function ViewAdvicesDialog(props) {
   const { onClose, obj } = props;
   const { label, list } = obj; 
 
-  console.log(list)
   return (
     <Dialog
       open

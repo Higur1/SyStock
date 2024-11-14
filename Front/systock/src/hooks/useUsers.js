@@ -45,7 +45,7 @@ export default function useUsers() {
       const users = await UsersActions.getAll();
       setUsers(users);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 

@@ -60,7 +60,6 @@ export default function useCategory() {
       setCategories(categories);
     } catch (error) {
       handleOpenSnackBar("error", error);
-      console.log(error);
     }
   }
 
@@ -112,7 +111,6 @@ export default function useCategory() {
       insertCategory(newItem);
       setOpenCreateCategory(false);
     } catch (error) {
-      console.log(error);
       handleOpenSnackBar("error", error, 3500);
     }
   }

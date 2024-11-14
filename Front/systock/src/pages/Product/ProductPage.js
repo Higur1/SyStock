@@ -41,7 +41,6 @@ export default function ProductPage() {
       setCategories(categories);
     } catch (error) {
       handleOpenSnackBar("error", error);
-      console.log(error);
     }
   }
 
@@ -211,7 +210,6 @@ export default function ProductPage() {
    * @param {*} id 
    */
   async function handleDeleteProduct(product) {
-    console.log(product);
     try {
       await ProductActions.delete(product.id);
       const updatedProducts = productsBase.filter(cat => cat.id !== product.id);

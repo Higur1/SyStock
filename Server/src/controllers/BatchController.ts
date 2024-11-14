@@ -62,6 +62,7 @@ export default class BatchController {
                 product_id: z.number().positive()
             });
             const { product_id } = batchValidation.parse(request.body);
+            debugger;
             const batchData: IBatch = {
                 expirantionDate: new Date(),
                 product_id: product_id,

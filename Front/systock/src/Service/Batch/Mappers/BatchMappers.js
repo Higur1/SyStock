@@ -3,9 +3,9 @@ import Batch from "../../../classes/Batch";
 export default class BatchMappers {
   toServer(obj = new Batch({})) {
     return {
-      product_id: 0, 
-      supplier_id: 0, 
-      quantity: 0 
+      product_id: 0,
+      supplier_id: 0,
+      quantity: 0
     }
   }
 
@@ -30,14 +30,19 @@ export default class BatchMappers {
     }
   }
 
-  toServerLogin({user, password}) {
+  toServerLogin({ user, password }) {
     return {
-      user_login:user,
+      user_login: user,
       user_password: password
     }
   }
 
-  toInterface({ id, name }) {
-    return new Batch({ id, name });
+  toInterface({ id, expirationDate, quantity, deletionStatus, dateTimeEmptyStock, product_id, eValidationStatus, createdAt, updatedAt }) {
+    return new Batch({
+      id,
+      expiry: new Date(expirationDate),
+      quantity,
+      productID: product_id,
+    });
   }
 }

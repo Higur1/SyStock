@@ -99,8 +99,6 @@ export default function useSupplier() {
       setSuppliers(suppliers);
     } catch (error) {
       handleOpenSnackBar("error", error);
-
-      console.log(error);
     }
   }
 
@@ -109,8 +107,7 @@ export default function useSupplier() {
 
     try {
       const newItem = await SupplierActions.create(obj);
-      
-      console.log(newItem);
+    
       setSuppliers(prevState => {
         return [...prevState, newItem];
       });

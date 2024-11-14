@@ -57,11 +57,10 @@ const useValidateForm = (entity, formType, extraValue = {}) => {
       minimumQuantity: (value) => value >= 0
     },
     [FORM_TYPE.DECREASE_PRODUCT]: {
-      quantityToRemove: (value) => value > 0 && value < extraValue?.currentQuantity
+      // quantityToRemove: (value) => value > 0 && value < extraValue?.currentQuantity
+      quantityToRemove: (value) => true
     }
   }), []);
-
-  console.log(extraValue);
 
   const getValidationMessage = (formType, attribute) => {
     return defaultValidationMessages[formType]?.[attribute] || '';
@@ -105,8 +104,6 @@ const useValidateForm = (entity, formType, extraValue = {}) => {
   const hasInteracted = (field) => interacted[field] === true;
 
   const hasAnyError = Object.keys(entity).some(hasError);
-
-  console.log({error});
 
   function resetValidate() {
     refEntity.current = entity;

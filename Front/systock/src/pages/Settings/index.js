@@ -43,7 +43,7 @@ export default function Settings() {
 
       handleOpenSnackBar("success", "Usuário deletado", 3000);
     } catch (e) {
-      console.log(e);
+      handleOpenSnackBar("error", e);
     } finally {
       setMenu({anchor: null, user: null});
     }

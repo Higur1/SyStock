@@ -98,8 +98,6 @@ export default function VirtualizedTableCustom(props) {
 
   const { rows, columns } = props;
 
-  console.log('rows', 'columns');
-
   return (
     <Paper style={{ height: 400, width: '100%' }}>
       <MuiVirtualizedTable

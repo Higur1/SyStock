@@ -51,7 +51,6 @@ export default function MyUser({ type, user, handleConfirm, onClose }) {
 
       handleConfirm(nextUser);
     } catch (e) {
-      console.log(e);
       handleOpenSnackBar("error", e, 3000);
     }
   }
@@ -64,7 +63,6 @@ export default function MyUser({ type, user, handleConfirm, onClose }) {
 
       handleConfirm(nextUser);
     } catch (e) {
-      console.log(e);
       handleOpenSnackBar("error", "An error occurred", 3000);
     }
   }

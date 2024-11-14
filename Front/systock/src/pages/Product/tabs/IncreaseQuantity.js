@@ -4,9 +4,7 @@ import React, { useContext, useEffect } from 'react'
 import { useState } from 'react';
 import { TableContainer, TableData, TableRow } from '../styles';
 import Batch from '../../../classes/Batch';
-import { DEBUG_LOCAL, MainContext } from '../../../App';
-import { ENTITIES } from '../../../utils/debug-local-helper';
-import Supply from '../../../classes/Supply';
+import { MainContext } from '../../../App';
 import ProductActions from '../../../Service/Product/ProductActions';
 import SupplierActions from '../../../Service/Supplier/SupplierActions';
 
@@ -37,7 +35,7 @@ function total(arr) {
       return total;
     }, 0);
 
-    return sum;
+    return sum.toFixed(2);
   } catch (e) {
     return 0;
   }
@@ -106,7 +104,6 @@ export default function IncreaseQuantity(props) {
   }
 
   function handleChangeProduct(result) {
-    console.log(result);
     setProduct(result);
 
     const product = productsBase.find(prod => prod.refCode === result.value);
@@ -122,7 +119,6 @@ export default function IncreaseQuantity(props) {
     } catch (error) {
       handleOpenSnackBar("error", error);
     }
-    onClose();
   }
 
   function reset() {
@@ -237,7 +233,7 @@ export default function IncreaseQuantity(props) {
         <TableContainer>
           <TableRow style={{ background: '#DCDCDC', borderRadius: '8px 8px 0px 0px' }}>
             {columns.map((column, i) => (
-              <TableData style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1"}} key={`header-column-${i}`}>{column.label}</TableData>
+              <TableData style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }} key={`header-column-${i}`}>{column.label}</TableData>
             ))}
           </TableRow>
           <div className="customScroll">
@@ -251,18 +247,18 @@ export default function IncreaseQuantity(props) {
 
                   if (column.value === "subTotal") {
                     return (
-                      <TableData key={`row-${index}-${i}`} style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1"}}>{prod.getSubTotal()}</TableData>
+                      <TableData key={`row-${index}-${i}`} style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }}>{prod.getSubTotal()}</TableData>
                     );
                   }
                   return (
-                    <TableData key={`row-${index}-${i}`} style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1"}}>{prod[column.value]}</TableData>
+                    <TableData key={`row-${index}-${i}`} style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }}>{prod[column.value]}</TableData>
                   );
                 })}
               </TableRow>
             ))}
             <TableRow style={{ borderRadius: '8px 8px 0px 0px' }}>
               {columns.map((column, i) => (
-                <TableData style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1"}} key={`column-${i}`}>{ }</TableData>
+                <TableData style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }} key={`column-${i}`}>{ }</TableData>
               ))}
             </TableRow>
           </div>

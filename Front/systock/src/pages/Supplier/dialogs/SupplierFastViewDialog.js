@@ -8,7 +8,6 @@ export default function SupplierFastViewDialog(props) {
   const { onClose, obj = new Batch() } = props;
   const { suppliers, name, quantity} = obj; 
 
-  console.log(suppliers);
   return (
     <Dialog
       open

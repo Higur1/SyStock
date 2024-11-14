@@ -11,7 +11,7 @@ export default class BatchActions {
 
     return Client.get()
       .then(dataObj => {
-        return dataObj.batchs.map(this.mapper.toInterface);
+        return dataObj.Batchs.map(this.mapper.toInterface);
       })
   }
 

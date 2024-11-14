@@ -17,8 +17,9 @@ export default class Batch extends Product {
    * @param {number} [options.supplierID=0] - The supplier;
    * @param {number} [options.productID=0] - The supplier;
    */
-  constructor({ product = new Product(), priceBuy = 0, priceSell = 0, quantity = 0, expiry = null, supplier = null, supplierID = 0, productID = 0 } = {}) {
+  constructor({ product = new Product(), id = 0, priceBuy = 0, priceSell = 0, quantity = 0, expiry = null, supplier = null, supplierID = 0, productID = 0 } = {}) {
     super(product);
+    this.id = id;
     this.supplierID = supplierID;
     this.productID = productID;
     
