@@ -12,7 +12,6 @@ import TableRenderUI from '../../utils/TableRenderUI'
 const columns = [
   { fixedWidth: false, label: "Nome", value: "name", width: 120 },
   { fixedWidth: false, label: "E-mail", value: "email", width: 200 },
-  { fixedWidth: true, label: "Telefone", value: "phone", width: 150 },
   { fixedWidth: true, label: "", value: "functions", width: 50 },
 ];
 

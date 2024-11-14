@@ -31,7 +31,7 @@ export default class SupplierActions {
   static async update(sup = new Supplier({})) {
     const Client = new HTTPClient("/supplier");
 
-    return Client.put(this.mapper.toServer(sup))
+    return Client.patch(this.mapper.toServer(sup))
       .then(response => this.mapper.toInterface(response.Supplier));
   }
 
