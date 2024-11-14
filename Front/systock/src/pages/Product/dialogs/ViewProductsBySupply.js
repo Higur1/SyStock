@@ -7,6 +7,7 @@ import ProductActions from '../../../Service/Product/ProductActions';
 import { MainContext } from '../../../App';
 import CircularLoading from '../../../components/common/CircularLoading';
 import TableRenderUI from '../../../utils/TableRenderUI';
+import SupplyActions from '../../../Service/Supply/SupplyActions';
 
 const infos = [
   { value: "id", label: "Código do Abastecimento" },
@@ -15,7 +16,7 @@ const infos = [
 ];
 
 const columns = [
-  { value: "name", label: "Produto" },
+  { value: "product", label: "Produto" },
   { value: "quantity", label: "Quantidade" },
   { value: "expiry", label: "Data de Validade" },
   { value: "priceBuy", label: "Preço de Custo" },
@@ -32,7 +33,7 @@ export default function ViewProductsBySupply({ supply = new Supply(), onClose })
   }, []);
   async function getProducts() {
     try {
-      const response = await ProductActions.getBySupply(supply.id);
+      const response = await SupplyActions.getById(supply.id);
 
       setProducts(response);
     } catch (error) {

@@ -1,11 +1,11 @@
 import { Close } from '@mui/icons-material'
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Snackbar } from '@mui/material'
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Snackbar } from '@mui/material'
 import React from 'react'
 
 export default function DialogCustom(props) {
   return (
     <>
-      <Snackbar 
+      <Snackbar
         open={props?.snackbar?.open}
         anchorOrigin={{
           vertical: 'top',
@@ -18,14 +18,17 @@ export default function DialogCustom(props) {
       </Snackbar>
       <Dialog open fullWidth {...props}>
         {!props.hideTitle ? (
-          <DialogTitle style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-            {props.title}
-            {props.hideCloseOnTitle ? null : (
-              <IconButton onClick={props.onClose}>
-                <Close />
-              </IconButton>
-            )}
-          </DialogTitle>
+          <>
+            <DialogTitle style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              {props.title}
+              {props.hideCloseOnTitle ? null : (
+                <IconButton onClick={props.onClose}>
+                  <Close />
+                </IconButton>
+              )}
+            </DialogTitle>
+            <Divider />
+          </>
         ) : null}
         <DialogContent>
           {props.children}

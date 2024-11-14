@@ -19,6 +19,12 @@ export default class SupplyActions {
       })
   }
 
+  static async getById(supplyID) {
+    const client = new HTTPClient(`/fill/findById`);
+
+    return client.get({}, `/${supplyID}`).then(response => response.Fill.map(this.mapper.toInterfaceViewProducts));
+  }
+
   static async getBySupplier(supplyID) {
     const Client = new HTTPClient(`/fill/findBySupplierName`);
 

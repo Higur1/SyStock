@@ -21,7 +21,6 @@ export const TableContainer = styled("div")({
 export const TableRow = styled("div")({
   width: '100%',
   display: 'flex',
-  gap: 16,
   height: '48px',
   padding: '0px 8px',
   alignItems: 'center',
@@ -39,11 +38,14 @@ export const TableData = styled("div")(() => ({
 
 const columns = [
   {
-    width: "35%", fixedWidth: true, label: "Data de Validade", value: "expiry"
+    width: "33%", fixedWidth: true, label: "ID do Abastecimento", value: "id"
   },
   {
-    width: "65%", fixedWidth: true, label: "Quantidade nessa Validade", value: "quantity"
-  }
+    width: "33%", fixedWidth: true, label: "Data de Validade", value: "expiry"
+  },
+  {
+    width: "33%", fixedWidth: true, label: "Quantidade nessa Validade", value: "quantity"
+  },
 ]
 
 export default function ViewProductBatchsDialog({ product = new Product(), onClose = () => { } }) {
@@ -78,20 +80,20 @@ export default function ViewProductBatchsDialog({ product = new Product(), onClo
   console.log(batchs, sum);
 
   return (
-    <DialogCustom maxWidth="xs" dialogTitle={"Produto"} hideActions onClose={onClose}>
+    <DialogCustom maxWidth="md" title={"Produto"} hideActions onClose={onClose}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', minWidth: "calc(50% - 16px)", gap: 16 }}>
-          <div style={{ flexBasis: "50%" }}><span>Código: <strong>{product.id}</strong></span></div>
+          <div style={{ flexBasis: "100%" }}><span>Código: <strong>{product.id}</strong></span></div>
           <div style={{ flexBasis: "100%" }}><span>Nome: <strong>{product.name}</strong></span></div>
-          <div style={{ flexBasis: "calc(50% - 16px)" }}><span>Preço de Compra: <strong>{TableRenderUI("price", product.priceBaseBuy)}</strong></span></div>
-          <div style={{ flexBasis: "calc(50% - 16px)" }}><span>Preço de Venda: <strong>{TableRenderUI("price", product.priceBaseSell)}</strong></span></div>
+          <div style={{ flexBasis: "100%" }}><span>Preço de Compra: <strong>{TableRenderUI("price", product.priceBaseBuy)}</strong></span></div>
+          <div style={{ flexBasis: "100%" }}><span>Preço de Venda: <strong>{TableRenderUI("price", product.priceBaseSell)}</strong></span></div>
           <div style={{ flexBasis: "100%", justifySelf: 'center', textAlign: "center" }}><span>Quantidade mínima informada: <strong>{product.minimumQuantity}</strong></span></div>
         </div>
         <Divider />
         <TableContainer>
-          <TableRow style={{ background: '#DCDCDC', borderRadius: '8px 8px 0px 0px', justifyContent: 'space-between' }}>
+          <TableRow style={{ background: '#DCDCDC', borderRadius: '8px 8px 0px 0px' }}>
             {columns.map((column, index) => (
-              <TableData style={{ background: '#DCDCDC', borderRadius: '8px 8px 0px 0px' }} key={index}>
+              <TableData style={{ background: '#DCDCDC', borderRadius: '8px 8px 0px 0px', width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1"  }} key={index}>
                 {column.label}
               </TableData>
             ))}
@@ -107,7 +109,7 @@ export default function ViewProductBatchsDialog({ product = new Product(), onClo
                 }}>
                   {columns.map((column, i) => {
                     return (
-                      <TableData key={`row-${index}-${i}`} style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }}>{TableRenderUI(column.value, prod[column.value])}</TableData>
+                      <TableData key={`row-${index}-${i}`} style={{ width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }}>{TableRenderUI(column.value, prod[column.value])}</TableData>
                     );
                   })}
                 </TableRow>

@@ -28,7 +28,7 @@ const columns = [
 ]
 
 const initialConfigProduct = { priceBuy: 0, priceSell: 0, expiry: null, quantity: 0 };
-const noneItem = { value: -1, label: "Nenhum" };
+const noneItem = { value: 0, label: "Nenhum" };
 
 function total(arr) {
   try {
@@ -293,7 +293,6 @@ export default function IncreaseQuantity(props) {
         </div>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 16 }}>
-        <Button variant="contained" onClick={onClose}>Cancelar</Button>
         <Button variant="contained" onClick={handleAddQuantity}>Confirmar</Button>
       </div>
     </div>

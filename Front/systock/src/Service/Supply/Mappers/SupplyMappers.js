@@ -45,4 +45,27 @@ export default class SupplyMappers {
 
     return supply;
   }
+
+  toInterfaceViewProducts({
+    batch_id_fk = {
+      product_id_fk: {
+        id: 1,
+        name: "",
+        costPrice: "",
+      },
+      quantity: 0,
+      expirationDate: new Date().toString()
+    },
+    subTotal,
+  }) {
+
+    return {
+      id: batch_id_fk?.product_id_fk?.id,
+      product: batch_id_fk?.product_id_fk?.name,
+      priceBuy: batch_id_fk?.product_id_fk?.costPrice,
+      quantity: batch_id_fk?.quantity,
+      expiry: batch_id_fk?.expirationDate,
+      subTotal
+    }
+  }
 }
