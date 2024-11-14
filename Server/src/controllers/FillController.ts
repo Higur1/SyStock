@@ -12,17 +12,17 @@ export default class FillController {
         try {
             const batch_fill = z.object({
                 quantity: z.number().positive(),
-                expirationDate: z.string().transform((val) => new Date(val)).optional(),
+                expirationDate: z.string().transform((val) => new Date(val)).optional().nullable(),
                 product_id: z.number().positive(),
                 price: z.number().positive(),
                 subTotal: z.number().positive(),
                 costPrice: z.number().positive()
             })  
             const fillValidation = z.object({
-                supplier_id: z.number().positive().optional(),
+                supplier_id: z.number().positive().optional().nullable(),
                 totalPrice: z.number().positive(),
                 batchs_fill: z.array(batch_fill),
-                observation: z.string().optional()
+                observation: z.string().optional().nullable()
             })
 
             const {totalPrice, batchs_fill, supplier_id, observation} = fillValidation.parse(request.body);
@@ -47,7 +47,7 @@ export default class FillController {
                 }
                 
                 const batchData: IBatch = {
-                    expirantionDate: element.expirationDate,
+                    expirantionDate: element.expirationDate || undefined,
                     product_id: element.product_id, 
                     quantity: element.quantity
                 }
