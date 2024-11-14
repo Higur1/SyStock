@@ -3,13 +3,13 @@ import { Container } from "./styles";
 import { Divider, Tab, Tabs } from "@mui/material";
 import CreateProduct from "./dialogs/CreateProduct";
 import EditProductDialog from "./dialogs/EditProductDialog";
-import AddSupply from "./dialogs/AddSupply";
 import ProductList from "./tabs/productList";
 import { ProductContext } from "./ProductPage";
 import DeleteProductDialog from "./dialogs/DeleteProductDialog";
 import ViewSupplies from "./tabs/ViewSupplies";
 import ViewProductsBySupply from "./dialogs/ViewProductsBySupply";
 import DecreaseQuantityProduct from "./tabs/DecreaseQuantityProduct";
+import IncreaseQuantity from "./tabs/IncreaseQuantity";
 
 
 export const TABS = {
@@ -98,7 +98,7 @@ export default function Product() {
             <CreateProduct onChangeTab={handleChange}/>
           )}
 
-          {tab === TABS.ADD_QUANTITY && (<AddSupply onClose={() => handleChange(null, TABS.PRODUCTS_LIST)}/>)}
+          {tab === TABS.ADD_QUANTITY && (<IncreaseQuantity onClose={() => handleChange(null, TABS.PRODUCTS_LIST)}/>)}
 
           {tab === TABS.DECREASE_QUANTITY && (<DecreaseQuantityProduct />)}
 

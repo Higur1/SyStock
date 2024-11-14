@@ -1,15 +1,14 @@
 import { Add, Delete, Remove } from '@mui/icons-material';
-import { Autocomplete, Button, Collapse, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, InputAdornment, Popper, TextField } from '@mui/material';
+import { Autocomplete, Button, Divider, IconButton, InputAdornment, Popper, TextField } from '@mui/material';
 import React, { useContext, useEffect } from 'react'
 import { useState } from 'react';
-import styled from 'styled-components';
-import SectionCollapser from '../../../components/common/SectionCollapser';
 import { TableContainer, TableData, TableRow } from '../styles';
 import Batch from '../../../classes/Batch';
 import { DEBUG_LOCAL, MainContext } from '../../../App';
 import { ENTITIES } from '../../../utils/debug-local-helper';
 import Supply from '../../../classes/Supply';
 import ProductActions from '../../../Service/Product/ProductActions';
+import SupplierActions from '../../../Service/Supplier/SupplierActions';
 
 const TYPES = {
   MINUS: "MINUS",
@@ -19,11 +18,11 @@ const TYPES = {
 const currencyRegex = /^[0-9]+(\.[0-9]{1,2})?$/;
 
 const columns = [
-  { label: "Data de Validade", value: "expiry" },
-  { label: "Nome", value: "name" },
-  { label: "Quantidade", value: "quantity" },
-  { label: "Preço de Custo", value: "priceBuy" },
-  { label: "SubTotal", value: "subTotal" }
+  { label: "Data de Validade", value: "expiry", fixedWidth: true, width: 150, },
+  { label: "Nome", value: "name", fixedWidth: false, width: 80, },
+  { label: "Quantidade", value: "quantity", fixedWidth: true, width: 120, },
+  { label: "Preço de Custo", value: "priceBuy", fixedWidth: true, width: 100, },
+  { label: "SubTotal", value: "subTotal", fixedWidth: true, width: 150, }
 ]
 
 const initialConfigProduct = { priceBuy: 0, priceSell: 0, expiry: null, quantity: 0 };
@@ -45,7 +44,7 @@ function total(arr) {
 
 }
 
-export default function AddQuantity(props) {
+export default function IncreaseQuantity(props) {
   const { onClose } = props;
   const [extraProps, setExtraProps] = useState(initialConfigProduct);
   const [productsToAdd, setProductsToAdd] = useState([]);
@@ -55,26 +54,31 @@ export default function AddQuantity(props) {
   const [products, setProducts] = useState([]);
   const [description, setDescription] = useState("");
   const [productsBase, setProductsBase] = useState([]);
-  const [suppliersBase, setSuppliersBase] = useState([]);
 
-  const { getData, updateData, handleOpenSnackBar } = useContext(MainContext);
+  const { handleOpenSnackBar } = useContext(MainContext);
 
   useEffect(() => {
-    const suppliers = getData("suppliers");
-    const products = getData("products");
-
-    const nextSuppliers = suppliers.map((sup) => ({ label: sup.name, value: sup.email }));
-    const nextProducts = products.map((prod) => ({ label: prod.name, value: prod.refCode }));
-
-    setSuppliersBase(suppliers);
-    setProductsBase(products);
-    setSuppliers([noneItem, ...nextSuppliers]);
-    setProducts([noneItem, ...nextProducts]);
-
-    setProduct(noneItem);
-    setSupplier(noneItem);
+    getInitialInfos();
   }, []);
 
+  async function getInitialInfos() {
+    try {
+      const suppliers = await SupplierActions.getAll();
+      const products = await ProductActions.getAll();
+
+      const nextSuppliers = suppliers.map((sup) => ({ label: sup.name, value: sup.email }));
+      const nextProducts = products.map((prod) => ({ label: prod.name, value: prod.refCode }));
+
+      setProductsBase(products);
+      setSuppliers([noneItem, ...nextSuppliers]);
+      setProducts([noneItem, ...nextProducts]);
+
+      setProduct(noneItem);
+      setSupplier(noneItem);
+    } catch (error) {
+      handleOpenSnackBar("error", error, 5000);
+    }
+  }
   function handleQuantity(type) {
     const nextValue = type === TYPES.MINUS ? extraProps.quantity - 1 : extraProps.quantity + 1;
     handleChangeExtraProps("quantity", nextValue);
@@ -111,30 +115,26 @@ export default function AddQuantity(props) {
   }
 
   async function handleAddQuantity() {
-    const nextSupplier = supplier ? suppliersBase.find(sup => sup.email === supplier.value) : null;
-    if (DEBUG_LOCAL) {
-
-      const batches = productsToAdd.map(prod => {
-        const supplier = nextSupplier ? nextSupplier : null;
-
-        prod.setSupplier(supplier);
-
-        return prod;
-      });
-
-
-      const currentSupplies = getData(ENTITIES.SUPPLY_LIST);
-
-      updateData(ENTITIES.SUPPLY_LIST, [...currentSupplies, new Supply({ batches, description, supplier: nextSupplier ? nextSupplier : null })]);
-      handleOpenSnackBar("success", "Abastecimento Criado", 5000);
-    } else {
+    try {
       await ProductActions.addMultipleQuantityProducts(productsToAdd);
+      reset();
+      handleOpenSnackBar("success", "Abastecimento Criado", 5000);
+    } catch (error) {
+      handleOpenSnackBar("error", error);
     }
     onClose();
   }
 
+  function reset() {
+    setProductsToAdd([]);
+    setProduct(null);
+    setSupplier(noneItem);
+    setExtraProps(initialConfigProduct);
+    setDescription("");
+  }
+
   return (
-    <div style={{ width: "100%", height: "100%", flexDirection: 'column', gap: 16, display: 'flex', justifyContent: 'space-between' }}>
+    <div style={{ width: "100%", height: "100%", flexDirection: 'column', gap: 16, display: 'flex', justifyContent: 'space-between', paddingTop: 16 }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <Autocomplete
           disablePortal
@@ -237,7 +237,7 @@ export default function AddQuantity(props) {
         <TableContainer>
           <TableRow style={{ background: '#DCDCDC', borderRadius: '8px 8px 0px 0px' }}>
             {columns.map((column, i) => (
-              <TableData style={{ justifyContent: 'center', width: 150, maxWidth: 150 }} key={`header-column-${i}`}>{column.label}</TableData>
+              <TableData style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1"}} key={`header-column-${i}`}>{column.label}</TableData>
             ))}
           </TableRow>
           <div className="customScroll">
@@ -251,18 +251,18 @@ export default function AddQuantity(props) {
 
                   if (column.value === "subTotal") {
                     return (
-                      <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{prod.getSubTotal()}</TableData>
+                      <TableData key={`row-${index}-${i}`} style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1"}}>{prod.getSubTotal()}</TableData>
                     );
                   }
                   return (
-                    <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{prod[column.value]}</TableData>
+                    <TableData key={`row-${index}-${i}`} style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1"}}>{prod[column.value]}</TableData>
                   );
                 })}
               </TableRow>
             ))}
             <TableRow style={{ borderRadius: '8px 8px 0px 0px' }}>
               {columns.map((column, i) => (
-                <TableData style={{ justifyContent: 'center', width: 150, maxWidth: 150 }} key={`column-${i}`}>{ }</TableData>
+                <TableData style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1"}} key={`column-${i}`}>{ }</TableData>
               ))}
             </TableRow>
           </div>
