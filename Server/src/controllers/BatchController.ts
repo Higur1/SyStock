@@ -1,7 +1,7 @@
 import IBatch from "../interface/IBatch";
 import BatchService from "../service/BatchService";
 import z from "zod"
-import {dateBase} from "../functions/baseFunctions";
+import {convertStringToNumber, dateBase} from "../functions/baseFunctions";
 
 export default class BatchController {
     static async findAll(request, response) {
@@ -59,12 +59,14 @@ export default class BatchController {
     static async findByProduct(request, response) {
         try {
             const batchValidation = z.object({
-                product_id: z.number().positive()
+                product_id: z.string().min(1).trim()
             });
-            const { product_id } = batchValidation.parse(request.body);
+            const { product_id } = batchValidation.parse(request.params);
+
+            const convertString = convertStringToNumber(product_id);
             const batchData: IBatch = {
                 expirantionDate: new Date(),
-                product_id: product_id,
+                product_id: convertString,
                 quantity: 0
             }
             const findResult = await BatchService.findByProduct(batchData);
@@ -83,7 +85,7 @@ export default class BatchController {
                 }));
             };
             response.status(400).send(JSON.stringify({
-                Error: error.issues[0].message,
+                Error: error,
             }));
         }
     }
