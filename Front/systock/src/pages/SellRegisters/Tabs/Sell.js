@@ -3,6 +3,7 @@ import { Autocomplete, Button, FormControl, MenuItem, Select, TextField } from '
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { TableContainer, TableData, TableRow } from '../styles';
+import TableRenderUI from '../../../utils/TableRenderUI';
 
 const Container = styled("div")({
   display: 'flex',
@@ -104,7 +105,7 @@ export default function Sell() {
                             flex: column.fixedWidth ? "none" : "1"
                           }}
                         >
-                          {log[column.value]}
+                          {TableRenderUI(column.value, log[column.value])}
                         </TableData>
                       );
                     })}

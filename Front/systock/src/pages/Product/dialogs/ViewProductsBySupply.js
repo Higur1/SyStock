@@ -6,6 +6,7 @@ import Supply from '../../../classes/Supply';
 import ProductActions from '../../../Service/Product/ProductActions';
 import { MainContext } from '../../../App';
 import CircularLoading from '../../../components/common/CircularLoading';
+import TableRenderUI from '../../../utils/TableRenderUI';
 
 const infos = [
   { value: "id", label: "Código do Abastecimento" },
@@ -85,28 +86,8 @@ export default function ViewProductsBySupply({ supply = new Supply(), onClose })
                       background: index & 2 === 0 ? "#ebebeb" : "#F5f5f5"
                     }}>
                       {columns.map((column, i) => {
-
-                        if (column.value === "expiry") {
-                          return (
-                            <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{prod.expiryToString()}</TableData>
-                          );
-                        }
-
-                        if (column.value === "subTotal") {
-                          return (
-                            <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{prod.getSubTotal()}</TableData>
-                          );
-                        }
-
-
-                        if (!prod[column.value]) {
-                          return (
-                            <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}></TableData>
-                          )
-                        }
-
                         return (
-                          <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{prod[column.value]}</TableData>
+                          <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{TableRenderUI(column.value, prod[column.value])}</TableData>
                         );
                       })}
                     </TableRow>

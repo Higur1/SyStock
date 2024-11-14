@@ -9,6 +9,7 @@ import { Delete, Edit, MoreVert, Search } from '@mui/icons-material';
 import NoData from '../../../components/common/NoData';
 import ProductActions from '../../../Service/Product/ProductActions';
 import { MainContext } from '../../../App';
+import TableRenderUI from '../../../utils/TableRenderUI';
 
 
 export const FILTER_TYPES = {
@@ -162,20 +163,8 @@ export default function ProductList(props) {
                         </TableData>
                       )
                     }
-
-                    if (column.value === "category") {
-                      return (
-                        <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: column.width, maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }}>{prod[column.value]?.name}</TableData>
-                      );
-                    }
-                    if (column.value === "expiry") {
-                      return (
-                        <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: column.width, maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }}>{formatDate(prod[column.value])}</TableData>
-                      );
-                    }
-
                     return (
-                      <TableData key={`row-${index}-${i}`} style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }}>{prod[column.value]}</TableData>
+                      <TableData key={`row-${index}-${i}`} style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }}>{TableRenderUI(column.value, prod[column.value])}</TableData>
                     );
                   })}
                 </TableRow>

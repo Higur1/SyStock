@@ -34,9 +34,31 @@ export default class BatchActions {
       .then(response => this.mapper.toInterface(response.batch));
   }
 
+  static async create(batch = new Batch({})) {
+    const Client = new HTTPClient("/batch");
+
+    return Client.post(this.mapper.toServerCreate(batch))
+      .then(response => this.mapper.toInterface(response.batch));
+  }
+
   static async decreaseQuantity(obj = { product_id: 0, expirationDate: new Date().toString(), quantity: 0 }) {
     const Client = new HTTPClient("/batch/subQuantity");
 
     return Client.post(obj);
+  }
+
+  static async addQuantity(batch = new Batch({})) {
+    const Client = new HTTPClient("/batch/addQuantity");
+
+    return Client.post(this.mapper.toServerCreate(batch))
+      .then(response => this.mapper.toInterface(response.batch));
+  }
+
+  static async addMultipleQuantityProducts(productsToAdd = []) {
+
+    const results = await Promise.all(productsToAdd.map(batch => BatchActions.addQuantity(batch)));
+
+    if (results.every(result => result instanceof Batch)) return Promise.result();
+    return Promise.reject(results.some(result => typeof result === "string"));
   }
 }

@@ -47,7 +47,7 @@ export function formatDate(dateString = null, addHours = true) {
   const hours = date.getHours();
   const minutes = date.getMinutes();
 
-  const formatDate = `${day}/${month}/${year}${addHours ? ` ${hours}:${minutes}` : ""}`;
+  const formatDate = `${day}/${month}/${year}${addHours ? ` ${hours < 10 ? `${hours}0` : hours}:${minutes < 10 ? `${minutes}0` : minutes}` : ""}`;
 
   return formatDate;
 }
@@ -314,4 +314,16 @@ export function getErrorMessage(method, route, status) {
 
 export function formatPhoneNumber(numberString) {
   return numberString.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+}
+
+export function formatToCurrency(value) {
+  const number = typeof value === "number" ? value : parseFloat(value);
+  if (isNaN(number)) return "Invalid number";
+
+  // Format the number as currency
+  return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 2, 
+  }).format(number);
 }

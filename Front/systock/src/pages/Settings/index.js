@@ -7,6 +7,7 @@ import NewUserDialog, { TYPE_USER_DIALOG } from './dialogs/NewUser'
 import Account from '../../classes/Account'
 import { MainContext } from '../../App'
 import MyUser from './dialogs/MyUser'
+import TableRenderUI from '../../utils/TableRenderUI'
 
 const columns = [
   { fixedWidth: false, label: "Nome", value: "name", width: 120 },
@@ -108,7 +109,7 @@ export default function Settings() {
                         }}
                       >
                         <>
-                          {column.value !== "functions" ? (<>{log[column.value]}</>) : (
+                          {column.value !== "functions" ? (<>{TableRenderUI(column.value, log[column.value])}</>) : (
                             <IconButton onClick={e => handleMenu(e, log)}>
                               <MoreVert />
                             </IconButton>

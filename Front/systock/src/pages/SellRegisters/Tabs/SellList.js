@@ -3,6 +3,7 @@ import { SellListContainer, TableContainer, TableData, TableRow } from '../style
 import { SellRegistersContext } from '../SellRegistersPage';
 import { IconButton } from '@mui/material';
 import { Description, Visibility } from '@mui/icons-material';
+import TableRenderUI from '../../../utils/TableRenderUI';
 
 const columns = [
   { fixedWidth: true, label: "Data da Venda", value: "date", width: 120 },
@@ -93,7 +94,7 @@ export default function SellList() {
                           flex: column.fixedWidth ? "none" : "1"
                         }}
                       >
-                        {log[column.value]}
+                        {TableRenderUI(column.value, log[column.value])}
                       </TableData>
                     );
                   })}

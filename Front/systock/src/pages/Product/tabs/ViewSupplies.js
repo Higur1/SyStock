@@ -6,6 +6,7 @@ import { TableContainer, TableData, TableRow } from '../styles';
 import { formatDate } from '../../../utils/utils';
 import { Visibility } from '@mui/icons-material';
 import SupplyActions from '../../../Service/Supply/SupplyActions';
+import TableRenderUI from '../../../utils/TableRenderUI';
 
 const columns = [
   { value: "dateInsert", label: "Data e Hora"},
@@ -102,32 +103,8 @@ export default function ViewSupplies({handleViewProducts}) {
                       </TableData>
                     );
                   }
-
-                  if (column.value === "supplier") {
-                    return (
-                      <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{prod[column.value]?.name}</TableData>
-                    );
-                  }
-                  if (column.value === "dateInsert") {
-                    return (
-                      <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{formatDate(prod[column.value], true)}</TableData>
-                    );
-                  }
-                  if (column.value === "totalCost") {
-                    return (
-                      <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{prod.getTotalValue()}</TableData>
-                    );
-                  }
-
-                  
-                  if(!prod[column.value]) {
-                    return (
-                      <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}></TableData>
-                    )
-                  }
-
                   return (
-                    <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{prod[column.value]}</TableData>
+                    <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{TableRenderUI(column.value, prod[column.value])}</TableData>
                   );
                 })}
               </TableRow>

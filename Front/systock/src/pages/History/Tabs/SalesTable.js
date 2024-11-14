@@ -3,6 +3,7 @@ import { TableContainer, TableData, TableRow } from '../styles'
 import { HistoryContext } from '../HistoryPage';
 import { IconButton } from '@mui/material';
 import { Description, Visibility } from '@mui/icons-material';
+import TableRenderUI from '../../../utils/TableRenderUI';
 
 const columns = [
   { fixedWidth: true, label: "Data e Hora", value: "date", width: 120 },
@@ -85,7 +86,7 @@ export default function SalesTable() {
                     flex: column.fixedWidth ? "none" : "1"
                   }}
                 >
-                  {log[column.value]}
+                  {TableRenderUI(column.value, log[column.value])}
                 </TableData>
               );
             })}

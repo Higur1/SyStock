@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { TableContainer, TableData, TableRow } from '../styles';
 import { SellRegistersContext } from '../SellRegistersPage';
 import { dateToTextField } from '../../../utils/utils';
+import TableRenderUI from '../../../utils/TableRenderUI';
 
 const Container = styled("div")({
   display: 'flex',
@@ -86,7 +87,7 @@ export default function ClosingOfTheDay() {
                             flex: column.fixedWidth ? "none" : "1"
                           }}
                         >
-                          {log[column.value]}
+                          {TableRenderUI(column.value, log[column.value])}
                         </TableData>
                       );
                     })}

@@ -9,6 +9,14 @@ export default class BatchMappers {
     }
   }
 
+  toServerCreate(obj = new Batch({})) {
+    return {
+      expirationDate: obj.expiry || null,
+      product_id: obj.productID,
+      quantity: obj.quantity
+    }
+  }
+
   toServerPut(obj = new Batch({})) {
     return {
       id: obj.id,

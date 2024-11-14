@@ -3,6 +3,7 @@ import { Autocomplete, Button, Dialog, DialogActions, DialogContent, DialogTitle
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { TableContainer, TableData, TableRow } from '../styles';
+import TableRenderUI from '../../../utils/TableRenderUI';
 
 export const Container = styled.div`
   display: flex;
@@ -123,7 +124,7 @@ export default function EditSell() {
                                 flex: column.fixedWidth ? "none" : "1"
                               }}
                             >
-                              {log[column.value]}
+                              {TableRenderUI(column.value, log[column.value])}
                             </TableData>
                           );
                         })}
