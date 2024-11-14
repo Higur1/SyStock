@@ -45,7 +45,7 @@ const columnsBase = {
     { fixedWidth: true, width: 200, label: "Categoria", value: "category" },
     { fixedWidth: true, width: 100, label: "Quantidade Total", value: "totalQuantity" },
     { fixedWidth: true, width: 120, label: "Quantidade nessa Validade", value: "totalQuantitySameExpiry" },
-    { fixedWidth: true, width: 100, label: "Funções", value: "menu" }
+    // { fixedWidth: true, width: 100, label: "Funções", value: "menu" }
   ],
   [FILTER_TYPES.LOW_QUANTITY]: [
     { fixedWidth: true, label: "Código de Referência", value: "refCode", width: 120 },
@@ -53,13 +53,13 @@ const columnsBase = {
     { fixedWidth: true, width: 200, label: "Categoria", value: "category" },
     { fixedWidth: true, width: 120, label: "Quantidade Mínima", value: "minimumQuantity" },
     { fixedWidth: true, width: 80, label: "Quantidade", value: "quantity" },
-    { fixedWidth: true, width: 100, label: "Funções", value: "menu" }
+    // { fixedWidth: true, width: 100, label: "Funções", value: "menu" }
   ],
   [FILTER_TYPES.EMPTY]: [
     { fixedWidth: true, label: "Código de Referência", value: "refCode", width: 120 },
     { fixedWidth: false, width: 200, label: "Nome", value: "name" },
     { fixedWidth: true, width: 200, label: "Categoria", value: "category" },
-    { fixedWidth: true, width: 100, label: "Funções", value: "menu" }
+    // { fixedWidth: true, width: 100, label: "Funções", value: "menu" }
   ],
   [FILTER_TYPES.EXPIRED]: [
     { fixedWidth: true, width: 150, label: "Data de Vencimento", value: "expiry" },
@@ -68,7 +68,7 @@ const columnsBase = {
     { fixedWidth: true, width: 200, label: "Categoria", value: "category" },
     { fixedWidth: true, width: 80, label: "Quantidade Total", value: "totalQuantity" },
     { fixedWidth: true, width: 80, label: "Quantidade Vencida", value: "totalQuantitySameExpiry" },
-    { fixedWidth: true, width: 100, label: "Funções", value: "menu" }
+    // { fixedWidth: true, width: 100, label: "Funções", value: "menu" }
   ],
 }
 
@@ -76,7 +76,7 @@ export default function ProductList(props) {
 
   const { categories } = useContext(ProductContext);
   const { handleOpenSnackBar } = useContext(MainContext);
-  const { handleEditProductDialog, handleDeleteProductDialog } = props;
+  const { handleEditProductDialog, handleDeleteProductDialog, handleViewProductDialog } = props;
 
   const [filter, setFilter] = useState(FILTER_TYPES.ALL);
   const [products, setProducts] = useState(null);
@@ -183,6 +183,7 @@ export default function ProductList(props) {
           open
           onClose={MenuActions.close}
         >
+          <MenuItem onClick={() => handleViewProductDialog(menu.prod)}>Visualizar Lotes do Produto</MenuItem>
           <MenuItem onClick={() => handleEditProductDialog(menu.prod)}>Editar Produto</MenuItem>
           <MenuItem onClick={() => handleDeleteProductDialog(menu.prod)}>Excluir Produto</MenuItem>
         </Menu>

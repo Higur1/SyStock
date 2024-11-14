@@ -1,11 +1,13 @@
-import { Title, Visibility } from '@mui/icons-material';
-import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import React from 'react';
+import TableRenderUI from '../../../utils/TableRenderUI';
 
 export default function ViewAdvicesDialog(props) {
 
   const { onClose, obj } = props;
   const { label, list } = obj; 
+
+  console.log(list);
 
   return (
     <Dialog
@@ -30,8 +32,8 @@ export default function ViewAdvicesDialog(props) {
               <div style={{display: 'flex', alignItems: 'center', height: 48, border: "1px solid #dcdcdc", width: "100%", borderRadius: 16}} key={index}>
                 <div style={{textAlign: 'center', width: 36}}>{index + 1}</div>
                 <div style={{display: 'flex',alignItems: 'center', flex: 1, fontWeight: 500}}>{product.name}</div>
-                <div style={{display: 'flex',alignItems: 'center', flexBasis: 150, justifyContent: 'center'}}>{product.quantity}</div>
-                <div style={{display: 'flex',alignItems: 'center', flexBasis: 150, justifyContent: 'center'}}>{product.expiryToString()}</div>
+                <div style={{display: 'flex',alignItems: 'center', flexBasis: 150, justifyContent: 'center'}}>{product.totalQuantity}</div>
+                <div style={{display: 'flex',alignItems: 'center', flexBasis: 150, justifyContent: 'center'}}>{TableRenderUI("expiry", product.expiryToString())}</div>
                 {/* <div style={{display: 'flex',alignItems: 'center', flexBasis: 100, fontWeight: 700}}>
                   <IconButton onClick={() => openSuppliers(product)}><Visibility /></IconButton>
                 </div> */}

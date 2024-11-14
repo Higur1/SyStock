@@ -15,7 +15,7 @@ const TABS = {
 const tabsList = [
   { type: TABS.PRODUCT_MOVEMENT, label: "Histórico - Movimentação de Produtos" },
   { type: TABS.SUPPLY, label: "Histórico - Abastecimentos" },
-  { type: TABS.SALES, label: "Histórico - Vendas" }
+  // { type: TABS.SALES, label: "Histórico - Vendas" }
 ];
 
 export default function History() {

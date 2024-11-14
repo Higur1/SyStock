@@ -52,13 +52,13 @@ export default function Sidebar({logOff}) {
       selected: window.location.pathname.indexOf('history') !== -1,
       openCollapse: false
     },
-    {
-      type: 'sellRegisters', 
-      label: 'Registros de venda', 
-      child: [],
-      selected: window.location.pathname.indexOf('sellRegisters') !== -1,
-      openCollapse: false
-    },
+    // {
+    //   type: 'sellRegisters', 
+    //   label: 'Registros de venda', 
+    //   child: [],
+    //   selected: window.location.pathname.indexOf('sellRegisters') !== -1,
+    //   openCollapse: false
+    // },
     {
       type: 'settings', 
       label: 'Configurações', 

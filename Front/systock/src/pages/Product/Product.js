@@ -10,6 +10,7 @@ import ViewSupplies from "./tabs/ViewSupplies";
 import ViewProductsBySupply from "./dialogs/ViewProductsBySupply";
 import DecreaseQuantityProduct from "./tabs/DecreaseQuantityProduct";
 import IncreaseQuantity from "./tabs/IncreaseQuantity";
+import ViewProductBatchsDialog from "./dialogs/ViewProductBatchsDialog";
 
 
 export const TABS = {
@@ -26,7 +27,8 @@ const TYPES_DIALOG = {
   EDIT_PRODUCT: 3,
   DELETE_PRODUCT: 4,
   VIEW_SUPPLIES: 5,
-  VIEW_PRODUCTS_BY_SUPPLY: 6
+  VIEW_PRODUCTS_BY_SUPPLY: 6,
+  VIEW_PRODUCT_BATCHS: 7
 }
 
 const tabsList = [
@@ -64,6 +66,11 @@ export default function Product() {
     setDialog({ type: TYPES_DIALOG.DELETE_PRODUCT, prod });
   }
 
+  function handleViewProductDialog(prod) {
+    console.log(prod);
+    setDialog({ type: TYPES_DIALOG.VIEW_PRODUCT_BATCHS, prod});
+  }
+
   function closeDialog() {
     setDialog({ type: TYPES_DIALOG.NONE });
   }
@@ -91,6 +98,7 @@ export default function Product() {
             <ProductList
               handleEditProductDialog={handleEditProductDialog}
               handleDeleteProductDialog={handleDeleteProductDialog}
+              handleViewProductDialog={handleViewProductDialog}
             />
           )}
 
@@ -121,6 +129,8 @@ export default function Product() {
       {dialog.type === TYPES_DIALOG.DELETE_PRODUCT && (<DeleteProductDialog closeDialog={closeDialog} product={dialog.prod} />)}
 
       {dialog.type === TYPES_DIALOG.VIEW_PRODUCTS_BY_SUPPLY && (<ViewProductsBySupply supply={dialog.supply} onClose={closeDialog} />)}
+
+      {dialog.type === TYPES_DIALOG.VIEW_PRODUCT_BATCHS && (<ViewProductBatchsDialog product={dialog.prod} onClose={closeDialog}/>)}
     </>
   )
 }

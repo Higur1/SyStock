@@ -15,13 +15,15 @@ export default class Product {
    * @param {string} [options.description=""] - The description of the product.
    * @param {number} [options.totalQuantity=0] - Total Quantity in stock
    */
-  constructor({ id = 0, name = "", refCode = "", category = null, priceBaseSell = 0, priceBaseBuy = 0, minimumQuantity = 0, description = "", totalQuantity = 0 } = {}) {
+  constructor({ id = 0, name = "", refCode = "", expiry = new Date() || null, category = null, priceBaseSell = 0, priceBaseBuy = 0, minimumQuantity = 0, description = "", totalQuantity = 0 } = {}) {
     this.id = id;
     /**
      * The name of the product.
      * @type {string}
      */
     this.name = name;
+
+    this.expiry = expiry;
 
     /**
      * The reference code of the product.

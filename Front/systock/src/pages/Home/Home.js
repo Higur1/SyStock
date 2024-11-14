@@ -4,6 +4,8 @@ import React, { useContext, useEffect } from 'react';
 import { useState } from 'react';
 import ViewAdvicesDialog from '../Supplier/dialogs/ViewAdvicesDialog';
 import { DEBUG_LOCAL, MainContext } from '../../App';
+import ProductActions from '../../Service/Product/ProductActions';
+import CategoryActions from '../../Service/Category/CategoryActions';
 
 export const ADVICE_VARIANT = {
   "ERROR": 0,
@@ -19,7 +21,7 @@ export const ADVICE_TYPE = {
 };
 
 export default function Home() {
-  const { dbBase } = useContext(MainContext);
+  const { handleOpenSnackBar } = useContext(MainContext);
   
   // const [suppliersDialog, setSuppliersDialog] = useState({open: false, obj: null});
   const [table, setTable] = useState([
@@ -50,52 +52,38 @@ export default function Home() {
     handleInitialData();
   }, []);
 
-  function getAdvicesDEBUG() {
-    const { supplyList } = dbBase;
+  async function getAdvices() {
+    try {
+      const categories = await CategoryActions.getAll();
+      const productsExpired = await ProductActions.getAllExpired(categories);
+      const productsEmpty = await ProductActions.getAllEmpty(categories);
+      const productsCloseToExpiry = await ProductActions.getAllCloseToExpiry(categories);
+      const productsLowQuantity = await ProductActions.getAllLowQuantity(categories);
 
-    const supplyListFiltered = supplyList.map(supply => {
-
-      return {
-        [ADVICE_TYPE.PRODUCT_EMPTY]: supply.getBatchesEmpty(),
-        [ADVICE_TYPE.PRODUCT_ENDING]: supply.getBatchesEnding(),
-        [ADVICE_TYPE.PRODUCT_EXPIRED]: supply.getBatchesExpired(),
-        [ADVICE_TYPE.PRODUCT_NEXT_TO_EXPIRE]: supply.getBatchesExpired(),
-      }
-    });
-
-    const emptyProducts = [];
-    const endingProducts = [];
-    const expiredProducts = [];
-    const nextToExpireProducts = [];
-
-    supplyListFiltered.forEach(objSupplyList => {
-      emptyProducts.push(...objSupplyList[ADVICE_TYPE.PRODUCT_EMPTY]);
-      endingProducts.push(...objSupplyList[ADVICE_TYPE.PRODUCT_ENDING]);
-      expiredProducts.push(...objSupplyList[ADVICE_TYPE.PRODUCT_EXPIRED]);
-      nextToExpireProducts.push(...objSupplyList[ADVICE_TYPE.PRODUCT_NEXT_TO_EXPIRE]);
-    });
-
-    setTable(prevTable => prevTable.map(table => {
-      switch(table.type) {
-        case ADVICE_TYPE.PRODUCT_EMPTY: {
-          return {...table, list: emptyProducts};
+      setTable(prevTable => prevTable.map(table => {
+        switch(table.type) {
+          case ADVICE_TYPE.PRODUCT_EMPTY: {
+            return {...table, list: productsEmpty};
+          }
+          case ADVICE_TYPE.PRODUCT_ENDING: {
+            return {...table, list: productsLowQuantity};
+          }
+          case ADVICE_TYPE.PRODUCT_EXPIRED: {
+            return {...table, list: productsExpired};
+          }
+          case ADVICE_TYPE.PRODUCT_NEXT_TO_EXPIRE: {
+            return {...table, list: productsCloseToExpiry};
+          }
+          default: return table;
         }
-        case ADVICE_TYPE.PRODUCT_ENDING: {
-          return {...table, list: endingProducts};
-        }
-        case ADVICE_TYPE.PRODUCT_EXPIRED: {
-          return {...table, list: expiredProducts};
-        }
-        case ADVICE_TYPE.PRODUCT_NEXT_TO_EXPIRE: {
-          return {...table, list: nextToExpireProducts};
-        }
-        default: return table;
-      }
-    }));
+      }));
+    } catch (e) {
+      handleOpenSnackBar("error", e);
+    }
   }
 
   function handleInitialData() {
-    if(DEBUG_LOCAL) getAdvicesDEBUG();
+    getAdvices();
   }
 
   // function openSuppliers(obj) {

@@ -18,7 +18,9 @@ export default class BatchActions {
   static async getByProduct(productID) {
     const Client = new HTTPClient(`/batch/product/${productID}`);
 
-    return Client.get().then(response => this.mapper.toInterface(response.batch));
+    return Client.get().then(response => {
+      return response.Batchs.map(this.mapper.toInterface)
+    });
   }
 
   static async getBySupplier(supplyID) {

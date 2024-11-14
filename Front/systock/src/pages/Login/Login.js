@@ -8,6 +8,7 @@ import { AccountCircle, Key, Visibility, VisibilityOff } from '@mui/icons-materi
 import ButtonCustom from '../../components/common/ButtonCustom/ButtonCustom'
 import { useLogin } from './useLogin'
 import styled from 'styled-components'
+import Logo from '../../components/common/Logo';
 
 const DivColumnFlex8 = styled("div")({ display: 'flex', flexDirection: 'column', gap: 8 });
 const DivGrid8 = styled("div")({ display: 'grid', gap: 8, gridTemplate: '1fr / 50% 50%' });
@@ -37,7 +38,7 @@ const Login = () => {
               {screen === "login" && (
                 <>
                   <InfoContainer>
-                    {"LOGO HERE"}
+                    <Logo />
                     <ButtonCustom
                       onClick={() => handleScreen("firstAccess")}
                       variant="outlined"
