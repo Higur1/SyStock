@@ -1,11 +1,8 @@
-import { Backdrop, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputAdornment, InputLabel, MenuItem, Select, Slide, TextField } from "@mui/material";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import { Button, FormControl, InputAdornment, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import React, { useContext, useMemo, useState } from "react";
 import PropTypes from 'prop-types';
-import { CurrencyInput } from "react-currency-mask";
 import styled from "styled-components";
-import { DEBUG_LOCAL, MainContext } from "../../../App";
-import { ENTITIES } from "../../../utils/debug-local-helper";
-import CategoryActions from "../../../Service/Category/CategoryActions";
+import { MainContext } from "../../../App";
 import Product from "../../../classes/Product";
 import { ProductContext } from "../ProductPage";
 import useValidateForm, { FORM_TYPE } from "../../../hooks/useValidateForm";
@@ -57,24 +54,12 @@ export default function CreateProduct() {
     }
   }
 
-  // function create() {
-  //   const prod = new Product({});
-
-  //   prod.name = name;
-  //   prod.priceBaseSell = priceSell;
-  //   prod.priceBaseBuy = priceBuy;
-  //   prod.minimumQuantity = minimumQuantity;
-  //   prod.description = description;
-  //   prod.category = categoryID ? categories.find(cat => cat.id === categoryID) : null;
-    
-  //   handleCreate(prod);
-  //   reset();
-  // }
-
   function reset() {
     setValues({name: "", description: "", priceSell: 0, priceBuy: 0, categoryID: "", minimumQuantity: 0});
     resetValidate();
   }
+
+  const disableConfirm = useMemo(() => [values.name].includes("") || [values.priceBuy, values.priceSell. minimumQuantity].includes(0), [values]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16, width: "100%", height: "100%" }}>
@@ -150,7 +135,7 @@ export default function CreateProduct() {
         </FormControl>
       </Container>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 16 }}>
-        <Button variant={"contained"} disabled={loading || hasAnyError} onClick={onConfirm}>Adicionar</Button>
+        <Button variant={"contained"} disabled={loading || hasAnyError || disableConfirm} onClick={onConfirm}>Adicionar</Button>
       </div>
     </div>
   );

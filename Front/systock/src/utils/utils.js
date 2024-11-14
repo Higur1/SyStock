@@ -93,7 +93,7 @@ export function dateToTextField(dateString = "") {
 
 export const CURRENT_INSTANCE = window.location.host;
 
-export function getErrorMessage(method, route, status) {
+export function getErrorMessage(method, route, status, secondaryMessage) {
   
   if(status === 500) return "Ocorreu um erro no sistema";
   switch(route) {
@@ -307,9 +307,7 @@ export function getErrorMessage(method, route, status) {
     }
     default: break;
   }
-
-  console.log(method, status, route);
-  return "Ocorreu um erro";
+  return secondaryMessage || "Ocorreu um erro";
 }
 
 export function formatPhoneNumber(numberString) {

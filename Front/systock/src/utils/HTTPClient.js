@@ -45,7 +45,10 @@ export default class HTTPClient {
       const response = await fetch(url, options);
       
       if (!response.ok) {
-        throw getErrorMessage(method, this.route, response.status);
+        const errorResponse = await response.json();
+
+        const secondaryError = errorResponse.Message || errorResponse.Error || null;
+        throw getErrorMessage(method, this.route, response.status, secondaryError);
       }
 
       try {
@@ -54,8 +57,8 @@ export default class HTTPClient {
         return await response.text();
       }
     } catch (error) {
-      console.error(error);
-      throw getErrorMessage(method, this.route, 1000);
+      console.log(`ERRO API ${this.route} - method: ${method}: ${error}`);
+      throw getErrorMessage(method, this.route, 1000, error);
     }
   }
 }

@@ -28,8 +28,6 @@ export default class SupplyActions {
   static async create(supply = new Supply()) {
     const Client = new HTTPClient("/fill");
 
-    return Client.post(this.mapper.toServer(supply))
-      .then(() => supply);
-      // .then(response => this.mapper.toInterface(response.batch));
+    return Client.post(this.mapper.toServer(supply));
   }
 }

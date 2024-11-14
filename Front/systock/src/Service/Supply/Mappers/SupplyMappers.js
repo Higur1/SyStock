@@ -5,10 +5,23 @@ import BatchMappers from "../../Batch/Mappers/BatchMappers";
 
 export default class SupplyMappers {
   toServer(obj = new Supply({})) {
+
+    const batchs_fill = obj.batches.map(batch => ({
+      quantity: batch.quantity,
+      expirationDate: batch.expiry,
+      product_id: batch.productID,
+      price: Number(batch.priceSell),
+      subTotal: batch.priceBuy * batch.quantity,
+      costPrice: Number(batch.priceBuy)
+    }));
+
+    const totalPrice = obj.getTotalValue();
+
     return {
-      product_id: 0,
-      supplier_id: 0,
-      quantity: 0
+      totalPrice,
+      batchs_fill,
+      supplier_id: obj.supplierID,
+      observation: obj.description
     }
   }
 
@@ -26,6 +39,7 @@ export default class SupplyMappers {
     supply.id = id;
     supply.totalValue = totalPrice;
     supply.supplier = suppliers.find(sup => sup.id === supplier_id) || null;
+    supply.supplierID = supplier_id;
     supply.description = observation;
     supply.dateInsert = new Date(createdAt);
 

@@ -9,6 +9,8 @@ import ProductActions from '../../../Service/Product/ProductActions';
 import SupplierActions from '../../../Service/Supplier/SupplierActions';
 import BatchActions from '../../../Service/Batch/BatchActions';
 import TableRenderUI from '../../../utils/TableRenderUI';
+import Supply from '../../../classes/Supply';
+import SupplyActions from '../../../Service/Supply/SupplyActions';
 
 const TYPES = {
   MINUS: "MINUS",
@@ -66,7 +68,7 @@ export default function IncreaseQuantity(props) {
       const suppliers = await SupplierActions.getAll();
       const products = await ProductActions.getAll();
 
-      const nextSuppliers = suppliers.map((sup) => ({ label: sup.name, value: sup.email }));
+      const nextSuppliers = suppliers.map((sup) => ({ label: sup.name, value: sup.id }));
       const nextProducts = products.map((prod) => ({ label: prod.name, value: prod.refCode }));
 
       setProductsBase(products);
@@ -97,7 +99,7 @@ export default function IncreaseQuantity(props) {
     const { value } = product;
 
     const nextProduct = productsBase.find(prod => prod.refCode === value);
-    const productToAdd = new Batch({ product: nextProduct, ...extraProps, expiry: extraProps.expiry ? new Date(extraProps.expiry) : null, supplier: null });
+    const productToAdd = new Batch({ productID: nextProduct.id,product: nextProduct, ...extraProps, expiry: extraProps.expiry ? new Date(extraProps.expiry) : null, supplier: null });
 
 
     setProductsToAdd(prevList => [...prevList, productToAdd]);
@@ -114,8 +116,13 @@ export default function IncreaseQuantity(props) {
   }
 
   async function handleAddQuantity() {
+    const obj = new Supply();
+    obj.batches = productsToAdd;
+    obj.description = description;
+    obj.supplierID = supplier.value || null;
+
     try {
-      await BatchActions.addMultipleQuantityProducts(productsToAdd);
+      await SupplyActions.create(obj);
       reset();
       handleOpenSnackBar("success", "Abastecimento Criado", 5000);
     } catch (error) {
@@ -246,6 +253,13 @@ export default function IncreaseQuantity(props) {
                 background: index & 2 === 0 ? "#ebebeb" : "#F5f5f5"
               }}>
                 {columns.map((column, i) => {
+
+                  if (column.value === "subTotal") {
+                    return (
+                      <TableData key={`row-${index}-${i}`} style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }}>{prod.getSubTotal()}</TableData>
+                    );
+                  }
+
                   return (
                     <TableData key={`row-${index}-${i}`} style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }}>{TableRenderUI(column.value, prod[column.value])}</TableData>
                   );
