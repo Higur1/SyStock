@@ -10,7 +10,7 @@ export default class ProductActions {
   static async getAll(categoriesList = null) {
     const Client = new HTTPClient("/products");
 
-    const categories = categoriesList ? categoriesList : await CategoryActions.getAll();
+    const categories = categoriesList;
 
     return Client.get()
       .then(dataObj => {
@@ -25,7 +25,7 @@ export default class ProductActions {
 
     return Client.get()
       .then(dataObj => {
-        return dataObj.Products.map(products => this.mapper.toInterface(products, { categories }));
+        return dataObj.Products.map(products => this.mapper.toInterfaceExpired(products, { categories }));
       })
   }
 
@@ -58,7 +58,7 @@ export default class ProductActions {
 
     return Client.get()
       .then(dataObj => {
-        return dataObj.Products.map(products => this.mapper.toInterface(products, { categories }));
+        return dataObj.Products.map(products => this.mapper.toInterfaceExpired(products, { categories }));
       })
   }
 

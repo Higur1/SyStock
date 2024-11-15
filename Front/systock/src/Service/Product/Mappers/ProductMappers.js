@@ -40,4 +40,21 @@ export default class ProductMappers {
       category: nextCategory
     });
   }
+
+  toInterfaceExpired({expirationDate, product_id_fk, quantity}) {
+    const name = product_id_fk?.name;
+    const id = product_id_fk?.id;
+    const totalQuantity = product_id_fk?.totalQuantityInStock;
+    const category = product_id_fk?.category_id_fk?.name || "";
+    
+    return new Product({ 
+      id,
+      refCode: id,
+      name, 
+      expiry: expirationDate ? new Date(expirationDate) : null,
+      totalQuantity: totalQuantity, 
+      totalQuantitySameExpiry: quantity,
+      category
+    });
+  }
 }

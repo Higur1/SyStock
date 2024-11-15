@@ -10,6 +10,11 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 export default function CustomizedSnackbars({open, severity, snackMessage, autoHide, handleClose}) {
 
+  if(typeof snackMessage === "object") {
+    console.log(snackMessage);
+    return null;
+  }
+
   return (
     <Slide direction="left" in={open} mountOnEnter unmountOnExit>
       <Snackbar open={open} autoHideDuration={autoHide} onClose={handleClose}

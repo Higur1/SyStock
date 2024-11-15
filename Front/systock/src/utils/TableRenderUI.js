@@ -22,7 +22,7 @@ export default (type, value) => {
     }
     case "supplier":
     case "category": {
-      return value?.name;
+      return value?.name || value;
     }
     case "movementType":
     default: return value;

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import CircularLoading from '../../../components/common/CircularLoading';
 import { ContainerProductsList, MenuOption, TableContainer, TableData, TableRow } from '../styles';
 import { ClickAwayListener, Divider, FormControlLabel, IconButton, Menu, MenuItem, Radio, RadioGroup } from '@mui/material';
@@ -10,6 +10,7 @@ import NoData from '../../../components/common/NoData';
 import ProductActions from '../../../Service/Product/ProductActions';
 import { MainContext } from '../../../App';
 import TableRenderUI from '../../../utils/TableRenderUI';
+import CategoryActions from '../../../Service/Category/CategoryActions';
 
 
 export const FILTER_TYPES = {
@@ -52,7 +53,7 @@ const columnsBase = {
     { fixedWidth: false, width: 200, label: "Nome", value: "name" },
     { fixedWidth: true, width: 200, label: "Categoria", value: "category" },
     { fixedWidth: true, width: 120, label: "Quantidade Mínima", value: "minimumQuantity" },
-    { fixedWidth: true, width: 80, label: "Quantidade", value: "quantity" },
+    { fixedWidth: true, width: 80, label: "Quantidade", value: "totalQuantity" },
     // { fixedWidth: true, width: 100, label: "Funções", value: "menu" }
   ],
   [FILTER_TYPES.EMPTY]: [
@@ -66,15 +67,15 @@ const columnsBase = {
     { fixedWidth: true, label: "Código de Referência", value: "refCode", width: 120 },
     { fixedWidth: false, width: 200, label: "Nome", value: "name" },
     { fixedWidth: true, width: 200, label: "Categoria", value: "category" },
-    { fixedWidth: true, width: 80, label: "Quantidade Total", value: "totalQuantity" },
-    { fixedWidth: true, width: 80, label: "Quantidade Vencida", value: "totalQuantitySameExpiry" },
+    { fixedWidth: true, width: 150, label: "Quantidade Total", value: "totalQuantity" },
+    { fixedWidth: true, width: 150, label: "Quantidade Vencida", value: "totalQuantitySameExpiry" },
     // { fixedWidth: true, width: 100, label: "Funções", value: "menu" }
   ],
 }
 
 export default function ProductList(props) {
 
-  const { categories } = useContext(ProductContext);
+  const categoriesRef = useRef(null);
   const { handleOpenSnackBar } = useContext(MainContext);
   const { handleEditProductDialog, handleDeleteProductDialog, handleViewProductDialog } = props;
 
@@ -83,8 +84,14 @@ export default function ProductList(props) {
   const [menu, setMenu] = useState({ anchor: null, prod: null });
 
   useEffect(() => {
+    getCategories();
+  }, []);
+  
+  useEffect(() => {
+    if(!categoriesRef.current) return;
+
     getProducts();
-  }, [filter]);
+  }, [filter, categoriesRef.current]);
 
   const columns = useMemo(() => columnsBase[filter], [filter]);
   const MenuActions = useMemo(() => ({
@@ -92,23 +99,35 @@ export default function ProductList(props) {
     close: () => setMenu({ anchor: null, prod: null })
   }), []);
 
-  async function get() {
+  async function get(categoriesList) {
     switch (filter) {
-      case FILTER_TYPES.EMPTY: return await ProductActions.getAllEmpty(categories);
-      case FILTER_TYPES.EXPIRED: return await ProductActions.getAllExpired(categories);
-      case FILTER_TYPES.LOW_QUANTITY: return await ProductActions.getAllLowQuantity(categories);
-      case FILTER_TYPES.NEXT_TO_EXPIRY: return await ProductActions.getAllCloseToExpiry(categories);
+      case FILTER_TYPES.EMPTY: return await ProductActions.getAllEmpty(categoriesList);
+      case FILTER_TYPES.EXPIRED: return await ProductActions.getAllExpired(categoriesList);
+      case FILTER_TYPES.LOW_QUANTITY: return await ProductActions.getAllLowQuantity(categoriesList);
+      case FILTER_TYPES.NEXT_TO_EXPIRY: return await ProductActions.getAllCloseToExpiry(categoriesList);
       case FILTER_TYPES.ALL:
-      default: return await ProductActions.getAll(categories);
+      default: return await ProductActions.getAll(categoriesList);
+    }
+  }
+
+  async function getCategories() {
+    try {
+      const categories = await CategoryActions.getAll();
+
+      categoriesRef.current = categories;
+    } catch (e) {
+      console.log(e);
+      handleOpenSnackBar("error", e);
     }
   }
 
   async function getProducts() {
     setProducts(null);
     try {
-      const products = await get();
+      const products = await get(categoriesRef.current);
       setProducts(products);
     } catch (error) {
+      console.log(error);
       setProducts([]);
       handleOpenSnackBar("error", error, 3500);
     }
