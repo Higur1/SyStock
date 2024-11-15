@@ -29,8 +29,8 @@ export default class ProductController {
                 price: z.number().positive(),
                 costPrice: z.number().positive(),
                 minimunQuantity: z.number().positive(),
-                observation: z.string().max(30).optional(),
-                category_id: z.number().positive().optional()
+                observation: z.string().max(30).optional().nullable(),
+                category_id: z.number().positive().optional().nullable()
               });
               const { name, price, costPrice, minimunQuantity, observation, category_id } =
                 productValidation.parse(request.body);
@@ -41,7 +41,7 @@ export default class ProductController {
                 price: new Decimal(price),
                 costPrice: new Decimal(costPrice),
                 minimunQuantity,
-                observation,
+                observation: observation || "",
                 totalQuantityInStock: 0,
                 category_id: category_id ?? 1
               };

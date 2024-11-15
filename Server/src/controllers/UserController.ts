@@ -204,8 +204,8 @@ export default class UserController {
                     .trim()
                     .min(3, "Name required minimum 3 character(s)")
                     .max(20, "Name required maximum 20 character(s)")
-                    .optional(),
-                email: z.string().email("Valid e-mail required").trim().optional()
+                    .optional().nullable(),
+                email: z.string().email("Valid e-mail required").trim().optional().nullable()
             });
 
             const { id, name, email } = userValidation.parse(request.body);
