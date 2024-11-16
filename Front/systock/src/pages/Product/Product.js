@@ -36,7 +36,7 @@ const tabsList = [
   { type: TABS.CREATE_PRODUCT, label: "Criar Produto" },
   { type: TABS.DECREASE_QUANTITY, label: "Diminuir Quantidade" },
   { type: TABS.VIEW_SUPPLIES, label: "Visualizar Abastecimentos" },
-  { type: TABS.ADD_QUANTITY, label: "Adicionar Quantidade" }
+  { type: TABS.ADD_QUANTITY, label: "Adicionar Abastecimento" }
 ];
 
 export default function Product() {

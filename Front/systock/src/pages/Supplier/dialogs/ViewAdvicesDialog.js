@@ -4,6 +4,7 @@ import TableRenderUI from '../../../utils/TableRenderUI';
 import styled from 'styled-components';
 import { FILTER_TYPES } from '../../Product/tabs/productList';
 import NoData from '../../../components/common/NoData';
+import TooltipAndEllipsis from '../../../components/dialogs/ComponentUtils/ToolTipAndEllipsis';
 
 
 export const TableContainer = styled("div")({
@@ -110,7 +111,18 @@ export default function ViewAdvicesDialog(props) {
                 }}>
                   {columns.map((column, i) => {
                     return (
-                      <TableData key={`row-${index}-${i}`} style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }}>{TableRenderUI(column.value, prod[column.value])}</TableData>
+                      <TableData 
+                        key={`row-${index}-${i}`} 
+                        style={{ 
+                          justifyContent: column.fixedWidth ? "center" : "left", 
+                          width: column.fixedWidth ? column.width : "100%", 
+                          maxWidth: column.fixedWidth ? column.width : "auto", 
+                          flex: column.fixedWidth ? "none" : "1" ,
+                          overflow: "hidden"
+                        }}
+                      >
+                        <TooltipAndEllipsis item={TableRenderUI(column.value, prod[column.value])} />
+                      </TableData>
                     );
                   })}
                 </TableRow>
