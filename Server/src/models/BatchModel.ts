@@ -111,6 +111,7 @@ export default class BatchModel {
   }
   static async subQuantityDesc(batchData: IBatch) {
     try {
+      console.log(batchData)
       const batchUpdated = await prisma.batch.update({
         data: {
           quantity: {
