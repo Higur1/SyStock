@@ -4,7 +4,7 @@ import { ContainerProductsList, MenuOption, TableContainer, TableData, TableRow 
 import { ClickAwayListener, Divider, FormControlLabel, IconButton, Menu, MenuItem, Radio, RadioGroup } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { ProductContext } from '../ProductPage';
-import { formatDate } from '../../../utils/utils';
+import { centerContent, formatDate } from '../../../utils/utils';
 import { Delete, Edit, MoreVert, Search } from '@mui/icons-material';
 import NoData from '../../../components/common/NoData';
 import ProductActions from '../../../Service/Product/ProductActions';
@@ -39,7 +39,7 @@ const columnsBase = {
     { fixedWidth: true, width: 200, label: "Categoria", value: "category" },
     { fixedWidth: true, width: 150, label: "Preço de Venda", value: "priceBaseSell" },
     { fixedWidth: true, width: 80, label: "Quantidade", value: "totalQuantity" },
-    { fixedWidth: true, width: 100, label: "Funções", value: "menu" }
+    { fixedWidth: true, width: 100, label: "", value: "menu" }
   ],
   [FILTER_TYPES.NEXT_TO_EXPIRY]: [
     { fixedWidth: true, width: 150, label: "Data de Vencimento", value: "expiry" },
@@ -163,7 +163,14 @@ export default function ProductList(props) {
           <TableContainer>
             <TableRow style={{ background: '#DCDCDC', borderRadius: '8px 8px 0px 0px' }}>
               {columns.map((column, i) => (
-                <TableData style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }} key={`header-column-${i}`}>{column.label}</TableData>
+                <TableData style={{ 
+                  textAlign: centerContent(column.value) ? "center" : "left", 
+                  justifyContent: centerContent(column.value) ? "center" : "flex-start", 
+                  width: column.fixedWidth ? column.width : "100%", 
+                  maxWidth: column.fixedWidth ? column.width : "auto", 
+                  flex: column.fixedWidth ? "none" : "1" 
+                }} 
+                key={`header-column-${i}`}>{column.label}</TableData>
               ))}
             </TableRow>
             <div className="customScroll">
@@ -191,14 +198,15 @@ export default function ProductList(props) {
                       <TableData 
                         key={`row-${index}-${i}`} 
                         style={{ 
-                          justifyContent: column.fixedWidth ? "center" : "left", 
+                          textAlign: centerContent(column.value) ? "center" : "left", 
+                          justifyContent: centerContent(column.value) ? "center" : "flex-start", 
                           width: column.fixedWidth ? column.width : "100%", 
                           maxWidth: column.fixedWidth ? column.width : "auto", 
                           flex: column.fixedWidth ? "none" : "1" ,
                           overflow:'hidden'
                         }}
                       >
-                        <TooltipAndEllipsis item={TableRenderUI(column.value, prod[column.value])} />
+                        <TooltipAndEllipsis item={TableRenderUI(column.value, prod[column.value])} centerText={centerContent(column.value)}/>
                       </TableData>
                     );
                   })}

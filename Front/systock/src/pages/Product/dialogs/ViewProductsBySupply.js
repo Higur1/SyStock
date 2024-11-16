@@ -1,6 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, TextField } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react'
-import { formatDate } from '../../../utils/utils';
+import { centerContent, formatDate } from '../../../utils/utils';
 import { TableContainer, TableData, TableRow } from '../styles';
 import Supply from '../../../classes/Supply';
 import ProductActions from '../../../Service/Product/ProductActions';
@@ -75,7 +75,10 @@ export default function ViewProductsBySupply({ supply = new Supply(), onClose })
               <TableContainer>
                 <TableRow style={{ background: '#DCDCDC', borderRadius: '8px 8px 0px 0px' }}>
                   {columns.map((column, i) => (
-                    <TableData style={{ justifyContent: 'center', width: 150, maxWidth: 150 }} key={`header-column-${i}`}>{column.label}</TableData>
+                    <TableData style={{
+                      textAlign: centerContent(column.value) ? "center" : "left",
+                      justifyContent: centerContent(column.value) ? "center" : "flex-start", width: 150, maxWidth: 150
+                    }} key={`header-column-${i}`}>{column.label}</TableData>
                   ))}
                 </TableRow>
                 {products === null ? (
@@ -89,8 +92,14 @@ export default function ViewProductsBySupply({ supply = new Supply(), onClose })
                     }}>
                       {columns.map((column, i) => {
                         return (
-                          <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150, overflow: 'hidden' }}>
-                            <TooltipAndEllipsis item={TableRenderUI(column.value, prod[column.value])} />
+                          <TableData key={`row-${index}-${i}`} 
+                          style={{ 
+                            textAlign: centerContent(column.value) ? "center" : "left", 
+                            justifyContent: centerContent(column.value) ? "center" : "flex-start", 
+                            width: 150, maxWidth: 150, 
+                            overflow: 'hidden' 
+                            }}>
+                            <TooltipAndEllipsis centerText={centerContent(column.value)} item={TableRenderUI(column.value, prod[column.value])} />
                           </TableData>
                         );
                       })}

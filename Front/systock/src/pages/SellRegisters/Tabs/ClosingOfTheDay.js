@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import styled from 'styled-components';
 import { TableContainer, TableData, TableRow } from '../styles';
 import { SellRegistersContext } from '../SellRegistersPage';
-import { dateToTextField } from '../../../utils/utils';
+import { centerContent, dateToTextField } from '../../../utils/utils';
 import TableRenderUI from '../../../utils/TableRenderUI';
 import TooltipAndEllipsis from '../../../components/dialogs/ComponentUtils/ToolTipAndEllipsis';
 
@@ -64,7 +64,8 @@ export default function ClosingOfTheDay() {
                   <TableData
                     key={`header-${i}`}
                     style={{
-                      justifyContent: column.fixedWidth ? "center" : "left",
+                      textAlign: centerContent(column.value) ? "center" : "left", 
+                      justifyContent: centerContent(column.value) ? "center" : "flex-start", 
                       width: column.width,
                       maxWidth: column.fixedWidth ? column.width : "auto",
                       flex: column.fixedWidth ? "none" : "1"
@@ -82,14 +83,15 @@ export default function ClosingOfTheDay() {
                         <TableData
                           key={`row-${index}-${i}`}
                           style={{
-                            justifyContent: column.fixedWidth ? "center" : "left",
+                            textAlign: centerContent(column.value) ? "center" : "left", 
+                            justifyContent: centerContent(column.value) ? "center" : "flex-start", 
                             width: column.width,
                             maxWidth: column.fixedWidth ? column.width : "auto",
                             flex: column.fixedWidth ? "none" : "1",
                             overflow: 'hidden'
                           }}
                         >
-                          <TooltipAndEllipsis item={TableRenderUI(column.value, log[column.value])} />
+                          <TooltipAndEllipsis centerText={centerContent(column.value)} item={TableRenderUI(column.value, log[column.value])} />
                         </TableData>
                       );
                     })}

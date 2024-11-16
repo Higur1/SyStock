@@ -5,6 +5,7 @@ import { IconButton } from '@mui/material';
 import { Description, Visibility } from '@mui/icons-material';
 import TableRenderUI from '../../../utils/TableRenderUI';
 import TooltipAndEllipsis from '../../../components/dialogs/ComponentUtils/ToolTipAndEllipsis';
+import { centerContent } from '../../../utils/utils';
 
 const columns = [
   { fixedWidth: true, label: "Data e Hora", value: "date", width: 120 },
@@ -26,7 +27,8 @@ export default function SalesTable() {
           <TableData
             key={`header-${i}`}
             style={{
-              justifyContent: column.fixedWidth ? "center" : "left",
+              textAlign: centerContent(column.value) ? "center" : "left", 
+              justifyContent: centerContent(column.value) ? "center" : "flex-start", 
               width: column.width,
               maxWidth: column.fixedWidth ? column.width : "auto",
               flex: column.fixedWidth ? "none" : "1"
@@ -46,7 +48,8 @@ export default function SalesTable() {
                   <TableData
                     key={`row-${index}-${i}`}
                     style={{
-                      justifyContent: column.fixedWidth ? "center" : "left",
+                      textAlign: centerContent(column.value) ? "center" : "left", 
+                      justifyContent: centerContent(column.value) ? "center" : "flex-start", 
                       width: column.width,
                       maxWidth: column.fixedWidth ? column.width : "auto",
                       flex: column.fixedWidth ? "none" : "1"
@@ -64,7 +67,8 @@ export default function SalesTable() {
                   <TableData
                     key={`row-${index}-${i}`}
                     style={{
-                      justifyContent: column.fixedWidth ? "center" : "left",
+                      textAlign: centerContent(column.value) ? "center" : "left", 
+                      justifyContent: centerContent(column.value) ? "center" : "flex-start", 
                       width: column.width,
                       maxWidth: column.fixedWidth ? column.width : "auto",
                       flex: column.fixedWidth ? "none" : "1"
@@ -81,14 +85,15 @@ export default function SalesTable() {
                 <TableData
                   key={`row-${index}-${i}`}
                   style={{
-                    justifyContent: column.fixedWidth ? "center" : "left",
+                    textAlign: centerContent(column.value) ? "center" : "left", 
+                    justifyContent: centerContent(column.value) ? "center" : "flex-start", 
                     width: column.width,
                     maxWidth: column.fixedWidth ? column.width : "auto",
                     flex: column.fixedWidth ? "none" : "1",
                     overflow: 'hidden'
                   }}
                 >
-                  <TooltipAndEllipsis item={TableRenderUI(column.value, log[column.value])} />
+                  <TooltipAndEllipsis centerText={centerContent(column.value)} item={TableRenderUI(column.value, log[column.value])} />
                 </TableData>
               );
             })}

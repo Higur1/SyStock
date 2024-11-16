@@ -3,22 +3,22 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import { MainContext } from '../../../App';
 import { ENTITIES } from '../../../utils/debug-local-helper';
 import { TableContainer, TableData, TableRow } from '../styles';
-import { formatDate } from '../../../utils/utils';
+import { centerContent, formatDate } from '../../../utils/utils';
 import { Visibility } from '@mui/icons-material';
 import SupplyActions from '../../../Service/Supply/SupplyActions';
 import TableRenderUI from '../../../utils/TableRenderUI';
 import TooltipAndEllipsis from '../../../components/dialogs/ComponentUtils/ToolTipAndEllipsis';
 
 const columns = [
-  { value: "dateInsert", label: "Data e Hora"},
-  { value: "id", label: "Código do Abastecimento"},
-  { value: "supplier", label: "Fornecedor"},
-  { value: "totalValue", label: "Total do Custo"},
-  { value: "description", label: "Observação"},
-  { value: "products", label: "Produtos"}
+  { value: "dateInsert", label: "Data e Hora" },
+  { value: "id", label: "Código do Abastecimento" },
+  { value: "supplier", label: "Fornecedor" },
+  { value: "totalValue", label: "Total do Custo" },
+  { value: "description", label: "Observação" },
+  { value: "products", label: "Produtos" }
 ];
 
-export default function ViewSupplies({handleViewProducts}) {
+export default function ViewSupplies({ handleViewProducts }) {
   const suppliesBase = useRef();
 
   const { handleOpenSnackBar } = useContext(MainContext);
@@ -32,7 +32,7 @@ export default function ViewSupplies({handleViewProducts}) {
   }, []);
 
   useEffect(() => {
-    if(!suppliesBase.current) return;
+    if (!suppliesBase.current) return;
 
     filterList(suppliesBase.current, filteredSupplier);
   }, [filteredSupplier]);
@@ -60,10 +60,10 @@ export default function ViewSupplies({handleViewProducts}) {
       filterList(suppliesBase.current, filteredSupplier);
     }
   }
-  
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16, height: "100%", width: "100%", alignItems: 'center' }}>
-      <span style={{ fontWeight: 600, textAlign: 'center' }}>
+      <span style={{ fontWeight: 600, textAlign: 'left' }}>
         Lista de Abastecimentos Recentes
       </span>
       <Autocomplete
@@ -77,15 +77,18 @@ export default function ViewSupplies({handleViewProducts}) {
         sx={{ width: "100%" }}
         renderInput={(params) => <TextField {...params} label="Fornecedor do Abastecimento" />}
         placeholder='Selecione o fornecedor para o abastecimento'
-        // PopperComponent={props => <Popper {...props} style={{ ...props.style, zIndex: 100000 }} disablePortal={false} />}
-        // PopperComponent={<Popper style={{zIndex: 2}}/>}
-        // ListboxProps={{ style: { zIndex: 5 } }}
+      // PopperComponent={props => <Popper {...props} style={{ ...props.style, zIndex: 100000 }} disablePortal={false} />}
+      // PopperComponent={<Popper style={{zIndex: 2}}/>}
+      // ListboxProps={{ style: { zIndex: 5 } }}
       />
       <div style={{ height: "100%", overflow: "hidden" }}>
         <TableContainer>
           <TableRow style={{ background: '#DCDCDC', borderRadius: '8px 8px 0px 0px' }}>
             {columns.map((column, i) => (
-              <TableData style={{ justifyContent: 'center', width: 150, maxWidth: 150 }} key={`header-column-${i}`}>{column.label}</TableData>
+              <TableData style={{
+                textAlign: centerContent(column.value) ? "center" : "left",
+                justifyContent: centerContent(column.value) ? "center" : "flex-start", width: 150, maxWidth: 150
+              }} key={`header-column-${i}`}>{column.label}</TableData>
             ))}
           </TableRow>
           <div className="customScroll">
@@ -107,8 +110,11 @@ export default function ViewSupplies({handleViewProducts}) {
                     );
                   }
                   return (
-                    <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150, overflow: 'hidden' }}>
-                      <TooltipAndEllipsis item={TableRenderUI(column.value, prod[column.value])} />
+                    <TableData key={`row-${index}-${i}`} style={{
+                      textAlign: centerContent(column.value) ? "center" : "left",
+                      justifyContent: centerContent(column.value) ? "center" : "flex-start", width: 150, maxWidth: 150, overflow: 'hidden'
+                    }}>
+                      <TooltipAndEllipsis centerText={centerContent(column.value)} item={TableRenderUI(column.value, prod[column.value])} />
                     </TableData>
                   );
                 })}

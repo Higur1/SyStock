@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Container, HeaderContainer, TableContainer, TableData, TableRow } from "./styles";
 import { Button, Dialog, DialogActions, DialogTitle, IconButton, Menu, MenuItem } from "@mui/material";
-import ToolTipAndEllipsis from "../../components/dialogs/ComponentUtils/ToolTipAndEllipsis";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CustomizedSnackbars from "../../components/CustomizedSnackBar";
 import useSupplier from "../../hooks/useSupplier";
@@ -11,6 +10,7 @@ import ButtonGroupCustom from "../../components/common/ButtonGroupCustom/ButtonG
 import LocationDialog from "./dialogs/LocationDialog";
 import BatchListDialog from "./dialogs/BatchListDialog";
 import { formatPhoneNumber } from "../../utils/utils";
+import TooltipAndEllipsis from "../../components/dialogs/ComponentUtils/ToolTipAndEllipsis";
 
 export default function Supplier() {
 
@@ -111,9 +111,9 @@ export default function Supplier() {
                   borderBottom: index === suppliers.length - 1 ? '0px' : '1px solid #d3D3D3',
                   background: index & 2 === 0 ? "#ebebeb" : "#F5f5f5"
                 }}>
-                  <TableData style={{ flex: 1, minWidth: '10%', maxWidth: 'calc(100% - (75% + 40px + 96px))' }}><ToolTipAndEllipsis item={sup.name} /></TableData>
-                  <TableData style={{ flexBasis: '25%', maxWidth: '25%', minWidth: '25%' }}><ToolTipAndEllipsis item={sup.email} /></TableData>
-                  <TableData style={{ flexBasis: '20%', maxWidth: '20%', minWidth: '20%', gap: 8 }}><ToolTipAndEllipsis item={formatPhoneNumber(sup.phone)} /></TableData>
+                  <TableData style={{ flex: 1, minWidth: '10%', maxWidth: 'calc(100% - (75% + 40px + 96px))' }}><TooltipAndEllipsis item={sup.name} /></TableData>
+                  <TableData style={{ flexBasis: '25%', maxWidth: '25%', minWidth: '25%' }}><TooltipAndEllipsis item={sup.email} /></TableData>
+                  <TableData style={{ flexBasis: '20%', maxWidth: '20%', minWidth: '20%', gap: 8 }}><TooltipAndEllipsis item={formatPhoneNumber(sup.phone)} /></TableData>
                   <TableData style={{ flex: 1, justifyContent: 'flex-end' }}>
                     <IconButton onClick={(e) => handleMenuOptions(e, index)}>
                       <MoreVertIcon fontSize='small' />

@@ -12,6 +12,7 @@ import TableRenderUI from '../../../utils/TableRenderUI';
 import Supply from '../../../classes/Supply';
 import SupplyActions from '../../../Service/Supply/SupplyActions';
 import TooltipAndEllipsis from '../../../components/dialogs/ComponentUtils/ToolTipAndEllipsis';
+import { centerContent } from '../../../utils/utils';
 
 const TYPES = {
   MINUS: "MINUS",
@@ -100,7 +101,7 @@ export default function IncreaseQuantity(props) {
     const { value } = product;
 
     const nextProduct = productsBase.find(prod => prod.refCode === value);
-    const productToAdd = new Batch({ productID: nextProduct.id,product: nextProduct, ...extraProps, expiry: extraProps.expiry ? new Date(extraProps.expiry) : null, supplier: null });
+    const productToAdd = new Batch({ productID: nextProduct.id, product: nextProduct, ...extraProps, expiry: extraProps.expiry ? new Date(extraProps.expiry) : null, supplier: null });
 
 
     setProductsToAdd(prevList => [...prevList, productToAdd]);
@@ -243,7 +244,13 @@ export default function IncreaseQuantity(props) {
         <TableContainer>
           <TableRow style={{ background: '#DCDCDC', borderRadius: '8px 8px 0px 0px' }}>
             {columns.map((column, i) => (
-              <TableData style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }} key={`header-column-${i}`}>{column.label}</TableData>
+              <TableData
+                style={{
+                  textAlign: centerContent(column.value) ? "center" : "left",
+                  justifyContent: centerContent(column.value) ? "center" : "flex-start",
+                  width: column.fixedWidth ? column.width : "100%",
+                  maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1"
+                }} key={`header-column-${i}`}>{column.label}</TableData>
             ))}
           </TableRow>
           <div className="customScroll">
@@ -257,22 +264,26 @@ export default function IncreaseQuantity(props) {
 
                   if (column.value === "subTotal") {
                     return (
-                      <TableData key={`row-${index}-${i}`} style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }}>{prod.getSubTotal()}</TableData>
+                      <TableData key={`row-${index}-${i}`}
+                        style={{ 
+                          textAlign: centerContent(column.value) ? "center" : "left", 
+                          justifyContent: centerContent(column.value) ? "center" : "flex-start", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }}>{prod.getSubTotal()}</TableData>
                     );
                   }
 
                   return (
-                    <TableData 
-                      key={`row-${index}-${i}`} 
-                      style={{ 
-                        justifyContent: column.fixedWidth ? "center" : "left", 
-                        width: column.fixedWidth ? column.width : "100%", 
-                        maxWidth: column.fixedWidth ? column.width : "auto", 
-                        flex: column.fixedWidth ? "none" : "1" ,
+                    <TableData
+                      key={`row-${index}-${i}`}
+                      style={{
+                        textAlign: centerContent(column.value) ? "center" : "left", 
+                        justifyContent: centerContent(column.value) ? "center" : "flex-start", 
+                        width: column.fixedWidth ? column.width : "100%",
+                        maxWidth: column.fixedWidth ? column.width : "auto",
+                        flex: column.fixedWidth ? "none" : "1",
                         overflow: 'hidden'
                       }}
                     >
-                      <TooltipAndEllipsis item={TableRenderUI(column.value, prod[column.value])} />
+                      <TooltipAndEllipsis centerText={centerContent(column.value)} item={TableRenderUI(column.value, prod[column.value])} />
                     </TableData>
                   );
                 })}

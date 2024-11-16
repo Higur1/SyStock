@@ -33,7 +33,7 @@ export const TableRow = styled("div")({
 });
 
 export const TableData = styled("div")(() => ({
-  textAlign: 'center',
+  textAlign: 'left',
   display: 'flex',
   alignItems: 'center',
   height: '48px',

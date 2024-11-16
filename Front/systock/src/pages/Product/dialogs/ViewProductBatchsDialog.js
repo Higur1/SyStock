@@ -8,6 +8,7 @@ import CircularLoading from '../../../components/common/CircularLoading';
 import BatchActions from '../../../Service/Batch/BatchActions';
 import Product from '../../../classes/Product';
 import TooltipAndEllipsis from '../../../components/dialogs/ComponentUtils/ToolTipAndEllipsis';
+import { centerContent } from '../../../utils/utils';
 
 export const TableContainer = styled("div")({
   display: 'flex',
@@ -30,7 +31,7 @@ export const TableRow = styled("div")({
 });
 
 export const TableData = styled("div")(() => ({
-  textAlign: 'center',
+  textAlign: 'left',
   display: 'flex',
   alignItems: 'center',
   height: '48px',
@@ -94,7 +95,15 @@ export default function ViewProductBatchsDialog({ product = new Product(), onClo
         <TableContainer>
           <TableRow style={{ background: '#DCDCDC', borderRadius: '8px 8px 0px 0px' }}>
             {columns.map((column, index) => (
-              <TableData style={{ background: '#DCDCDC', borderRadius: '8px 8px 0px 0px', width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1"  }} key={index}>
+              <TableData style={{ 
+                textAlign: centerContent(column.value) ? "center" : "left", 
+                justifyContent: centerContent(column.value) ? "center" : "flex-start", 
+                background: '#DCDCDC', 
+                borderRadius: '8px 8px 0px 0px', 
+                width: column.fixedWidth ? column.width : "100%", 
+                maxWidth: column.fixedWidth ? column.width : "auto", 
+                flex: column.fixedWidth ? "none" : "1"  
+              }} key={index}>
                 {column.label}
               </TableData>
             ))}
@@ -112,13 +121,15 @@ export default function ViewProductBatchsDialog({ product = new Product(), onClo
                     return (
                       <TableData key={`row-${index}-${i}`} 
                         style={{ 
+                          textAlign: centerContent(column.value) ? "center" : "left", 
+                          justifyContent: centerContent(column.value) ? "center" : "flex-start", 
                           width: column.fixedWidth ? column.width : "100%", 
                           maxWidth: column.fixedWidth ? column.width : "auto", 
                           flex: column.fixedWidth ? "none" : "1",
                           overflow: 'hidden'
                         }}
                       >
-                        <TooltipAndEllipsis item={TableRenderUI(column.value, prod[column.value])} />
+                        <TooltipAndEllipsis centerText={centerContent(column.value)} item={TableRenderUI(column.value, prod[column.value])} />
                       </TableData>
                     );
                   })}

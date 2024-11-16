@@ -5,6 +5,32 @@ export function deepCopy(object) {
 
 export const generateID = () => Math.random().toString().slice(2);
 
+
+export const centerContent = column => 
+  [
+    "totalQuantity", 
+    "refCode", 
+    "priceBaseSell",
+    "date",
+    "codRef",
+    "quantity",
+    "movementType",
+    "codSell",
+    "products",
+    "total",
+    "paymentType",
+    "id",
+    "expiry",
+    "quantity",
+    "priceBuy",
+    "subTotal",
+    "totalQuantitySameExpiry",
+    "minimumQuantity",
+    "dateInsert",
+    "totalValue",
+  ].includes(column);
+
+
 export const states = [
   { name: "Acre", acronym: "AC" },
   { name: "Alagoas", acronym: "AL" },
@@ -302,6 +328,15 @@ export function getErrorMessage(method, route, status, secondaryMessage) {
           break;
         }
         default: break; 
+      }
+      break;
+    }
+    case "/batch/subQuantity": {
+      switch(method) {
+        case "POST": {
+          if(status === 409) return "Quantidade insuficiente";
+          break;
+        }
       }
       break;
     }

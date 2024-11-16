@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { FILTER_TYPES } from '../../Product/tabs/productList';
 import NoData from '../../../components/common/NoData';
 import TooltipAndEllipsis from '../../../components/dialogs/ComponentUtils/ToolTipAndEllipsis';
+import { centerContent } from '../../../utils/utils';
 
 
 export const TableContainer = styled("div")({
@@ -29,7 +30,7 @@ export const TableRow = styled("div")({
 });
 
 export const TableData = styled("div")(() => ({
-  textAlign: 'center',
+  textAlign: 'left',
   display: 'flex',
   alignItems: 'center',
   height: '48px',
@@ -85,7 +86,7 @@ export default function ViewAdvicesDialog(props) {
   return (
     <Dialog
       open
-      maxWidth="md"
+      maxWidth="lg"
       fullWidth
       onClose={onClose}
     >
@@ -96,7 +97,10 @@ export default function ViewAdvicesDialog(props) {
           <TableContainer>
             <TableRow style={{ background: '#DCDCDC', borderRadius: '8px 8px 0px 0px' }}>
               {columns.map((column, i) => (
-                <TableData style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }} key={`header-column-${i}`}>{column.label}</TableData>
+                <TableData style={{ 
+                  textAlign: centerContent(column.value) ? "center" : "left", 
+                  justifyContent: centerContent(column.value) ? "center" : "flex-start", 
+                  width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }} key={`header-column-${i}`}>{column.label}</TableData>
               ))}
             </TableRow>
             <div className="customScroll">
@@ -114,14 +118,15 @@ export default function ViewAdvicesDialog(props) {
                       <TableData 
                         key={`row-${index}-${i}`} 
                         style={{ 
-                          justifyContent: column.fixedWidth ? "center" : "left", 
+                          textAlign: centerContent(column.value) ? "center" : "left", 
+                          justifyContent: centerContent(column.value) ? "center" : "flex-start", 
                           width: column.fixedWidth ? column.width : "100%", 
                           maxWidth: column.fixedWidth ? column.width : "auto", 
                           flex: column.fixedWidth ? "none" : "1" ,
                           overflow: "hidden"
                         }}
                       >
-                        <TooltipAndEllipsis item={TableRenderUI(column.value, prod[column.value])} />
+                        <TooltipAndEllipsis centerText={centerContent(column.value)} item={TableRenderUI(column.value, prod[column.value])} />
                       </TableData>
                     );
                   })}

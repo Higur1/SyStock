@@ -23,7 +23,7 @@ export default function TooltipAndEllipsis(props) {
       }
     >
       <div style={{display: 'flex', flexGrow: 1, alignItems: 'center', width: '100%'}}>
-        <div ref={setRef} style={{width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
+        <div ref={setRef} style={{width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: props.centerText ? 'center' : 'left'}}>
           {props.item}
         </div>
       </div>
@@ -32,5 +32,6 @@ export default function TooltipAndEllipsis(props) {
 }
 
 TooltipAndEllipsis.propTypes = {
-  item: PropTypes.string
+  item: PropTypes.string,
+  centerText: PropTypes.bool
 }

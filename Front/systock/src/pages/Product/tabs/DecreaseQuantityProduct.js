@@ -82,7 +82,7 @@ export default function DecreaseQuantityProduct() {
 
     const product_id = product.id;
     const expirationDate = values.expiryDate;
-    const quantity = values.quantityToRemove;
+    const quantity = parseInt(values.quantityToRemove);
 
     const obj = { product_id, expirationDate, quantity };
     try {
