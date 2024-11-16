@@ -216,10 +216,10 @@ export default class BatchController {
 
             const batchData: IBatch = {
                 product_id: product_id,
-                expirantionDate: expirationDate ? expirationDate: dateBase(),
+                expirantionDate: expirationDate ? expirationDate : undefined,
                 quantity: quantity
             };
-
+            console.log(batchData)
             await BatchService.subQuantity(batchData);
 
             response.status(200).send(JSON.stringify({

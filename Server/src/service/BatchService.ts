@@ -98,21 +98,18 @@ export default class BatchService {
             if (find.batch == undefined) {
                 throw new Error("Batch not found");
             };
-
+            batchData.id = find.batch.id
             if (find.batch.quantity < batchData.quantity) {
                 throw new Error("Insufficient stock to withdraw quantity");
             };
             if(batchData.expirantionDate == undefined){
-                batchData.id = find.batch.id
                 const subResult = await BatchModel.subQuantityGeneric(batchData);
                 await ProductModel.updatedSubQuantityInStock(batchData.product_id, batchData.quantity)
                 if (subResult.batch?.quantity == 0) {
                     await BatchModel.setDateTheBatchWasCleared(batchData);
                 };
-
                 return subResult;
             }
-            batchData.id = find.batch.id
             const subResult = await BatchModel.subQuantityDesc(batchData);
             await ProductModel.updatedSubQuantityInStock(batchData.product_id, batchData.quantity)
 
