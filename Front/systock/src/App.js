@@ -6,6 +6,7 @@ import { createContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DB_DEBUG_NAME, getDBBase, setInitialData, verifyHasContent } from './utils/debug-local-helper.js';
 import CustomizedSnackbars from './components/CustomizedSnackBar.js';
+import { FILTER_TYPES } from './pages/Product/tabs/productList.js';
 
 export const MainContext = createContext();
 export const DEBUG_LOCAL = false;
@@ -25,6 +26,10 @@ function App() {
 
   function handleCloseSnackBar() {
     setSnackbar(initialStateSnack);
+  }
+
+  function redirectToListProductsFiltered(filter = FILTER_TYPES.ALL) {
+    navigate(`/products?filter=${filter}`);
   }
 
 
@@ -123,7 +128,7 @@ function App() {
       handleOpenSnackBar,
       dbBase,
       updateData,
-      getData,
+      getData,redirectToListProductsFiltered,
       token: tokenRef.current
     }}>
       <div className='main' style={{display: !isLoggedIn ? 'flex' : 'grid'}}>

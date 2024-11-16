@@ -11,6 +11,7 @@ import ProductActions from '../../../Service/Product/ProductActions';
 import { MainContext } from '../../../App';
 import TableRenderUI from '../../../utils/TableRenderUI';
 import CategoryActions from '../../../Service/Category/CategoryActions';
+import { useSearchParams } from 'react-router-dom';
 
 
 export const FILTER_TYPES = {
@@ -75,17 +76,20 @@ const columnsBase = {
 
 export default function ProductList(props) {
 
+  const [searchParams] = useSearchParams();
   const categoriesRef = useRef(null);
   const { handleOpenSnackBar } = useContext(MainContext);
   const { handleEditProductDialog, handleDeleteProductDialog, handleViewProductDialog } = props;
 
-  const [filter, setFilter] = useState(FILTER_TYPES.ALL);
+  const [filter, setFilter] = useState(searchParams.get("filter") || FILTER_TYPES.ALL);
   const [products, setProducts] = useState(null);
   const [menu, setMenu] = useState({ anchor: null, prod: null });
 
   useEffect(() => {
     getCategories();
   }, []);
+
+  console.log(searchParams.get("filter"))
   
   useEffect(() => {
     if(!categoriesRef.current) return;

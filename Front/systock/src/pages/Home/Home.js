@@ -1,4 +1,4 @@
-import { Visibility } from '@mui/icons-material';
+import { Launch, Visibility } from '@mui/icons-material';
 import { IconButton} from '@mui/material';
 import React, { useContext, useEffect } from 'react';
 import { useState } from 'react';
@@ -6,6 +6,7 @@ import ViewAdvicesDialog from '../Supplier/dialogs/ViewAdvicesDialog';
 import { DEBUG_LOCAL, MainContext } from '../../App';
 import ProductActions from '../../Service/Product/ProductActions';
 import CategoryActions from '../../Service/Category/CategoryActions';
+import { FILTER_TYPES } from '../Product/tabs/productList';
 
 export const ADVICE_VARIANT = {
   "ERROR": 0,
@@ -13,35 +14,28 @@ export const ADVICE_VARIANT = {
   "SUCCESS": 2
 };
 
-export const ADVICE_TYPE = {
-  PRODUCT_ENDING: 0,
-  PRODUCT_EXPIRED: 1,
-  PRODUCT_EMPTY: 2,
-  PRODUCT_NEXT_TO_EXPIRE: 3
-};
-
 export default function Home() {
-  const { handleOpenSnackBar } = useContext(MainContext);
+  const { handleOpenSnackBar, redirectToListProductsFiltered } = useContext(MainContext);
   
   // const [suppliersDialog, setSuppliersDialog] = useState({open: false, obj: null});
   const [table, setTable] = useState([
     {
-      type: ADVICE_TYPE.PRODUCT_EXPIRED,
+      type: FILTER_TYPES.EXPIRED,
       list: [],
       label: "Vencidos"
     },
     {
-      type: ADVICE_TYPE.PRODUCT_EMPTY,
+      type: FILTER_TYPES.EMPTY,
       list: [],
       label: "Estoque Zerado"
     },
     {
-      type: ADVICE_TYPE.PRODUCT_NEXT_TO_EXPIRE,
+      type: FILTER_TYPES.NEXT_TO_EXPIRY,
       list: [],
       label: "Próximos ao vencimento"
     },
     {
-      type: ADVICE_TYPE.PRODUCT_ENDING,
+      type: FILTER_TYPES.LOW_QUANTITY,
       list: [],
       label: "Baixa Quantidade"
     },
@@ -62,16 +56,16 @@ export default function Home() {
 
       setTable(prevTable => prevTable.map(table => {
         switch(table.type) {
-          case ADVICE_TYPE.PRODUCT_EMPTY: {
+          case FILTER_TYPES.EMPTY: {
             return {...table, list: productsEmpty};
           }
-          case ADVICE_TYPE.PRODUCT_ENDING: {
+          case FILTER_TYPES.LOW_QUANTITY: {
             return {...table, list: productsLowQuantity};
           }
-          case ADVICE_TYPE.PRODUCT_EXPIRED: {
+          case FILTER_TYPES.EXPIRED: {
             return {...table, list: productsExpired};
           }
-          case ADVICE_TYPE.PRODUCT_NEXT_TO_EXPIRE: {
+          case FILTER_TYPES.NEXT_TO_EXPIRY: {
             return {...table, list: productsCloseToExpiry};
           }
           default: return table;
@@ -141,8 +135,8 @@ export default function Home() {
                   <span>{item.list.length}</span>
                 </div>
                 <div style={{flexBasis: "20%", display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                  <IconButton onClick={() => setOpenDialogViewAdvices({open: true, obj: item})} disabled={item.list.length === 0}>
-                    <Visibility />
+                  <IconButton onClick={() => redirectToListProductsFiltered(item.type)} disabled={item.list.length === 0}>
+                    <Launch />
                   </IconButton>
                 </div>
               </div>
