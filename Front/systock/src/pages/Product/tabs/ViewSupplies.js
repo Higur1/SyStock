@@ -43,6 +43,7 @@ export default function ViewSupplies({handleViewProducts}) {
 
     setSupplies(nextFilteredList);
   }
+  console.log(suppliesBase.current);
 
   async function getBatches() {
     try {
@@ -50,7 +51,7 @@ export default function ViewSupplies({handleViewProducts}) {
       suppliesBase.current = supplies;
 
       const suppliersNotFiltered = supplies.map(supply => supply.supplier).filter(supplier => supplier !== null);
-      setSuppliersAutoComplete(suppliersNotFiltered.filter((sup, index) => suppliersNotFiltered.findIndex(supFind => supFind.id === sup.id) === index));
+      setSuppliersAutoComplete([...suppliersNotFiltered.filter((sup, index) => suppliersNotFiltered.findIndex(supFind => supFind.id === sup.id) === index)]);
     } catch (error) {
       handleOpenSnackBar("error", error);
       suppliesBase.current = [];

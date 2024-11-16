@@ -11,10 +11,11 @@ export const Container = styled.div`
   height: 100vh;
   padding: 16px;
 `
-
+//  grid-template: 24px 60px 1px 1fr /1fr;
 export const ContainerProductsList = styled.div`
   display: grid;
-  grid-template: 24px 60px 1px 1fr /1fr;
+  grid-template: 1fr /1fr;
+ 
   gap: 16px;
   width: 100%;
   height: 100%;

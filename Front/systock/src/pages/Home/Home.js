@@ -135,8 +135,11 @@ export default function Home() {
                   <span>{item.list.length}</span>
                 </div>
                 <div style={{flexBasis: "20%", display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                  <IconButton onClick={() => redirectToListProductsFiltered(item.type)} disabled={item.list.length === 0}>
+                  {/* <IconButton onClick={() => redirectToListProductsFiltered(item.type)} disabled={item.list.length === 0}>
                     <Launch />
+                  </IconButton> */}
+                  <IconButton onClick={() => setOpenDialogViewAdvices({open: true, obj: item})} disabled={item.list.length === 0}>
+                    <Visibility />
                   </IconButton>
                 </div>
               </div>

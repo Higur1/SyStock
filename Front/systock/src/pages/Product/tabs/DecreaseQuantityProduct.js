@@ -80,7 +80,7 @@ export default function DecreaseQuantityProduct() {
   async function onConfirm() {
     handleLoading(LOADING_TYPE.DECREASING, true);
 
-    const product_id = 0;
+    const product_id = product.id;
     const expirationDate = values.expiryDate;
     const quantity = values.quantityToRemove;
 
@@ -160,7 +160,7 @@ export default function DecreaseQuantityProduct() {
   }
 
   const disabled = useMemo(() => loading.includes(LOADING_TYPE.DECREASING), [loading]);
-  const disableConfirm = useMemo(() => hasAnyError || disabled, [hasAnyError, disabled]);
+  const disableConfirm = useMemo(() => hasAnyError || disabled || product === null, [hasAnyError, disabled, product]);
 
   const loadingProducts = loading.includes(LOADING_TYPE.PRODUCTS);
   return (

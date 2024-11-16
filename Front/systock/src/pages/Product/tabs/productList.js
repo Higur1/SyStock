@@ -141,7 +141,7 @@ export default function ProductList(props) {
 
   return (
     <ContainerProductsList>
-      <span style={{ fontWeight: 600 }}>Filtros</span>
+      {/* <span style={{ fontWeight: 600 }}>Filtros</span>
       <RadioGroup row aria-label="position" name="position" value={filter} onChange={(_, value) => setFilter(value)}>
         {filtersBase.map((filter, i) => (
           <FormControlLabel
@@ -154,7 +154,7 @@ export default function ProductList(props) {
         ))}
       </RadioGroup>
 
-      <Divider />
+      <Divider /> */}
       <div style={{ height: '100%', overflow: 'hidden' }}>
         {loading ? (
           <CircularLoading />
