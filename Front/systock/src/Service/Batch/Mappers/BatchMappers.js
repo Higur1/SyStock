@@ -46,9 +46,11 @@ export default class BatchMappers {
   }
 
   toInterface({ id, expirationDate, quantity, deletionStatus, dateTimeEmptyStock, product_id, eValidationStatus, createdAt, updatedAt }) {
+
+    const expiry = expirationDate === null ? null : new Date(expirationDate);
     return new Batch({
       id,
-      expiry: new Date(expirationDate),
+      expiry,
       quantity,
       productID: product_id,
     });

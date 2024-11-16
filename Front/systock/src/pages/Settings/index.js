@@ -8,6 +8,7 @@ import Account from '../../classes/Account'
 import { MainContext } from '../../App'
 import MyUser from './dialogs/MyUser'
 import TableRenderUI from '../../utils/TableRenderUI'
+import TooltipAndEllipsis from '../../components/dialogs/ComponentUtils/ToolTipAndEllipsis'
 
 const columns = [
   { fixedWidth: false, label: "Nome", value: "name", width: 120 },
@@ -104,11 +105,12 @@ export default function Settings() {
                           justifyContent: column.fixedWidth ? "center" : "left",
                           width: column.fixedWidth ? column.width : "100%",
                           maxWidth: column.fixedWidth ? column.width : "auto",
-                          flex: column.fixedWidth ? "none" : "1"
+                          flex: column.fixedWidth ? "none" : "1",
+                          overflow: 'hidden'
                         }}
                       >
                         <>
-                          {column.value !== "functions" ? (<>{TableRenderUI(column.value, log[column.value])}</>) : (
+                          {column.value !== "functions" ? (<><TooltipAndEllipsis item={TableRenderUI(column.value, log[column.value])} /></>) : (
                             <IconButton onClick={e => handleMenu(e, log)}>
                               <MoreVert />
                             </IconButton>

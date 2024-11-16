@@ -4,6 +4,7 @@ import { SellRegistersContext } from '../SellRegistersPage';
 import { IconButton } from '@mui/material';
 import { Description, Visibility } from '@mui/icons-material';
 import TableRenderUI from '../../../utils/TableRenderUI';
+import TooltipAndEllipsis from '../../../components/dialogs/ComponentUtils/ToolTipAndEllipsis';
 
 const columns = [
   { fixedWidth: true, label: "Data da Venda", value: "date", width: 120 },
@@ -91,10 +92,11 @@ export default function SellList() {
                           justifyContent: column.fixedWidth ? "center" : "left",
                           width: column.width,
                           maxWidth: column.fixedWidth ? column.width : "auto",
-                          flex: column.fixedWidth ? "none" : "1"
+                          flex: column.fixedWidth ? "none" : "1",
+                          overflow: 'hidden'
                         }}
                       >
-                        {TableRenderUI(column.value, log[column.value])}
+                        <TooltipAndEllipsis item={TableRenderUI(column.value, log[column.value])} />
                       </TableData>
                     );
                   })}

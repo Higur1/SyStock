@@ -8,6 +8,7 @@ import { MainContext } from '../../../App';
 import CircularLoading from '../../../components/common/CircularLoading';
 import TableRenderUI from '../../../utils/TableRenderUI';
 import SupplyActions from '../../../Service/Supply/SupplyActions';
+import TooltipAndEllipsis from '../../../components/dialogs/ComponentUtils/ToolTipAndEllipsis';
 
 const infos = [
   { value: "id", label: "Código do Abastecimento" },
@@ -88,7 +89,9 @@ export default function ViewProductsBySupply({ supply = new Supply(), onClose })
                     }}>
                       {columns.map((column, i) => {
                         return (
-                          <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{TableRenderUI(column.value, prod[column.value])}</TableData>
+                          <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150, overflow: 'hidden' }}>
+                            <TooltipAndEllipsis item={TableRenderUI(column.value, prod[column.value])} />
+                          </TableData>
                         );
                       })}
                     </TableRow>

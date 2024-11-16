@@ -11,6 +11,7 @@ import BatchActions from '../../../Service/Batch/BatchActions';
 import TableRenderUI from '../../../utils/TableRenderUI';
 import Supply from '../../../classes/Supply';
 import SupplyActions from '../../../Service/Supply/SupplyActions';
+import TooltipAndEllipsis from '../../../components/dialogs/ComponentUtils/ToolTipAndEllipsis';
 
 const TYPES = {
   MINUS: "MINUS",
@@ -261,7 +262,18 @@ export default function IncreaseQuantity(props) {
                   }
 
                   return (
-                    <TableData key={`row-${index}-${i}`} style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }}>{TableRenderUI(column.value, prod[column.value])}</TableData>
+                    <TableData 
+                      key={`row-${index}-${i}`} 
+                      style={{ 
+                        justifyContent: column.fixedWidth ? "center" : "left", 
+                        width: column.fixedWidth ? column.width : "100%", 
+                        maxWidth: column.fixedWidth ? column.width : "auto", 
+                        flex: column.fixedWidth ? "none" : "1" ,
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <TooltipAndEllipsis item={TableRenderUI(column.value, prod[column.value])} />
+                    </TableData>
                   );
                 })}
               </TableRow>

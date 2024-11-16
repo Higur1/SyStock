@@ -12,6 +12,7 @@ import { MainContext } from '../../../App';
 import TableRenderUI from '../../../utils/TableRenderUI';
 import CategoryActions from '../../../Service/Category/CategoryActions';
 import { useSearchParams } from 'react-router-dom';
+import TooltipAndEllipsis from '../../../components/dialogs/ComponentUtils/ToolTipAndEllipsis';
 
 
 export const FILTER_TYPES = {
@@ -187,7 +188,18 @@ export default function ProductList(props) {
                       )
                     }
                     return (
-                      <TableData key={`row-${index}-${i}`} style={{ justifyContent: column.fixedWidth ? "center" : "left", width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }}>{TableRenderUI(column.value, prod[column.value])}</TableData>
+                      <TableData 
+                        key={`row-${index}-${i}`} 
+                        style={{ 
+                          justifyContent: column.fixedWidth ? "center" : "left", 
+                          width: column.fixedWidth ? column.width : "100%", 
+                          maxWidth: column.fixedWidth ? column.width : "auto", 
+                          flex: column.fixedWidth ? "none" : "1" ,
+                          overflow:'hidden'
+                        }}
+                      >
+                        <TooltipAndEllipsis item={TableRenderUI(column.value, prod[column.value])} />
+                      </TableData>
                     );
                   })}
                 </TableRow>

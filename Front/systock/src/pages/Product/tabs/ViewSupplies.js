@@ -7,6 +7,7 @@ import { formatDate } from '../../../utils/utils';
 import { Visibility } from '@mui/icons-material';
 import SupplyActions from '../../../Service/Supply/SupplyActions';
 import TableRenderUI from '../../../utils/TableRenderUI';
+import TooltipAndEllipsis from '../../../components/dialogs/ComponentUtils/ToolTipAndEllipsis';
 
 const columns = [
   { value: "dateInsert", label: "Data e Hora"},
@@ -106,7 +107,9 @@ export default function ViewSupplies({handleViewProducts}) {
                     );
                   }
                   return (
-                    <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150 }}>{TableRenderUI(column.value, prod[column.value])}</TableData>
+                    <TableData key={`row-${index}-${i}`} style={{ justifyContent: 'center', width: 150, maxWidth: 150, overflow: 'hidden' }}>
+                      <TooltipAndEllipsis item={TableRenderUI(column.value, prod[column.value])} />
+                    </TableData>
                   );
                 })}
               </TableRow>

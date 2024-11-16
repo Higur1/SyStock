@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { TableContainer, TableData, TableRow } from '../styles';
 import TableRenderUI from '../../../utils/TableRenderUI';
+import TooltipAndEllipsis from '../../../components/dialogs/ComponentUtils/ToolTipAndEllipsis';
 
 export const Container = styled.div`
   display: flex;
@@ -121,10 +122,11 @@ export default function EditSell() {
                                 justifyContent: column.fixedWidth ? "center" : "left",
                                 width: column.width,
                                 maxWidth: column.fixedWidth ? column.width : "auto",
-                                flex: column.fixedWidth ? "none" : "1"
+                                flex: column.fixedWidth ? "none" : "1",
+                                overflow: 'hidden'
                               }}
                             >
-                              {TableRenderUI(column.value, log[column.value])}
+                              <TooltipAndEllipsis item={TableRenderUI(column.value, log[column.value])} />
                             </TableData>
                           );
                         })}

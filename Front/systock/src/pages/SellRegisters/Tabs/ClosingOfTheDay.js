@@ -5,6 +5,7 @@ import { TableContainer, TableData, TableRow } from '../styles';
 import { SellRegistersContext } from '../SellRegistersPage';
 import { dateToTextField } from '../../../utils/utils';
 import TableRenderUI from '../../../utils/TableRenderUI';
+import TooltipAndEllipsis from '../../../components/dialogs/ComponentUtils/ToolTipAndEllipsis';
 
 const Container = styled("div")({
   display: 'flex',
@@ -84,10 +85,11 @@ export default function ClosingOfTheDay() {
                             justifyContent: column.fixedWidth ? "center" : "left",
                             width: column.width,
                             maxWidth: column.fixedWidth ? column.width : "auto",
-                            flex: column.fixedWidth ? "none" : "1"
+                            flex: column.fixedWidth ? "none" : "1",
+                            overflow: 'hidden'
                           }}
                         >
-                          {TableRenderUI(column.value, log[column.value])}
+                          <TooltipAndEllipsis item={TableRenderUI(column.value, log[column.value])} />
                         </TableData>
                       );
                     })}

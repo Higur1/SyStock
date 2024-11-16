@@ -7,6 +7,7 @@ import { MainContext } from '../../../App';
 import CircularLoading from '../../../components/common/CircularLoading';
 import BatchActions from '../../../Service/Batch/BatchActions';
 import Product from '../../../classes/Product';
+import TooltipAndEllipsis from '../../../components/dialogs/ComponentUtils/ToolTipAndEllipsis';
 
 export const TableContainer = styled("div")({
   display: 'flex',
@@ -109,7 +110,16 @@ export default function ViewProductBatchsDialog({ product = new Product(), onClo
                 }}>
                   {columns.map((column, i) => {
                     return (
-                      <TableData key={`row-${index}-${i}`} style={{ width: column.fixedWidth ? column.width : "100%", maxWidth: column.fixedWidth ? column.width : "auto", flex: column.fixedWidth ? "none" : "1" }}>{TableRenderUI(column.value, prod[column.value])}</TableData>
+                      <TableData key={`row-${index}-${i}`} 
+                        style={{ 
+                          width: column.fixedWidth ? column.width : "100%", 
+                          maxWidth: column.fixedWidth ? column.width : "auto", 
+                          flex: column.fixedWidth ? "none" : "1",
+                          overflow: 'hidden'
+                        }}
+                      >
+                        <TooltipAndEllipsis item={TableRenderUI(column.value, prod[column.value])} />
+                      </TableData>
                     );
                   })}
                 </TableRow>
