@@ -260,7 +260,7 @@ for (let i = 0; i< 60; i++){
   const daysUntilExpiration = i % 20 - 10; // vencido, proximo ou dentro da validade
   const expirationDate = daysUntilExpiration > 0 ? new Date (Date.now() + daysUntilExpiration * 24 * 60 * 60 * 1000).toISOString() : null
   const eValidationStatus = expirationDate ? daysUntilExpiration > 7 ? 1 : daysUntilExpiration > 0 ? 2 : 3 : 1
-  console.log(isBelowMinimun)
+
   await Promise.all([
     await prisma.batch.create({
       data:{
