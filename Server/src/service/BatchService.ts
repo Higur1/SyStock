@@ -105,6 +105,7 @@ export default class BatchService {
 
             if(batchData.expirantionDate == undefined){
                 const subResult = await BatchModel.subQuantityGeneric(batchData);
+                await ProductModel.updatedSubQuantityInStock(batchData.product_id, batchData.quantity)
                 if (subResult.batch?.quantity == 0) {
                     await BatchModel.setDateTheBatchWasCleared(batchData);
                 };
@@ -112,6 +113,8 @@ export default class BatchService {
                 return subResult;
             }
             const subResult = await BatchModel.subQuantityDesc(batchData);
+            await ProductModel.updatedSubQuantityInStock(batchData.product_id, batchData.quantity)
+
             if (subResult.batch?.quantity == 0) {
                 await BatchModel.setDateTheBatchWasCleared(batchData);
             };
