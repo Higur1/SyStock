@@ -209,7 +209,7 @@ export default class BatchController {
         try {
             const batchValidation = z.object({
                 product_id: z.number(),
-                expirationDate: z.string().transform((val) => new Date(val)),
+                expirationDate: z.string().transform((val) => new Date(val)).optional().nullable(),
                 quantity: z.number()
             });
             const { product_id, expirationDate, quantity } = batchValidation.parse(request.body);
