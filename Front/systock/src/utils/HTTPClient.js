@@ -1,10 +1,11 @@
+import { apiBase } from "../apiBase";
 import { getErrorMessage } from "./utils";
 
 export default class HTTPClient {
   constructor(route) {
     this.route = route;
   }
-  baseURL = "192.168.15.15:3333";
+  baseURL = apiBase;
 
   async get(headers = {}, param = "") {
     return this.request("GET", null, headers, param);
