@@ -246,7 +246,10 @@ export default class ProductService {
     try {
       const list = await prisma.product.findMany({
         where: {
-          totalQuantityInStock: 0
+          AND: [
+            {totalQuantityInStock: 0}, {excludedStatus: false}
+          ]
+          
         }
       })
       return list != undefined ? {status: true, exists: true, list:list} : {status: true, exists: false, list: {}}
@@ -259,6 +262,7 @@ export default class ProductService {
       const list = await prisma.$queryRaw`
         SELECT * FROM product
         WHERE totalQuantityInStock < minimunQuantity
+        AND excludedStatus = false
       ` 
       return list != null ? {status: true, exists: true, list: list} : {status: true, exists: false, list: {}}
     } catch (error) {
