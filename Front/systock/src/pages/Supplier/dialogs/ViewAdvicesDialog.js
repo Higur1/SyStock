@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogTitle } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, Divider } from '@mui/material';
 import React, { useMemo } from 'react';
 import TableRenderUI from '../../../utils/TableRenderUI';
 import styled from 'styled-components';
@@ -91,6 +91,7 @@ export default function ViewAdvicesDialog(props) {
       onClose={onClose}
     >
       <DialogTitle>{`Produtos - ${label}`}</DialogTitle>
+      <Divider />
       <DialogContent>
         <div style={{ display: 'flex', flexDirection: ' column', width: "100%", height: "100%", gap: 16 }}>
 
