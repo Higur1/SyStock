@@ -39,12 +39,10 @@ export default function ViewSupplies({ handleViewProducts }) {
 
   function filterList(suppliesBaseArray = suppliesBase.current, filterSupply = filteredSupplier) {
     if (filterSupply === null) return setSupplies(suppliesBaseArray);
-    console.log(suppliesBaseArray, filterSupply);
     const nextFilteredList = suppliesBaseArray.filter(supply => supply.supplierID === filterSupply.id);
 
     setSupplies(nextFilteredList);
   }
-  console.log(suppliesBase.current);
 
   async function getBatches() {
     try {

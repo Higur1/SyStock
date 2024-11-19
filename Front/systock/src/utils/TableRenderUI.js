@@ -7,7 +7,7 @@ export default (type, value) => {
     case "dateInsert":
     case "date":
     case "expiry": {
-      if(value === null) return "--/--/----";
+      if(value === null) return "Sem data";
       const addHours = ["createdAt", "updateAt", "dateInsert"].includes(type);
       return formatDate(value?.toString(), addHours);
     }

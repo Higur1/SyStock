@@ -1,3 +1,4 @@
+import { generateID } from "../utils/utils";
 import Product from "./Product";
 
 /**
@@ -20,6 +21,7 @@ export default class Batch extends Product {
   constructor({ product = new Product(), id = 0, priceBuy = 0, priceSell = 0, quantity = 0, expiry = null, supplier = null, supplierID = 0, productID = 0 } = {}) {
     super(product);
     this.id = id;
+    this.frontID = generateID();
     this.supplierID = supplierID;
     this.productID = productID;
     

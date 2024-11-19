@@ -360,3 +360,30 @@ export function formatToCurrency(value) {
       minimumFractionDigits: 2, 
   }).format(number);
 }
+
+export function formatDateToTextField(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+export function removeFromHash(obj = {}, key) {
+  const nextObj = {};
+  Object.entries(obj).forEach(([objKey, objValue]) => {
+    if(objKey !== key) nextObj[objKey] = objValue;
+  });
+
+  return nextObj;
+}
+
+export function textFieldDateToDateObject(dateString = "11-14-2000") {
+  if(dateString === "") return null;
+  const nextDate = new Date(dateString);
+  console.log(nextDate);
+
+  const diffMinutes = nextDate.getTimezoneOffset();
+  nextDate.setMinutes(nextDate.getMinutes() + diffMinutes);
+
+  return nextDate;
+}

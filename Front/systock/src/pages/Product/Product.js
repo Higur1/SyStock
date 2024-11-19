@@ -42,7 +42,7 @@ const tabsList = [
 export default function Product() {
   const isMountRef = useRef(false);
 
-  const { productsFiltered, createProduct, errorInsert, updateProduct, loadProducts, } = useContext(ProductContext);
+  const { errorInsert, updateProduct, loadProducts, } = useContext(ProductContext);
 
   const [dialog, setDialog] = useState({ type: TYPES_DIALOG.NONE });
   const [tab, setTab] = useState(TABS.PRODUCTS_LIST);

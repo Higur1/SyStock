@@ -89,8 +89,6 @@ export default function ProductList(props) {
   useEffect(() => {
     getCategories();
   }, []);
-
-  console.log(searchParams.get("filter"))
   
   useEffect(() => {
     if(!categoriesRef.current) return;
