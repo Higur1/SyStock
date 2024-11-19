@@ -1,44 +1,66 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react'
 import Product from './Product';
-import { DEBUG_LOCAL, MainContext } from '../../App';
-import { FILTER_TYPES } from './tabs/productList';
-import { convertMsToDay, extraDateToString } from '../../utils/utils';
-import { ENTITIES } from '../../utils/debug-local-helper';
-import { SuperArray } from '../../utils/arrayFunctions';
+import { MainContext } from '../../App';
 import ProductActions from '../../Service/Product/ProductActions';
 import CategoryActions from '../../Service/Category/CategoryActions';
+
+export const FILTER_TYPES = {
+  ALL: "ALL",
+  NEXT_TO_EXPIRY: "NEXT_TO_EXPIRY",
+  LOW_QUANTITY: "LOW_QUANTITY",
+  EMPTY: "EMPTY",
+  EXPIRED: "EXPIRED"
+};
+
+export const filtersBase = [
+  { type: FILTER_TYPES.ALL, value: "Todos" },
+  { type: FILTER_TYPES.NEXT_TO_EXPIRY, value: "Próximo do Vencimento" },
+  { type: FILTER_TYPES.LOW_QUANTITY, value: "Baixa Quantidade" },
+  { type: FILTER_TYPES.EMPTY, value: "Estoque Zerado" },
+  { type: FILTER_TYPES.EXPIRED, value: "Vencidos" }
+];
+
+async function get(categoriesList, filter = FILTER_TYPES.ALL) {
+  switch (filter) {
+    case FILTER_TYPES.EMPTY: return await ProductActions.getAllEmpty(categoriesList);
+    case FILTER_TYPES.EXPIRED: return await ProductActions.getAllExpired(categoriesList);
+    case FILTER_TYPES.LOW_QUANTITY: return await ProductActions.getAllLowQuantity(categoriesList);
+    case FILTER_TYPES.NEXT_TO_EXPIRY: return await ProductActions.getAllCloseToExpiry(categoriesList);
+    case FILTER_TYPES.ALL:
+    default: return await ProductActions.getAll(categoriesList);
+  }
+}
 
 export const ProductContext = createContext();
 
 export default function ProductPage() {
 
-  const [categories, setCategories] = useState([]);
-  const [productsWithoutSupply, setProductsWithoutSupply] = useState([]);
-  const [productsBase, setProductsBase] = useState(null);
-  const [productsFiltered, setProductsFiltered] = useState(null);
-  const [filter, setFilter] = useState(FILTER_TYPES.ALL);
+  const productsRef = useRef(null);
+  const categoriesRef = useRef(null);
+  const [listOfProducts, setListOfProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const [errorInsert, setErrorInsert] = useState(null);
-
-  const [productsListAutoComplete, setProductsListAutoComplete] = useState([]);
-
-  const { updateData, getData, handleOpenSnackBar } = useContext(MainContext);
-
-  useEffect(() => {
-    if(productsFiltered === null) return;
-
-    setLoading(false);
-  }, [productsFiltered]);
+  const { handleOpenSnackBar } = useContext(MainContext);
 
   useEffect(() => {
     getCategories();
   }, []);
 
+  useEffect(() => {
+    if(!categoriesRef.current) return;
+
+    getProducts();
+  }, [categoriesRef.current]);
+
+  useEffect(() => {
+    if(!productsRef.current) return;
+
+    getList();
+  }, [productsRef.current]);
+
   async function getCategories() {
     try {
       const categories = await CategoryActions.getAll();
-      setCategories(categories);
+      categoriesRef.current = categories;
     } catch (error) {
       handleOpenSnackBar("error", error);
     }
@@ -49,205 +71,51 @@ export default function ProductPage() {
     getProducts();
   }
 
-  function setFilteredProducts(products = productsBase, filterBase = filter) {
-
-    let nextProducts = [];
-    if (filterBase === FILTER_TYPES.LOW_QUANTITY) {
-      nextProducts = products.filter(batch => batch.quantity < batch.minimumQuantity);
-    }
-    if (filterBase === FILTER_TYPES.EMPTY) {
-      const nextProductsWithoutSupply = productsWithoutSupply.filter(prod => !(products.some(batch => batch.refCode === prod.refCode)));
-      nextProducts = [...products.filter(batch => batch.quantity === 0), ...nextProductsWithoutSupply];
-    }
-    if (filterBase === FILTER_TYPES.EXPIRED) {
-
-      const filteredProducts = products.filter(batch => batch.expiry !== null && (new Date(batch.expiry) - new Date()) < 0);
-
-      for (let i = 0; i < filteredProducts.length; i++) {
-        const currentProduct = filteredProducts[i];
-
-        const productInsideNextProducts = nextProducts.find(prod => prod.refCode === currentProduct.refCode && (extraDateToString(prod.expiry)) === (extraDateToString(currentProduct.expiry)));
-
-        if (productInsideNextProducts) continue;
-
-        const equalProducts = filteredProducts.filter((prod, index) => prod.refCode === currentProduct.refCode).map(prod => prod.quantity);
-        const equalProductsSameSupply = filteredProducts.filter((prod, index) => prod.refCode === currentProduct.refCode && (extraDateToString(prod.expiry)) === (extraDateToString(currentProduct.expiry))).map(prod => prod.quantity);
-
-        const totalQuantity = equalProducts.reduce((acumulator, prod) => {
-          const total = prod + acumulator;
-          return acumulator + total;
-        });
-        const totalQuantitySameExpiry = equalProductsSameSupply.reduce((acumulator, prod) => {
-          const total = prod + acumulator;
-          return acumulator + total;
-        });
-
-        nextProducts.push({ ...currentProduct, totalQuantity, totalQuantitySameExpiry });
-      }
-    }
-    if (filterBase === FILTER_TYPES.NEXT_TO_EXPIRY) {
-
-      const daysDiff = 7;
-      const nextDay = new Date();
-      nextDay.setDate(new Date().getDate() + daysDiff);
-
-      const filteredProducts = products.filter(batch => batch.expiry !== null && (convertMsToDay(new Date(batch.expiry) - nextDay) < daysDiff));
-
-
-      for (let i = 0; i < filteredProducts.length; i++) {
-        const currentProduct = filteredProducts[i];
-
-        const productInsideNextProducts = nextProducts.find(prod => prod.refCode === currentProduct.refCode && (extraDateToString(prod.expiry)) === (extraDateToString(currentProduct.expiry)));
-
-        if (productInsideNextProducts) continue;
-
-        const equalProducts = filteredProducts.filter((prod, index) => prod.refCode === currentProduct.refCode).map(prod => prod.quantity);
-        const equalProductsSameSupply = filteredProducts.filter((prod, index) => prod.refCode === currentProduct.refCode && (extraDateToString(prod.expiry)) === (extraDateToString(currentProduct.expiry))).map(prod => prod.quantity);
-
-        const totalQuantity = equalProducts.reduce((acumulator, prod) => {
-          const total = prod + acumulator;
-          return acumulator + total;
-        });
-        const totalQuantitySameExpiry = equalProductsSameSupply.reduce((acumulator, prod) => {
-          const total = prod + acumulator;
-          return acumulator + total;
-        });
-
-        nextProducts.push({ ...currentProduct, totalQuantity, totalQuantitySameExpiry });
-      }
-    }
-    if (filterBase === FILTER_TYPES.ALL) {
-      for (let i = 0; i < products.length; i++) {
-        const currentProduct = products[i];
-
-        const productInsideNextProducts = nextProducts.find(prod => prod.refCode === currentProduct.refCode);
-
-        if (productInsideNextProducts) continue;
-
-        const equalProducts = products.filter((prod, index) => prod.refCode === currentProduct.refCode).map(prod => prod.quantity);
-        const totalQuantity = equalProducts.reduce((acumulator, prod) => {
-          const total = prod + acumulator;
-          return acumulator + total;
-        });
-
-        nextProducts.push({ ...currentProduct, totalQuantity });
-      }
-    }
-
-
-    setProductsFiltered(nextProducts);
-  }
-
-  function getProductTotalQuantity(refCode) {
-    try {
-      const productsQuantity = productsBase.filter(batch => batch.refCode === refCode).map(batch => batch.quantity);
-      const totalQuantity = productsQuantity.reduce((acumulator, prod) => {
-        const total = prod + acumulator;
-        return acumulator + total;
-      });
-
-      return totalQuantity;
-    } catch {
-      return 0;
-    }
-  }
-
   async function getProducts() {
     try {
-      const products = await ProductActions.getAll();
-      setFilteredProducts(products);
-      setProductsBase(products);
+      const products = await get(categoriesRef.current);
+      setBaseProducts(products);
     } catch (error) {
-      setProductsBase([]);
-      setFilteredProducts([]);
+      setBaseProducts([]);
       handleOpenSnackBar("error", error, 3500);
+    } finally {
+      setLoading(false);
     }
   }
 
-  async function createProduct(product) {
-    if (DEBUG_LOCAL) {
-      const nextProducts = [...productsBase, product];
+  function getList() {
+    setListOfProducts(productsRef.current);
+  }
 
-      setFilteredProducts(nextProducts);
-      setProductsBase(nextProducts);
-      return updateData(ENTITIES.PRODUCTS, nextProducts);
-    }
-    try {
-      const prod = await ProductActions.create(product);
-
-      handleOpenSnackBar("success", "Produto criado com sucesso!", 3500);
-      const productss = [...productsBase, prod]
-      setFilteredProducts(productss);
-      setProductsBase(productss);
-    } catch (error) {
-      handleOpenSnackBar("error", error, 3500);
-    }
+  function setBaseProducts(nextlist) {
+    productsRef.current = nextlist;
   }
 
   async function updateProduct(product) {
-    if (DEBUG_LOCAL) {
-      const nextProducts = productsBase.map(p => (p.refCode === product.refCode ? { ...product } : { ...p }));
-
-      setProductsBase(nextProducts);
-      setFilteredProducts(nextProducts);
-      return updateData(ENTITIES.PRODUCTS, nextProducts);
-    }
-
-    try {
-      const nextProduct = await ProductActions.update(product);
-      handleOpenSnackBar("success", "Produto editado com sucesso!", 3500);
-      const newProducts = productsBase.map(p => (p.refCode === nextProduct.refCode ? nextProduct : { ...p }));
-
-      setProductsBase(newProducts);
-      setFilteredProducts(newProducts);
-    } catch (error) {
-      handleOpenSnackBar("error", error, 3500);
-    }
+    const newProducts = productsRef.current.map(p => (p.refCode === product.refCode ? product : { ...p }));
+    setBaseProducts(newProducts);
   }
 
   /**
    * * delete product by id
    * @param {*} id 
    */
-  async function handleDeleteProduct(product) {
-    try {
-      await ProductActions.delete(product.id);
-      const updatedProducts = productsBase.filter(cat => cat.id !== product.id);
-      setFilteredProducts(updatedProducts);
-      setProductsBase(updatedProducts);
-    } catch (e) {
-      handleOpenSnackBar("error", e, 3500);
-    }
-  }
+  function handleDeleteProduct(id) {
+    const updatedProducts = productsRef.current
+      .filter(cat => cat.id !== id);
 
-  function handleFilter(value) {
-    setFilter(value);
-    setLoading(true);
-    setFilteredProducts(productsBase, value);
-  }
-
-  function getExpiryDatesByProduct(refCode) {
-    const thisProductBatches = productsBase.filter(batch => batch.refCode === refCode)
-      .map(batch => batch.expiry)
-      .filter(expiry => expiry !== null);
-
-    const expiryDates = new SuperArray(thisProductBatches).removeEquals();
-
-    return expiryDates;
+    setBaseProducts(updatedProducts);
   }
 
   return (
     <ProductContext.Provider
       value={{
-        productsBase,
-        productsFiltered, filter, handleFilter,
-        createProduct, updateProduct,
-        errorInsert, handleDeleteProduct,
-        productsWithoutSupply, getProductTotalQuantity,
-        getExpiryDatesByProduct,
+        listOfProducts,
+        updateProduct,
+        handleDeleteProduct,
         loading,
         loadProducts,
-        categories
+        categories: categoriesRef.current
       }}
     >
       <Product />

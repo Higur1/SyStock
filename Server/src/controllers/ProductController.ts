@@ -199,7 +199,7 @@ export default class ProductController {
                 costPrice: z.number().positive(),
                 minimunQuantity: z.number().positive(),
                 observation: z.string().trim().max(30),
-                category_id: z.number().positive(),
+                category_id: z.number().positive().optional(),
               });
         
               const { id, name, price, costPrice, minimunQuantity, observation, category_id } = productValidation.parse(request.body);

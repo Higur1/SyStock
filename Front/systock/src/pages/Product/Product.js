@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Container } from "./styles";
-import { Divider, Tab, Tabs } from "@mui/material";
+import { Divider, Menu, MenuItem, Tab, Tabs } from "@mui/material";
 import CreateProduct from "./dialogs/CreateProduct";
 import EditProductDialog from "./dialogs/EditProductDialog";
 import ProductList from "./tabs/productList";
@@ -42,11 +42,17 @@ const tabsList = [
 export default function Product() {
   const isMountRef = useRef(false);
 
-  const { errorInsert, updateProduct, loadProducts, } = useContext(ProductContext);
+  const { loadProducts } = useContext(ProductContext);
 
   const [dialog, setDialog] = useState({ type: TYPES_DIALOG.NONE });
   const [tab, setTab] = useState(TABS.PRODUCTS_LIST);
+  const [menu, setMenu] = useState({ anchor: null, prod: null });
   
+  const MenuActions = useMemo(() => ({
+    open: (e, prod) => setMenu({ anchor: e.currentTarget, prod }),
+    close: () => setMenu({ anchor: null, prod: null })
+  }), []);
+
   useEffect(() => {
     if(!isMountRef) return;
     if(!isMountRef.current) return;
@@ -72,6 +78,7 @@ export default function Product() {
   }
 
   function closeDialog() {
+    MenuActions.close();
     setDialog({ type: TYPES_DIALOG.NONE });
   }
 
@@ -94,13 +101,7 @@ export default function Product() {
         </div>
 
         <div style={{ gridArea: "tabcontent", overflow: 'hidden' }}>
-          {tab === TABS.PRODUCTS_LIST && (
-            <ProductList
-              handleEditProductDialog={handleEditProductDialog}
-              handleDeleteProductDialog={handleDeleteProductDialog}
-              handleViewProductDialog={handleViewProductDialog}
-            />
-          )}
+          {tab === TABS.PRODUCTS_LIST && (<ProductList openMenu={MenuActions.open} />)}
 
           {tab === TABS.CREATE_PRODUCT && (
             <CreateProduct onChangeTab={handleChange}/>
@@ -115,12 +116,7 @@ export default function Product() {
       </Container >
 
       {(dialog.type === TYPES_DIALOG.EDIT_PRODUCT) && <EditProductDialog
-        handleEdit={(prod) => {
-          updateProduct(prod);
-          closeDialog();
-        }}
         handleClose={closeDialog}
-        error={errorInsert}
         open
         product={dialog.prod}
       />
@@ -131,6 +127,21 @@ export default function Product() {
       {dialog.type === TYPES_DIALOG.VIEW_PRODUCTS_BY_SUPPLY && (<ViewProductsBySupply supply={dialog.supply} onClose={closeDialog} />)}
 
       {dialog.type === TYPES_DIALOG.VIEW_PRODUCT_BATCHS && (<ViewProductBatchsDialog product={dialog.prod} onClose={closeDialog}/>)}
+
+      
+      {menu.anchor !== null && (
+        <Menu
+          id="simple-menu"
+          anchorEl={menu.anchor}
+          keepMounted
+          open
+          onClose={MenuActions.close}
+        >
+          <MenuItem onClick={() => handleViewProductDialog(menu.prod)}>Visualizar Lotes do Produto</MenuItem>
+          <MenuItem onClick={() => handleEditProductDialog(menu.prod)}>Editar Produto</MenuItem>
+          <MenuItem onClick={() => handleDeleteProductDialog(menu.prod)}>Excluir Produto</MenuItem>
+        </Menu>
+      )}
     </>
   )
 }

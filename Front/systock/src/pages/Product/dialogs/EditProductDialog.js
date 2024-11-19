@@ -1,11 +1,12 @@
-import { Backdrop, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputAdornment, InputLabel, MenuItem, Select, Slide, TextField } from "@mui/material";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import { Autocomplete, Backdrop, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputAdornment, InputLabel, MenuItem, Popper, Select, Slide, TextField } from "@mui/material";
+import React, { useContext, useState } from "react";
 import PropTypes from 'prop-types';
-import { CurrencyInput } from "react-currency-mask";
 import styled from "styled-components";
-import { DEBUG_LOCAL, MainContext } from "../../../App";
-import { ENTITIES} from "../../../utils/debug-local-helper";
-import CategoryActions from "../../../Service/Category/CategoryActions";
+import { MainContext } from "../../../App";
+import ProductActions from "../../../Service/Product/ProductActions";
+import { ProductContext } from "../ProductPage";
+import { NumericFormatCustom } from "../../../components/common/InputCurrency";
+import Product from "../../../classes/Product";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
@@ -25,42 +26,19 @@ const Container = styled.div`
 `
 
 export default function EditProductDialog(props) {
-  const { handleEdit, handleClose, error, open, product } = props;
+  const { handleClose, open, product = new Product() } = props;
 
-  const { id } = product;
-  const [name, setName] = useState("");
+  const [name, setName] = useState(product.name || "");
   const [description, setDescription] = useState(product.description || "");
-  const [priceBuy, setPriceBuy] = useState(product.priceBuy || 0);
-  const [priceSell, setPriceSell] = useState(product.priceSell || 0);
-  const [categories, setCategories] = useState([])
-  const [hasError, setHasError] = useState(false);
+  const [priceBuy, setPriceBuy] = useState(product.priceBaseBuy || 0);
+  const [priceSell, setPriceSell] = useState(product.priceBaseSell || 0);
   const [isLoading, setIsLoading] = useState(false);
   const [category, setCategory] = useState(product.category || null);
-  const isMount = useRef();
   const currencyRegex = /^[0-9]+(\.[0-9]{1,2})?$/;
 
-  const { getData } = useContext(MainContext);
+  const { handleOpenSnackBar } = useContext(MainContext);
+  const { updateProduct, categories } = useContext(ProductContext);
 
-  useEffect(() => {
-    if(isMount.current) return;
-    
-    isMount.current = true;
-    getCategories();
-  }, []);
-
-  async function getCategories() {
-    if(DEBUG_LOCAL) {
-      const categArr = getData(ENTITIES.CATEGORIES);
-
-      return setTimeout(() => setCategories(categArr), 350);
-    }
-    try {
-      const categories = await CategoryActions.getAll();
-      setCategories(categories);
-    } catch (error) {
-      console.error(error);
-    }
-  }
 
   const handlePriceBuyChange = e => {
     let value = e.target.value;
@@ -80,6 +58,20 @@ export default function EditProductDialog(props) {
     setPriceSell(e.target.value);
   }
   
+  async function onEdit(prod) {
+    handleOpenSnackBar("info", "Editando produto...", undefined);
+    try {
+      const nextProduct = await ProductActions.update(prod);
+      handleOpenSnackBar("success", "Produto editado com sucesso!", 3500);
+      updateProduct(nextProduct);
+      handleClose();
+    } catch (error) {
+      handleOpenSnackBar("error", error, 3500);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
     <>
       <Dialog
@@ -93,7 +85,7 @@ export default function EditProductDialog(props) {
           <Container>
             <TextField
               required
-              label="NCM/SH"
+              label="Código de referência"
               value={product.refCode}
               disabled
             />
@@ -104,47 +96,44 @@ export default function EditProductDialog(props) {
               disabled={isLoading}
             />
             <TextField
-              label="Preço de Compra"
               value={priceBuy}
-              onChange={handlePriceBuyChange}
-              placeholder={"ex: 100.00"}
-              name="numberformat"
-              id="formatted-numberformat-input"
+              label="Preço de Compra"
+              style={{ flex: 1 }}
+              name={"priceBuy"}
               disabled={isLoading}
+              onChange={handlePriceBuyChange}
+              Input
               InputProps={{
-                startAdornment: <InputAdornment position="start">R$</InputAdornment>
+                inputComponent: NumericFormatCustom,
               }}
             />
             <TextField
-              label="Preço de Venda"
               value={priceSell}
-              onChange={handlePriceSellChange}
-              placeholder={"ex: 100.00"}
-              name="numberformat"
-              id="formatted-numberformat-input"
+              label="Preço de Venda"
+              style={{ flex: 1 }}
+              name={"priceSell"}
               disabled={isLoading}
+              onChange={handlePriceSellChange}
+              Input
               InputProps={{
-                startAdornment: <InputAdornment position="start">R$</InputAdornment>
+                inputComponent: NumericFormatCustom,
               }}
             />
-            <FormControl>
-              <InputLabel id="test-select-label">Categoria do Produto</InputLabel>
-              <Select
-                value={category}
-                onChange={(e, target) => setCategory(target)}
-                labelId="test-select-label"
-                label="Categoria"
-                disabled={isLoading}
-              >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                {categories.map((cat, index) => (
-                  <MenuItem value={cat.id} key={index}>{cat.name}</MenuItem>
-                )
-                )}
-              </Select>
-            </FormControl>
+            <Autocomplete
+              disablePortal
+              value={category}
+              onChange={(event, newInputValue) => {
+                console.log(newInputValue)
+                setCategory(newInputValue);
+              }}
+              options={categories}
+              getOptionLabel={(option) => option.name}
+              sx={{ width: "100%" }}
+              renderInput={(params) => <TextField {...params} label="Categoria" />}
+              PopperComponent={props => <Popper {...props} style={{ ...props.style, zIndex: 100000 }} disablePortal={false} />}
+              // PopperComponent={<Popper style={{zIndex: 2}}/>}
+              ListboxProps={{ style: { zIndex: 5 } }}
+            />
             <TextField
               label="Observação"
               value={description}
@@ -156,48 +145,31 @@ export default function EditProductDialog(props) {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancelar</Button>
-          <Button onClick={() => {
-            if(product.ncmSh === '' || description === '' ||
-              priceBuy === 0 || priceSell === 0 || categories === null) {
-              setHasError(true);
-              return;
-            }
-
-            if(!currencyRegex.test(priceBuy)) {
-              // setHasErrorPrice(true);
-              return;
-            }
-
-            if(!currencyRegex.test(priceSell)) {
-              // setHasErrorPrice(true);
-              return;
-            }
-
+          <Button disabled={
+              name === '' || 
+              !currencyRegex.test(priceBuy) || 
+              !currencyRegex.test(priceSell) || isLoading
+            } onClick={() => {
             setIsLoading(true);
             const strpriceSell = parseFloat(priceSell);
             const strpriceBuy = parseFloat(priceBuy);
-            const product = {
+
+            const nextProduct = {
               ...product,
-              id,
+              name,
               description,
               priceBuy: strpriceBuy,
+              priceBaseBuy: strpriceBuy,
               priceSell: strpriceSell,
-              // supplier_id: supplierID
+              priceBaseSell: strpriceSell,
+              category
             };
 
-            handleEdit(product);
-            }}>Editar</Button>
+            onEdit(nextProduct);
+            }}>Confirmar</Button>
         </DialogActions>
 
       </Dialog>
-
-      <Backdrop
-      sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-      open={isLoading}
-      >
-      <CircularProgress color="inherit" />
-      </Backdrop>
-    
     </>
   );
 }

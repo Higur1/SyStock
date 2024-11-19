@@ -105,17 +105,11 @@ export default class ProductActions {
   }
 
   static async update(sup = new Product({})) {
+    console.trace();
     const Client = new HTTPClient("/product");
-    try {
-      const nextProduct = Client.put(this.mapper.toServer(sup, "PUT")).then(response => response.Product);
 
-      const category = await CategoryActions.getById(nextProduct.category_id);
-
-      return this.mapper.toInterface(nextProduct, { category });
-    } catch (e) {
-      console.error("Error:", e);
-      throw e;
-    }
+    return Client.put(this.mapper.toServer(sup, "PUT"))
+      .then(response => this.mapper.toInterface(response.Product, { category: sup.category }));
   }
 
   static async delete(id) {

@@ -189,11 +189,9 @@ export default function IncreaseQuantity() {
     setEditing(prevEditing => ({...prevEditing, [id]: extraPropsOfProduct}));
   } 
 
-  console.log(productsToAdd);
   function confirmEditRow(id) {
     const prodIndex = productsToAdd.findIndex(prd => prd.frontID === id);
 
-    console.log(productsToAdd[prodIndex]);
     const extraPropsOfProduct = editing[id];
     const nextProductToAdd = new Batch({ 
       product: new Product({...productsToAdd[prodIndex]}),
