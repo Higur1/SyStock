@@ -37,7 +37,7 @@ function App() {
     if(DEBUG_LOCAL) {
       if(!verifyHasContent()) setInitialData();
       
-      getDB();
+      // getDB();
     }
     verifyToken();
   }, []);
@@ -47,7 +47,7 @@ function App() {
     if(DEBUG_LOCAL) {
       if(payload === "connectLocal") {
         setIsLoggedIn(true);
-        getDB();
+        // getDB();
         return initialNavigation();
       } else {
         setIsLoggedIn(false);
@@ -73,7 +73,7 @@ function App() {
       } else {
         setIsLoggedIn(true);
         tokenRef.current = token;
-        getDB();
+        // getDB();
         initialNavigation();
       }
     } else {
