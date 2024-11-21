@@ -8,7 +8,7 @@ interface InterfaceProduct {
   minimunQuantity: number;
   observation?: string;
   totalQuantityInStock?: number;
-  category_id: number;
+  category_id?: number;
   excludedStatus?: boolean;
 }
 
@@ -20,7 +20,7 @@ class IProduct {
   minimunQuantity: number;
   observation?: string;
   totalQuantityInStock?: number;
-  category_id: number;
+  category_id?: number;
   excludedStatus?: boolean;
 
   public constructor({

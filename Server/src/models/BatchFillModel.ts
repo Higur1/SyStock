@@ -36,7 +36,11 @@ export default class BatchFill {
                                         costPrice: true,
                                     }
                                 },
-                                quantity: true,
+                                Batch_Fill:{
+                                    select:{
+                                        quantity: true
+                                    }
+                                },
                                 expirationDate: true,
                             }
                         },

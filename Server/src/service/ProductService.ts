@@ -15,7 +15,7 @@ export default class ProducService {
       throw error;
     }
   }
-  static async lowQuantity(){
+  static async lowQuantity() {
     try {
       const list = await ProductModel.lowQuantity();
 
@@ -24,7 +24,7 @@ export default class ProducService {
       throw error;
     }
   }
-  static async zeroStock(){
+  static async zeroStock() {
     try {
       const list = await ProductModel.zeroStock();
 
@@ -33,11 +33,11 @@ export default class ProducService {
       throw error;
     }
   }
-  static async expired(){
+  static async expired() {
     try {
 
       const today = new Date();
-      today.setHours(0,0,0,0);
+      today.setHours(0, 0, 0, 0);
       const list = await BatchModel.expiredBatchs(today);
 
       return list;
@@ -45,13 +45,13 @@ export default class ProducService {
       throw error;
     }
   }
-  static async closeToExpiration(){
+  static async closeToExpiration() {
     try {
       const today = new Date();
-      today.setHours(0,0,0,0);
+      today.setHours(0, 0, 0, 0);
 
       const nextWeek = new Date(today)
-      nextWeek.setDate(today.getDate() +7);
+      nextWeek.setDate(today.getDate() + 7);
       const list = await BatchModel.closeToExpiration(nextWeek);
 
       return list;
@@ -62,8 +62,8 @@ export default class ProducService {
   static async create(productData: IProduct) {
     try {
       let category_id_replace = 0;
- 
-      if (productData.category_id != 0) {
+
+      if (productData.category_id != 0 && productData.category_id != undefined) {
         category_id_replace = productData.category_id;
       }
       const categoryData: ICategory = {
@@ -118,12 +118,15 @@ export default class ProducService {
       if (!findCategory.exists) {
         throw new Error("Category doesn't found");
       }
+      if (productData.category_id == undefined) {
+        throw new Error("Category id is undefined")
+      }
 
       const findResult = await ProductModel.findByCategory(
         productData.category_id
       );
-
       return findResult;
+
     } catch (error) {
       throw error;
     }
@@ -153,7 +156,7 @@ export default class ProducService {
       }
       const verifyDuplicateName = await ProductModel.findByName(productData);
 
-      if (verifyDuplicateName.exists) {
+      if (verifyDuplicateName.exists && verifyDuplicateName.product?.id != productData.id) {
         throw new Error("Could not update product, name already exists");
       }
 

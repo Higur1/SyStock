@@ -211,7 +211,7 @@ export default class ProductController {
                 costPrice: new Decimal(costPrice),
                 minimunQuantity: minimunQuantity,
                 observation: observation,
-                category_id: category_id,
+                category_id: category_id || undefined,
                 excludedStatus: false,
               };
 
