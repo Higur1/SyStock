@@ -84,14 +84,16 @@ try {
         { id: 3, name: "Caixas d'água",},
         { id: 4, name: "Cimento",},
         { id: 5, name: "Rejuntes",},
-        { id: 6, name: "Telha de Plástico",},
-		{ id: 7, name: "estruturas metalicas" },
+        { id: 6, name: "Telha",},
+		{ id: 7, name: "Estruturas metálicas" },
 		{ id: 8, name: "Coberturas e telhados" },
 		{ id: 9, name: "Ferragens" },
 		{ id: 10, name: "Madeiras" },
 		{ id: 11, name: "Tintas" },
 		{ id: 12, name: "Tubulações" },
 		{ id: 13, name: "Ferramentas" },
+    { id: 14, name: "Pregos e Parafusos" },
+    { id: 14, name: "Conexões para tubos pvc" }
       ],
     }),
     await prisma.product.createMany({
@@ -105,23 +107,23 @@ try {
         { id: 7, name: "Rejunte Cimentício Aditivado Cinza Platina 1 Kg Axton", category_id: 5, price: 16.0, costPrice: 8.41, minimunQuantity: 8, observation: "", totalQuantityInStock: 0, excludedStatus: false },
         { id: 8, name: "Rejunte Acrílico Rejunte Base Plástica Branco 1kg Axton", category_id: 5, price: 28.0, costPrice: 18.27, minimunQuantity: 6, observation: "", totalQuantityInStock: 0, excludedStatus: false},
         { id: 9, name: "Telha de Polipropileno Ondulada 50x153cm 1,1mm Translúcida Atco", category_id: 6, price: 36.0, costPrice: 18.03, minimunQuantity: 5, observation: "", totalQuantityInStock: 0, excludedStatus: false, },
-        { id: 10, name: "Telha Cerâmica Vermelha", category_id: 7, price: 20.0, costPrice: 16.0, minimunQuantity: 5, observation: "Telha resistente.", totalQuantityInStock: 0, excludedStatus: false },
-        { id: 11, name: "Telha Galvanizada", category_id: 7, price: 50.0, costPrice: 40.0, minimunQuantity: 10, observation: "Industrial.", totalQuantityInStock: 0, excludedStatus: false },
-        { id: 12, name: "Cimento CP II 50kg", category_id: 8, price: 35.0, costPrice: 28.0, minimunQuantity: 15, observation: "", totalQuantityInStock: 0, excludedStatus: false },
-        { id: 13, name: "Cimento Branco", category_id: 8, price: 45.0, costPrice: 37.0, minimunQuantity: 8, observation: "", totalQuantityInStock: 0, excludedStatus: true },
-        { id: 14, name: "Prego 18x27mm", category_id: 9, price: 15.0, costPrice: 10.0, minimunQuantity: 20, observation: "Uso geral.", totalQuantityInStock: 0, excludedStatus: false },
+        { id: 10, name: "Telha Cerâmica Vermelha", category_id: 6, price: 20.0, costPrice: 16.0, minimunQuantity: 5, observation: "Telha resistente.", totalQuantityInStock: 0, excludedStatus: false },
+        { id: 11, name: "Telha Galvanizada", category_id: 6, price: 50.0, costPrice: 40.0, minimunQuantity: 10, observation: "Industrial.", totalQuantityInStock: 0, excludedStatus: false },
+        { id: 12, name: "Cimento CP II 50kg", category_id: 4, price: 35.0, costPrice: 28.0, minimunQuantity: 15, observation: "", totalQuantityInStock: 0, excludedStatus: false },
+        { id: 13, name: "Cimento Branco", category_id: 4, price: 45.0, costPrice: 37.0, minimunQuantity: 8, observation: "", totalQuantityInStock: 0, excludedStatus: true },
+        { id: 14, name: "Prego 18x27mm", category_id: 14, price: 15.0, costPrice: 10.0, minimunQuantity: 20, observation: "Uso geral.", totalQuantityInStock: 0, excludedStatus: false },
         { id: 15, name: "Arame Recozido 1kg", category_id: 9, price: 25.0, costPrice: 18.0, minimunQuantity: 5, observation: "", totalQuantityInStock: 0, excludedStatus: false },
         { id: 16, name: "Tábua de Pinus", category_id: 10, price: 12.0, costPrice: 9.0, minimunQuantity: 10, observation: "Para estruturas leves.", totalQuantityInStock: 0, excludedStatus: false },
         { id: 17, name: "Caibro de Eucalipto", category_id: 10, price: 30.0, costPrice: 22.0, minimunQuantity: 15, observation: "", totalQuantityInStock: 0, excludedStatus: false },
         { id: 18, name: "Tinta Látex Branca", category_id: 11, price: 50.0, costPrice: 35.0, minimunQuantity: 10, observation: "", totalQuantityInStock: 0, excludedStatus: false },
         { id: 19, name: "Tinta Óleo Vermelha", category_id: 11, price: 70.0, costPrice: 50.0, minimunQuantity: 8, observation: "", totalQuantityInStock: 0, excludedStatus: false },
         { id: 20, name: "Canos PVC 100mm", category_id: 12, price: 25.0, costPrice: 18.0, minimunQuantity: 10, observation: "", totalQuantityInStock: 0, excludedStatus: false },
-        { id: 21, name: "Conexão em T PVC", category_id: 12, price: 8.0, costPrice: 6.0, minimunQuantity: 25, observation: "", totalQuantityInStock: 0, excludedStatus: false },
+        { id: 21, name: "Conexão em T PVC", category_id: 15, price: 8.0, costPrice: 6.0, minimunQuantity: 25, observation: "", totalQuantityInStock: 0, excludedStatus: false },
         { id: 22, name: "Martelo Unha 500g", category_id: 13, price: 40.0, costPrice: 28.0, minimunQuantity: 5, observation: "", totalQuantityInStock: 0, excludedStatus: false },
         { id: 23, name: "Chave de Fenda", category_id: 13, price: 15.0, costPrice: 10.0, minimunQuantity: 10, observation: "",totalQuantityInStock: 0, excludedStatus: false },
         { id: 24, name: "Chave Inglesa", category_id: 13, price: 60.0, costPrice: 45.0, minimunQuantity: 8, observation: "Alta durabilidade.", totalQuantityInStock: 0, excludedStatus: false },
         { id: 25, name: "Serrote 24''", category_id: 13, price: 70.0, costPrice: 55.0, minimunQuantity: 5, observation: "", totalQuantityInStock: 0, excludedStatus: true },
-        { id: 26, name: "Parafuso 3x25mm", category_id: 9, price: 10.0, costPrice: 7.0, minimunQuantity: 50, observation: "", totalQuantityInStock: 0, excludedStatus: false },
+        { id: 26, name: "Parafuso 3x25mm", category_id: 14, price: 10.0, costPrice: 7.0, minimunQuantity: 50, observation: "", totalQuantityInStock: 0, excludedStatus: false },
         { id: 27, name: "Madeira Compensada", category_id: 10, price: 90.0, costPrice: 70.0, minimunQuantity: 10, observation: "Ideal para construção.", totalQuantityInStock: 0, excludedStatus: false },
         { id: 28, name: "Broca para Concreto", category_id: 13, price: 25.0, costPrice: 20.0, minimunQuantity: 5, observation: "", totalQuantityInStock: 0, excludedStatus: false },
         { id: 29, name: "Viga de Aço", category_id: 9, price: 300.0, costPrice: 250.0, minimunQuantity: 3, observation: "Para estruturas pesadas.", totalQuantityInStock: 0, excludedStatus: false },
@@ -130,10 +132,10 @@ try {
 
     await prisma.batch.create({
       data: {
-        product_id: 1,
+        product_id: 1, 
         quantity: 30,
         deletionStatus: false,
-        expirationDate: "2024-01-01T00:00:01.000Z",
+        expirationDate: "2024-05-21T00:00:01.000Z",
         eValidationStatus: 1,
       }
     }).then(async (element) => {
@@ -185,7 +187,7 @@ try {
         product_id: 6,
         quantity: 9,
         deletionStatus: false,
-        expirationDate: "2024-12-10T00:00:01.000Z",
+        expirationDate: "2025-12-10T00:00:01.000Z",
         eValidationStatus: 3,
       }
     }).then(async (element) => {
@@ -253,25 +255,44 @@ try {
 } catch (error) {
   console.log(error);
 }
-for (let i = 0; i< 60; i++){
-  const produtctId = 10 + (i % 20);
-  const isBelowMinimun = Math.random() < 0.3 // 30% dos lotes terao quantidade abaixo minima
-  const quantity = isBelowMinimun ? Math.floor(Math.random() * 5) + 1 : Math.floor(Math.random() * 50) + 10;
-  const daysUntilExpiration = i % 20 - 10; // vencido, proximo ou dentro da validade
-  const expirationDate = daysUntilExpiration > 0 ? new Date (Date.now() + daysUntilExpiration * 24 * 60 * 60 * 1000).toISOString() : null
-  const eValidationStatus = expirationDate ? daysUntilExpiration > 7 ? 1 : daysUntilExpiration > 0 ? 2 : 3 : 1
+const productsWithExpiration = [12, 13, 18, 19]; // IDs de produtos com validade na vida real
 
-  await Promise.all([
-    await prisma.batch.create({
-      data:{
-        product_id: produtctId, 
-        quantity,
-        deletionStatus: false,
-        expirationDate,
-        eValidationStatus
-      }
-    }).then(async (element) => {
-      await updateQuantityProduct(produtctId, quantity)
-    })
-  ])
-};
+for (let i = 0; i < 60; i++) {
+  const productId = 10 + (i % 20); // IDs variando entre 10 e 29
+  const isBelowMinimum = Math.random() < 0.3; // 30% dos lotes terão quantidade abaixo da mínima
+  const quantity = isBelowMinimum ? Math.floor(Math.random() * 5) + 1 : Math.floor(Math.random() * 50) + 10;
+
+  // Verifica se o produto possui validade
+  const hasExpiration = productsWithExpiration.includes(productId);
+  let daysUntilExpiration;
+
+  // Calcula `daysUntilExpiration` somente se o produto possui validade
+  if (hasExpiration) {
+    daysUntilExpiration = i % 20 - 10;
+  }
+
+  // Calcula a data de validade e o status de validação
+  const expirationDate =
+    hasExpiration && daysUntilExpiration !== null && daysUntilExpiration > 0
+      ? new Date(Date.now() + daysUntilExpiration * 24 * 60 * 60 * 1000).toISOString()
+      : null;
+
+  const eValidationStatus =
+    hasExpiration && expirationDate
+      ? daysUntilExpiration > 7
+        ? 1 // Dentro da validade
+        : daysUntilExpiration > 0
+        ? 2 // Próximo do vencimento
+        : 3 // Vencido
+      : 1; // Produtos sem validade são sempre considerados dentro da validade
+
+  await prisma.batch.create({
+    data: {
+      product_id: productId,
+      quantity,
+      deletionStatus: false,
+      expirationDate,
+      eValidationStatus,
+    },
+  });
+}
