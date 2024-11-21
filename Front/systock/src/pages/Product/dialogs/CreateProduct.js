@@ -70,8 +70,6 @@ export default function CreateProduct() {
           label="Nome do Produto"
           value={values.name}
           onChange={(e) => onChange("name", e.target.value)}
-          error={hasError("name") && hasInteracted("name")}
-          helperText={error["name"]}
           disabled={loading}
         />
         <TextField
