@@ -139,7 +139,7 @@ try {
         eValidationStatus: 1,
       }
     }).then(async (element) => {
-      await updateQuantityProduct(element.id, element.quantity)
+      await updateQuantityProduct(element.product_id, element.quantity)
     }),
     await prisma.batch.create({
       data: {
@@ -150,7 +150,7 @@ try {
         eValidationStatus: 3,
       }
     }).then(async (element) => {
-      await updateQuantityProduct(element.id, element.quantity)
+      await updateQuantityProduct(element.product_id, element.quantity)
     }),
     await prisma.batch.create({
       data: {
@@ -160,7 +160,7 @@ try {
         eValidationStatus: 4,
       }
     }).then(async (element) => {
-      await updateQuantityProduct(element.id, element.quantity)
+      await updateQuantityProduct(element.product_id, element.quantity)
     }),
     await prisma.batch.create({
       data: {
@@ -170,7 +170,7 @@ try {
         eValidationStatus: 4,
       }
     }).then(async (element) => {
-      await updateQuantityProduct(element.id, element.quantity)
+      await updateQuantityProduct(element.product_id, element.quantity)
     }),
     await prisma.batch.create({
       data: {
@@ -180,7 +180,7 @@ try {
         eValidationStatus: 4,
       }
     }).then(async (element) => {
-      await updateQuantityProduct(element.id, element.quantity)
+      await updateQuantityProduct(element.product_id, element.quantity)
     }),
     await prisma.batch.create({
       data: {
@@ -191,7 +191,7 @@ try {
         eValidationStatus: 3,
       }
     }).then(async (element) => {
-      await updateQuantityProduct(element.id, element.quantity)
+      await updateQuantityProduct(element.product_id, element.quantity)
     }),
     await prisma.batch.create({
       data: {
@@ -202,7 +202,7 @@ try {
         eValidationStatus: 2,
       }
     }).then(async (element) => {
-      await updateQuantityProduct(element.id, element.quantity)
+      await updateQuantityProduct(element.product_id, element.quantity)
     }),
     await prisma.batch.create({
       data: {
@@ -213,7 +213,7 @@ try {
         eValidationStatus: 3,
       }
     }).then(async (element) => {
-      await updateQuantityProduct(element.id, element.quantity)
+      await updateQuantityProduct(element.product_id, element.quantity)
     }),
     await prisma.batch.create({
       data: {
@@ -223,7 +223,7 @@ try {
         eValidationStatus: 4,
       }
     }).then(async (element) => {
-      await updateQuantityProduct(element.id, element.quantity)
+      await updateQuantityProduct(element.product_id, element.quantity)
     }),
     /*Create generic supplier*/
     await prisma.supplier.createMany({
@@ -300,6 +300,6 @@ for (let i = 0; i < 60; i++) {
       deletionStatus: false,
       expirationDate,
       eValidationStatus: eValidationStatus,
-    },
-  });
+    }
+  }).then(async(element) => {await updateQuantityProduct(element.product_id, element.quantity)})
 }
