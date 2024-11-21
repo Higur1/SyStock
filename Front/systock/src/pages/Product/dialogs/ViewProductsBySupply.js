@@ -112,7 +112,7 @@ export default function ViewProductsBySupply({ supply = new Supply(), onClose })
 
           </div>
           <div style={{ width: "100%", display: "flex", alignItems: 'center', justifyContent: 'flex-end' }}>
-            <TextField style={{ width: 150 }} disabled value={supply.totalValue} variant="outlined" label="Total" />
+            <TextField style={{ width: 150 }} disabled value={TableRenderUI("subTotal", supply.totalValue)} variant="outlined" label="Total" />
           </div>
         </div>
       </DialogContent>

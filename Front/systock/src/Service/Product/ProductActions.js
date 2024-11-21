@@ -8,9 +8,10 @@ export default class ProductActions {
   static mapper = new ProductMappers();
 
   static async getAll(categoriesList = null) {
-    const Client = new HTTPClient("/products");
 
-    const categories = categoriesList;
+    const Client = new HTTPClient("/products");
+    const categories = categoriesList ? categoriesList : await CategoryActions.getAll();
+
 
     return Client.get()
       .then(dataObj => {

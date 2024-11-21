@@ -1,3 +1,4 @@
+/* eslint-disable-next-line no-unsafe-optional-chaining */
 import Batch from "../../../classes/Batch";
 import Supplier from "../../../classes/Supplier";
 import Supply from "../../../classes/Supply";
@@ -53,17 +54,20 @@ export default class SupplyMappers {
         name: "",
         costPrice: "",
       },
-      quantity: 0,
+      Batch_Fill: [{quantity: 0}],
       expirationDate: new Date().toString()
     },
     subTotal,
   }) {
 
+    const [fillQuantity] =  batch_id_fk?.Batch_Fill || [];
+    const  { quantity } = fillQuantity; 
+
     return {
       id: batch_id_fk?.product_id_fk?.id,
       product: batch_id_fk?.product_id_fk?.name,
       priceBuy: batch_id_fk?.product_id_fk?.costPrice,
-      quantity: batch_id_fk?.quantity,
+      quantity,
       expiry: batch_id_fk?.expirationDate,
       subTotal
     }

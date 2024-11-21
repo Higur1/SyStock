@@ -7,6 +7,7 @@ import Product from "../../../classes/Product";
 import { ProductContext } from "../ProductPage";
 import useValidateForm, { FORM_TYPE } from "../../../hooks/useValidateForm";
 import ProductActions from "../../../Service/Product/ProductActions";
+import { NumericFormatCustom } from "../../../components/common/InputCurrency";
 
 const Container = styled.div`
   display: flex;
@@ -18,7 +19,7 @@ const Container = styled.div`
 export default function CreateProduct() {
   const { categories } = useContext(ProductContext);
 
-  const [values, setValues] = useState({name: "", description: "", priceSell: 0, priceBuy: 0, categoryID: "", minimumQuantity: 0});
+  const [values, setValues] = useState({ name: "", description: "", priceSell: 0, priceBuy: 0, categoryID: "", minimumQuantity: 0 });
   const [loading, setLoading] = useState(false);
 
   const { error, hasError, hasInteracted, hasAnyError, resetValidate } = useValidateForm(values, FORM_TYPE.PRODUCT);
@@ -27,7 +28,7 @@ export default function CreateProduct() {
   const { handleOpenSnackBar } = useContext(MainContext);
 
   function onChange(type, value) {
-    setValues(prev => ({...prev, [type]: value}))
+    setValues(prev => ({ ...prev, [type]: value }))
   }
 
   async function onConfirm() {
@@ -55,11 +56,11 @@ export default function CreateProduct() {
   }
 
   function reset() {
-    setValues({name: "", description: "", priceSell: 0, priceBuy: 0, categoryID: "", minimumQuantity: 0});
+    setValues({ name: "", description: "", priceSell: 0, priceBuy: 0, categoryID: "", minimumQuantity: 0 });
     resetValidate();
   }
 
-  const disableConfirm = useMemo(() => [values.name].includes("") || [values.priceBuy, values.priceSell. minimumQuantity].includes(0), [values]);
+  const disableConfirm = useMemo(() => [values.name].includes("") || [values.priceBuy, values.priceSell.minimumQuantity].includes(0), [values]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16, width: "100%", height: "100%" }}>
@@ -74,31 +75,29 @@ export default function CreateProduct() {
           disabled={loading}
         />
         <TextField
-          label="Preço de Venda"
           value={values.priceSell}
-          onChange={(e) => onChange("priceSell", e.target.value)}
-          placeholder={"ex: 100.00"}
-          name="numberformat"
-          id="formatted-numberformat-input-sell"
-          error={hasError("priceSell") && hasInteracted("priceSell")}
-          disabled={loading}
-          helperText={error["priceSell"]}
+          style={{ flexBasis: "calc(50% - 16px)" }}
+          name={"priceSell"}
+          onChange={(e) => {
+            onChange("priceSell", e.target.value);
+          }}
+          label="Preço de Venda"
+          Input
           InputProps={{
-            startAdornment: <InputAdornment position="start">R$</InputAdornment>
+            inputComponent: NumericFormatCustom,
           }}
         />
         <TextField
-          label="Preço de Compra"
           value={values.priceBuy}
-          onChange={(e) => onChange("priceBuy", e.target.value)}
-          placeholder={"ex: 100.00"}
-          name="numberformat"
-          id="formatted-numberformat-input-buy"
-          error={hasError("priceBuy") && hasInteracted("priceBuy")}
-          disabled={loading}
-          helperText={error["priceBuy"]}
+          style={{ flexBasis: "calc(50% - 16px)" }}
+          name={"priceBuy"}
+          onChange={(e) => {
+            onChange("priceBuy", e.target.value);
+          }}
+          label="Preço de Compra"
+          Input
           InputProps={{
-            startAdornment: <InputAdornment position="start">R$</InputAdornment>
+            inputComponent: NumericFormatCustom,
           }}
         />
         <TextField

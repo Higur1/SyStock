@@ -20,16 +20,6 @@ export const filtersBase = [
   { type: FILTER_TYPES.EXPIRED, value: "Vencidos" }
 ];
 
-async function get(categoriesList, filter = FILTER_TYPES.ALL) {
-  switch (filter) {
-    case FILTER_TYPES.EMPTY: return await ProductActions.getAllEmpty(categoriesList);
-    case FILTER_TYPES.EXPIRED: return await ProductActions.getAllExpired(categoriesList);
-    case FILTER_TYPES.LOW_QUANTITY: return await ProductActions.getAllLowQuantity(categoriesList);
-    case FILTER_TYPES.NEXT_TO_EXPIRY: return await ProductActions.getAllCloseToExpiry(categoriesList);
-    case FILTER_TYPES.ALL:
-    default: return await ProductActions.getAll(categoriesList);
-  }
-}
 
 export const ProductContext = createContext();
 
@@ -41,18 +31,30 @@ export default function ProductPage() {
   const [loading, setLoading] = useState(true);
   const { handleOpenSnackBar } = useContext(MainContext);
 
+
+  async function get(categoriesList = categoriesRef.current, filter = FILTER_TYPES.ALL) {
+    switch (filter) {
+      case FILTER_TYPES.EMPTY: return await ProductActions.getAllEmpty(categoriesList);
+      case FILTER_TYPES.EXPIRED: return await ProductActions.getAllExpired(categoriesList);
+      case FILTER_TYPES.LOW_QUANTITY: return await ProductActions.getAllLowQuantity(categoriesList);
+      case FILTER_TYPES.NEXT_TO_EXPIRY: return await ProductActions.getAllCloseToExpiry(categoriesList);
+      case FILTER_TYPES.ALL:
+      default: return await ProductActions.getAll(categoriesList);
+    }
+  }
+
   useEffect(() => {
     getCategories();
   }, []);
 
   useEffect(() => {
-    if(!categoriesRef.current) return;
+    if (!categoriesRef.current) return;
 
     getProducts();
   }, [categoriesRef.current]);
 
   useEffect(() => {
-    if(!productsRef.current) return;
+    if (!productsRef.current) return;
 
     getList();
   }, [productsRef.current]);
@@ -73,7 +75,7 @@ export default function ProductPage() {
 
   async function getProducts() {
     try {
-      const products = await get(categoriesRef.current);
+      const products = await get();
       setBaseProducts(products);
     } catch (error) {
       setBaseProducts([]);
