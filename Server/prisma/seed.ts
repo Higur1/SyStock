@@ -264,20 +264,26 @@ for (let i = 0; i < 60; i++) {
 
   // Verifica se o produto possui validade
   const hasExpiration = productsWithExpiration.includes(productId);
-  let daysUntilExpiration;
+  let daysUntilExpiration: number | null = null;  // Definir o tipo como `number | null`
 
   // Calcula `daysUntilExpiration` somente se o produto possui validade
   if (hasExpiration) {
     daysUntilExpiration = i % 20 - 10;
+
+    // Garante que `daysUntilExpiration` seja um valor positivo
+    if (daysUntilExpiration <= 0) {
+      daysUntilExpiration = Math.floor(Math.random() * 30) + 1; // Gera dias entre 1 e 30
+    }
   }
 
-  // Calcula a data de validade e o status de validação
-  const expirationDate =
-    hasExpiration && daysUntilExpiration !== null && daysUntilExpiration > 0
-      ? new Date(Date.now() + daysUntilExpiration * 24 * 60 * 60 * 1000).toISOString()
-      : null;
-
-  const eValidationStatus =
+  // Verifica se `daysUntilExpiration` não é nulo antes de usar
+  const expirationDate = hasExpiration && daysUntilExpiration !== null
+    ? new Date(Date.now() + daysUntilExpiration * 24 * 60 * 60 * 1000).toISOString()
+    : null;
+  let  eValidationStatus = 1
+  // Determina o status de validação
+  if(daysUntilExpiration != null){
+    eValidationStatus = 
     hasExpiration && expirationDate
       ? daysUntilExpiration > 7
         ? 1 // Dentro da validade
@@ -285,14 +291,15 @@ for (let i = 0; i < 60; i++) {
         ? 2 // Próximo do vencimento
         : 3 // Vencido
       : 1; // Produtos sem validade são sempre considerados dentro da validade
-
+  }
+  // Cria o lote no banco de dados
   await prisma.batch.create({
     data: {
       product_id: productId,
       quantity,
       deletionStatus: false,
       expirationDate,
-      eValidationStatus,
+      eValidationStatus: eValidationStatus,
     },
   });
 }
