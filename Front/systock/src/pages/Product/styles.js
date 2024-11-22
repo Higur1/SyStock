@@ -14,8 +14,8 @@ export const Container = styled.div`
 //  grid-template: 24px 60px 1px 1fr /1fr;
 export const ContainerProductsList = styled.div`
   display: grid;
-  grid-template: 1fr /1fr;
- 
+  grid-template: 48px /1fr;
+  padding-top: 16px;
   gap: 16px;
   width: 100%;
   height: 100%;

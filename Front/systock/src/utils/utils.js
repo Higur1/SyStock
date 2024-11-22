@@ -387,3 +387,42 @@ export function textFieldDateToDateObject(dateString = "11-14-2000") {
 
   return nextDate;
 }
+
+export function getSorting(parameter, order = 'asc') {
+  return (a, b) => {
+    let valueA = a[parameter];
+    let valueB = b[parameter];
+
+    // Handle undefined or null values
+    if (valueA == null && valueB == null) return 0;
+    if (valueA == null) return order === 'asc' ? -1 : 1;
+    if (valueB == null) return order === 'asc' ? 1 : -1;
+
+    if(parameter === "category") {
+      return order === 'asc' 
+        ? valueA.name.localeCompare(valueB.name) 
+        : valueB.name.localeCompare(valueA.name);
+    }
+    // Handle numbers, strings, and dates
+    if (typeof valueA === 'number' && typeof valueB === 'number') {
+      return order === 'asc' ? valueA - valueB : valueB - valueA;
+    }
+    if (typeof valueA === 'string' && typeof valueB === 'string') {
+      return order === 'asc' 
+        ? valueA.localeCompare(valueB) 
+        : valueB.localeCompare(valueA);
+    }
+    if (valueA instanceof Date && valueB instanceof Date) {
+      return order === 'asc' 
+        ? valueA - valueB 
+        : valueB - valueA;
+    }
+
+    // Fallback to comparing as strings
+    valueA = valueA.toString();
+    valueB = valueB.toString();
+    return order === 'asc' 
+      ? valueA.localeCompare(valueB) 
+      : valueB.localeCompare(valueA);
+  };
+}
